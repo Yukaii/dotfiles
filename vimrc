@@ -110,10 +110,15 @@ let g:ale_linters = {
 
 let g:nerdtree_sync_cursorline = 1
 
+" NerdTree config
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeShowHidden=1
 
+let ayucolor="light"
+
+let g:airline_theme='solarized'
+let g:airline#extensions#tabline#enabled = 1
 " ##################
 " # GENERAL CONFIG #
 " ##################
@@ -132,9 +137,6 @@ if has("termguicolors")     " set true colors
   set t_8b=\[[48;2;%lu;%lu;%lum
   set termguicolors
 endif
-
-let ayucolor="light"
-let g:airline_theme='solarized'
 
 colorscheme ayu
 
