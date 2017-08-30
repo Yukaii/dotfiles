@@ -30,6 +30,7 @@ Plug 'wakatime/vim-wakatime'
 Plug 'tpope/vim-endwise'
 Plug 'scrooloose/nerdcommenter' " Toggle comment
 Plug 'tpope/vim-sensible' " General config
+Plug 'moll/vim-bbye'
 
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
