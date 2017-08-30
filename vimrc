@@ -131,6 +131,7 @@ let g:session_autoload = 'yes'
 let g:session_autosave_periodic = 1
 let g:session_autosave_silent = 1
 let g:session_default_name = substitute(getcwd(), "\/", "_", "g")
+let g:session_default_overwrite = 1
 
 " ##################
 " # GENERAL CONFIG #
