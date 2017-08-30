@@ -34,6 +34,8 @@ Plug 'tpope/vim-sensible' " General config
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
 
+Plug 'junegunn/goyo.vim'
+
 " ####################
 " # LANGUAGE SUPPORT #
 " ####################
