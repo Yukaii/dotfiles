@@ -48,6 +48,7 @@ Plug 'gisphm/vim-gitignore'
 Plug 'nikvdp/ejs-syntax'
 Plug 'PProvost/vim-ps1'
 Plug 'tpope/vim-liquid'
+Plug 'leafgarland/typescript-vim'
 
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
@@ -95,6 +96,7 @@ set hidden
 let g:LanguageClient_serverCommands = {
     \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
     \ 'javascript': ['javascript-typescript-stdio'],
+    \ 'typescript': ['javascript-typescript-stdio']
     \ }
 
 " Automatically start language servers.
