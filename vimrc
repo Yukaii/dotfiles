@@ -31,6 +31,9 @@ Plug 'tpope/vim-endwise'
 Plug 'scrooloose/nerdcommenter' " Toggle comment
 Plug 'tpope/vim-sensible' " General config
 
+Plug 'xolox/vim-misc' " Session management
+Plug 'xolox/vim-session' " Session management
+
 " ####################
 " # LANGUAGE SUPPORT #
 " ####################
@@ -119,6 +122,13 @@ let ayucolor="light"
 
 let g:airline_theme='solarized'
 let g:airline#extensions#tabline#enabled = 1
+
+let g:session_autosave = 'yes'
+let g:session_autoload = 'yes'
+let g:session_autosave_periodic = 1
+let g:session_autosave_silent = 1
+let g:session_default_name = substitute(getcwd(), "\/", "_", "g")
+
 " ##################
 " # GENERAL CONFIG #
 " ##################
