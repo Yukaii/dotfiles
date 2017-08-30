@@ -71,6 +71,7 @@ Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'tweekmonster/fzf-filemru'
 
 " (Optional) Multi-entry selection UI.
 Plug 'Shougo/denite.nvim'
@@ -156,6 +157,7 @@ colorscheme ayu
 " # KEY MAPPING #
 " ###############
 
-map <C-S-p> :Commands<CR>
-map <M-p> :GFiles<CR>
+map <M-o> :Commands<CR>
+map <C-M-p> :ProjectMru --tiebreak=end<cr>
+map <C-p> :FilesMru --tiebreak=end<cr>
 map <F2> :NERDTreeToggle<CR>
