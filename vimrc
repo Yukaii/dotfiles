@@ -50,6 +50,7 @@ Plug 'PProvost/vim-ps1'
 Plug 'tpope/vim-liquid'
 Plug 'leafgarland/typescript-vim'
 Plug 'posva/vim-vue'
+Plug 'fatih/vim-go'
 
 Plug 'godlygeek/tabular' " vim-markdown dependency
 Plug 'plasticboy/vim-markdown'
