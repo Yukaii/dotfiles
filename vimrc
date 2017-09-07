@@ -50,7 +50,7 @@ Plug 'PProvost/vim-ps1'
 Plug 'tpope/vim-liquid'
 Plug 'leafgarland/typescript-vim'
 Plug 'posva/vim-vue'
-Plug 'fatih/vim-go'
+" Plug 'fatih/vim-go'
 
 Plug 'godlygeek/tabular' " vim-markdown dependency
 Plug 'plasticboy/vim-markdown'
@@ -98,7 +98,8 @@ set hidden
 let g:LanguageClient_serverCommands = {
     \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
     \ 'javascript': ['javascript-typescript-stdio'],
-    \ 'typescript': ['javascript-typescript-stdio']
+    \ 'typescript': ['javascript-typescript-stdio'],
+    \ 'go': ['go-langserver']
     \ }
 
 " Automatically start language servers.
