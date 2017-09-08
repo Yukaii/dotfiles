@@ -66,6 +66,8 @@ Plug 'ayu-theme/ayu-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
+Plug 'edkolev/tmuxline.vim'
+
 " #######################################
 " # LANGUAGE SERVER RECOMMENDED PLUGINS #
 " #######################################
@@ -128,10 +130,11 @@ let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeShowHidden=1
 
-let ayucolor="light"
+let ayucolor="mirage"
 
 let g:airline_theme='solarized'
 let g:airline#extensions#tabline#enabled = 1
+let g:airline_solarized_bg='dark'
 
 let g:session_autosave = 'yes'
 let g:session_autoload = 'yes'
