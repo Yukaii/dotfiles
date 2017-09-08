@@ -10,3 +10,11 @@ Install GNU stow, then recover using it:
 cd dotfiles
 stow vim neovim # ...
 ```
+
+## Available configs
+
+* neovim
+* vim
+* ruby
+* tmux
+
