@@ -99,7 +99,8 @@ let g:LanguageClient_serverCommands = {
     \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
     \ 'javascript': ['javascript-typescript-stdio'],
     \ 'typescript': ['javascript-typescript-stdio'],
-    \ 'go': ['go-langserver']
+    \ 'go': ['go-langserver'],
+    \ 'vue': ['vls']
     \ }
 
 " Automatically start language servers.
