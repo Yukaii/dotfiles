@@ -31,6 +31,7 @@ Plug 'tpope/vim-endwise'
 Plug 'scrooloose/nerdcommenter' " Toggle comment
 Plug 'tpope/vim-sensible' " General config
 Plug 'moll/vim-bbye'
+Plug 'mattn/emmet-vim'
 
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
@@ -50,7 +51,8 @@ Plug 'PProvost/vim-ps1'
 Plug 'tpope/vim-liquid'
 Plug 'leafgarland/typescript-vim'
 Plug 'posva/vim-vue'
-" Plug 'fatih/vim-go'
+Plug 'fatih/vim-go'
+Plug 'vim-ruby/vim-ruby'
 
 Plug 'godlygeek/tabular' " vim-markdown dependency
 Plug 'plasticboy/vim-markdown'
@@ -101,7 +103,6 @@ let g:LanguageClient_serverCommands = {
     \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
     \ 'javascript': ['javascript-typescript-stdio'],
     \ 'typescript': ['javascript-typescript-stdio'],
-    \ 'go': ['go-langserver'],
     \ 'vue': ['vls']
     \ }
 
@@ -168,7 +169,7 @@ colorscheme ayu
 " # KEY MAPPING #
 " ###############
 
-map <M-o> :Commands<CR>
-map <C-M-p> :ProjectMru --tiebreak=end<cr>
+map <C-t> :Commands<CR>
+map <C-x> :ProjectMru --tiebreak=end<cr>
 map <C-p> :FilesMru --tiebreak=end<cr>
 map <F2> :NERDTreeToggle<CR>
