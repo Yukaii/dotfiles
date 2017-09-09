@@ -144,6 +144,8 @@ let g:session_autosave_silent = 1
 let g:session_default_name = substitute(getcwd(), "\/", "_", "g")
 let g:session_default_overwrite = 1
 
+let g:magit_discard_untracked_do_delete=1
+
 " ##################
 " # GENERAL CONFIG #
 " ##################
