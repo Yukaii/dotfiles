@@ -17,4 +17,5 @@ stow vim neovim # ...
 * vim
 * ruby
 * tmux
+* termite
 
