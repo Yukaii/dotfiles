@@ -1,0 +1,44 @@
+root = true
+
+[*]
+charset = utf-8
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.java]
+indent_size = 8
+indent_style = 4
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[{*.rb,Gemfile}]
+indent_style = space
+indent_size = 2
+
+[{Makefile,*.mak}]
+indent_style = tab
+
+[*.yml]
+indent_style = space
+
+[package.json]
+indent_style = space
+indent_size = 2
+
+[{*.{csproj,vcxproj,vcxproj.user}}]
+indent_size = 2
+indent_style = space
+insert_final_newline = false
+end_of_line = crlf

@@ -18,4 +18,5 @@ stow vim neovim # ...
 * ruby
 * tmux
 * termite
+* editorconfig
 
