@@ -53,6 +53,7 @@ Plug 'leafgarland/typescript-vim'
 Plug 'posva/vim-vue'
 Plug 'fatih/vim-go'
 Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-dotenv'
 
 Plug 'godlygeek/tabular' " vim-markdown dependency
 Plug 'plasticboy/vim-markdown'
