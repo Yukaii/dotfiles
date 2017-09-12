@@ -157,6 +157,10 @@ set mouse=a
 set wrap
 set linebreak
 
+" persist undo history
+set undofile
+set undodir=~/.vim/undodir
+
 filetype plugin on
 
 if has("termguicolors")     " set true colors
