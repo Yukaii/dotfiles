@@ -20,7 +20,7 @@ Plug 'unkiwii/vim-nerdtree-sync'
 Plug 'w0rp/ale'
 
 Plug 'airblade/vim-gitgutter'
-" Plug 'easymotion/vim-easymotion'
+Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive' " Git Commands
 Plug 'jreybert/vimagit' " Magit
@@ -44,6 +44,7 @@ Plug 'junegunn/goyo.vim'
 " ####################
 
 " Syntax
+Plug 'sheerun/vim-polyglot'
 Plug 'dag/vim-fish'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'gisphm/vim-gitignore'
