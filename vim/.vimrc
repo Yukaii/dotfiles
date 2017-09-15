@@ -231,5 +231,6 @@ colorscheme seoul256
 
 map <C-t> :Commands<CR>
 map <C-x> :ProjectMru --tiebreak=end<cr>
+map <C-s> :Buffers<cr>
 map <C-p> :FilesMru --tiebreak=end<cr>
 map <F2> :NERDTreeToggle<CR>
