@@ -65,6 +65,8 @@ Plug 'plasticboy/vim-markdown'
 
 " Colorschemes
 Plug 'ayu-theme/ayu-vim'
+Plug 'junegunn/seoul256.vim'
+Plug 'w0ng/vim-hybrid'
 
 " Customization
 " Plug 'vim-airline/vim-airline'
@@ -147,6 +149,9 @@ let g:NERDTrimTrailingWhitespace = 1
 
 let ayucolor="mirage"
 
+let g:seoul256_background = 233
+let g:seoul256_light_background = 256
+
 let g:airline_theme='solarized'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_solarized_bg='dark'
@@ -217,7 +222,7 @@ if has("termguicolors")     " set true colors
   set termguicolors
 endif
 
-colorscheme ayu
+colorscheme seoul256
 
 " ###############
 " # KEY MAPPING #
