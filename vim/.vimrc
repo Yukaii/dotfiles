@@ -169,22 +169,22 @@ let g:lightline = {
 \ }
 
 function! LightLineFilename()
-	let name = ""
-	let subs = split(expand('%:~'), "/")
-	let i = 1
-	for s in subs
-		let parent = name
-		if  i == len(subs) " last sub
-			let name = parent . '/' . s
-		elseif i == 1
-			let name = s
+  let name = ""
+  let subs = split(expand('%:~'), "/")
+  let i = 1
+  for s in subs
+    let parent = name
+    if  i == len(subs) " last sub
+      let name = parent . '/' . s
+    elseif i == 1
+      let name = s
     elseif s[0] == '.'
-			let name = parent . '/' . s[0:1]
+      let name = parent . '/' . s[0:1]
     else
-			let name = parent . '/' . s[0]
-		endif
-		let i += 1
-	endfor
+      let name = parent . '/' . s[0]
+    endif
+    let i += 1
+  endfor
   return name
 endfunction
 
