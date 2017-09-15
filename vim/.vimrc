@@ -67,8 +67,9 @@ Plug 'plasticboy/vim-markdown'
 Plug 'ayu-theme/ayu-vim'
 
 " Customization
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
+Plug 'itchyny/lightline.vim'
 
 Plug 'edkolev/tmuxline.vim'
 
@@ -150,6 +151,39 @@ let g:airline_theme='solarized'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_solarized_bg='dark'
 
+let g:lightline = {
+  \ 'colorscheme': 'seoul256',
+  \ 'active': {
+  \   'left': [ [ 'mode', 'paste' ],
+  \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
+  \ },
+  \ 'component_function': {
+  \   'gitbranch': 'fugitive#head',
+  \ },
+\ }
+
+function! LightLineFilename()
+	let name = ""
+	let subs = split(expand('%:~'), "/")
+	let i = 1
+	for s in subs
+		let parent = name
+		if  i == len(subs) " last sub
+			let name = parent . '/' . s
+		elseif i == 1
+			let name = s
+    elseif s[0] == '.'
+			let name = parent . '/' . s[0:1]
+    else
+			let name = parent . '/' . s[0]
+		endif
+		let i += 1
+	endfor
+  return name
+endfunction
+
+let g:tmuxline_powerline_separators = 0
+
 let g:session_autosave = 'yes'
 let g:session_autoload = 'yes'
 let g:session_autosave_periodic = 1
@@ -169,6 +203,7 @@ set cursorline
 set mouse=a
 set wrap
 set linebreak
+set noshowmode
 
 " persist undo history
 set undofile
