@@ -55,6 +55,7 @@ Plug 'leafgarland/typescript-vim'
 Plug 'posva/vim-vue'
 Plug 'fatih/vim-go'
 Plug 'vim-ruby/vim-ruby'
+Plug 'joker1007/vim-ruby-heredoc-syntax'
 Plug 'tpope/vim-dotenv'
 
 Plug 'godlygeek/tabular' " vim-markdown dependency
