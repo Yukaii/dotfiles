@@ -219,8 +219,6 @@ set undodir=~/.vim/undodir
 filetype plugin on
 
 if has("termguicolors")     " set true colors
-  set t_8f=\[[38;2;%lu;%lu;%lum
-  set t_8b=\[[48;2;%lu;%lu;%lum
   set termguicolors
 endif
 
