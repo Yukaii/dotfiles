@@ -13,6 +13,7 @@ stow vim neovim # ...
 
 ## Available configs
 
+* bin
 * neovim
 * vim
 * ruby
