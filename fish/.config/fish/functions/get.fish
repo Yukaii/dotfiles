@@ -1,0 +1,1 @@
+/Users/yukai/.config/fisherman/get/functions/get.fish

@@ -1,0 +1,1 @@
+/Users/yukai/.config/fisherman/await/functions/await.fish
