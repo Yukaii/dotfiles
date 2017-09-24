@@ -1,0 +1,1 @@
+/Users/yukai/.config/fisherman/bass/functions/bass.fish

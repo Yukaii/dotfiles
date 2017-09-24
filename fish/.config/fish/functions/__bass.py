@@ -1,0 +1,1 @@
+/Users/yukai/.config/fisherman/bass/functions/__bass.py

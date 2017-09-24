@@ -1,0 +1,195 @@
+# migrating from https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh
+
+set PATH $PATH "$HOME/.bin"
+
+# Aliases
+alias pg8='ping 8.8.8.8'
+alias vim='nvim'
+
+function passgrep
+  pass find $argv | env GREP_COLOR='1;34' egrep --color -i "$argv|\$"
+end
+
+alias g='git'
+#compdef g=git
+alias gst='git status'
+#compdef _git gst=git-status
+alias gd='git diff'
+#compdef _git gd=git-diff
+alias gdc='git diff --cached'
+#compdef _git gdc=git-diff
+alias gpu='git pull'
+#compdef _git gl=git-pull
+alias gup='git pull --rebase'
+#compdef _git gup=git-fetch
+alias gp='git push'
+#compdef _git gp=git-push
+alias gd='git diff'
+
+alias gaa="git add --all"
+
+function gdv
+  git diff -w $argv | view -
+end
+
+#compdef _git gdv=git-diff
+alias gc='git commit -v'
+#compdef _git gcln=git-clone
+alias gcln='git clone'
+#compdef _git gc=git-commit
+alias gc!='git commit -v --amend'
+#compdef _git gc!=git-commit
+alias gca='git commit -v -a'
+#compdef _git gc=git-commit
+alias gca!='git commit -v -a --amend'
+#compdef _git gca!=git-commit
+alias gcmsg='git commit -m'
+#compdef _git gcmsg=git-commit
+alias gco='git checkout'
+#compdef _git gco=git-checkout
+alias gcm='git checkout master'
+alias gr='git remote'
+#compdef _git gr=git-remote
+alias grv='git remote -v'
+#compdef _git grv=git-remote
+alias grmv='git remote rename'
+#compdef _git grmv=git-remote
+alias grrm='git remote remove'
+#compdef _git grrm=git-remote
+alias grset='git remote set-url'
+#compdef _git grset=git-remote
+alias grup='git remote update'
+#compdef _git grset=git-remote
+alias grbi='git rebase -i'
+#compdef _git grbi=git-rebase
+alias grbc='git rebase --continue'
+#compdef _git grbc=git-rebase
+alias grba='git rebase --abort'
+#compdef _git grba=git-rebase
+alias gb='git branch'
+#compdef _git gb=git-branch
+alias gba='git branch -a'
+#compdef _git gba=git-branch
+alias gbr='git branch -r'
+#compdef _git gbr=git-branch-remote
+alias gcount='git shortlog -sn'
+#compdef gcount=git
+alias gcl='git config --list'
+alias gcp='git cherry-pick'
+#compdef _git gcp=git-cherry-pick
+alias glg='git log --stat --max-count=10'
+#compdef _git glg=git-log
+alias glgg='git log --graph --max-count=10'
+#compdef _git glgg=git-log
+alias glgga='git log --graph --decorate --all'
+#compdef _git glgga=git-log
+alias gl="git-foresta --all --style=10 | less -RSX"
+alias gll='git log --oneline --pretty="format:%C(yellow)%h %Cblue%>(12)%ad %Cgreen%<(7)%aN%Cred%d %Creset%s" --date=relative --graph --branches --remotes --tags --decorate'
+alias gl2="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
+#compdef _git glo=git-log
+alias gss='git status -s'
+#compdef _git gss=git-status
+alias ga='git add'
+#compdef _git ga=git-add
+alias gm='git merge'
+#compdef _git gm=git-merge
+alias grh='git reset HEAD'
+alias grhh='git reset HEAD --hard'
+alias gclean='git reset --hard; and git clean -dfx'
+alias gwc='git whatchanged -p --abbrev-commit --pretty=medium'
+
+alias grpr-dry='git remote prune origin --dry-run'
+alias grpr='git remote prune origin'
+#compdef _git grpr=git-remote-prune-origin
+alias gs="git show $1 --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --color"
+#compdef _git gs=git-show
+alias gsl="git show $1 --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --color | less -RSX"
+#compdef _git gsl=git-show-less
+
+alias gf='git fetch'
+#compdef _git gf=git-fetch
+
+alias gfgrep='git ls-files | grep'
+
+alias gpoat='git push origin --all; and git push origin --tags'
+alias gmt='git mergetool --no-prompt'
+#compdef _git gm=git-mergetool
+
+alias gg='git grep -n '
+#alias gg='git gui citool'
+#alias gga='git gui citool --amend'
+alias gk='gitk --all --branches'
+
+alias gsts='git stash show --text'
+alias gsta='git stash'
+alias gstp='git stash pop'
+alias gstd='git stash drop'
+
+# Will cd into the top of the current repository
+# or submodule.
+alias grt='cd (git rev-parse --show-toplevel or echo ".")'
+
+# Git and svn mix
+alias git-svn-dcommit-push='git svn dcommit; and git push github master:svntrunk'
+#compdef git-svn-dcommit-push=git
+
+alias gsr='git svn rebase'
+alias gsd='git svn dcommit'
+#
+# Will return the current branch name
+# Usage example: git pull origin $(current_branch)
+#
+function current_branch
+  set ref (git symbolic-ref HEAD 2> /dev/null); or \
+  set ref (git rev-parse --short HEAD 2> /dev/null); or return
+  echo ref | sed s-refs/heads--
+end
+
+function current_repository
+  set ref (git symbolic-ref HEAD 2> /dev/null); or \
+  set ref (git rev-parse --short HEAD 2> /dev/null); or return
+  echo (git remote -v | cut -d':' -f 2)
+end
+
+# these aliases take advantage of the previous function
+alias ggpull='git pull origin (current_branch)'
+#compdef ggpull=git
+alias ggpur='git pull --rebase origin (current_branch)'
+#compdef ggpur=git
+alias ggpush='git push origin (current_branch)'
+#compdef ggpush=git
+alias ggpnp='git pull origin (current_branch); and git push origin (current_branch)'
+#compdef ggpnp=git
+
+# these alias commit and uncomit wip branches
+alias gwip='git add -A; git ls-files --deleted -z | xargs -0 git rm; git commit -m "wip"'
+alias gunwip='git log -n 1 | grep -q -c wip; and git reset HEAD~1'
+
+alias ptt="ssh bbsu@ptt.cc"
+
+# rails alias
+alias ttr="touch tmp/restart.txt"
+alias rlog="tail -f log/development.log"
+alias resetdb="bin/rake db:drop; bin/rake db:create; bin/rake db:migrate"
+
+alias scheme="rlwrap /usr/local/bin/scheme"
+
+# less syntax highlight
+export LESSOPEN="| /usr/local/bin/src-hilite-lesspipe.sh %s"
+export LESS='-R'
+
+export EDITOR=nvim
+alias l='ls -alh'
+
+alias em="emacs -nw"
+
+function tre
+  tree -C $argv | less -r
+end
+
+# bobthefish theme options
+set -g theme_display_ruby yes
+set -g theme_avoid_ambiguous_glyphs yes
+set -g theme_powerline_fonts no
+set -g theme_display_cmd_duration yes
+set -g theme_title_display_process yes

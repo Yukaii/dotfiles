@@ -1,0 +1,1 @@
+/Users/yukai/.config/fisherman/rbenv/functions/rbenv.fish
