@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/brew/init.fish
+/home/yukai/.config/fisherman/brew/init.fish

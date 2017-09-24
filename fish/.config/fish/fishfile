@@ -14,9 +14,9 @@ fisherman/humanize_duration
 fisherman/imgcat
 fisherman/last_job_id
 fisherman/nvm
-oh-my-fish/plugin-osx
 fisherman/pyenv
 fisherman/rbenv
+fisherman/rvm
 oh-my-fish/plugin-tmux
 Cyber-Duck/fish-wakatime
 fisherman/z

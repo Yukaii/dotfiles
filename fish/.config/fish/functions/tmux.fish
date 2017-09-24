@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/tmux/functions/tmux.fish
+/home/yukai/.config/fisherman/tmux/functions/tmux.fish

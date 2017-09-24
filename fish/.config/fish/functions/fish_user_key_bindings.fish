@@ -1,4 +1,3 @@
-
 function fish_user_key_bindings
     ### fzf ###
     set -q FZF_LEGACY_KEYBINDINGS
@@ -32,3 +31,5 @@ function fish_user_key_bindings
     end
     ### fzf ###
 end
+
+fzf_key_bindings

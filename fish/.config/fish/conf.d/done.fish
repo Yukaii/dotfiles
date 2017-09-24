@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/done/conf.d/done.fish
+/home/yukai/.config/fisherman/done/conf.d/done.fish

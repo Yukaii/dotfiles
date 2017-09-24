@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/bundler/bundler.fish
+/home/yukai/.config/fisherman/bundler/bundler.fish

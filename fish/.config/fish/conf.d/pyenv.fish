@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/pyenv/conf.d/pyenv.fish
+/home/yukai/.config/fisherman/pyenv/conf.d/pyenv.fish

@@ -1,1 +1,1 @@
-/Users/yukai/.fzf/shell/key-bindings.fish
+/home/yukai/.fzf/shell/key-bindings.fish

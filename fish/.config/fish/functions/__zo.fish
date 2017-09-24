@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/z/functions/__zo.fish
+/home/yukai/.config/fisherman/z/functions/__zo.fish

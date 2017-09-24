@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/docker-fish-completion/docker-compose.fish
+/home/yukai/.config/fisherman/docker-fish-completion/docker-compose.fish

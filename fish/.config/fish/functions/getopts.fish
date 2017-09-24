@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/getopts/getopts.fish
+/home/yukai/.config/fisherman/getopts/getopts.fish

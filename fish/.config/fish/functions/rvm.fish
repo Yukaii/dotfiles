@@ -1,0 +1,1 @@
+/home/yukai/.config/fisherman/rvm/functions/rvm.fish

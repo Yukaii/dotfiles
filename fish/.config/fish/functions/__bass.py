@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/bass/functions/__bass.py
+/home/yukai/.config/fisherman/bass/functions/__bass.py

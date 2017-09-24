@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/fzf/functions/__fzfcmd.fish
+/home/yukai/.config/fisherman/fzf/functions/__fzfcmd.fish

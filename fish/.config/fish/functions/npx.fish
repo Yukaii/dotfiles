@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/nvm/npx.fish
+/home/yukai/.config/fisherman/nvm/npx.fish

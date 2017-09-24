@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/bass/functions/bass.fish
+/home/yukai/.config/fisherman/bass/functions/bass.fish

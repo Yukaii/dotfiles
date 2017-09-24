@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/rbenv/conf.d/rbenv.fish
+/home/yukai/.config/fisherman/rbenv/conf.d/rbenv.fish

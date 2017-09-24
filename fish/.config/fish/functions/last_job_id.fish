@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/last_job_id/last_job_id.fish
+/home/yukai/.config/fisherman/last_job_id/last_job_id.fish

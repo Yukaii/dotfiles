@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/humanize_duration/humanize_duration.fish
+/home/yukai/.config/fisherman/humanize_duration/humanize_duration.fish

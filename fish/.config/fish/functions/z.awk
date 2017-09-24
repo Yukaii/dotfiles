@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/z/functions/z.awk
+/home/yukai/.config/fisherman/z/functions/z.awk

@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/imgcat/imgcat.fish
+/home/yukai/.config/fisherman/imgcat/imgcat.fish
