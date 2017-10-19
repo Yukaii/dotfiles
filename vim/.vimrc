@@ -21,6 +21,7 @@ Plug 'w0rp/ale'
 
 Plug 'airblade/vim-gitgutter'
 Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive' " Git Commands
 Plug 'jreybert/vimagit' " Magit
