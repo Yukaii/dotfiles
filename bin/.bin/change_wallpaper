@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+cd $HOME/Pictures
+
+PHOTO="$HOME/Pictures/$(unsplash-wallpaper --random | grep -o "wallpaper\-.*.jpg")"
+
+feh --bg-fill $PHOTO
