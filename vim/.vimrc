@@ -33,6 +33,7 @@ Plug 'tpope/vim-sensible' " General config
 Plug 'moll/vim-bbye'
 Plug 'mattn/emmet-vim'
 Plug 'terryma/vim-multiple-cursors'
+Plug 's3rvac/AutoFenc'
 
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
