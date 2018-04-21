@@ -84,19 +84,19 @@ Plug 'edkolev/tmuxline.vim'
 " # LANGUAGE SERVER RECOMMENDED PLUGINS #
 " #######################################
 
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-" (Optional) Multi-entry selection UI.
+
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+
+" (Completion plugin option 2)
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tweekmonster/fzf-filemru'
 
-" (Optional) Multi-entry selection UI.
-Plug 'Shougo/denite.nvim'
-" (Optional) Completion integration with deoplete.
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" (Optional) Completion integration with nvim-completion-manager.
-Plug 'roxma/nvim-completion-manager'
 " (Optional) Showing function signature and inline doc.
 Plug 'Shougo/echodoc.vim'
 
