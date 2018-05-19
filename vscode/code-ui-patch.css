@@ -1,0 +1,7 @@
+.title-actions > .monaco-toolbar > .monaco-action-bar > .actions-container > .action-item > .action-label.icon.explorer-action {
+  display: none !important;
+}
+
+.editor-actions > .monaco-toolbar > .monaco-action-bar {
+  display: none !important;
+}
