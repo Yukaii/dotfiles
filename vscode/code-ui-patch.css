@@ -2,6 +2,6 @@
   display: none !important;
 }
 
-.editor-actions > .monaco-toolbar > .monaco-action-bar {
+.editor-actions > .monaco-toolbar > .monaco-action-bar, .title-actions > .monaco-toolbar > .monaco-action-bar {
   display: none !important;
 }
