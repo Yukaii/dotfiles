@@ -4,7 +4,14 @@ This is [Yukai](https://github.com/Yukaii)'s dotfiles.
 
 ## Usage
 
-Install GNU stow, then recover using it:
+Install [Homebrew](https://brew.sh/) first, then run `brew bundle` command to install all homebrew dependencies:
+
+```bash
+cd homebrew
+brew bundle
+```
+
+And recover everything with [GNU stow](https://www.gnu.org/software/stow/):
 
 ```bash
 cd dotfiles
@@ -20,4 +27,3 @@ stow vim neovim # ...
 * tmux
 * termite
 * editorconfig
-
