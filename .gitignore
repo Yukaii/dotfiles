@@ -4,7 +4,10 @@ neovim/.config/nvim/spell
 vim/.vim/.netrwhist
 vim/.vim/bundle
 vim/.vim/spell/*.spl
+vim/.vim/sessions
+vim/.vim/undodir
 
 fish/.config/fish/fish_history
+fish/.config/configstore
 fish/.config/fish/fishd.*
 
