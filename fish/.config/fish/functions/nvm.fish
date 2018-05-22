@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/nvm/nvm.fish
+/Users/yukai/.config/fisherman/nvm/functions/nvm.fish
