@@ -1,6 +1,8 @@
 app_options:
   Slack:
     ascii_mode: true
+  co.zeit.hyper:
+    ascii_mode: true
   com.alfredapp.Alfred:
     ascii_mode: true
   com.apple.Spotlight:
@@ -30,6 +32,8 @@ app_options:
     ascii_mode: true
   "com.runningwithcrayons.Alfred-2":
     ascii_mode: true
+  "com.runningwithcrayons.Alfred-3":
+    ascii_mode: true
   com.sublimetext.3:
     ascii_mode: true
   org.gnu.Emacs:
@@ -40,8 +44,8 @@ app_options:
     ascii_mode: true
     no_inline: true
 chord_duration: 0.1
-config_version: 0.22.custom.4109319597
-customization: 4109319597
+config_version: 0.22.custom.1682895029
+customization: 1682895029
 preset_color_schemes:
   aqua:
     author: "佛振 <chen.sst@gmail.com>"
