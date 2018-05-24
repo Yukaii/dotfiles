@@ -1,0 +1,98 @@
+# default.custom.yaml
+# save it to:
+#   ~/.config/ibus/rime  (linux)
+#   ~/Library/Rime       (macos)
+#   %APPDATA%\Rime       (windows)
+
+patch:
+  schema_list:
+    # - schema: luna_pinyin          # 朙月拼音
+    # - schema: luna_pinyin_simp     # 朙月拼音 简化字模式
+    # - schema: luna_pinyin_tw       # 朙月拼音 臺灣正體模式
+    # - schema: terra_pinyin         # 地球拼音 dì qiú pīn yīn
+    # - schema: bopomofo             # 注音
+    - schema: bopomofo_tw            # 注音 臺灣正體模式
+    # - schema: jyutping             # 粵拼
+    # - schema: cangjie5             # 倉頡五代
+    # - schema: cangjie5_express     # 倉頡 快打模式
+    # - schema: quick5               # 速成
+    # - schema: wubi86               # 五笔86
+    # - schema: wubi_pinyin          # 五笔拼音混合輸入
+    # - schema: double_pinyin        # 自然碼雙拼
+    # - schema: double_pinyin_mspy   # 微軟雙拼
+    # - schema: double_pinyin_abc    # 智能ABC雙拼
+    # - schema: double_pinyin_flypy  # 小鶴雙拼
+    # - schema: wugniu        # 吳語上海話（新派）
+    # - schema: wugniu_lopha  # 吳語上海話（老派）
+    # - schema: sampheng      # 中古漢語三拼
+    # - schema: zyenpheng     # 中古漢語全拼
+    # - schema: ipa_xsampa    # X-SAMPA 國際音標
+    - schema: emoji         # emoji表情
+
+  "menu/page_size": 10
+
+  key_binder:
+    bindings:
+      - {accept: "Control+p", send: Up, when: composing}
+      - {accept: "Control+n", send: Down, when: composing}
+      - {accept: "Control+b", send: Left, when: composing}
+      - {accept: "Control+f", send: Right, when: composing}
+      - {accept: "Control+a", send: Home, when: composing}
+      - {accept: "Control+e", send: End, when: composing}
+      - {accept: "Control+d", send: Delete, when: composing}
+      - {accept: "Control+k", send: "Shift+Delete", when: composing}
+      - {accept: "Control+h", send: BackSpace, when: composing}
+      - {accept: "Control+g", send: Escape, when: composing}
+      - {accept: "Control+bracketleft", send: Escape, when: composing}
+      - {accept: "Alt+v", send: Page_Up, when: composing}
+      - {accept: "Control+v", send: Page_Down, when: composing}
+      - {accept: ISO_Left_Tab, send: Page_Up, when: composing}
+      - {accept: "Shift+Tab", send: Page_Up, when: composing}
+      - {accept: Tab, send: Page_Down, when: composing}
+      - {accept: minus, send: Page_Up, when: has_menu}
+      - {accept: equal, send: Page_Down, when: has_menu}
+      - {accept: comma, send: Page_Up, when: paging}
+      - {accept: period, send: Page_Down, when: has_menu}
+      - {accept: "Control+Shift+1", select: .next, when: always}
+      - {accept: "Control+Shift+2", toggle: ascii_mode, when: always}
+      - {accept: "Control+Shift+3", toggle: full_shape, when: always}
+      - {accept: "Control+Shift+4", toggle: simplification, when: always}
+      - {accept: "Control+Shift+5", toggle: extended_charset, when: always}
+      - {accept: "Control+Shift+exclam", select: .next, when: always}
+      - {accept: "Control+Shift+at", toggle: ascii_mode, when: always}
+      - {accept: "Control+Shift+numbersign", toggle: full_shape, when: always}
+      - {accept: "Control+Shift+dollar", toggle: simplification, when: always}
+      - {accept: "Control+Shift+percent", toggle: extended_charset, when: always}
+      - {accept: "Shift+space", toggle: full_shape, when: always}
+      - { when: paging, accept: bracketleft, send: Page_Up }
+      - { when: has_menu, accept: bracketright, send: Page_Down }
+
+  "switcher/hotkeys":
+    - "Alt+Shift+grave"
+    # - "Control+grave"
+
+# 中西文切換鍵的默認設置寫在 default.yaml 裏面
+# 以下的 default.custom.yaml 在全局範圍重定義該組快速鍵
+#
+# 可用的按鍵有 Caps_Lock, Shift_L, Shift_R, Control_L, control_R
+# Mac 系統上的鼠鬚管不能區分左、右，因此只有對 Shift_L, Control_L 的設定起作用
+#
+# 已輸入編碼時按切換鍵，可以進一步設定輸入法中西文切換的形式。
+# 可選的臨時切換策略有三：
+# inline_ascii 在輸入法的臨時西文編輯區內輸入字母、數字、符號、空格等，回車上屏後自動復位到中文
+# commit_text 已輸入的候選文字上屏並切換至西文輸入模式
+# commit_code 已輸入的編碼字符上屏並切換至西文輸入模式
+# 設爲 noop，屏蔽該切換鍵
+#
+# 如果要把 Caps Lock 設爲只改變字母的大小寫而不做中西文切換，可將 Caps_Lock 對應的切換方式設爲 noop
+# 如果要以 Caps Lock 切換到西文模式，默認輸出小寫字母，請置 ascii_composer/good_old_caps_lock: false
+# 如果要以 Caps Lock 切換到西文模式，默認輸出大寫字母，請使用以下設置：
+  ascii_composer:
+    # good_old_caps_lock: false
+    switch_key:
+      Caps_Lock: noop
+      Control_L: noop
+      Control_R: noop
+      Eisu_toggle: clear
+      Shift_L: clear
+      Shift_R: inline_ascii

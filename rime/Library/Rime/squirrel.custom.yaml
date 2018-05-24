@@ -1,0 +1,19 @@
+patch:
+  "style/color_scheme": "google"
+  "style/font_face": "Hiragino Sans GB W3"
+  # color_scheme: native
+  "style/corner_radius": 3
+  "app_options/com.sublimetext.3/ascii_mode": true
+  "app_options/com.google.Chrome/ascii_mode": true
+  "app_options/org.net9.Welly/ascii_mode": true
+  "app_options/Slack/ascii_mode": true
+  "app_options/com.microsoft.VSCode/ascii_mode": true
+  "app_options/com.microsoft.VSCodeInsiders/ascii_mode": true
+  "app_options/com.apple.finder/ascii_mode": true
+  "app_options/com.github.atom/ascii_mode": true
+  "app_options/com.apple.safari/ascii_mode": true
+  "app_options/com.apple.Spotlight/ascii_mode": true
+  "app_options/com.contextsformac.Contexts/ascii_mode": true
+  "app_options/org.gnu.Emacs/ascii_mode": true
+  "app_options/com.apple.dt.Xcode/ascii_mode": true
+
