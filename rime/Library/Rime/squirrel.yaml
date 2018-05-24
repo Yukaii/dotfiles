@@ -30,6 +30,8 @@ app_options:
     ascii_mode: true
   com.microsoft.VSCodeInsiders:
     ascii_mode: true
+  com.operasoftware.Opera:
+    ascii_mode: true
   "com.runningwithcrayons.Alfred-2":
     ascii_mode: true
   "com.runningwithcrayons.Alfred-3":
@@ -44,8 +46,8 @@ app_options:
     ascii_mode: true
     no_inline: true
 chord_duration: 0.1
-config_version: 0.22.custom.1682895029
-customization: 1682895029
+config_version: 0.22.custom.819180815
+customization: 819180815
 preset_color_schemes:
   aqua:
     author: "佛振 <chen.sst@gmail.com>"
