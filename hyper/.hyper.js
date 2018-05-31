@@ -6,13 +6,13 @@ module.exports = {
   config: {
     // choose either `'stable'` for receiving highly polished,
     // or `'canary'` for less polished but more frequent updates
-    updateChannel: 'stable',
+    updateChannel: 'canary',
 
     // default font size in pixels for all tabs
-    fontSize: 18,
+    fontSize: 17,
 
     // font family with optional fallbacks
-    fontFamily: 'mononoki',
+    fontFamily: 'Sarasa Mono TC',
 
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',
@@ -124,8 +124,8 @@ module.exports = {
 
     // for advanced config flags please refer to https://hyper.is/#cfg
     verminal: {
-      fontFamily: 'Hack-Regular',
-      fontSize: 16
+      fontFamily: 'mononoki',
+      fontSize: 18
     },
   },
 
@@ -136,7 +136,12 @@ module.exports = {
   //   `hyperpower`
   //   `@company/project`
   //   `project#1.0.1`
-  plugins: ["verminal", "hyper-search", "hyper-tabs-enhanced", "hyper-statusline"],
+  plugins: [
+    "hyper-search",
+    "hyper-tabs-enhanced",
+    "hyper-statusline",
+    "hyper-night-owl"
+  ],
 
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
