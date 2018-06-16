@@ -13,6 +13,8 @@ module.exports = {
 
     // font family with optional fallbacks
     fontFamily: 'Sarasa Mono TC',
+    
+    letterSpacing: 1,
 
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',
