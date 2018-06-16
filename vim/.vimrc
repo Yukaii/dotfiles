@@ -38,6 +38,8 @@ Plug 's3rvac/AutoFenc'
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
 
+Plug 'farmergreg/vim-lastplace'
+
 Plug 'junegunn/goyo.vim'
 
 " ####################
