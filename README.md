@@ -14,6 +14,7 @@ brew bundle
 And recover everything with [GNU stow](https://www.gnu.org/software/stow/):
 
 ```bash
+git clone https://github.com/Yukaii/dotfiles --recursive
 cd dotfiles
 stow vim neovim # ...
 ```
