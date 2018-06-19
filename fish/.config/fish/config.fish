@@ -2,6 +2,8 @@
 
 set PATH $PATH "$HOME/.bin"
 
+export LANG="en_US.UTF-8"
+
 # Aliases
 alias pg8='ping 8.8.8.8'
 alias vim='nvim'
