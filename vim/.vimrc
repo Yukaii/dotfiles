@@ -221,6 +221,9 @@ set noshowmode
 set undofile
 set undodir=~/.vim/undodir
 
+" set to system keyboard
+set clipboard+=unnamedplus
+
 filetype plugin on
 
 if has("termguicolors")     " set true colors
