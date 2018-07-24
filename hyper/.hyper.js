@@ -9,12 +9,14 @@ module.exports = {
     updateChannel: 'canary',
 
     // default font size in pixels for all tabs
-    fontSize: 17,
+    fontSize: 15,
 
     // font family with optional fallbacks
-    fontFamily: 'Sarasa Mono TC',
+    fontFamily: 'Monaco',
     
     letterSpacing: 1,
+    
+    lineHeight: 1.2,
 
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',

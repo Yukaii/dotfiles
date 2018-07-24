@@ -2,7 +2,7 @@
 
 set PATH $PATH "$HOME/.bin"
 
-export LANG="en_US.UTF-8"
+set LANG "en_US.UTF-8"
 
 # Aliases
 alias pg8='ping 8.8.8.8'
@@ -177,10 +177,10 @@ alias resetdb="bin/rake db:drop; bin/rake db:create; bin/rake db:migrate"
 alias scheme="rlwrap /usr/local/bin/scheme"
 
 # less syntax highlight
-export LESSOPEN="| /usr/local/bin/src-hilite-lesspipe.sh %s"
-export LESS='-R'
+set LESSOPEN "| /usr/local/bin/src-hilite-lesspipe.sh %s"
+set LESS '-R'
 
-export EDITOR=nvim
+set EDITOR "nvim"
 alias l='ls -alh'
 
 alias em="emacs -nw"
