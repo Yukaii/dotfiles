@@ -42,6 +42,9 @@ Plug 'farmergreg/vim-lastplace'
 
 Plug 'junegunn/goyo.vim'
 
+Plug 'google/vim-searchindex'
+Plug 't9md/vim-choosewin'
+
 " ####################
 " # LANGUAGE SUPPORT #
 " ####################
@@ -204,6 +207,11 @@ let g:session_default_name = substitute(getcwd(), "\/", "_", "g")
 let g:session_default_overwrite = 1
 
 let g:magit_discard_untracked_do_delete=1
+
+" vim-choosewin config
+" invoke with '-'
+nmap  -  <Plug>(choosewin)
+let g:choosewin_overlay_enable = 1
 
 " ##################
 " # GENERAL CONFIG #
