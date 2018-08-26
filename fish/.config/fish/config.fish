@@ -5,8 +5,12 @@ set PATH $PATH "$HOME/.bin"
 set LANG "en_US.UTF-8"
 
 # Aliases
+alias ping='prettyping --nolegend'
 alias pg8='ping 8.8.8.8'
 alias vim='nvim'
+alias cat='bat'
+alias preview="fzf --preview 'bat --color \"always\" {}'"
+alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 
 function passgrep
   pass find $argv | env GREP_COLOR='1;34' egrep --color -i "$argv|\$"
