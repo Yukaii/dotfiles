@@ -112,6 +112,11 @@ alias gs="git show $1 --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C
 alias gsl="git show $1 --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --color | less -RSX"
 #compdef _git gsl=git-show-less
 
+alias gbc-dry='git branch --merged | egrep -v "(^\*|master|dev)"'
+#compdef _git gbrc-dry='git-branch-cleanup-dryrun'
+alias gbc='gbc-dry | xargs git branch -d'
+#compdef _git gbrc='git-branch-cleanup'
+
 alias gf='git fetch'
 #compdef _git gf=git-fetch
 
