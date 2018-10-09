@@ -1,1 +1,7 @@
-/Users/yukai/.config/fisherman/bundler/__execute_as_bundler.fish
+function __execute_as_bundler
+  if __is_a_bundled_executable $argv[1]
+    command bundle exec $argv
+  else
+    eval command $argv
+  end
+end

@@ -1,1 +1,3 @@
-/Users/yukai/.config/fisherman/osx/functions/pushdf.fish
+function pushdf -d "pushd to the current Finder directory"
+  pushd (pfd)
+end

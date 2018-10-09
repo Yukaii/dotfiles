@@ -1,1 +1,3 @@
-/Users/yukai/.config/fisherman/osx/functions/unset.fish
+function unset
+  set --erase $argv
+end

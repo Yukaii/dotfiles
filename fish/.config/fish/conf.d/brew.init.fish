@@ -1,1 +1,0 @@
-/Users/yukai/.config/fisherman/brew/init.fish

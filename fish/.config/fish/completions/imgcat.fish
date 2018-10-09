@@ -1,1 +1,1 @@
-/Users/yukai/.config/fisherman/imgcat/completions/imgcat.fish
+complete -c imgcat -s h -l help -d "Show usage help"
