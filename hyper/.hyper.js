@@ -9,15 +9,11 @@ module.exports = {
     updateChannel: 'canary',
 
     // default font size in pixels for all tabs
-    fontSize: 15,
+    fontSize: 18,
 
     // font family with optional fallbacks
-    fontFamily: 'Monaco',
+    fontFamily: 'Sarasa Mono TC',
     
-    letterSpacing: 1,
-    
-    lineHeight: 1.2,
-
     // default font weight: 'normal' or 'bold'
     fontWeight: 'normal',
 
@@ -25,7 +21,7 @@ module.exports = {
     fontWeightBold: 'bold',
 
     // terminal cursor background color and opacity (hex, rgb, hsl, hsv, hwb or cmyk)
-    cursorColor: 'rgba(248,28,229,0.8)',
+//     cursorColor: 'rgba(248,28,229,0.8)',
 
     // terminal text color under BLOCK cursor
     cursorAccentColor: '#000',
@@ -140,7 +136,12 @@ module.exports = {
   //   `hyperpower`
   //   `@company/project`
   //   `project#1.0.1`
-  plugins: ["hyper-search", "hyper-tabs-enhanced", "hyper-night-owl"],
+  plugins: [
+    "hyper-search",
+    "hyper-tabs-enhanced",
+    "hyper-subliminal-theme",
+    "hyper-dark-scrollbar"
+  ],
 
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
