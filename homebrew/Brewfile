@@ -14,12 +14,12 @@ brew "gnupg", link: false
 brew "htop"
 brew "joplin"
 brew "jq"
+brew "sqlite"
 brew "mackup"
 brew "mas"
 brew "ncdu"
 brew "neovim"
 brew "pass"
-brew "sqlite"
 brew "pgcli"
 brew "pinentry-mac"
 brew "postgresql", restart_service: true
@@ -39,6 +39,7 @@ cask "github"
 cask "hyper"
 cask "iina"
 cask "keycastr"
+cask "pennywise"
 cask "phoenix"
 cask "postman"
 cask "qlcolorcode"
@@ -59,6 +60,7 @@ mas "CotEditor", id: 1024640650
 mas "Evernote", id: 406056744
 mas "GIF Brewery 3", id: 1081413713
 mas "Irvue", id: 1039633667
+mas "Keep It", id: 1272768911
 mas "Keynote", id: 409183694
 mas "LINE", id: 539883307
 mas "Numbers", id: 409203825
@@ -67,6 +69,7 @@ mas "Pastebot", id: 1179623856
 mas "Quip", id: 1003160018
 mas "Quiver", id: 866773894
 mas "Reeder", id: 880001334
+mas "Remote Mouse", id: 403195710
 mas "Simplenote", id: 692867256
 mas "Spark", id: 1176895641
 mas "Wunderlist", id: 410628904
