@@ -1,3 +1,4 @@
+tap "heroku/brew"
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
@@ -33,6 +34,7 @@ brew "stow"
 brew "tmux"
 brew "wget"
 brew "youtube-dl"
+brew "heroku/brew/heroku"
 brew "wagoodman/dive/dive"
 cask "caprine"
 cask "clyang-welly"
@@ -76,5 +78,6 @@ mas "Reeder", id: 880001334
 mas "Remote Mouse", id: 403195710
 mas "Simplenote", id: 692867256
 mas "Spark", id: 1176895641
+mas "SubEthaEdit", id: 728530824
 mas "Wunderlist", id: 410628904
 mas "Xcode", id: 497799835
