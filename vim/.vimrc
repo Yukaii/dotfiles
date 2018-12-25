@@ -44,6 +44,7 @@ Plug 'junegunn/goyo.vim'
 
 Plug 'google/vim-searchindex'
 Plug 't9md/vim-choosewin'
+Plug 'wincent/terminus'
 
 " ####################
 " # LANGUAGE SUPPORT #
