@@ -49,6 +49,8 @@ alias gca='git commit -v -a'
 #compdef _git gc=git-commit
 alias gca!='git commit -v -a --amend'
 #compdef _git gca!=git-commit
+alias gcar!='git commit -v -a --amend --reuse-message=HEAD'
+#compdef _git gcar!=git-commit
 alias gcmsg='git commit -m'
 #compdef _git gcmsg=git-commit
 alias gco='git checkout'
