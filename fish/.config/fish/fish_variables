@@ -12,6 +12,7 @@ SETUVAR Z_DATA_DIR:/Users/yukai/\x2elocal/share/z
 SETUVAR Z_EXCLUDE:/Users/yukai
 SETUVAR __fish_init_2_39_8:\x1d
 SETUVAR __fish_init_2_3_0:\x1d
+SETUVAR __fish_init_3_x:\x1d
 SETUVAR fish_color_autosuggestion:555\x1ebrblack
 SETUVAR fish_color_cancel:\x2dr
 SETUVAR fish_color_command:\x2d\x2dbold
