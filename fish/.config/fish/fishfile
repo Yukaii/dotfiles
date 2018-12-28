@@ -10,7 +10,6 @@ fisherman/fzf
 fisherman/get
 fisherman/getopts
 fisherman/humanize_duration
-fisherman/imgcat
 fisherman/last_job_id
 fisherman/nvm
 oh-my-fish/plugin-osx
