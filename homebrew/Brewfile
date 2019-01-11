@@ -1,3 +1,5 @@
+tap "d12frosted/emacs-plus"
+tap "fish-shell/fish"
 tap "heroku/brew"
 tap "homebrew/bundle"
 tap "homebrew/cask"
@@ -10,9 +12,13 @@ brew "bashdb"
 brew "bat"
 brew "boost"
 brew "cmake"
+brew "ffmpeg"
 brew "fish"
+brew "node"
+brew "fx"
 brew "fzf"
 brew "gnupg", link: false
+brew "hexyl"
 brew "htop"
 brew "joplin"
 brew "jq"
@@ -34,10 +40,12 @@ brew "stow"
 brew "tmux"
 brew "wget"
 brew "youtube-dl"
+brew "d12frosted/emacs-plus/emacs-plus", args: ["with-modern-icon"]
 brew "heroku/brew/heroku"
 brew "wagoodman/dive/dive"
 cask "caprine"
 cask "clyang-welly"
+cask "flume"
 cask "font-fira-code"
 cask "font-hack"
 cask "github"
@@ -58,6 +66,7 @@ cask "spotifree"
 cask "spotify"
 cask "squirrel"
 cask "suspicious-package"
+cask "textmate"
 cask "webpquicklook"
 cask "wireshark"
 mas "Amphetamine", id: 937984704
@@ -69,6 +78,7 @@ mas "Irvue", id: 1039633667
 mas "Keep It", id: 1272768911
 mas "Keynote", id: 409183694
 mas "LINE", id: 539883307
+mas "Mirror for Samsung TV", id: 1107644799
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pastebot", id: 1179623856
