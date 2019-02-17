@@ -1,8 +1,11 @@
 # migrating from https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh
 
 set PATH $PATH "$HOME/.bin"
+set PATH $PATH "$HOME/.deno/bin"
 
 set LANG "en_US.UTF-8"
+
+set -x PIPENV_SHELL_FANCY 1
 
 # Aliases
 alias ping='prettyping --nolegend'
