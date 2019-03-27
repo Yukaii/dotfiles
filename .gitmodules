@@ -4,3 +4,6 @@
 [submodule "emacs/.emacs.d"]
 	path = emacs/.emacs.d
 	url = https://github.com/syl20bnr/spacemacs.git
+[submodule "vscode/config"]
+	path = vscode/config
+	url = git@gist.github.com:7cddf043210006198e46dbe47912481d.git
