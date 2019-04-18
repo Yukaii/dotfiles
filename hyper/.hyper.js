@@ -26,6 +26,8 @@ module.exports = {
     // terminal text color under BLOCK cursor
     cursorAccentColor: '#000',
 
+    letterSpacing: 1,
+
     // `'BEAM'` for |, `'UNDERLINE'` for _, `'BLOCK'` for █
     cursorShape: 'BLOCK',
 
@@ -124,8 +126,10 @@ module.exports = {
 
     // for advanced config flags please refer to https://hyper.is/#cfg
     verminal: {
-      fontFamily: 'mononoki',
-      fontSize: 18
+      // fontFamily: 'mononoki',
+      fontFamily: 'Sarasa Mono TC',
+      fontSize: 18,
+      letterSpacing: 1
     },
   },
 
@@ -136,12 +140,7 @@ module.exports = {
   //   `hyperpower`
   //   `@company/project`
   //   `project#1.0.1`
-  plugins: [
-    "hyper-search",
-    "hyper-tabs-enhanced",
-    "hyper-subliminal-theme",
-    "hyper-dark-scrollbar"
-  ],
+  plugins: ["hyper-search", "hyper-tabs-enhanced", "hyper-dark-scrollbar", "verminal"],
 
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
