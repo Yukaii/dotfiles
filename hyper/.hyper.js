@@ -28,6 +28,8 @@ module.exports = {
 
     letterSpacing: 1,
 
+    scrollback: 100000000,
+
     // `'BEAM'` for |, `'UNDERLINE'` for _, `'BLOCK'` for █
     cursorShape: 'BLOCK',
 
@@ -131,6 +133,10 @@ module.exports = {
       fontSize: 18,
       letterSpacing: 1
     },
+
+    pokemon: 'random',
+    unibody: 'false',
+    poketab: 'true'
   },
 
 
@@ -140,7 +146,13 @@ module.exports = {
   //   `hyperpower`
   //   `@company/project`
   //   `project#1.0.1`
-  plugins: ["hyper-search", "hyper-tabs-enhanced", "hyper-dark-scrollbar", "verminal"],
+  plugins: [
+    "hyper-search",
+    "hyper-tabs-enhanced",
+    "hyper-dark-scrollbar",
+    "hypercwd",
+    "hyper-pokemon"
+  ],
 
   // in development, you can create a directory under
   // `~/.hyper_plugins/local/` and include it here
