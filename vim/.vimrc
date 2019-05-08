@@ -126,7 +126,7 @@ inoremap <silent><expr> <TAB>
       \ pumvisible() ? "<C-n>" :
       \ <SID>check_back_space() ? "<TAB>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "<C-p>" : "<C-h>"
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -138,7 +138,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 
 " Use <cr> for confirm completion, `<C-g>u` means break undo chain at current position.
 " Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "<C-y>" : "<C-g>u\<CR>"
+inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Use `[c` and `]c` for navigate diagnostics
 nmap <silent> [c <Plug>(coc-diagnostic-prev)
