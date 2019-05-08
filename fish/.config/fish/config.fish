@@ -3,6 +3,8 @@
 set PATH $PATH "$HOME/.bin"
 set PATH $PATH "$HOME/.deno/bin"
 
+set PATH $PATH "$HOME/go/bin"
+
 set LANG "en_US.UTF-8"
 
 set -x PIPENV_SHELL_FANCY 1
