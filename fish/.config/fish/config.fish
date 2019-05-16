@@ -205,6 +205,13 @@ function tre
   tree -C $argv | less -r
 end
 
+function input_volumn_max
+  while true
+    osascript -e "set volume input volume 100"
+    sleep 10
+  end
+end
+
 # bobthefish theme options
 set -g theme_display_ruby yes
 set -g theme_avoid_ambiguous_glyphs yes
