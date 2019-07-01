@@ -7,3 +7,6 @@
 [submodule "vscode/config"]
 	path = vscode/config
 	url = git@gist.github.com:7cddf043210006198e46dbe47912481d.git
+[submodule "vscode/vscode-transparent-glow"]
+	path = vscode/vscode-transparent-glow
+	url = https://github.com/Jinkeycode/vscode-transparent-glow.git
