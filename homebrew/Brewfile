@@ -30,6 +30,7 @@ brew "jq"
 brew "kakoune"
 brew "mackup"
 brew "mas"
+brew "mosh"
 brew "ncdu"
 brew "neofetch"
 brew "neovim"
@@ -39,6 +40,7 @@ brew "pgcli"
 brew "pinentry-mac"
 brew "pipenv"
 brew "postgresql", restart_service: true
+brew "postgresql@10"
 brew "prettyping"
 brew "pyenv"
 brew "rbenv"
@@ -51,10 +53,12 @@ brew "wget"
 brew "wine"
 brew "winetricks"
 brew "youtube-dl"
+brew "zlib"
 brew "amar1729/formulae/browserpass"
 brew "d12frosted/emacs-plus/emacs-plus", args: ["with-modern-icon"]
 brew "heroku/brew/heroku"
 brew "wagoodman/dive/dive"
+cask "alacritty"
 cask "anki"
 cask "caprine"
 cask "charles"
@@ -63,6 +67,7 @@ cask "devdocs"
 cask "flume"
 cask "font-fira-code"
 cask "font-hack"
+cask "font-input"
 cask "font-sarasa-gothic"
 cask "github"
 cask "hyper"
@@ -95,11 +100,15 @@ cask "visual-studio-code-insiders"
 cask "vivaldi"
 cask "webpquicklook"
 cask "wireshark"
+cask "zotero"
 mas "Amphetamine", id: 937984704
 mas "App Language Chooser", id: 451732904
 mas "CotEditor", id: 1024640650
+mas "Dato", id: 1470584107
+mas "Drafts", id: 1435957248
 mas "Evernote", id: 406056744
 mas "GIF Brewery 3", id: 1081413713
+mas "Highland 2", id: 1171820258
 mas "Irvue", id: 1039633667
 mas "Keep It", id: 1272768911
 mas "Keynote", id: 409183694
