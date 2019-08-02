@@ -25,6 +25,9 @@ function __bobthefish_glyphs -S -d 'Define glyphs used by bobthefish'
   # Desk glyphs
   set -x desk_glyph              \u25F2
 
+  # Kubernetes glyphs
+  set -x k8s_glyph               \u2388 # '⎈'
+
   # Vagrant glyphs
   set -x vagrant_running_glyph   \u2191 # ↑ 'running'
   set -x vagrant_poweroff_glyph  \u2193 # ↓ 'poweroff'
@@ -62,6 +65,7 @@ function __bobthefish_glyphs -S -d 'Define glyphs used by bobthefish'
     set virtualenv_glyph \uE73C ' '
     set ruby_glyph       \uE791 ' '
     set go_glyph         \uE626 ' '
+    set node_glyph       \uE718 ' '
 
     set vagrant_running_glyph  \uF431 # ↑ 'running'
     set vagrant_poweroff_glyph \uF433 # ↓ 'poweroff'

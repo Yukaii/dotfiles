@@ -212,6 +212,45 @@ function input_volumn_max
   end
 end
 
+function kp --description "Kill processes"
+  set -l __kp__pid ''
+
+  if contains -- '--tcp' $argv
+    set __kp__pid (lsof -Pwni tcp | sed 1d | eval "fzf $FZF_DEFAULT_OPTS -m --header='[kill:tcp]'" | awk '{print $2}')
+  else
+    set __kp__pid (ps -ef | sed 1d | eval "fzf $FZF_DEFAULT_OPTS -m --header='[kill:process]'" | awk '{print $2}')
+  end
+
+  if test "x$__kp__pid" != "x"
+    if test "x$argv[1]" != "x"
+      echo $__kp__pid | xargs kill $argv[1]
+    else
+      echo $__kp__pid | xargs kill -9
+    end
+    kp
+  end
+end
+
+function bip --description "Install brew plugins"
+  set -l inst (brew search | eval "fzf $FZF_DEFAULT_OPTS -m --header='[brew:install]'")
+
+  if not test (count $inst) = 0
+    for prog in $inst
+      brew install "$prog"
+    end
+  end
+end
+
+function bcp --description "Remove brew plugins"
+  set -l inst (brew leaves | eval "fzf $FZF_DEFAULT_OPTS -m --header='[brew:uninstall]'")
+
+  if not test (count $inst) = 0
+    for prog in $inst
+      brew uninstall "$prog"
+    end
+  end
+end
+
 # bobthefish theme options
 set -g theme_display_ruby yes
 set -g theme_avoid_ambiguous_glyphs yes
