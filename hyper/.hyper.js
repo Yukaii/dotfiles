@@ -151,7 +151,7 @@ module.exports = {
     "hyper-tabs-enhanced",
     "hyper-dark-scrollbar",
     "hypercwd",
-    "hyper-pokemon"
+    "hyper-afterglow"
   ],
 
   // in development, you can create a directory under
