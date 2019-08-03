@@ -22,6 +22,8 @@ patch:
   "app_options/com.runningwithcrayons.Alfred-3/ascii_mode": true
   "app_options/com.operasoftware.Opera/ascii_mode": true
   "app_options/org.terminus/ascii_mode": true
+  "app_options/io.alacritty/ascii_mode": true
+  "app_options/net.kovidgoyal.kitty/ascii_mode": true
 
   "preset_color_schemes/batman":
     author: "Rango <tntaben@gmail.com>"
