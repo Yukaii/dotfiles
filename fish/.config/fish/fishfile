@@ -11,11 +11,11 @@ fisherman/get
 fisherman/getopts
 fisherman/humanize_duration
 fisherman/last_job_id
-fisherman/nvm
 oh-my-fish/plugin-osx
 fisherman/pyenv
 fisherman/rbenv
 oh-my-fish/plugin-tmux
 Cyber-Duck/fish-wakatime
 jethrokuan/z
-kennethreitz/fish-pipenv
+lilyball/nix-env.fish
+FabioAntunes/fish-nvm

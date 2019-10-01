@@ -5,6 +5,8 @@ set PATH $PATH "$HOME/.deno/bin"
 
 set PATH $PATH "$HOME/go/bin"
 
+set PATH $PATH "$HOME/.poetry/bin"
+
 set LANG "en_US.UTF-8"
 
 set -x PIPENV_SHELL_FANCY 1
@@ -257,3 +259,7 @@ set -g theme_avoid_ambiguous_glyphs yes
 set -g theme_powerline_fonts no
 set -g theme_display_cmd_duration yes
 set -g theme_title_display_process yes
+
+# pyenv virtualenv config
+# status --is-interactive; and pyenv init - | source
+# status --is-interactive; and source (pyenv virtualenv-init -|psub)
