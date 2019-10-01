@@ -45,6 +45,7 @@ Plug 'junegunn/goyo.vim'
 Plug 'google/vim-searchindex'
 Plug 't9md/vim-choosewin'
 Plug 'wincent/terminus'
+Plug 'brooth/far.vim'
 
 " ####################
 " # LANGUAGE SUPPORT #
@@ -64,11 +65,10 @@ Plug 'fatih/vim-go'
 Plug 'vim-ruby/vim-ruby'
 Plug 'joker1007/vim-ruby-heredoc-syntax'
 Plug 'tpope/vim-dotenv'
-
 Plug 'godlygeek/tabular' " vim-markdown dependency
 Plug 'plasticboy/vim-markdown'
-
 Plug 'tpope/vim-rails'
+Plug 'LnL7/vim-nix'
 
 " ###################
 " # THEMES & COLORS #
