@@ -1,5 +1,6 @@
 tap "amar1729/formulae"
 tap "d12frosted/emacs-plus"
+tap "dandavison/delta", "https://github.com/dandavison/delta"
 tap "fish-shell/fish"
 tap "heroku/brew"
 tap "homebrew/bundle"
@@ -9,6 +10,7 @@ tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "homebrew/services"
 tap "wagoodman/dive"
+cask "xquartz"
 brew "aria2"
 brew "bashdb"
 brew "bat"
@@ -28,6 +30,7 @@ brew "fx"
 brew "fzf"
 brew "git-lfs"
 brew "gnupg", link: false
+brew "graphviz"
 brew "hexyl"
 brew "htop"
 brew "imagemagick"
@@ -49,9 +52,13 @@ brew "pinentry-mac"
 brew "pipenv"
 brew "pkg-config"
 brew "postgresql", restart_service: true
+brew "postgis"
 brew "postgresql@10"
 brew "prettyping"
 brew "pyenv"
+brew "pyenv-ccache"
+brew "pyenv-virtualenv"
+brew "pyenv-virtualenvwrapper"
 brew "rbenv"
 brew "redis", restart_service: true
 brew "ripgrep"
@@ -66,6 +73,7 @@ brew "youtube-dl"
 brew "zlib"
 brew "amar1729/formulae/browserpass"
 brew "d12frosted/emacs-plus/emacs-plus", args: ["with-modern-icon"]
+brew "dandavison/delta/git-delta"
 brew "heroku/brew/heroku"
 brew "wagoodman/dive/dive"
 cask "alacritty"
@@ -74,23 +82,31 @@ cask "caprine"
 cask "charles"
 cask "clyang-welly"
 cask "devdocs"
+cask "figma"
 cask "flume"
+cask "font-cascadia"
 cask "font-fira-code"
 cask "font-hack"
 cask "font-input"
 cask "font-sarasa-gothic"
+cask "font-victor-mono"
 cask "github"
+cask "headset"
 cask "hyper"
 cask "iina"
 cask "james"
 cask "keycastr"
 cask "kitty"
+cask "maccy"
 cask "mkchromecast"
 cask "mono-mdk"
+cask "mos"
 cask "mousepose"
+cask "notable"
 cask "pennywise"
 cask "phoenix"
 cask "postman"
+cask "powershell"
 cask "psequel"
 cask "qlcolorcode"
 cask "qlimagesize"
@@ -115,6 +131,7 @@ cask "wireshark"
 cask "zotero"
 mas "Amphetamine", id: 937984704
 mas "App Language Chooser", id: 451732904
+mas "Bear", id: 1091189122
 mas "CotEditor", id: 1024640650
 mas "Dato", id: 1470584107
 mas "Drafts", id: 1435957248
@@ -125,7 +142,7 @@ mas "Irvue", id: 1039633667
 mas "Keep It", id: 1272768911
 mas "Keynote", id: 409183694
 mas "LINE", id: 539883307
-mas "Mirror for Samsung TV", id: 1107644799
+mas "Microsoft To Do", id: 1274495053
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pastebot", id: 1179623856
