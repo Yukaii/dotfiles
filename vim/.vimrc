@@ -78,6 +78,7 @@ Plug 'LnL7/vim-nix'
 Plug 'ayu-theme/ayu-vim'
 Plug 'junegunn/seoul256.vim'
 Plug 'w0ng/vim-hybrid'
+Plug 'phanviet/vim-monokai-pro'
 
 " Customization
 " Plug 'vim-airline/vim-airline'
@@ -91,14 +92,17 @@ Plug 'edkolev/tmuxline.vim'
 " # LANGUAGE SERVER RECOMMENDED PLUGINS #
 " #######################################
 
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release'}
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tweekmonster/fzf-filemru'
+Plug 'liuchengxu/vista.vim'
 
 " (Optional) Showing function signature and inline doc.
 Plug 'Shougo/echodoc.vim'
+Plug 'ryanoasis/vim-devicons'
+
 
 call plug#end()
 
@@ -307,7 +311,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline_solarized_bg='dark'
 
 let g:lightline = {
-  \ 'colorscheme': 'seoul256',
+  \ 'colorscheme': 'wombat',
   \ 'active': {
   \   'left': [ [ 'mode', 'paste' ],
   \             [ 'gitbranch', 'cocstatus', 'readonly', 'relativepath', 'modified' ] ]
@@ -371,6 +375,11 @@ let g:magit_discard_untracked_do_delete=1
 nmap  -  <Plug>(choosewin)
 let g:choosewin_overlay_enable = 1
 
+" Vista config
+
+let g:vista#executives = ['coc', 'ctags']
+let g:vista_executive_for = {'typescript': 'coc', 'go': 'coc', 'c': 'coc', 'javascript': 'coc', 'html': 'coc', 'rust': 'coc', 'cpp': 'coc', 'css': 'coc', 'python': 'coc'}
+
 " ##################
 " # GENERAL CONFIG #
 " ##################
@@ -396,7 +405,7 @@ if has("termguicolors")     " set true colors
   set termguicolors
 endif
 
-colorscheme seoul256
+colorscheme monokai_pro
 
 " ###############
 " # KEY MAPPING #
@@ -406,3 +415,4 @@ map <C-t> :Commands<CR>
 map <C-x> :ProjectMru --tiebreak=end<cr>
 map <C-p> :Buffers<cr>
 map <F2> :NERDTreeToggle<CR>
+map <C-G> :Magit<CR>
