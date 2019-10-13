@@ -23,6 +23,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive' " Git Commands
+Plug 'tpope/vim-rhubarb' " GitHub related
 Plug 'jreybert/vimagit' " Magit
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth' " Auto detect indentation
@@ -34,6 +35,7 @@ Plug 'moll/vim-bbye'
 Plug 'mattn/emmet-vim'
 Plug 'terryma/vim-multiple-cursors'
 Plug 's3rvac/AutoFenc'
+Plug 'Yggdroot/indentLine'
 
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
@@ -45,7 +47,7 @@ Plug 'junegunn/goyo.vim'
 Plug 'google/vim-searchindex'
 Plug 't9md/vim-choosewin'
 Plug 'wincent/terminus'
-Plug 'brooth/far.vim'
+Plug 'wincent/ferret'
 
 " ####################
 " # LANGUAGE SUPPORT #
@@ -379,6 +381,8 @@ let g:choosewin_overlay_enable = 1
 
 let g:vista#executives = ['coc', 'ctags']
 let g:vista_executive_for = {'typescript': 'coc', 'go': 'coc', 'c': 'coc', 'javascript': 'coc', 'html': 'coc', 'rust': 'coc', 'cpp': 'coc', 'css': 'coc', 'python': 'coc'}
+
+let g:indentLine_char = '│'
 
 " ##################
 " # GENERAL CONFIG #
