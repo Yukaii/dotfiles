@@ -83,10 +83,10 @@ Plug 'w0ng/vim-hybrid'
 Plug 'phanviet/vim-monokai-pro'
 
 " Customization
-" Plug 'vim-airline/vim-airline'
-" Plug 'vim-airline/vim-airline-themes'
-Plug 'itchyny/lightline.vim'
-Plug 'mengelbrecht/lightline-bufferline'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+" Plug 'itchyny/lightline.vim'
+" Plug 'mengelbrecht/lightline-bufferline'
 
 Plug 'edkolev/tmuxline.vim'
 
@@ -279,7 +279,8 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " #################
 
 let g:ale_linters = {
-\   'javascript': ['standard'],
+\   'javascript': ['standard', 'tsserver'],
+\   'javascriptreact': ['standard', 'tsserver'],
 \}
 
 " Enable completion where available.
@@ -308,7 +309,6 @@ let ayucolor="mirage"
 let g:seoul256_background = 233
 let g:seoul256_light_background = 256
 
-let g:airline_theme='solarized'
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_solarized_bg='dark'
 
@@ -420,3 +420,8 @@ map <C-x> :ProjectMru --tiebreak=end<cr>
 map <C-p> :Buffers<cr>
 map <F2> :NERDTreeToggle<CR>
 map <C-G> :Magit<CR>
+map <F3> :Vista<CR>
+
+" Switch tab
+nmap <S-Tab> :tabprev<Return>
+nmap <Tab> :tabnext<Return>
