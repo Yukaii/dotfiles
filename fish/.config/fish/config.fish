@@ -6,6 +6,17 @@ set PATH $PATH "$HOME/.deno/bin"
 set PATH $PATH "$HOME/go/bin"
 
 set PATH $PATH "$HOME/.poetry/bin"
+set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
+
+
+# For Android development
+set ANT_HOME "/usr/local/opt/ant"
+set MAVEN_HOME "/usr/local/opt/maven"
+set GRADLE_HOME "/usr/local/opt/gradle"
+
+set ANDROID_HOME "/usr/local/share/android-sdk"
+set ANDROID_NDK_HOME "/usr/local/share/android-ndk"
+set ANDROID_SDK_ROOT "/Users/yukai/Library/Android/sdk"
 
 set LANG "en_US.UTF-8"
 
