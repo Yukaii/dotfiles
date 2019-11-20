@@ -1,3 +1,15 @@
 {
-  "git.enableGutters": false
+  "git.enableGutters": true,
+  "explorer.icon.enableNerdfont": true,
+  "explorer.file.columns": [
+    "selection",
+    "clip",
+    "diagnosticError",
+    "indent",
+    "icon",
+    "filename",
+    "size",
+    "modified",
+    "readonly"
+  ]
 }

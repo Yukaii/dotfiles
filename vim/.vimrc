@@ -19,7 +19,7 @@ Plug 'unkiwii/vim-nerdtree-sync'
 " Asynchronous Lint Engine
 Plug 'w0rp/ale'
 
-Plug 'airblade/vim-gitgutter'
+" Plug 'airblade/vim-gitgutter'
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive' " Git Commands
@@ -32,7 +32,7 @@ Plug 'wakatime/vim-wakatime'
 Plug 'scrooloose/nerdcommenter' " Toggle comment
 Plug 'tpope/vim-sensible' " General config
 Plug 'moll/vim-bbye'
-Plug 'mattn/emmet-vim'
+" Plug 'mattn/emmet-vim'
 Plug 'terryma/vim-multiple-cursors'
 Plug 's3rvac/AutoFenc'
 Plug 'Yggdroot/indentLine'
@@ -165,8 +165,22 @@ nno <silent> <c-p> :Veonim prev-problem<cr>
 endif
 
 " ##########################
-" # LANGUAGE SERVER CONFIG #
+" # COC CONFIG #
 " ##########################
+
+let g:coc_global_extensions = [
+\   'coc-emmet',
+\   'coc-html',
+\   'coc-highlight',
+\   'coc-git',
+\   'coc-lists',
+\   'coc-explorer',
+\   'coc-json',
+\   'coc-pyls',
+\   'coc-vetur',
+\   'coc-css',
+\   'coc-tsserver'
+\]
 
 " Required for operations modifying multiple buffers like rename.
 set hidden
@@ -436,8 +450,10 @@ colorscheme monokai_pro
 map <C-t> :Commands<CR>
 map <C-x> :ProjectMru --tiebreak=end<cr>
 map <C-p> :Buffers<cr>
-map <F2> :NERDTreeToggle<CR>
+" map <F2> :NERDTreeToggle<CR>
+nmap <silent> ge :CocCommand explorer<CR>
 map <C-G> :Magit<CR>
+map <silent> <C-H> :CocCommand<CR>
 map <F3> :Vista<CR>
 
 " Switch tab
