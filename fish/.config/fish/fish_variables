@@ -7,9 +7,9 @@ SETUVAR FZF_PREVIEW_FILE_CMD:head\x20\x2dn\x2010
 SETUVAR FZF_TMUX_HEIGHT:40\x25
 SETUVAR ZO_CMD:zo
 SETUVAR Z_CMD:z
-SETUVAR Z_DATA:/Users/yukai/\x2elocal/share/z/data
-SETUVAR Z_DATA_DIR:/Users/yukai/\x2elocal/share/z
-SETUVAR Z_EXCLUDE:/Users/yukai
+SETUVAR Z_DATA:/home/yukai/\x2elocal/share/z/data
+SETUVAR Z_DATA_DIR:/home/yukai/\x2elocal/share/z
+SETUVAR Z_EXCLUDE:/home/yukai
 SETUVAR __fish_init_2_39_8:\x1d
 SETUVAR __fish_init_2_3_0:\x1d
 SETUVAR __fish_init_3_x:\x1d

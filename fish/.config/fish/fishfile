@@ -1,4 +1,3 @@
-fisherman/await
 edc/bass
 oh-my-fish/theme-bobthefish
 oh-my-fish/plugin-brew
@@ -7,10 +6,7 @@ brgmnn/fish-docker-compose
 barnybug/docker-fish-completion
 fisherman/done
 fisherman/fzf
-fisherman/get
 fisherman/getopts
-fisherman/humanize_duration
-fisherman/last_job_id
 oh-my-fish/plugin-osx
 fisherman/rbenv
 oh-my-fish/plugin-tmux
