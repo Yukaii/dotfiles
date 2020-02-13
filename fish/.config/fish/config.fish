@@ -1,12 +1,20 @@
 # migrating from https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh
 
 set PATH $PATH "$HOME/.bin"
-set PATH $PATH "$HOME/.deno/bin"
+# set PATH $PATH "$HOME/.deno/bin"
+#
+# set PATH $PATH "$HOME/go/bin"
+#
+# set PATH $PATH "$HOME/.poetry/bin"
+# set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
 
-set PATH $PATH "$HOME/go/bin"
-
-set PATH $PATH "$HOME/.poetry/bin"
-set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
+set HOMEBREW_PREFIX "/home/linuxbrew/.linuxbrew"
+set HOMEBREW_CELLAR "/home/linuxbrew/.linuxbrew/Cellar";
+set HOMEBREW_REPOSITORY "/home/linuxbrew/.linuxbrew/Homebrew";
+set PATH $PATH "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin";
+set MANPATH $MANPATH "/home/linuxbrew/.linuxbrew/share/man";
+set INFOPATH $INFOPATH "/home/linuxbrew/.linuxbrew/share/info";
+set DISPLAY (cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
 
 
 # For Android development
@@ -30,7 +38,9 @@ alias cat='bat'
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 
-source $HOME/.cargo/env
+alias start_services="sudo service redis-server start && sudo service postgresql start && sudo service apache2 start"
+
+# source $HOME/.cargo/env
 
 function passgrep
   pass find $argv | env GREP_COLOR='1;34' egrep --color -i "$argv|\$"
