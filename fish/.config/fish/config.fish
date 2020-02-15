@@ -7,6 +7,7 @@ set PATH $PATH "$HOME/go/bin"
 
 set PATH $PATH "$HOME/.poetry/bin"
 set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
+set PATH $PATH "$HOME/Library/Android/sdk/tools"
 
 
 # For Android development
@@ -50,6 +51,8 @@ alias gpur='git pull --rebase'
 #compdef _git gup=git-fetch
 alias gp='git push'
 #compdef _git gp=git-push
+alias gpf='git push --force-with-lease'
+#compdef _git gpf=git-push
 alias gd='git diff'
 
 alias gaa="git add --all"
