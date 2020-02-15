@@ -5,6 +5,12 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
+  silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
 call plug#begin('~/.vim/plugged')
 
 " #############
@@ -20,7 +26,8 @@ Plug 'unkiwii/vim-nerdtree-sync'
 Plug 'w0rp/ale'
 
 " Plug 'airblade/vim-gitgutter'
-Plug 'easymotion/vim-easymotion'
+" Plug 'asvetliakov/vim-easymotion' " vim neovim fork
+Plug 'easymotion/vim-easymotion', { 'as': 'easymotion' }
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive' " Git Commands
 Plug 'tpope/vim-rhubarb' " GitHub related
