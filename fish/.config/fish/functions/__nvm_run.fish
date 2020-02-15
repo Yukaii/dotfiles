@@ -6,14 +6,17 @@ function __nvm_run
     return 1
   end
 
+  if test (uname -s) = 'Darwin'; and string match -q "*versions/node/*/bin" $PATH
+    set -l nvm_node_path (string match "*versions/node/*/bin" $PATH)
+    set -l nvm_index (contains -i -- $nvm_node_path $PATH)
+    if test $nvm_index -gt 1
+      set -gx PATH $nvm_node_path (string match -v $nvm_node_path $PATH)
+    end
+  end
+
   function run_command
     set stack (status stack-trace | grep called | cut -d " " -f 7)
     set count (count $argv)
-    if test "$count" -ge 2
-      set args $argv[2..-1]
-    else
-      set args ""
-    end
 
     if type -fqP $argv[1]; and test "$stack[1]" != (which $argv[1])
       set count (count $argv)
@@ -48,12 +51,15 @@ function __nvm_run
   end
 
   if not test -n "$NVM_HAS_RUN"
-    if test -f .nvmrc; and nvm use > /dev/null 2>&1
-      if can_run_command $argv[1]
+    if test -f .nvmrc;
+      set nvm_output (nvm use)
+      set nvm_status $status
+      if test $nvm_status -gt 0
+        echo $nvm_output
+      end
+      if test $nvm_status -eq 0; and can_run_command $argv[1]
         set -gx NVM_HAS_RUN 1
         run_command $argv
-      else
-        run_default $argv
       end
     else
       run_default $argv
