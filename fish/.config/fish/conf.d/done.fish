@@ -20,7 +20,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -g __done_version 1.12.0
+set -g __done_version 1.14.6
+
+function __done_run_powershell_script
+    set -l powershell_exe (command --search "powershell.exe")
+
+    if test $status -ne 0
+        and command --search wslvar
+
+        set -l powershell_exe (wslpath (wslvar windir)/System32/WindowsPowerShell/v1.0/powershell.exe)
+    end
+
+    if string length --quiet "$powershell_exe"
+        and test -x "$powershell_exe"
+
+        set cmd (string escape $argv)
+
+        eval "$powershell_exe -Command $cmd"
+    end
+end
 
 function __done_get_focused_window_id
     if type -q lsappinfo
@@ -30,9 +48,21 @@ function __done_get_focused_window_id
         swaymsg --type get_tree | jq '.. | objects | select(.focused == true) | .id'
     else if type -q xprop
         and test -n "$DISPLAY"
+        # Test that the X server at $DISPLAY is running
+        and xprop -grammar >/dev/null 2>&1
         xprop -root 32x '\t$0' _NET_ACTIVE_WINDOW | cut -f 2
     else if uname -a | string match --quiet --regex Microsoft
-        echo 12345 # dummy value since cannot get window state info under WSL
+        __done_run_powershell_script '
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class WindowsCompat {
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+    }
+"@
+[WindowsCompat]::GetForegroundWindow()
+'
     end
 end
 
@@ -59,7 +89,11 @@ end
 function __done_is_process_window_focused
     # Return false if the window is not focused
     set __done_focused_window_id (__done_get_focused_window_id)
-    if test "$__done_initial_window_id" != "$__done_focused_window_id"
+    if test "$__done_sway_ignore_visible" -eq 1
+        and test -n "$SWAYSOCK"
+        string match --quiet --regex "^true" (swaymsg -t get_tree | jq ".. | objects | select(.id == "$__done_initial_window_id") | .visible")
+        return $status
+    else if test "$__done_initial_window_id" != "$__done_focused_window_id"
         return 1
     end
     # If inside a tmux session, check if the tmux window is focused
@@ -88,6 +122,7 @@ if test -z "$SSH_CLIENT" # not over ssh
     set -q __done_min_cmd_duration; or set -g __done_min_cmd_duration 5000
     set -q __done_exclude; or set -g __done_exclude 'git (?!push|pull)'
     set -q __done_notify_sound; or set -g __done_notify_sound 0
+    set -q __done_sway_ignore_visible; or set -g __done_sway_ignore_visible 0
 
     function __done_started --on-event fish_preexec
         set __done_initial_window_id (__done_get_focused_window_id)
@@ -108,7 +143,7 @@ if test -z "$SSH_CLIENT" # not over ssh
             set -l humanized_duration (echo "$cmd_duration" | humanize_duration)
 
             set -l title "Done in $humanized_duration"
-            set -l wd (pwd | sed "s,^$HOME,~,")
+            set -l wd (string replace --regex "^$HOME" "~" (pwd))
             set -l message "$wd/ $history[1]"
             set -l sender $__done_initial_window_id
 
@@ -135,7 +170,8 @@ if test -z "$SSH_CLIENT" # not over ssh
                 end
 
             else if type -q notify-send # Linux notify-send
-                set -l urgency
+                set -l urgency $__done_notification_urgency_level
+                # override user-defined urgency level if non-zero exitstatus
                 if test $exit_status -ne 0
                     set urgency "--urgency=critical"
                 end
@@ -155,12 +191,18 @@ if test -z "$SSH_CLIENT" # not over ssh
                 end
 
             else if uname -a | string match --quiet --regex Microsoft
-                if powershell.exe -command "Import-Module -Name BurntToast" 2>/dev/null
-                    if test "$__done_notify_sound" -eq 1
-                        set soundopt "-Sound Default"
-                    end
-                    powershell.exe -command New-BurntToastNotification -Text \""$title"\",\""$message"\" $soundopt
+                if test "$__done_notify_sound" -eq 1
+                    set soundopt "-Sound Default"
+                else
+                    set soundopt "-Silent"
                 end
+
+                __done_run_powershell_script "
+                    Import-Module -Name BurntToast 2>&1 | Out-Null
+                    if (Get-Module -Name BurntToast) {
+                        New-BurntToastNotification -Text \"$title\",\"$message\" $soundopt
+                    }
+                "
 
             else # anything else
                 echo -e "\a" # bell sound

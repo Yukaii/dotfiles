@@ -28,6 +28,7 @@
 #     set -g theme_display_vagrant yes
 #     set -g theme_display_docker_machine no
 #     set -g theme_display_k8s_context yes
+#     set -g theme_display_k8s_namespace no
 #     set -g theme_display_hg yes
 #     set -g theme_display_virtualenv no
 #     set -g theme_display_ruby no
@@ -66,6 +67,13 @@ function __bobthefish_pwd -d 'Get a normalized $PWD'
     or echo $PWD
 end
 
+# Note that for fish < 3.0 this falls back to unescaped, rather than trying to do something clever /shrug
+# After we drop support for older fishies, we can inline this without the fallback.
+function __bobthefish_escape_regex -a str -d 'A backwards-compatible `string escape --style=regex` implementation'
+    string escape --style=regex "$str" 2>/dev/null
+    or echo "$str"
+end
+
 function __bobthefish_git_branch -S -d 'Get the current git branch (or commitish)'
     set -l ref (command git symbolic-ref HEAD 2>/dev/null)
     and begin
@@ -102,7 +110,7 @@ function __bobthefish_pretty_parent -S -a child_dir -d 'Print a parent directory
 
     # Replace $HOME with ~
     set -l real_home ~
-    set -l parent_dir (string replace -r '^'"$real_home"'($|/)' '~$1' (__bobthefish_dirname $child_dir))
+    set -l parent_dir (string replace -r '^'(__bobthefish_escape_regex "$real_home")'($|/)' '~$1' (__bobthefish_dirname $child_dir))
 
     # Must check whether `$parent_dir = /` if using native dirname
     if [ -z "$parent_dir" ]
@@ -230,7 +238,7 @@ function __bobthefish_project_pwd -S -a project_root_dir -a real_pwd -d 'Print t
     set -q theme_project_dir_length
     or set -l theme_project_dir_length 0
 
-    set -l project_dir (string replace -r '^'"$project_root_dir"'($|/)' '' $real_pwd)
+    set -l project_dir (string replace -r '^'(__bobthefish_escape_regex "$project_root_dir")'($|/)' '' $real_pwd)
 
     if [ $theme_project_dir_length -eq 0 ]
         echo -n $project_dir
@@ -399,7 +407,7 @@ end
 
 
 # ==============================
-# Status and input mode segments
+# Status segment
 # ==============================
 
 function __bobthefish_prompt_status -S -a last_status -d 'Display flags for a non-zero exit status, root user, and background jobs'
@@ -474,32 +482,6 @@ function __bobthefish_prompt_status -S -a last_status -d 'Display flags for a no
                 echo -n $bg_job_glyph
             end
         end
-    end
-end
-
-function __bobthefish_prompt_vi -S -d 'Display vi mode'
-    [ "$theme_display_vi" != 'no' ]
-    or return
-
-    [ "$fish_key_bindings" = 'fish_vi_key_bindings' \
-        -o "$fish_key_bindings" = 'hybrid_bindings' \
-        -o "$fish_key_bindings" = 'fish_hybrid_key_bindings' \
-        -o "$theme_display_vi" = 'yes' ]
-    or return
-
-    switch $fish_bind_mode
-        case default
-            __bobthefish_start_segment $color_vi_mode_default
-            echo -n 'N '
-        case insert
-            __bobthefish_start_segment $color_vi_mode_insert
-            echo -n 'I '
-        case replace_one replace-one
-            __bobthefish_start_segment $color_vi_mode_insert
-            echo -n 'R '
-        case visual
-            __bobthefish_start_segment $color_vi_mode_visual
-            echo -n 'V '
     end
 end
 
@@ -639,7 +621,8 @@ function __bobthefish_prompt_k8s_context -S -d 'Show current Kubernetes context'
     set -l context (__bobthefish_k8s_context)
     or return
 
-    set -l namespace (__bobthefish_k8s_namespace)
+    [ "$theme_display_k8s_namespace" = 'yes' ]
+    and set -l namespace (__bobthefish_k8s_namespace)
 
     set -l segment $k8s_glyph " " $context
     [ -n "$namespace" ]
@@ -1062,7 +1045,6 @@ function fish_prompt -d 'bobthefish, a fish theme optimized for awesome'
 
     # Status flags and input mode
     __bobthefish_prompt_status $last_status
-    __bobthefish_prompt_vi
 
     # User / hostname info
     __bobthefish_prompt_user

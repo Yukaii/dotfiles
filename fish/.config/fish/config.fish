@@ -2,6 +2,7 @@
 
 set PATH $PATH "$HOME/.bin"
 set PATH $PATH "$HOME/.deno/bin"
+set PATH $PATH "/usr/local/bin"
 
 set PATH $PATH "$HOME/go/bin"
 
@@ -279,3 +280,4 @@ set -g theme_title_display_process yes
 # pyenv virtualenv config
 # status --is-interactive; and pyenv init - | source
 # status --is-interactive; and source (pyenv virtualenv-init -|psub)
+# status --is-interactive; and source (pyenv init -|psub)

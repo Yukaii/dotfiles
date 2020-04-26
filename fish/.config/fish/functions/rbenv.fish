@@ -25,7 +25,7 @@ function rbenv
 
   switch "$command"
   case rehash shell
-    source (rbenv "sh-$command" $argv|psub)
+    . (rbenv "sh-$command" $argv|psub)
   case '*'
     command rbenv "$command" $argv
   end
