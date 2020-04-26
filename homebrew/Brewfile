@@ -31,6 +31,7 @@ brew "cairo"
 brew "cmake"
 brew "giflib"
 brew "jpeg"
+brew "python"
 brew "ffmpeg"
 brew "fish"
 brew "pango"
@@ -45,10 +46,8 @@ brew "graphviz"
 brew "hexyl"
 brew "htop"
 brew "imagemagick"
-brew "joplin"
 brew "jpegoptim"
 brew "jq"
-brew "kakoune"
 brew "librsvg"
 brew "mackup"
 brew "mas"
@@ -65,14 +64,14 @@ brew "pinentry-mac"
 brew "pipenv"
 brew "pkg-config"
 brew "postgresql@10"
-brew "postgresql@11"
+brew "postgresql@11", restart_service: true
 brew "prettyping"
 brew "pyenv"
 brew "pyenv-ccache"
 brew "pyenv-virtualenv"
 brew "pyenv-virtualenvwrapper"
 brew "rbenv"
-brew "redis"
+brew "redis", restart_service: true
 brew "ripgrep"
 brew "speedtest-cli"
 brew "stow"
@@ -91,7 +90,6 @@ brew "d12frosted/emacs-plus/emacs-plus", args: ["with-modern-icon"]
 brew "dandavison/delta/git-delta"
 brew "github/gh/gh"
 brew "heroku/brew/heroku"
-brew "measurement-kit/measurement-kit/measurement-kit"
 brew "measurement-kit/measurement-kit/mingw-w64-measurement-kit"
 brew "mistertea/et/et"
 brew "possatti/possatti/pokemonsay"
@@ -99,9 +97,9 @@ brew "wagoodman/dive/dive"
 cask "adoptopenjdk"
 cask "alacritty"
 cask "alt-tab"
-cask "android-ndk"
 cask "anki"
 cask "boostnote"
+cask "cakebrew"
 cask "caprine"
 cask "charles"
 cask "clyang-welly"
@@ -124,6 +122,8 @@ cask "james"
 cask "keycastr"
 cask "kitty"
 cask "maccy"
+cask "macdown"
+cask "mark-text"
 cask "mkchromecast"
 cask "mono-mdk"
 cask "mos"
@@ -160,23 +160,19 @@ mas "App Language Chooser", id: 451732904
 mas "Be Focused", id: 973134470
 mas "CotEditor", id: 1024640650
 mas "Dato", id: 1470584107
-mas "Drafts", id: 1435957248
+mas "DwayneCam", id: 524382627
 mas "Evernote", id: 406056744
 mas "GIF Brewery 3", id: 1081413713
-mas "Highland 2", id: 1171820258
 mas "Irvue", id: 1039633667
-mas "Keep It", id: 1272768911
 mas "Keynote", id: 409183694
 mas "LINE", id: 539883307
+mas "Messenger", id: 1480068668
 mas "Microsoft To Do", id: 1274495053
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-mas "Quip", id: 1003160018
 mas "Reeder", id: 880001334
 mas "Remote Mouse", id: 403195710
 mas "Spark", id: 1176895641
-mas "SubEthaEdit", id: 728530824
-mas "theBin", id: 1479977155
 mas "TweetDeck", id: 485812721
 mas "Wunderlist", id: 410628904
 mas "Xcode", id: 497799835
