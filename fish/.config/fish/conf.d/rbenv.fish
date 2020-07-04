@@ -6,13 +6,13 @@ else
     set rbenv_root "$RBENV_ROOT"
 end
 
-# set -x PATH $rbenv_root/bin $PATH
-# if not command -s rbenv > /dev/null
-#     echo "rbenv: command not found. See https://github.com/rbenv/rbenv"
-#     exit 1
-# else
-#     set --erase RBENV_ROOT
-# end
+set -x PATH $rbenv_root/bin $PATH
+if not command -s rbenv > /dev/null
+    echo "rbenv: command not found. See https://github.com/rbenv/rbenv"
+    exit 1
+else
+    set --erase RBENV_ROOT
+end
 
 set -x PATH $rbenv_root/shims $PATH
 set -x RBENV_SHELL fish

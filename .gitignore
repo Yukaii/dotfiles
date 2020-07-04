@@ -12,4 +12,4 @@ fish/.config/fish/fish_history
 fish/.config/configstore
 fish/.config/fisherman
 fish/.config/fish/fishd.*
-
+fish/.config/fish/secrets.fish

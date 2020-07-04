@@ -1,5 +1,7 @@
 # migrating from https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/git/git.plugin.zsh
 
+source $__fish_config_dir/secrets.fish
+
 set PATH $PATH "$HOME/.bin"
 set PATH $PATH "$HOME/.deno/bin"
 set PATH $PATH "/usr/local/bin"
@@ -10,6 +12,8 @@ set PATH $PATH "$HOME/.poetry/bin"
 set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
 set PATH $PATH "$HOME/Library/Android/sdk/tools"
 
+# mysql
+set PATH $PATH "/usr/local/mysql/bin:"
 
 # For Android development
 set ANT_HOME "/usr/local/opt/ant"
@@ -23,6 +27,7 @@ set ANDROID_SDK_ROOT "/Users/yukai/Library/Android/sdk"
 set LANG "en_US.UTF-8"
 
 set -x PIPENV_SHELL_FANCY 1
+set -x PIPENV_IGNORE_VIRTUALENVS 1
 
 # Aliases
 alias ping='prettyping --nolegend'
