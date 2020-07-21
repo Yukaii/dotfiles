@@ -8,9 +8,9 @@ fisherman/done
 fisherman/fzf
 fisherman/getopts
 oh-my-fish/plugin-osx
-fisherman/rbenv
 oh-my-fish/plugin-tmux
 Cyber-Duck/fish-wakatime
 jethrokuan/z
 lilyball/nix-env.fish
-FabioAntunes/fish-nvm
+jorgebucaran/fish-nvm
+oh-my-fish/plugin-rvm

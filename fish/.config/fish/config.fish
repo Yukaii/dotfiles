@@ -8,14 +8,15 @@ set PATH $PATH "$HOME/.bin"
 # set PATH $PATH "$HOME/.poetry/bin"
 # set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
 
-set HOMEBREW_PREFIX "/home/linuxbrew/.linuxbrew"
-set HOMEBREW_CELLAR "/home/linuxbrew/.linuxbrew/Cellar";
-set HOMEBREW_REPOSITORY "/home/linuxbrew/.linuxbrew/Homebrew";
-set PATH $PATH "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin";
-set MANPATH $MANPATH "/home/linuxbrew/.linuxbrew/share/man";
-set INFOPATH $INFOPATH "/home/linuxbrew/.linuxbrew/share/info";
-set DISPLAY (cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
+set -x HOMEBREW_PREFIX "/home/linuxbrew/.linuxbrew"
+set -x HOMEBREW_CELLAR "/home/linuxbrew/.linuxbrew/Cellar";
+set -x HOMEBREW_REPOSITORY "/home/linuxbrew/.linuxbrew/Homebrew";
+set -x PATH $PATH "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin";
+set -x MANPATH $MANPATH "/home/linuxbrew/.linuxbrew/share/man";
+set -x INFOPATH $INFOPATH "/home/linuxbrew/.linuxbrew/share/info";
+set -x DISPLAY (cat /etc/resolv.conf | grep nameserver | awk '{print $2}'):0
 
+set GPG_TTY (tty)
 
 # For Android development
 set ANT_HOME "/usr/local/opt/ant"
@@ -38,7 +39,7 @@ alias cat='bat'
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 
-alias start_services="sudo service redis-server start && sudo service postgresql start && sudo service apache2 start"
+alias start_services="sudo service redis-server start && sudo service postgresql start"
 
 # source $HOME/.cargo/env
 
