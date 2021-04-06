@@ -10,5 +10,5 @@ function tunnel --description "ngrok alternative"
     return 0
   end
 
-  eval "inlets client --remote=wss://$INLETS_REMOTE --upstream=http://localhost:$_flag_port -t $INLETS_AUTH_TOKEN"
+  eval "inlets client --url=wss://$INLETS_REMOTE --upstream=http://localhost:$_flag_port -t $INLETS_AUTH_TOKEN"
 end

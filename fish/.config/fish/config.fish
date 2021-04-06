@@ -4,7 +4,14 @@ source $__fish_config_dir/secrets.fish
 
 set PATH $PATH "$HOME/.bin"
 set PATH $PATH "$HOME/.deno/bin"
-set PATH $PATH "/usr/local/bin"
+
+set arc (arch)
+if string match -q "arm64" $arc
+    set PATH $PATH "/opt/homebrew/bin/"
+else
+  set PATH $PATH "/usr/local/bin"
+end
+
 
 set PATH $PATH "$HOME/go/bin"
 
@@ -37,7 +44,7 @@ alias cat='bat'
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 
-source $HOME/.cargo/env
+# source $HOME/.cargo/env
 
 function passgrep
   pass find $argv | env GREP_COLOR='1;34' egrep --color -i "$argv|\$"
@@ -286,3 +293,12 @@ set -g theme_title_display_process yes
 # status --is-interactive; and pyenv init - | source
 # status --is-interactive; and source (pyenv virtualenv-init -|psub)
 # status --is-interactive; and source (pyenv init -|psub)
+
+rvm default
+# nvm use
+set -x GPG_TTY (tty)
+
+alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
+alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
+
+oh-my-posh --init --shell fish --config ~/.poshthemes/yukai.omp.json | source
