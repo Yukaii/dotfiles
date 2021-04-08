@@ -7,29 +7,18 @@
       "segments": [
         {
           "type": "os",
-          "style": "powerline",
-          "foreground": "#26C6DA",
-          "background": "#546E7A"
-        },
-        {
-          "type": "root",
-          "style": "plain",
-          "foreground": "#FFEE58"
-        },
-        {
-          "type": "session",
-          "style": "plain",
-          "foreground": "#ffffff",
-          "properties": {
-            "template": "{{.UserName}}"
-          }
+          "style": "diamond",
+          "foreground": "#96d0ff",
+          "background": "#2d333b",
+          "leading_diamond": "\ue0b6",
+          "trailing_diamond": "\ue0b4"
         },
         {
           "type": "path",
           "style": "powerline",
-          "powerline_symbol": "\uE0B0",
-          "foreground": "#100e23",
-          "background": "#91ddff",
+          "powerline_symbol": "\ue0b4",
+          "foreground": "#2d333b",
+          "background": "#c6e6ff",
           "properties": {
             "style": "mixed",
             "enable_hyperlink": true,
@@ -41,19 +30,9 @@
         {
           "type": "git",
           "style": "powerline",
-          "powerline_symbol": "\uE0B0",
-          "foreground": "#193549",
-          "background": "#ff95e4"
-        },
-        {
-          "type": "python",
-          "style": "powerline",
-          "powerline_symbol": "\uE0B0",
-          "foreground": "#100e23",
-          "background": "#906cff",
-          "properties": {
-            "prefix": " \uE235 "
-          }
+          "powerline_symbol": "\ue0b4",
+          "foreground": "#2d333b",
+          "background": "#f69d50"
         },
         {
           "type": "exit",
@@ -74,9 +53,10 @@
         {
           "type": "executiontime",
           "style": "powerline",
-          "powerline_symbol": "\uE0B0",
+          "powerline_symbol": "\ue0b6",
+          "invert_powerline": true,
           "foreground": "#ffffff",
-          "background": "#8800dd",
+          "background": "#daaa3f",
           "properties": {
             "threshold": 500,
             "style": "austin",
@@ -86,9 +66,10 @@
         {
           "type": "node",
           "style": "powerline",
-          "powerline_symbol": "\uE0B0",
+          "powerline_symbol": "\ue0b6",
+          "invert_powerline": true,
           "foreground": "#ffffff",
-          "background": "#6CA35E",
+          "background": "#57ab5a",
           "properties": {
             "prefix": " \uE718 "
           }
@@ -96,28 +77,31 @@
         {
           "type": "time",
           "style": "powerline",
-          "powerline_symbol": "\uE0B0",
-          "background": "#333",
-          "foreground": "#FFF",
+          "invert_powerline": true,
+          "powerline_symbol": "\ue0b6",
+          "background": "#373e47",
+          "foreground": "#ffffff",
           "properties": {
-            "style": "austin"
+            "time_format": "Mon 1/2 3:04 PM"
           }
         },
         {
           "type": "battery",
           "style": "powerline",
-          "powerline_symbol": "\uE0B0",
+          "trailing_diamond": "\ue0b4",
+          "invert_powerline": true,
+          "powerline_symbol": "\ue0b6",
           "foreground": "#193549",
-          "background": "#ffeb3b",
+          "background": "#daaa3f",
           "properties": {
             "battery_icon": "",
-            "discharging_icon": "\uE231 ",
-            "charging_icon": "\uE234 ",
-            "charged_icon": "\uE22F ",
+            "discharging_icon": "\uf57d ",
+            "charging_icon": "\uf583 ",
+            "charged_icon": "\uf578 ",
             "color_background": true,
             "charged_color": "#4caf50",
-            "charging_color": "#40c4ff",
-            "discharging_color": "#ffaf79",
+            "charging_color": "#f47067",
+            "discharging_color": "#c96198",
             "postfix": "\uF295 ",
             "display_charging": true
           }
@@ -130,12 +114,15 @@
     {
       "type": "prompt",
       "alignment": "left",
+      "vertical_offset": 1,
       "segments": [
         {
           "type": "text",
-          "style": "plain",
-          "foreground": "#ffffff",
-          "background": "#333",
+          "style": "diamond",
+          "leading_diamond": "\ue0b6",
+          "trailing_diamond": "\ue0b4",
+          "foreground": "#96d0ff",
+          "background": "#2d333b",
           "properties": {
             "prefix": "",
             "text": " \uf113"
