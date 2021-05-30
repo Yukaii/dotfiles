@@ -32,7 +32,12 @@
           "style": "powerline",
           "powerline_symbol": "\ue0b4",
           "foreground": "#2d333b",
-          "background": "#f69d50"
+          "background": "#f69d50",
+          "properties": {
+            "display_status": true,
+            "display_stash_count": true,
+            "display_upstream_icon": true
+          }
         },
         {
           "type": "exit",
