@@ -80,6 +80,12 @@ Plug 'plasticboy/vim-markdown'
 Plug 'tpope/vim-rails'
 Plug 'LnL7/vim-nix'
 
+" Tree sitter
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/playground'
+
+Plug 'neovim/nvim-lspconfig'
+
 " ###################
 " # THEMES & COLORS #
 " ###################
@@ -98,7 +104,6 @@ Plug 'mengelbrecht/lightline-bufferline'
 
 Plug 'edkolev/tmuxline.vim'
 
-" dependencies
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 " telescope
@@ -107,7 +112,7 @@ Plug 'nvim-telescope/telescope.nvim'
 " (Optional) Showing function signature and inline doc.
 Plug 'Shougo/echodoc.vim'
 Plug 'ryanoasis/vim-devicons'
-
+Plug 'hrsh7th/nvim-compe'
 
 call plug#end()
 
@@ -164,7 +169,13 @@ let g:lightline = {
   \ 'component_expand': {'buffers': 'lightline#bufferline#buffers'},
   \ 'component_type': {'buffers': 'tabsel'},
 \ }
+let g:lightline.component_raw = {'buffers': 1}
 let g:lightline#bufferline#show_number = 2
+let g:lightline#bufferline#number_map = {
+\ 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴',
+\ 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹'}
+let g:lightline#bufferline#enable_devicons = 1
+let g:lightline#bufferline#clickable = 1
 
 set showtabline=2
 
@@ -259,6 +270,15 @@ endif
 
 colorscheme ayu
 
+" ############################
+" # LANGUAGE SERVER PROTOCOL #
+" ############################
+
+lua << EOF
+require'lspconfig'.tsserver.setup{}
+EOF
+
+
 " ###############
 " # KEY MAPPING #
 " ###############
@@ -267,8 +287,8 @@ map <F2> :NERDTreeToggle<CR>
 map <C-G> :Magit<CR>
 
 " Switch tab
-nmap <S-Tab> :tabprev<Return>
-nmap <Tab> :tabnext<Return>
+" nmap <S-Tab> :tabprev<Return>
+" nmap <Tab> :tabnext<Return>
 
 function! s:goyo_enter()
   set scrolloff=999
