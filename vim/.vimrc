@@ -98,14 +98,11 @@ Plug 'vim-airline/vim-airline-themes'
 
 Plug 'edkolev/tmuxline.vim'
 
-" #######################################
-" # LANGUAGE SERVER RECOMMENDED PLUGINS #
-" #######################################
-
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'tweekmonster/fzf-filemru'
-Plug 'liuchengxu/vista.vim'
+" dependencies
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+" telescope
+Plug 'nvim-telescope/telescope.nvim'
 
 " (Optional) Showing function signature and inline doc.
 Plug 'Shougo/echodoc.vim'
@@ -216,13 +213,6 @@ let g:magit_discard_untracked_do_delete=1
 nmap  -  <Plug>(choosewin)
 let g:choosewin_overlay_enable = 1
 
-" Vista config
-
-let g:vista#executives = ['coc', 'ctags']
-let g:vista_executive_for = {'typescript': 'coc', 'go': 'coc', 'c': 'coc', 'javascript': 'coc', 'html': 'coc', 'rust': 'coc', 'cpp': 'coc', 'css': 'coc', 'python': 'coc'}
-
-let g:indentLine_char = '│'
-
 " markdown config
 
 " disable header folding
@@ -272,13 +262,9 @@ colorscheme monokai_pro
 " ###############
 
 map <C-t> :Commands<CR>
-map <C-x> :ProjectMru --tiebreak=end<cr>
 map <C-p> :Buffers<cr>
-" map <F2> :NERDTreeToggle<CR>
-nmap <silent> ge :CocCommand explorer<CR>
+map <F2> :NERDTreeToggle<CR>
 map <C-G> :Magit<CR>
-map <silent> <C-H> :CocCommand<CR>
-map <F3> :Vista<CR>
 
 " Switch tab
 nmap <S-Tab> :tabprev<Return>
@@ -296,3 +282,9 @@ endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
+" Telescope
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
