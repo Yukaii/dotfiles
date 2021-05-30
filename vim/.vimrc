@@ -23,7 +23,7 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'unkiwii/vim-nerdtree-sync'
 
 " Asynchronous Lint Engine
-Plug 'w0rp/ale'
+" Plug 'w0rp/ale'
 
 " Plug 'airblade/vim-gitgutter'
 " Plug 'asvetliakov/vim-easymotion' " vim neovim fork
@@ -92,21 +92,22 @@ Plug 'neovim/nvim-lspconfig'
 
 " Colorschemes
 Plug 'ayu-theme/ayu-vim'
-Plug 'junegunn/seoul256.vim'
-Plug 'w0ng/vim-hybrid'
-Plug 'phanviet/vim-monokai-pro'
+" Plug 'junegunn/seoul256.vim'
+" Plug 'w0ng/vim-hybrid'
+" Plug 'phanviet/vim-monokai-pro'
 
 " Customization
 " Plug 'vim-airline/vim-airline'
 " Plug 'vim-airline/vim-airline-themes'
 Plug 'itchyny/lightline.vim'
-Plug 'mengelbrecht/lightline-bufferline'
+" Plug 'mengelbrecht/lightline-bufferline'
+Plug 'akinsho/nvim-bufferline.lua'
 
-Plug 'edkolev/tmuxline.vim'
+" Plug 'edkolev/tmuxline.vim'
 
+" Telescope & deps
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
-" telescope
 Plug 'nvim-telescope/telescope.nvim'
 
 " (Optional) Showing function signature and inline doc.
@@ -116,14 +117,40 @@ Plug 'hrsh7th/nvim-compe'
 
 call plug#end()
 
+" ##################
+" # GENERAL CONFIG #
+" ##################
+
+set number
+set relativenumber
+set cursorline
+set mouse=a
+set wrap
+set linebreak
+set noshowmode
+
+" persist undo history
+set undofile
+set undodir=~/.vim/undodir
+
+" set to system keyboard
+set clipboard+=unnamedplus
+
+filetype plugin on
+
+if has("termguicolors")     " set true colors
+  set termguicolors
+endif
+
+
 " #################
 " # PLUGIN CONFIG #
 " #################
 
-let g:ale_linters = {
-\   'javascript': ['standard', 'tsserver'],
-\   'javascriptreact': ['standard', 'tsserver'],
-\}
+" let g:ale_linters = {
+" \   'javascript': ['standard', 'tsserver'],
+" \   'javascriptreact': ['standard', 'tsserver'],
+" \}
 
 " Enable completion where available.
 " let g:ale_completion_enabled = 1
@@ -148,8 +175,7 @@ let g:NERDTrimTrailingWhitespace = 1
 
 let ayucolor="mirage"
 
-let g:seoul256_background = 233
-let g:seoul256_light_background = 256
+colorscheme ayu
 
 " let g:airline#extensions#tabline#enabled = 1
 " let g:airline_solarized_bg='dark'
@@ -165,7 +191,9 @@ let g:lightline = {
   \ 'component_function': {
   \   'gitbranch': 'fugitive#head',
   \ },
-  \ 'tabline': {'left': [['buffers']], 'right': [['close']]},
+  \ 'enable': {
+  \   'tabline': 0
+  \ },
   \ 'component_expand': {'buffers': 'lightline#bufferline#buffers'},
   \ 'component_type': {'buffers': 'tabsel'},
 \ }
@@ -243,39 +271,23 @@ let g:vim_markdown_frontmatter = 1  " for YAML format
 let g:vim_markdown_toml_frontmatter = 1  " for TOML format
 let g:vim_markdown_json_frontmatter = 1  " for JSON format
 
-" ##################
-" # GENERAL CONFIG #
-" ##################
 
-set number
-set relativenumber
-set cursorline
-set mouse=a
-set wrap
-set linebreak
-set noshowmode
+" indent line config
+let g:indentLine_char = '⎸'
 
-" persist undo history
-set undofile
-set undodir=~/.vim/undodir
-
-" set to system keyboard
-set clipboard+=unnamedplus
-
-filetype plugin on
-
-if has("termguicolors")     " set true colors
-  set termguicolors
-endif
-
-colorscheme ayu
-
-" ############################
-" # LANGUAGE SERVER PROTOCOL #
-" ############################
+" ##############
+" # Lua Config #
+" ##############
 
 lua << EOF
 require'lspconfig'.tsserver.setup{}
+require'bufferline'.setup{
+  options = {
+    show_buffer_icons = false,
+    tab_size = 10,
+    diagnostics = "nvim_lsp",
+  }
+}
 EOF
 
 
@@ -304,9 +316,10 @@ autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
 " Telescope
-nnoremap <leader>ff <cmd>Telescope find_files<cr>
-nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>ff <cmd>Telescope git_files<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+nnoremap <silent> gb :BufferLinePick<CR>
 
 map <C-t> :Telescope commands<CR>
 map <C-x> :Telescope builtin<cr>
+
