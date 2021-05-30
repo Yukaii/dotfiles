@@ -91,10 +91,10 @@ Plug 'w0ng/vim-hybrid'
 Plug 'phanviet/vim-monokai-pro'
 
 " Customization
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-" Plug 'itchyny/lightline.vim'
-" Plug 'mengelbrecht/lightline-bufferline'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
+Plug 'itchyny/lightline.vim'
+Plug 'mengelbrecht/lightline-bufferline'
 
 Plug 'edkolev/tmuxline.vim'
 
@@ -146,11 +146,13 @@ let ayucolor="mirage"
 let g:seoul256_background = 233
 let g:seoul256_light_background = 256
 
-let g:airline#extensions#tabline#enabled = 1
-let g:airline_solarized_bg='dark'
+" let g:airline#extensions#tabline#enabled = 1
+" let g:airline_solarized_bg='dark'
 
 let g:lightline = {
-  \ 'colorscheme': 'wombat',
+  \ 'colorscheme': 'ayu_mirage',
+  \ 'separator': { 'left': '', 'right': '' },
+  \ 'subseparator': { 'left': '', 'right': '' },
   \ 'active': {
   \   'left': [ [ 'mode', 'paste' ],
   \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
@@ -255,14 +257,12 @@ if has("termguicolors")     " set true colors
   set termguicolors
 endif
 
-colorscheme monokai_pro
+colorscheme ayu
 
 " ###############
 " # KEY MAPPING #
 " ###############
 
-map <C-t> :Commands<CR>
-map <C-p> :Buffers<cr>
 map <F2> :NERDTreeToggle<CR>
 map <C-G> :Magit<CR>
 
@@ -286,5 +286,7 @@ autocmd! User GoyoLeave nested call <SID>goyo_leave()
 " Telescope
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
+
+map <C-t> :Telescope commands<CR>
+map <C-x> :Telescope builtin<cr>
