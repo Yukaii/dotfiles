@@ -322,4 +322,5 @@ nnoremap <silent> gb :BufferLinePick<CR>
 
 map <C-t> :Telescope commands<CR>
 map <C-x> :Telescope builtin<cr>
+map <C-p> :Telescope git_files<cr>
 
