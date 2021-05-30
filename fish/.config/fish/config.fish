@@ -293,6 +293,7 @@ set -g theme_title_display_process yes
 # status --is-interactive; and pyenv init - | source
 # status --is-interactive; and source (pyenv virtualenv-init -|psub)
 # status --is-interactive; and source (pyenv init -|psub)
+status is-login; and pyenv init --path | source
 
 rvm default
 # nvm use
@@ -302,3 +303,5 @@ alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
 
 oh-my-posh --init --shell fish --config ~/.poshthemes/yukai.omp.json | source
+set -gx VOLTA_HOME "$HOME/.volta"
+set -gx PATH "$VOLTA_HOME/bin" $PATH
