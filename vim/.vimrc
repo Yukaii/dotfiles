@@ -92,6 +92,7 @@ Plug 'neovim/nvim-lspconfig'
 
 " Colorschemes
 Plug 'ayu-theme/ayu-vim'
+Plug 'wojciechkepka/vim-github-dark'
 " Plug 'junegunn/seoul256.vim'
 " Plug 'w0ng/vim-hybrid'
 " Plug 'phanviet/vim-monokai-pro'
@@ -175,28 +176,30 @@ let g:NERDTrimTrailingWhitespace = 1
 
 let ayucolor="mirage"
 
-colorscheme ayu
+colorscheme ghdark
 
 " let g:airline#extensions#tabline#enabled = 1
 " let g:airline_solarized_bg='dark'
 
 let g:lightline = {
-  \ 'colorscheme': 'ayu_mirage',
+  \ 'colorscheme': 'ghdark',
   \ 'separator': { 'left': '', 'right': '' },
   \ 'subseparator': { 'left': '', 'right': '' },
   \ 'active': {
   \   'left': [ [ 'mode', 'paste' ],
-  \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ]
+  \             [ 'gitbranch', 'readonly', 'icon', 'relativepath', 'modified' ] ]
   \ },
   \ 'component_function': {
   \   'gitbranch': 'fugitive#head',
+  \   'icon': 'WebDevIconsGetFileTypeSymbol',
   \ },
   \ 'enable': {
   \   'tabline': 0
   \ },
   \ 'component_expand': {'buffers': 'lightline#bufferline#buffers'},
   \ 'component_type': {'buffers': 'tabsel'},
-\ }
+  \ }
+
 let g:lightline.component_raw = {'buffers': 1}
 let g:lightline#bufferline#show_number = 2
 let g:lightline#bufferline#number_map = {
@@ -236,6 +239,11 @@ function! LightLineFilename()
     let i += 1
   endfor
   return name
+endfunction
+
+function! LightlineWebDevIcons(n)
+  let l:bufnr = tabpagebuflist(a:n)[tabpagewinnr(a:n) - 1]
+  return WebDevIconsGetFileTypeSymbol(bufname(l:bufnr))
 endfunction
 
 let g:tmuxline_powerline_separators = 0
@@ -288,6 +296,63 @@ require'bufferline'.setup{
     diagnostics = "nvim_lsp",
   }
 }
+require'compe'.setup {
+  enabled = true;
+  autocomplete = true;
+  debug = false;
+  min_length = 1;
+  preselect = 'enable';
+  throttle_time = 80;
+  source_timeout = 200;
+  incomplete_delay = 400;
+  max_abbr_width = 100;
+  max_kind_width = 100;
+  max_menu_width = 100;
+  documentation = true;
+
+  source = {
+    path = true;
+    nvim_lsp = true;
+  };
+}
+
+local t = function(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+
+local check_back_space = function()
+    local col = vim.fn.col('.') - 1
+    if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+        return true
+    else
+        return false
+    end
+end
+
+-- Use (s-)tab to:
+--- move to prev/next item in completion menuone
+--- jump to prev/next snippet's placeholder
+_G.tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-n>"
+  elseif check_back_space() then
+    return t "<Tab>"
+  else
+    return vim.fn['compe#complete']()
+  end
+end
+_G.s_tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-p>"
+  else
+    return t "<S-Tab>"
+  end
+end
+
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 EOF
 
 
