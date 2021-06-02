@@ -1,12 +1,13 @@
+jorgebucaran/fisher
 edc/bass
 oh-my-fish/plugin-bundler
 brgmnn/fish-docker-compose
 barnybug/docker-fish-completion
 fisherman/done
-fisherman/fzf
 oh-my-fish/plugin-osx
 oh-my-fish/plugin-tmux
 Cyber-Duck/fish-wakatime
 jethrokuan/z
 lilyball/nix-env.fish
 FabioAntunes/fish-nvm
+PatrickF1/fzf.fish

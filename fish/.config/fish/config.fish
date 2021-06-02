@@ -36,6 +36,8 @@ set LANG "en_US.UTF-8"
 set -x PIPENV_SHELL_FANCY 1
 set -x PIPENV_IGNORE_VIRTUALENVS 1
 
+set --export FZF_DEFAULT_OPTS --height 50% --no-extended +i
+
 # Aliases
 alias ping='prettyping --nolegend'
 alias pg8='ping 8.8.8.8'
