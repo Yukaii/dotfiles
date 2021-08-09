@@ -27,7 +27,7 @@ set ANT_HOME "/usr/local/opt/ant"
 set MAVEN_HOME "/usr/local/opt/maven"
 set GRADLE_HOME "/usr/local/opt/gradle"
 
-set ANDROID_HOME "/usr/local/share/android-sdk"
+set ANDROID_HOME "/Users/yukai/Library/Android/sdk"
 set ANDROID_NDK_HOME "/usr/local/share/android-ndk"
 set ANDROID_SDK_ROOT "/Users/yukai/Library/Android/sdk"
 
@@ -305,5 +305,3 @@ alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
 
 oh-my-posh --init --shell fish --config ~/.poshthemes/yukai.omp.json | source
-set -gx VOLTA_HOME "$HOME/.volta"
-set -gx PATH "$VOLTA_HOME/bin" $PATH
