@@ -2,140 +2,161 @@
   "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
   "blocks": [
     {
-      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "type": "os",
-          "style": "diamond",
-          "foreground": "#96d0ff",
+          "Enabled": false,
           "background": "#2d333b",
+          "foreground": "#96d0ff",
           "leading_diamond": "\ue0b6",
-          "trailing_diamond": "\ue0b4"
+          "style": "diamond",
+          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} ",
+          "trailing_diamond": "\ue0b4",
+          "type": "os"
         },
         {
-          "type": "path",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b4",
-          "foreground": "#2d333b",
+          "Enabled": false,
           "background": "#c6e6ff",
-          "properties": {
-            "style": "mixed",
-            "enable_hyperlink": true,
-            "home_icon": "\uF7DB",
-            "folder_icon": "\uF115",
-            "folder_separator_icon": " \uE0B1 "
-          }
-        },
-        {
-          "type": "git",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b4",
           "foreground": "#2d333b",
-          "background": "#f69d50",
+          "powerline_symbol": "\ue0b4",
           "properties": {
-            "display_status": true,
-            "display_stash_count": true,
-            "display_upstream_icon": true,
-            "branch_max_length": 30
-          }
+            "folder_icon": "\uf115",
+            "folder_separator_icon": " \ue0b1 ",
+            "home_icon": "\uf7db",
+            "style": "mixed"
+          },
+          "style": "powerline",
+          "template": " {{ .Path }} ",
+          "type": "path"
         },
         {
-          "type": "exit",
-          "style": "powerline",
-          "powerline_symbol": "\uE0B0",
-          "foreground": "#ffffff",
-          "background": "#ff8080",
+          "Enabled": false,
+          "background": "#f69d50",
+          "foreground": "#2d333b",
+          "powerline_symbol": "\ue0b4",
           "properties": {
-            "prefix": "\uE20F"
-          }
+            "branch_max_length": 30,
+            "fetch_stash_count": true,
+            "fetch_status": true,
+            "fetch_upstream_icon": true
+          },
+          "style": "powerline",
+          "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}} \uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} ",
+          "type": "git"
+        },
+        {
+          "Enabled": false,
+          "background": "#ff8080",
+          "foreground": "#ffffff",
+          "powerline_symbol": "\ue0b0",
+          "style": "powerline",
+          "template": "\ue20f{{ if gt .Code 0 }}\uf00d {{ .Meaning }}{{ else }}\uf42e{{ end }} ",
+          "type": "exit"
         }
-      ]
+      ],
+      "type": "prompt"
     },
     {
-      "type": "prompt",
       "alignment": "right",
       "segments": [
         {
-          "type": "executiontime",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b6",
-          "invert_powerline": true,
-          "foreground": "#ffffff",
+          "Enabled": false,
           "background": "#daaa3f",
-          "properties": {
-            "threshold": 500,
-            "style": "austin",
-            "prefix": " <#fefefe>\ufbab</> "
-          }
-        },        
-        {
-          "type": "node",
-          "style": "powerline",
-          "powerline_symbol": "\ue0b6",
-          "invert_powerline": true,
           "foreground": "#ffffff",
-          "background": "#57ab5a",
+          "invert_powerline": true,
+          "powerline_symbol": "\ue0b6",
           "properties": {
-            "prefix": " \uE718 "
-          }
+            "style": "austin",
+            "threshold": 500
+          },
+          "style": "powerline",
+          "template": " <#fefefe>\ufbab</> {{ .FormattedMs }} ",
+          "type": "executiontime"
         },
         {
-          "type": "time",
-          "style": "powerline",
+          "Enabled": false,
+          "background": "#57ab5a",
+          "foreground": "#ffffff",
           "invert_powerline": true,
           "powerline_symbol": "\ue0b6",
+          "style": "powerline",
+          "template": " \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }} ",
+          "type": "node"
+        },
+        {
+          "Enabled": false,
           "background": "#373e47",
           "foreground": "#ffffff",
-          "properties": {
-            "time_format": "Mon 1/2 3:04 PM"
-          }
-        },
-        {
-          "type": "battery",
-          "style": "diamond",
-          "leading_diamond": "\ue0b6",
           "invert_powerline": true,
           "powerline_symbol": "\ue0b6",
-          "foreground": "#193549",
-          "background": "#daaa3f",
           "properties": {
-            "battery_icon": "",
-            "discharging_icon": "\uf57d ",
-            "charging_icon": "\uf583 ",
+            "time_format": "Mon 1/2 3:04 PM"
+          },
+          "style": "powerline",
+          "template": " {{ .CurrentDate | date .Format }} ",
+          "type": "time"
+        },
+        {
+          "Enabled": false,
+          "background": "#2f2f2f",
+          "foreground": "#26C6DA",
+          "invert_powerline": true,
+          "powerline_symbol": "\ue0b6",
+          "properties": {
+            "postfix": "% ",
+            "precision": 2,
+            "prefix": " \uf85a {{ round .PhysicalPercentUsed .Precision }}%"
+          },
+          "style": "powerline",
+          "type": "sysinfo"
+        },
+        {
+          "Enabled": false,
+          "background": "#daaa3f",
+          "background_templates": [
+            "{{ if eq \"Full\" .State.String }}#4caf50{{ end }}",
+            "{{ if eq \"Charging\" .State.String }}#f47067{{ end }}",
+            "{{ if eq \"Discharging\" .State.String }}#c96198{{ end }}"
+          ],
+          "foreground": "#193549",
+          "invert_powerline": true,
+          "leading_diamond": "\ue0b6",
+          "powerline_symbol": "\ue0b6",
+          "properties": {
             "charged_icon": "\uf578 ",
-            "color_background": true,
-            "charged_color": "#4caf50",
-            "charging_color": "#f47067",
-            "discharging_color": "#c96198",
-            "postfix": "\uF295 ",
-            "display_charging": true
-          }
+            "charging_icon": "\uf583 ",
+            "discharging_icon": "\uf57d "
+          },
+          "style": "diamond",
+          "template": " {{ if not .Error }}{{ .Icon }}{{ .Percentage }}{{ end }}{{ .Error }}\uf295 ",
+          "type": "battery"
         }
-      ]
+      ],
+      "type": "prompt"
     },
     {
       "type": "newline"
     },
     {
-      "type": "prompt",
       "alignment": "left",
       "segments": [
         {
-          "type": "text",
-          "style": "diamond",
-          "leading_diamond": "\ue0b6",
-          "trailing_diamond": "\ue0b4",
-          "foreground": "#96d0ff",
+          "Enabled": false,
           "background": "#2d333b",
-          "properties": {
-            "prefix": "",
-            "text": " \uf113"
-          }
+          "foreground": "#96d0ff",
+          "leading_diamond": "\ue0b6",
+          "style": "diamond",
+          "template": " \uf113 ",
+          "trailing_diamond": "\ue0b4",
+          "type": "text"
         }
-      ]
+      ],
+      "type": "prompt"
     }
-
   ],
-  "final_space": true
+  "final_space": true,
+  "transient_prompt": {
+    "Enabled": false
+  },
+  "version": 2
 }
