@@ -2,6 +2,8 @@ local wezterm = require 'wezterm';
 
 return {
   font = wezterm.font_with_fallback({
+    -- "Sarasa Term TC Nerd Font",
+    -- "Sarasa Term TC",
     "Iosevka Nerd Font Mono",
     -- "Jetbrains Mono",
   }),
@@ -9,15 +11,18 @@ return {
   window_decorations = "RESIZE",
   font_size = 18,
   default_prog = {"/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish"},
-  color_scheme = "ayu",
+  -- color_scheme = "Ayu Mirage",
+  -- color_scheme = "Overnight Slumber",
+  color_scheme = "GitHub Dark",
   window_padding = {
     left = 15,
     right = 15,
     top = 15,
     bottom = 15,
   },
+  use_fancy_tab_bar = false,
   tab_bar_at_bottom = true,
-  colors = {    
+  colors = {
     tab_bar = {
       background = "#0f1419",
       active_tab = {
@@ -44,6 +49,6 @@ return {
         fg_color = "#c9d1d9",
         italic = false,
       }
-    }  
+    }
   },
 }
