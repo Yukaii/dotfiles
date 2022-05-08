@@ -42,7 +42,8 @@ Plug 'moll/vim-bbye'
 " Plug 'mattn/emmet-vim'
 Plug 'terryma/vim-multiple-cursors'
 Plug 's3rvac/AutoFenc'
-Plug 'Yggdroot/indentLine'
+" Plug 'Yggdroot/indentLine'
+Plug 'lukas-reineke/indent-blankline.nvim'
 
 Plug 'xolox/vim-misc' " Session management
 Plug 'xolox/vim-session' " Session management
@@ -51,6 +52,7 @@ Plug 'farmergreg/vim-lastplace'
 
 Plug 'junegunn/goyo.vim'
 Plug 'junegunn/limelight.vim'
+Plug 'amix/vim-zenroom2'
 
 Plug 'google/vim-searchindex'
 Plug 't9md/vim-choosewin'
@@ -86,6 +88,9 @@ Plug 'nvim-treesitter/playground'
 
 Plug 'neovim/nvim-lspconfig'
 
+" The mighty
+Plug 'github/copilot.vim'
+
 " ###################
 " # THEMES & COLORS #
 " ###################
@@ -93,9 +98,10 @@ Plug 'neovim/nvim-lspconfig'
 " Colorschemes
 Plug 'ayu-theme/ayu-vim'
 Plug 'wojciechkepka/vim-github-dark'
-" Plug 'junegunn/seoul256.vim'
-" Plug 'w0ng/vim-hybrid'
-" Plug 'phanviet/vim-monokai-pro'
+Plug 'preservim/vim-colors-pencil'
+Plug 'junegunn/seoul256.vim'
+Plug 'w0ng/vim-hybrid'
+Plug 'phanviet/vim-monokai-pro'
 
 " Customization
 " Plug 'vim-airline/vim-airline'
@@ -174,7 +180,7 @@ let g:NERDCommentEmptyLines = 1
 " Enable trimming of trailing whitespace when uncommenting
 let g:NERDTrimTrailingWhitespace = 1
 
-let ayucolor="mirage"
+let ayucolor="light"
 
 colorscheme ghdark
 
@@ -281,7 +287,17 @@ let g:vim_markdown_json_frontmatter = 1  " for JSON format
 
 
 " indent line config
-let g:indentLine_char = '⎸'
+" let g:indentLine_char = '⎸'
+
+" ##################
+" # Neovide Config #
+" ##################
+
+let g:neovide_cursor_vfx_mode = "railgun"
+let g:neovide_transparency = 0.95
+" let g:neovide_fullscreen=v:true
+let g:neovide_cursor_vfx_particle_density=15.0
+set guifont=JetBrainsMono\ Nerd\ Font\ Mono:h16
 
 " ##############
 " # Lua Config #
@@ -353,6 +369,11 @@ vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
 vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+
+require("indent_blankline").setup {
+    char = "|",
+    buftype_exclude = {"terminal"}
+}
 EOF
 
 
@@ -370,11 +391,15 @@ map <C-G> :Magit<CR>
 function! s:goyo_enter()
   set scrolloff=999
   Limelight
+  colorscheme pencil
+  set background=light
 endfunction
 
 function! s:goyo_leave()
   set scrolloff=0
   Limelight!
+  colorscheme ghdark
+  set background=dark
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
