@@ -13,6 +13,8 @@ else
 end
 
 
+set PATH $PATH "$HOME/.cargo/bin"
+
 set PATH $PATH "$HOME/go/bin"
 
 set PATH $PATH "$HOME/.poetry/bin"
@@ -30,6 +32,9 @@ set GRADLE_HOME "/usr/local/opt/gradle"
 set ANDROID_HOME "/Users/yukai/Library/Android/sdk"
 set ANDROID_NDK_HOME "/usr/local/share/android-ndk"
 set ANDROID_SDK_ROOT "/Users/yukai/Library/Android/sdk"
+
+# Python 3
+set PATH $PATH "/Users/yukai/Library/Python/3.8/bin:"
 
 set LANG "en_US.UTF-8"
 
@@ -51,6 +56,8 @@ alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 function passgrep
   pass find $argv | env GREP_COLOR='1;34' egrep --color -i "$argv|\$"
 end
+
+alias n='nvm use'
 
 alias g='git'
 #compdef g=git
@@ -305,3 +312,4 @@ alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
 
 oh-my-posh --init --shell fish --config ~/.poshthemes/yukai.omp.json | source
+# oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/M365Princess.omp.json" | source
