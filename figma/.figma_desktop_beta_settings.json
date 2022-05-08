@@ -1,0 +1,6 @@
+{
+  "cssInjection": {
+    "path": "~/.config/figma/figmadark.css",
+    "backgroundColor": "#333"
+  }
+}
