@@ -30,6 +30,7 @@ patch:
   "app_options/com.facebook.archon/ascii_mode": true
   "app_options/com.readdle.spark/ascii_mode": true
   "app_options/com.raycast.macos/ascii_mode": true
+  "app_options/md.obsidian/ascii_mode": true
 
   "preset_color_schemes/batman":
     author: "Rango <tntaben@gmail.com>"
