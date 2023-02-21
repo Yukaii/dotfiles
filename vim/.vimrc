@@ -27,6 +27,7 @@ Plug 'unkiwii/vim-nerdtree-sync'
 
 " Plug 'airblade/vim-gitgutter'
 " Plug 'asvetliakov/vim-easymotion' " vim neovim fork
+Plug 'lewis6991/gitsigns.nvim'
 Plug 'easymotion/vim-easymotion', { 'as': 'easymotion' }
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive' " Git Commands
@@ -81,6 +82,13 @@ Plug 'godlygeek/tabular' " vim-markdown dependency
 Plug 'plasticboy/vim-markdown'
 Plug 'tpope/vim-rails'
 Plug 'LnL7/vim-nix'
+Plug 'ledger/vim-ledger'
+
+" Command
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'Shougo/deol.nvim'
+Plug 'vim-denops/denops.vim'
+Plug 'Shougo/ddu.vim'
 
 " Tree sitter
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -102,6 +110,7 @@ Plug 'preservim/vim-colors-pencil'
 Plug 'junegunn/seoul256.vim'
 Plug 'w0ng/vim-hybrid'
 Plug 'phanviet/vim-monokai-pro'
+Plug 'rebelot/kanagawa.nvim'
 
 " Customization
 " Plug 'vim-airline/vim-airline'
@@ -121,6 +130,8 @@ Plug 'nvim-telescope/telescope.nvim'
 Plug 'Shougo/echodoc.vim'
 Plug 'ryanoasis/vim-devicons'
 Plug 'hrsh7th/nvim-compe'
+
+Plug 'github/copilot.vim'
 
 call plug#end()
 
@@ -183,6 +194,7 @@ let g:NERDTrimTrailingWhitespace = 1
 let ayucolor="light"
 
 colorscheme ghdark
+" colorscheme kanagawa
 
 " let g:airline#extensions#tabline#enabled = 1
 " let g:airline_solarized_bg='dark'
@@ -374,6 +386,8 @@ require("indent_blankline").setup {
     char = "|",
     buftype_exclude = {"terminal"}
 }
+
+require('gitsigns').setup()
 EOF
 
 
@@ -414,3 +428,5 @@ map <C-t> :Telescope commands<CR>
 map <C-x> :Telescope builtin<cr>
 map <C-p> :Telescope git_files<cr>
 
+" Syntax mode alias
+au BufReadPost *.beancount set syntax=ledger
