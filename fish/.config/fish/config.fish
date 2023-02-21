@@ -7,6 +7,7 @@ set PATH $PATH "$HOME/.deno/bin"
 
 set arc (arch)
 if string match -q "arm64" $arc
+    # set PATH $PATH "/usr/local/bin"
     set PATH $PATH "/opt/homebrew/bin/"
 else
   set PATH $PATH "/usr/local/bin"
@@ -20,6 +21,12 @@ set PATH $PATH "$HOME/go/bin"
 set PATH $PATH "$HOME/.poetry/bin"
 set PATH $PATH "$HOME/Library/Android/sdk/platform-tools"
 set PATH $PATH "$HOME/Library/Android/sdk/tools"
+
+# solana
+set PATH $PATH "$HOME/.local/share/solana/install/active_release/bin"
+
+# bun
+set PATH $PATH "$HOME/.bun/bin"
 
 # mysql
 set PATH $PATH "/usr/local/mysql/bin:"
@@ -311,5 +318,16 @@ set -x GPG_TTY (tty)
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
 
-oh-my-posh --init --shell fish --config ~/.poshthemes/yukai.omp.json | source
+oh-my-posh --init --shell fish --config ~/.poshthemes/uew.omp.json | source
 # oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/M365Princess.omp.json" | source
+
+# pnpm setup
+set PNPM_HOME "$HOME/Library/pnpm"
+set PATH $PNPM_HOME $PATH
+
+# tabtab source for packages
+# uninstall by removing these lines
+[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
+
+# GCloud
+source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
