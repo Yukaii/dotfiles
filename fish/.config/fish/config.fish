@@ -64,8 +64,6 @@ function passgrep
   pass find $argv | env GREP_COLOR='1;34' egrep --color -i "$argv|\$"
 end
 
-alias n='nvm use'
-
 alias g='git'
 #compdef g=git
 alias gst='git status'
@@ -318,8 +316,7 @@ set -x GPG_TTY (tty)
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
 
-oh-my-posh --init --shell fish --config ~/.poshthemes/uew.omp.json | source
-# oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/M365Princess.omp.json" | source
+oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/uew.omp.json" | source
 
 # pnpm setup
 set PNPM_HOME "$HOME/Library/pnpm"
@@ -331,3 +328,12 @@ set PATH $PNPM_HOME $PATH
 
 # GCloud
 source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
+
+set -gx VOLTA_HOME "$HOME/.volta"
+set -gx PATH "$VOLTA_HOME/bin" $PATH
+
+for completion in (volta completions fish)
+  eval $completion
+end
+
+alias v='volta'
