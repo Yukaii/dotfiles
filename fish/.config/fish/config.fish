@@ -5,10 +5,13 @@ source $__fish_config_dir/secrets.fish
 set PATH $PATH "$HOME/.bin"
 set PATH $PATH "$HOME/.deno/bin"
 
+set VOLTA_HOME "$HOME/.volta"
+set PATH "$VOLTA_HOME/bin" $PATH
+
 set arc (arch)
 if string match -q "arm64" $arc
-    # set PATH $PATH "/usr/local/bin"
-    set PATH $PATH "/opt/homebrew/bin/"
+  # set PATH $PATH "/usr/local/bin"
+  set PATH $PATH "/opt/homebrew/bin/"
 else
   set PATH $PATH "/usr/local/bin"
 end
@@ -309,7 +312,7 @@ set -g theme_title_display_process yes
 # status --is-interactive; and source (pyenv init -|psub)
 status is-login; and pyenv init --path | source
 
-rvm default
+# rvm default
 # nvm use
 set -x GPG_TTY (tty)
 
@@ -329,11 +332,13 @@ set PATH $PNPM_HOME $PATH
 # GCloud
 source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
 
-set -gx VOLTA_HOME "$HOME/.volta"
-set -gx PATH "$VOLTA_HOME/bin" $PATH
+for completion in (fnm completions --shell fish)
+  eval $completion
+end
 
 for completion in (volta completions fish)
   eval $completion
 end
 
-alias v='volta'
+fnm env --use-on-cd | source
+
