@@ -1,0 +1,25 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run the `open default settings` command
+// from the command palette or from `Zed` application menu.
+{
+    "buffer_font_size": 16,
+    "theme": "Rosé Pine",
+    "vim_mode": true,
+    "auto_update": true,
+    "terminal": {
+        "shell": {
+            "program": "/opt/homebrew/bin/fish"
+        },
+        "font_family": "Iosevka Nerd Font Mono",
+        "font_size": 18,
+        "blinking": "off",
+        "option_as_meta": true
+    },
+    "confirm_quit": true,
+    "cursor_blink": false
+}
