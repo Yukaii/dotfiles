@@ -2,3 +2,13 @@ theme = "sonokai"
 
 [editor]
 line-number = "relative"
+bufferline = "always"
+# scroll-lines = 1
+cursorline = true
+cursorcolumn = true
+
+[editor.indent-guides]
+render = true
+
+[editor.soft-wrap]
+enable = true
