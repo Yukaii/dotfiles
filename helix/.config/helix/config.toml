@@ -1,8 +1,10 @@
 theme = "sonokai"
 
 [editor]
+true-color = true
 line-number = "relative"
 bufferline = "always"
+rulers = [120]
 # scroll-lines = 1
 cursorline = true
 cursorcolumn = true
@@ -12,3 +14,22 @@ render = true
 
 [editor.soft-wrap]
 enable = true
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+[editor.file-picker]
+hidden = false
+
+[keys.normal]
+C-y = ["move_line_up", "scroll_up"]
+C-e = ["move_line_down", "scroll_down"]
+esc = ["collapse_selection", "keep_primary_selection"]
+
+[keys.normal.space]
+w   = ":write"
+q   = ":quit"
+c   = ":config-reload"
+',' = ":config-open"
