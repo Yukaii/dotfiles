@@ -2,10 +2,7 @@ local wezterm = require 'wezterm';
 
 return {
   font = wezterm.font_with_fallback({
-    -- "Sarasa Term TC Nerd Font",
-    -- "Sarasa Term TC",
     "Iosevka Nerd Font Mono",
-    -- "Jetbrains Mono",
   }),
   window_background_opacity = 1.0,
   window_decorations = "RESIZE",
@@ -52,4 +49,6 @@ return {
     }
   },
   -- scrollback_lines = 1000000
+  command_palette_font_size = 18,
+  command_palette_bg_color = "#0f1419"
 }
