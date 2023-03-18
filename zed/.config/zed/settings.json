@@ -8,7 +8,7 @@
 // from the command palette or from `Zed` application menu.
 {
     "buffer_font_size": 16,
-    "theme": "Rosé Pine",
+    "theme": "Rosé Pine Moon",
     "vim_mode": true,
     "auto_update": true,
     "terminal": {
