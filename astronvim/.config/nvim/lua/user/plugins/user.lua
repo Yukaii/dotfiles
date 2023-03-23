@@ -18,13 +18,6 @@ return {
     end
   },
   { 'ruifm/gitlinker.nvim', lazy = false },
-  {
-    'github/copilot.vim',
-    lazy = false,
-    config = function()
-      -- require('copilot').setup({
-      --   accept = '<M-l>'
-      -- })
-    end
-  },
+  { 'github/copilot.vim',   lazy = false },
+  { 'ntpeters/vim-better-whitespace', lazy = false }
 }

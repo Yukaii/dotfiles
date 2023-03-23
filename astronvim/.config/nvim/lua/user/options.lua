@@ -19,6 +19,7 @@ return {
     copilot_no_tab_map = true,
     copilot_assume_mapped = true,
     copilot_node_command = "~/.volta/tools/image/node/18.14.2/bin/node",
+    better_whitespace_enabled = false
   },
 }
 -- If you need more control, you can use the function()...end notation
