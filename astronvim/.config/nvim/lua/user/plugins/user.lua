@@ -22,9 +22,9 @@ return {
     'github/copilot.vim',
     lazy = false,
     config = function()
-      vim.g.copilot_no_tab_map = true
-      vim.g.copilot_assume_mapped = true
-      vim.g.copilot_node_command = "~/.volta/tools/image/node/18.14.2/bin/node"
+      -- require('copilot').setup({
+      --   accept = '<M-l>'
+      -- })
     end
-  }
+  },
 }
