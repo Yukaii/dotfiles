@@ -31,7 +31,13 @@ return {
       require('kanagawa').setup({})
     end
   },
-  { 'ruifm/gitlinker.nvim',           lazy = false },
+  {
+    'ruifm/gitlinker.nvim',
+    lazy = false,
+    config = function()
+      require "gitlinker".setup()
+    end
+  },
   { 'github/copilot.vim',             lazy = false },
   { 'ntpeters/vim-better-whitespace', lazy = false }
 }
