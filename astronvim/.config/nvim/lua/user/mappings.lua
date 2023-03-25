@@ -35,14 +35,19 @@ return {
       function()
         require("astronvim.utils").toggle_term_cmd("tig")
       end,
-      desc = "Open tig",
+      desc = "ToggleTerm tig",
     },
     ["<leader>tt"] = {
-      -- "<cmd>TermExec cmd=btop<cr>",
       function()
         require("astronvim.utils").toggle_term_cmd("btop")
       end,
-      desc = "Open btop"
+      desc = "ToggleTerm btop"
+    },
+    ["<leader>tb"] = {
+      function()
+        require("astronvim.utils").toggle_term_cmd("git-bug termui")
+      end,
+      desc = "ToggleTerm git-bug"
     },
     ["<leader>c"] = {
       function()
@@ -56,6 +61,10 @@ return {
     ["<leader>Z"] = { "<cmd>ZenMode<cr>" },
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
+    ["<C-l>"] = false,
+    ["<C-h>"] = false,
+    ["<C-j>"] = false,
+    ["<C-k>"] = false,
   },
   t = {
     -- setting a mapping to false will disable it
