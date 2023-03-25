@@ -69,8 +69,9 @@ return {
       require("nvim-surround").setup {}
     end
   },
-  { "mg979/vim-visual-multi", event = "VeryLazy", },
-  { 'windwp/nvim-spectre',    event = "VeryLazy" }
+  { "mg979/vim-visual-multi",           event = "VeryLazy", },
+  { 'windwp/nvim-spectre',              event = "VeryLazy" },
+  { 'nyoom-engineering/oxocarbon.nvim', lazy = false },
   {
     "MaximilianLloyd/ascii.nvim",
     lazy = false,
