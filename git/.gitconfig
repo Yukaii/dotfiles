@@ -4,11 +4,13 @@
 [core]
 	pager = git-split-diffs --color | less -RFX
 	excludesfile = ~/.gitignore_global
-	editor = code -w
+	editor = nvim
 [delta]
     plus-style = "syntax #012800"
     minus-style = "syntax #340001"
     syntax-theme = Monokai Extended
+[push]
+	autoSetupRemote = true
 
 [interactive]
     diffFilter = delta --color-only
