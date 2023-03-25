@@ -81,6 +81,11 @@ return {
     require('toggleterm').setup {
       shell = 'fish'
     }
+
+    vim.o.langmenu = 'en_US'
+
+    if vim.g.neovide then
+    end
   end,
   icons = {
     ActiveLSP = "",
