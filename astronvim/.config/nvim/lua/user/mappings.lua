@@ -24,6 +24,11 @@ return {
     -- this is useful for naming menus
     ["<leader>b"] = { name = "Buffers" },
     ["<leader>gy"] = { desc = "Copy GitHub URL" },
+    ["<leader>s"] = { name = "Whitespace" },
+    ["<leader>ss"] = {
+      "<cmd>StripWhitespace<cr>",
+      desc = "Strip whitespace",
+    },
     ["<leader>tg"] = {
       function()
         require("astronvim.utils").toggle_term_cmd("tig")
