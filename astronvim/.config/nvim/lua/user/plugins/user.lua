@@ -70,13 +70,21 @@ return {
     end
   },
   { "mg979/vim-visual-multi",           event = "VeryLazy", },
-  { 'windwp/nvim-spectre',              event = "VeryLazy" },
-  { 'nyoom-engineering/oxocarbon.nvim', lazy = false },
+  { "windwp/nvim-spectre",              event = "VeryLazy" },
+  { "nyoom-engineering/oxocarbon.nvim", lazy = false },
   {
     "MaximilianLloyd/ascii.nvim",
     lazy = false,
-    requires = {
+    dependencies = {
       "MunifTanjim/nui.nvim"
     }
+  },
+  {
+    "nvim-telescope/telescope-frecency.nvim",
+    config = function()
+      require "telescope".load_extension("frecency")
+    end,
+    event = "VeryLazy",
+    dependencies = { "kkharji/sqlite.lua", event = "VeryLazy" }
   }
 }

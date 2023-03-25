@@ -65,6 +65,10 @@ return {
     ["<C-h>"] = false,
     ["<C-j>"] = false,
     ["<C-k>"] = false,
+    ["<C-p>"] = {
+      "<cmd>lua require('telescope').extensions.frecency.frecency()<CR>",
+      desc = "Telescope Frecency",
+    }
   },
   t = {
     -- setting a mapping to false will disable it
