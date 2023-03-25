@@ -39,5 +39,6 @@ return {
     end
   },
   { 'github/copilot.vim',             lazy = false },
-  { 'ntpeters/vim-better-whitespace', lazy = false }
+  { 'ntpeters/vim-better-whitespace', lazy = false },
+  { 'imsnif/kdl.vim',                 lazy = false }
 }
