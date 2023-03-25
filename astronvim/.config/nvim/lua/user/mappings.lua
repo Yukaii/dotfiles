@@ -24,11 +24,13 @@ return {
     -- this is useful for naming menus
     ["<leader>b"] = { name = "Buffers" },
     ["<leader>gy"] = { desc = "Copy GitHub URL" },
-    ["<leader>s"] = { name = "Whitespace" },
-    ["<leader>ss"] = {
+    ["<leader>s"] = { name = "Search and Format" },
+    ["<leader>s<space>"] = {
       "<cmd>StripWhitespace<cr>",
       desc = "Strip whitespace",
     },
+    ["<leader>ss"] = { function() require("spectre").open() end, desc = "Search" },
+    ["<leader>sw"] = { function() require("spectre").open_visual { select_word = true } end, desc = "Search current word" },
     ["<leader>tg"] = {
       function()
         require("astronvim.utils").toggle_term_cmd("tig")

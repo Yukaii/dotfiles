@@ -63,10 +63,12 @@ return {
   },
   {
     "kylechui/nvim-surround",
-    version = "*",   -- Use for stability; omit to use `main` branch for the latest features
+    version = "*",      -- Use for stability; omit to use `main` branch for the latest features
     event = "VeryLazy", -- Load on specific events
     config = function()
       require("nvim-surround").setup {}
     end
-  }
+  },
+  { "mg979/vim-visual-multi", event = "VeryLazy", },
+  { 'windwp/nvim-spectre',    event = "VeryLazy" }
 }
