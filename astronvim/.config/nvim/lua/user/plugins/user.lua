@@ -71,4 +71,11 @@ return {
   },
   { "mg979/vim-visual-multi", event = "VeryLazy", },
   { 'windwp/nvim-spectre',    event = "VeryLazy" }
+  {
+    "MaximilianLloyd/ascii.nvim",
+    lazy = false,
+    requires = {
+      "MunifTanjim/nui.nvim"
+    }
+  }
 }
