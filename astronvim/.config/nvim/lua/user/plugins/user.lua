@@ -10,21 +10,6 @@ return {
   --   end,
   -- },
   {
-    "catppuccin/nvim",
-    config = function()
-      require('catppuccin').setup({
-        flavour = "mocha"
-      })
-    end
-  },
-  {
-    "projekt0n/github-nvim-theme",
-    lazy = false,
-    config = function()
-      require('github-theme').setup()
-    end
-  },
-  {
     "rebelot/kanagawa.nvim",
     lazy = false,
     config = function()
@@ -59,7 +44,7 @@ return {
         plugins = {
           options = {
             enabled = true,
-            ruler = false, -- disables the ruler text in the cmd line area
+            ruler = false,   -- disables the ruler text in the cmd line area
             showcmd = false, -- disables the command in the last line of the screen
           },
         },
@@ -74,6 +59,14 @@ return {
           vim.o.cmdheight = 0
         end
       }
+    end
+  },
+  {
+    "kylechui/nvim-surround",
+    version = "*",   -- Use for stability; omit to use `main` branch for the latest features
+    event = "VeryLazy", -- Load on specific events
+    config = function()
+      require("nvim-surround").setup {}
     end
   }
 }
