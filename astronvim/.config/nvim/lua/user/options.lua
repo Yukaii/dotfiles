@@ -21,6 +21,9 @@ return {
     copilot_no_tab_map = true,
     copilot_assume_mapped = true,
     copilot_node_command = "~/.volta/tools/image/node/18.14.2/bin/node",
+    copilot_filetypes = {
+      markdown = true
+    },
     better_whitespace_enabled = false
   },
 }
