@@ -86,5 +86,6 @@ return {
     end,
     event = "VeryLazy",
     dependencies = { "kkharji/sqlite.lua", event = "VeryLazy" }
-  }
+  },
+  { 'sindrets/diffview.nvim', event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' }
 }
