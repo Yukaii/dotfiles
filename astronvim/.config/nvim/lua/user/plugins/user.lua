@@ -87,5 +87,19 @@ return {
     event = "VeryLazy",
     dependencies = { "kkharji/sqlite.lua", event = "VeryLazy" }
   },
-  { 'sindrets/diffview.nvim', event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' }
+  { 'sindrets/diffview.nvim', event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },
+  {
+    "jackMort/ChatGPT.nvim",
+    config = function()
+      require("chatgpt").setup({
+        -- optional configuration
+      })
+    end,
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim"
+    }
+  }
 }
