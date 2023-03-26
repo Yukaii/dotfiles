@@ -49,6 +49,12 @@ return {
       end,
       desc = "ToggleTerm git-bug"
     },
+    ["<leader>ts"] = {
+      function()
+        require("astronvim.utils").toggle_term_cmd("spt")
+      end,
+      desc = "ToggleTerm spotify-tui"
+    },
     ["<leader>c"] = {
       function()
         local bufs = vim.fn.getbufinfo { buflisted = true }
