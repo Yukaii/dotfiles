@@ -72,7 +72,7 @@ return {
     ["<C-j>"] = false,
     ["<C-k>"] = false,
     ["<C-p>"] = {
-      "<cmd>lua require('telescope').extensions.frecency.frecency()<CR>",
+      "<cmd>lua require('telescope').extensions.frecency.frecency({ show_unindexed = false })<CR>",
       desc = "Telescope Frecency",
     }
   },
