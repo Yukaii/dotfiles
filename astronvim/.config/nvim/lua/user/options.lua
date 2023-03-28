@@ -9,6 +9,7 @@ return {
     wrap = true,           -- sets vim.opt.wrap
     guifont = "JetbrainsMono Nerd Font:h17:#h-normal",
     cursorcolumn = true,
+    conceallevel = 2,
   },
   g = {
     mapleader = " ",                 -- sets vim.g.mapleader
@@ -24,7 +25,18 @@ return {
     copilot_filetypes = {
       markdown = true
     },
-    better_whitespace_enabled = false
+    better_whitespace_enabled = false,
+    vim_markdown_new_list_item_indent = 2,
+    vim_markdown_frontmatter = 1,
+    vim_markdown_folding_level = 6,
+    vim_markdown_conceal_code_blocks = 0,
+    markdown_fenced_languages = {
+      'javascript=js',
+      'ruby=rb',
+      'rust=rs',
+      'typescript=ts',
+      'python=py',
+    }
   },
 }
 -- If you need more control, you can use the function()...end notation

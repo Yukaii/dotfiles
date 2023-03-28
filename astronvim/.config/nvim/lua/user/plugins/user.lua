@@ -113,6 +113,13 @@ return {
       "MunifTanjim/nui.nvim",
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope.nvim"
+    },
+  },
+  {
+    'preservim/vim-markdown',
+    event = "VeryLazy",
+    dependencies = {
+      'godlygeek/tabular'
     }
   }
 }
