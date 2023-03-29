@@ -86,7 +86,8 @@ return {
       {
         "nvim-telescope/telescope-frecency.nvim",
         dependencies = { "kkharji/sqlite.lua" }
-      }
+      },
+      "LukasPietzschmann/telescope-tabs"
     },
     -- the first parameter is the plugin specification
     -- the second is the table of options as set up in Lazy with the `opts` key
@@ -98,6 +99,9 @@ return {
       local telescope = require "telescope"
       telescope.load_extension "media_files"
       telescope.load_extension "frecency"
+      require 'telescope-tabs'.setup {
+        -- Your custom config :^)
+      }
     end,
   },
   { 'sindrets/diffview.nvim', event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },

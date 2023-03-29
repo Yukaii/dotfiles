@@ -31,6 +31,7 @@ return {
     },
     ["<leader>ss"] = { function() require("spectre").open() end, desc = "Search" },
     ["<leader>sw"] = { function() require("spectre").open_visual { select_word = true } end, desc = "Search current word" },
+    ["<leader>fT"] = { function() require('telescope-tabs').list_tabs() end, desc = "Find tabs" },
     ["<leader>tg"] = {
       function()
         require("astronvim.utils").toggle_term_cmd("tig")
