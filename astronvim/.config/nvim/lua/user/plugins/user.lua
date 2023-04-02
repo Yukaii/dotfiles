@@ -125,5 +125,13 @@ return {
     dependencies = {
       'godlygeek/tabular'
     }
+  },
+  {
+    "xiyaowong/transparent.nvim",
+    lazy = false,
+    config = function()
+      require("transparent").setup({
+      })
+    end,
   }
 }
