@@ -13,5 +13,4 @@ return {
   { import = "astrocommunity.markdown-and-latex.glow-nvim",       enabled = true },
   { import = "astrocommunity.editing-support.todo-comments-nvim", enabled = true },
   { import = "astrocommunity.editing-support.nvim-ts-rainbow2",   enabled = true },
-  { import = "astrocommunity.bars-and-lines.bufferline-nvim",     enabled = true },
 }
