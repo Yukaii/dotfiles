@@ -1,19 +1,22 @@
 local wezterm = require 'wezterm';
 
-return {
+local config = {
+  adjust_window_size_when_changing_font_size = false,
   font = wezterm.font_with_fallback({
-    "Iosevka Nerd Font Mono",
+    -- "Iosevka Nerd Font Mono",
+    "JetbrainsMono Nerd Font",
   }),
-  window_background_opacity = 1.0,
+  window_background_opacity = 0.90,
   window_decorations = "RESIZE",
-  font_size = 18,
-  default_prog = {"/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish"},
+  macos_window_background_blur = 40,
+  hide_tab_bar_if_only_one_tab = false,
+  font_size = 17,
+  default_prog = { "/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish" },
   -- color_scheme = "Ayu Mirage",
   -- color_scheme = "Overnight Slumber",
-  color_scheme = "GitHub Dark",
+  -- color_scheme = "GitHub Dark",
+  color_scheme = "Kanagawa (Gogh)",
   window_padding = {
-    left = 15,
-    right = 15,
     top = 15,
     bottom = 15,
   },
@@ -49,6 +52,8 @@ return {
     }
   },
   -- scrollback_lines = 1000000
-  command_palette_font_size = 18,
-  command_palette_bg_color = "#0f1419"
+  command_palette_font_size = 17,
+  command_palette_bg_color = "#1F1F28",
 }
+
+return config
