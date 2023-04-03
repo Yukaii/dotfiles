@@ -56,6 +56,12 @@ return {
       end,
       desc = "ToggleTerm spotify-tui"
     },
+    ["<leader>td"] = {
+      function()
+        require("astronvim.utils").toggle_term_cmd("lazydocker")
+      end,
+      desc = "ToggleTerm lazydocker"
+    },
     ["<leader>c"] = {
       function()
         local bufs = vim.fn.getbufinfo { buflisted = true }
