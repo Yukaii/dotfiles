@@ -98,5 +98,11 @@ return {
       }
       return opts
     end,
+  },
+  {
+    "rcarriga/nvim-notify",
+    opts = {
+      level = vim.log.levels.ERROR
+    }
   }
 }
