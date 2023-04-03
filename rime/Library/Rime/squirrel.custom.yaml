@@ -8,7 +8,7 @@ patch:
   "app_options/com.sublimetext.4/ascii_mode": true
   "app_options/com.google.Chrome/ascii_mode": true
   "app_options/org.net9.Welly/ascii_mode": true
-  "app_options/Slack/ascii_mode": true
+  "app_options/com.tinyspeck.slackmacgap/ascii_mode": true
   "app_options/com.microsoft.VSCode/ascii_mode": true
   "app_options/com.microsoft.VSCodeInsiders/ascii_mode": true
   "app_options/com.apple.finder/ascii_mode": true
@@ -31,6 +31,11 @@ patch:
   "app_options/com.readdle.spark/ascii_mode": true
   "app_options/com.raycast.macos/ascii_mode": true
   "app_options/md.obsidian/ascii_mode": true
+  "app_options/com.neovide.neovide/ascii_mode": true
+  "app_options/im.riot.app/ascii_mode": true
+  "app_options/com.github.wez.wezterm/ascii_mode": true
+  "app_options/company.thebrowser.Browser/ascii_mode": true
+  "app_options/com.readdle.SparkDesktop/ascii_mode": true
 
   "preset_color_schemes/batman":
     author: "Rango <tntaben@gmail.com>"
