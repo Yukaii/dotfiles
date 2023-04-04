@@ -16,9 +16,9 @@ return {
       require "gitlinker".setup()
     end
   },
-  { 'github/copilot.vim',               event = "BufRead" },
-  { 'ntpeters/vim-better-whitespace',   event = "BufRead" },
-  { "mg979/vim-visual-multi",           event = "VeryLazy", },
+  { 'github/copilot.vim',             event = "BufRead" },
+  { 'ntpeters/vim-better-whitespace', event = "BufRead" },
+  { "mg979/vim-visual-multi",         event = "VeryLazy", },
   {
     "MaximilianLloyd/ascii.nvim",
     lazy = false,
@@ -66,5 +66,9 @@ return {
       require("transparent").setup({
       })
     end,
+  },
+  {
+    "wakatime/vim-wakatime",
+    lazy = false,
   }
 }

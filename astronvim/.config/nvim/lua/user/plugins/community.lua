@@ -14,5 +14,5 @@ return {
   { import = "astrocommunity.editing-support.todo-comments-nvim",    enabled = true },
   { import = "astrocommunity.editing-support.nvim-ts-rainbow2",      enabled = true },
   { import = "astrocommunity.bars-and-lines.heirline-vscode-winbar", enabled = true },
-  { import = "astrocommunity.motion.leap-nvim",                      enabled = true },
+  -- { import = "astrocommunity.motion.leap-nvim",                      enabled = true },
 }

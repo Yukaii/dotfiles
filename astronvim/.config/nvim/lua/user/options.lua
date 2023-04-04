@@ -36,7 +36,10 @@ return {
       'rust=rs',
       'typescript=ts',
       'python=py',
-    }
+    },
+    neovide_transparency = 0.9,
+    neovide_floating_blur_amount_x = 2.0,
+    neovide_floating_blur_amount_y = 2.0,
   },
 }
 -- If you need more control, you can use the function()...end notation
