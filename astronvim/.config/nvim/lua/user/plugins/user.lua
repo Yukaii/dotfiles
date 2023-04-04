@@ -16,11 +16,9 @@ return {
       require "gitlinker".setup()
     end
   },
-  { 'github/copilot.vim',             lazy = false },
-  { 'ntpeters/vim-better-whitespace', lazy = false },
-  { 'imsnif/kdl.vim',                 lazy = false },
+  { 'github/copilot.vim',               event = "BufRead" },
+  { 'ntpeters/vim-better-whitespace',   event = "BufRead" },
   { "mg979/vim-visual-multi",           event = "VeryLazy", },
-  { "nyoom-engineering/oxocarbon.nvim", lazy = false },
   {
     "MaximilianLloyd/ascii.nvim",
     lazy = false,
@@ -54,20 +52,6 @@ return {
     end,
   },
   { 'sindrets/diffview.nvim', event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },
-  {
-    "jackMort/ChatGPT.nvim",
-    config = function()
-      require("chatgpt").setup({
-        -- optional configuration
-      })
-    end,
-    event = "VeryLazy",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim"
-    },
-  },
   {
     'preservim/vim-markdown',
     event = "VeryLazy",
