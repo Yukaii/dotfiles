@@ -23,7 +23,8 @@ return {
     copilot_assume_mapped = true,
     copilot_node_command = "~/.volta/tools/image/node/18.14.2/bin/node",
     copilot_filetypes = {
-      markdown = true
+      markdown = true,
+      yaml = true,
     },
     better_whitespace_enabled = false,
     vim_markdown_new_list_item_indent = 2,
