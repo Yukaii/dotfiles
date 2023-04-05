@@ -341,4 +341,5 @@ for completion in (volta completions fish)
 end
 
 fnm env --use-on-cd | source
+zoxide init fish | source
 
