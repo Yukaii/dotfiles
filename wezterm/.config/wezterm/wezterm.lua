@@ -1,5 +1,9 @@
 local wezterm = require 'wezterm';
 
+local color_scheme = "Kanagawa (Gogh)"
+-- local color_scheme = "Ayu Mirage"
+local colors = wezterm.get_builtin_color_schemes()[color_scheme]
+
 local config = {
   adjust_window_size_when_changing_font_size = false,
   font = wezterm.font_with_fallback({
@@ -15,7 +19,7 @@ local config = {
   -- color_scheme = "Ayu Mirage",
   -- color_scheme = "Overnight Slumber",
   -- color_scheme = "GitHub Dark",
-  color_scheme = "Kanagawa (Gogh)",
+  color_scheme = color_scheme,
   window_padding = {
     top = 15,
     bottom = 15,
@@ -24,36 +28,33 @@ local config = {
   tab_bar_at_bottom = true,
   colors = {
     tab_bar = {
-      background = "#0f1419",
+      background = colors.background,
       active_tab = {
-        bg_color = "#0f1419",
-        fg_color = "#c0c0c0",
-        italic = false,
-        strikethrough = false,
+        bg_color = colors.background,
+        fg_color = colors.brights[8],
+        intensity = "Bold"
       },
       inactive_tab = {
-        bg_color = "#0f1419",
-        fg_color = "#808080",
+        bg_color = colors.ansi[1],
+        fg_color = colors.ansi[8],
       },
       inactive_tab_hover = {
-        bg_color = "#051d4d",
-        fg_color = "#909090",
-        italic = false,
+        bg_color = colors.background,
+        fg_color = colors.brights[8],
       },
       new_tab = {
-        bg_color = "#0f1419",
-        fg_color = "#8b949e",
+        bg_color = colors.ansi[1],
+        fg_color = colors.ansi[8],
       },
       new_tab_hover = {
-        bg_color = "#032f62",
-        fg_color = "#c9d1d9",
-        italic = false,
+        bg_color = colors.background,
+        fg_color = colors.brights[8],
       }
     }
   },
   -- scrollback_lines = 1000000
   command_palette_font_size = 17,
-  command_palette_bg_color = "#1F1F28",
+  command_palette_bg_color = colors.ansi[1],
 }
 
 return config
