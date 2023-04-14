@@ -1,0 +1,39 @@
+#CONFIG {BUFFER SIZE} {10000}
+#CONFIG {CHARSET} {BIG5TOUTF8}
+#CONFIG {COLOR MODE} {TRUE}
+#CONFIG {COLOR PATCH} {OFF}
+#CONFIG {COMMAND COLOR} {\e[0;37m}
+#CONFIG {COMMAND ECHO} {ON}
+#CONFIG {COMPACT} {OFF}
+#CONFIG {HISTORY SIZE} {1000}
+#CONFIG {LOG MODE} {RAW}
+#CONFIG {MOUSE} {OFF}
+#CONFIG {PACKET PATCH} {AUTO OFF}
+#CONFIG {REPEAT CHAR} {!}
+#CONFIG {REPEAT ENTER} {OFF}
+#CONFIG {SCREEN READER} {OFF}
+#CONFIG {SCROLL LOCK} {ON}
+#CONFIG {SPEEDWALK} {OFF}
+#CONFIG {TELNET} {ON}
+#CONFIG {VERBATIM} {OFF}
+#CONFIG {VERBATIM CHAR} {\}
+#CONFIG {VERBOSE} {OFF}
+#CONFIG {WORDWRAP} {ON}
+
+#PATHDIR {d} {u} {32}
+#PATHDIR {e} {w} {2}
+#PATHDIR {n} {s} {1}
+#PATHDIR {ne} {sw} {3}
+#PATHDIR {nw} {se} {9}
+#PATHDIR {s} {n} {4}
+#PATHDIR {se} {nw} {6}
+#PATHDIR {sw} {ne} {12}
+#PATHDIR {u} {d} {16}
+#PATHDIR {w} {e} {8}
+
+#split 0 0
+
+; Use tt++ -G ~/.config/tintin/main.tin to start tt++ with this config
+; Some popular sessions
+;
+; #session wf 210.59.236.38 7788
