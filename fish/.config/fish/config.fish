@@ -340,6 +340,31 @@ for completion in (volta completions fish)
   eval $completion
 end
 
+# https://shareg.pt/9HvnQ77 made with GPT-4
+function load_wezterm_completions
+  set -l completions (wezterm shell-completion --shell fish)
+  set -l current_completion ""
+  for line in $completions
+      if string match -qr '^complete -c wezterm -n' -- $line
+          # If a valid completion is stored, evaluate it before processing the next one
+          if test -n "$current_completion"
+              eval $current_completion
+              set -e current_completion
+          end
+      end
+
+      # Append the line to the current completion, removing line breaks and adding a space
+      set current_completion (string join " " -- $current_completion $line)
+  end
+
+  # Evaluate the last completion if it's not empty
+  if test -n "$current_completion"
+      eval $current_completion
+  end
+end
+
+load_wezterm_completions
+
 fnm env --use-on-cd | source
 zoxide init fish | source
 
