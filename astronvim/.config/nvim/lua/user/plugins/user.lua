@@ -34,7 +34,11 @@ return {
         "nvim-telescope/telescope-frecency.nvim",
         dependencies = { "kkharji/sqlite.lua" }
       },
-      "LukasPietzschmann/telescope-tabs"
+      "LukasPietzschmann/telescope-tabs",
+      {
+        "nvim-telescope/telescope-file-browser.nvim",
+        dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+      }
     },
     -- the first parameter is the plugin specification
     -- the second is the table of options as set up in Lazy with the `opts` key
@@ -46,12 +50,13 @@ return {
       local telescope = require "telescope"
       telescope.load_extension "media_files"
       telescope.load_extension "frecency"
+      telescope.load_extension "file_browser"
       require 'telescope-tabs'.setup {
         -- Your custom config :^)
       }
     end,
   },
-  { 'sindrets/diffview.nvim', event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },
+  { 'sindrets/diffview.nvim',        event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },
   {
     'preservim/vim-markdown',
     event = "VeryLazy",
@@ -70,5 +75,6 @@ return {
   {
     "wakatime/vim-wakatime",
     lazy = false,
-  }
+  },
+  { "mrjones2014/smart-splits.nvim", event = "VeryLazy" }
 }

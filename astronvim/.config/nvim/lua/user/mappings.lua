@@ -72,6 +72,8 @@ return {
     },
     ["<leader>z"] = { name = "Folding" },
     ["<leader>Z"] = { "<cmd>ZenMode<cr>" },
+    ["<leader>fp"] = { "<cmd>Telescope file_browser hidden=true<cr>" },
+    ["<leader>fP"] = { "<cmd>Telescope file_browser path=%:p:h select_buffer=true hidden=true<cr>" },
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
     ["<C-l>"] = false,
