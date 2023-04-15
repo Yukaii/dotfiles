@@ -1,4 +1,23 @@
 # https://shareg.pt/xVGFrXf
+function wezs
+  # Use the provided pane ID or default to the current pane using the $WEZTERM_PANE environment variable
+  if test -n "$argv[1]"
+    set pane_id $argv[1]
+  else
+    set pane_id $WEZTERM_PANE
+  end
+
+  # Use the provided current working directory or default to the present working directory
+  if test -n "$argv[2]"
+    set cwd $argv[2]
+  else
+    set cwd (pwd)
+  end
+
+  set second_pane_id (wezterm cli split-pane --pane-id $pane_id --right --percent 50 --cwd $cwd)
+  wezterm cli split-pane --pane-id $second_pane_id --bottom --percent 50 --cwd $cwd
+end
+
 function wezc
   # Set the default current working directory to the present working directory if no argument is given
   if test -n "$argv[1]"
@@ -22,6 +41,5 @@ function wezc
 
   # Split the second tab with a 50%|50%/50% layout using the stored pane ID
   set second_tab_pane_id $pane_ids[2]
-  set second_pane_id (wezterm cli split-pane --pane-id $second_tab_pane_id --right --percent 50 --cwd $cwd)
-  wezterm cli split-pane --pane-id $second_pane_id --bottom --percent 50 --cwd $cwd
+  wezs $second_tab_pane_id $cwd
 end
