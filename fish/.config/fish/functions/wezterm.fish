@@ -65,11 +65,19 @@ function wezl
           else
             set pane_id $WEZTERM_PANE
             set window_id (wezterm cli list --format json | jq -r ".[] | select(.pane_id == $pane_id) | .window_id")
+            # Create the first tab in the active window
+            set pane_id (wezterm cli spawn --window-id $window_id --cwd $cwd)
           end
         end
       case "/"
+        if test -z "$pane_id"
+          set pane_id $WEZTERM_PANE
+        end
         set pane_id (wezterm cli split-pane --pane-id $pane_id --right --percent 50 --cwd $cwd)
       case "-"
+        if test -z "$pane_id"
+          set pane_id $WEZTERM_PANE
+        end
         set pane_id (wezterm cli split-pane --pane-id $pane_id --bottom --percent 50 --cwd $cwd)
       case "*"
         echo "Unknown symbol in layout string: $symbol"
