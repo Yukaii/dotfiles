@@ -29,15 +29,15 @@ function wezl
         echo "Layout string syntax:"
         echo "  |  - New tab"
         echo "  /  - Vertical split"
-        echo "  -  - Horizontal split"
+        echo "  =  - Horizontal split"
         echo
         echo "Examples:"
         echo "  wezl '||-//-'"
-        echo "  wezl --new-window --cwd /path/to/directory '||-//-'"
+        echo "  wezl --new-window --cwd /path/to/directory '||=//='"
         return 0
       case "*"
         if test -z "$layout_string"
-          set layout_string $arg
+          set layout_string "$arg"
         else
           echo "Unknown argument: $arg"
           return 1
@@ -74,7 +74,7 @@ function wezl
           set pane_id $WEZTERM_PANE
         end
         set pane_id (wezterm cli split-pane --pane-id $pane_id --right --percent 50 --cwd $cwd)
-      case "-"
+      case "="
         if test -z "$pane_id"
           set pane_id $WEZTERM_PANE
         end
@@ -90,5 +90,5 @@ complete -c wezl -l new-window -d "Create layout in a new window"
 complete -c wezl -l cwd -d "Specify the current working directory" -r
 complete -c wezl -l help -d "Show help message"
 
-alias wezs "wezl '||/-'"
-alias wezc "wezl --new-window '||/-'"
+alias wezs "wezl '||/='"
+alias wezc "wezl --new-window '||/='"
