@@ -101,6 +101,7 @@ return {
   },
   {
     "rcarriga/nvim-notify",
+    enabled = false,
     opts = {
       level = vim.log.levels.ERROR
     }
