@@ -32,7 +32,7 @@ function wezl
         echo "  =  - Horizontal split"
         echo
         echo "Examples:"
-        echo "  wezl '||-//-'"
+        echo "  wezl '||=//='"
         echo "  wezl --new-window --cwd /path/to/directory '||=//='"
         return 0
       case "*"
