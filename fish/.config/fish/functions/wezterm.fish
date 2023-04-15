@@ -31,9 +31,30 @@ function wezl
         echo "  /  - Vertical split"
         echo "  =  - Horizontal split"
         echo
+        echo "The layout string is executed in sequence, meaning each character is applied sequentially to create the desired layout."
+        echo
         echo "Examples:"
         echo "  wezl '||=//='"
         echo "  wezl --new-window --cwd /path/to/directory '||=//='"
+        echo
+        echo "For the example given:"
+        echo
+        echo "Tab 1:"
+        echo
+        echo "+---------------------+"
+        echo "|        Pane 1       |"
+        echo "+---------------------+"
+        echo 
+        echo "Tab 2:"
+        echo 
+        echo "+---------------------+"
+        echo "|        Pane 2       |"
+        echo "+---------------------+"
+        echo "|          |    |  5  |"
+        echo "|  Pane 3  | 4  |-----|"
+        echo "|          |    |  6  |"
+        echo "+----------+----------+"
+
         return 0
       case "*"
         if test -z "$layout_string"
