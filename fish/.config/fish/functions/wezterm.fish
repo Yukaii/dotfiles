@@ -32,8 +32,8 @@ function wezl
         echo "  -  - Horizontal split"
         echo
         echo "Examples:"
-        echo "  wezl '||-//-'
-        echo "  wezl --new-window --cwd /path/to/directory ||-//-
+        echo "  wezl '||-//-'"
+        echo "  wezl --new-window --cwd /path/to/directory '||-//-'"
         return 0
       case "*"
         if test -z "$layout_string"
