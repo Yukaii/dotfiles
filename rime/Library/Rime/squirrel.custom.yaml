@@ -36,6 +36,7 @@ patch:
   "app_options/com.github.wez.wezterm/ascii_mode": true
   "app_options/company.thebrowser.Browser/ascii_mode": true
   "app_options/com.readdle.SparkDesktop/ascii_mode": true
+  "app_options/dev.zed.Zed/ascii_mode": true
 
   "preset_color_schemes/batman":
     author: "Rango <tntaben@gmail.com>"
