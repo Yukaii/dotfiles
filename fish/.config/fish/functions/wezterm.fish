@@ -1,45 +1,86 @@
-# https://shareg.pt/xVGFrXf
-function wezs
-  # Use the provided pane ID or default to the current pane using the $WEZTERM_PANE environment variable
-  if test -n "$argv[1]"
-    set pane_id $argv[1]
-  else
-    set pane_id $WEZTERM_PANE
+# https://shareg.pt/UFBSNrN
+function wezl
+  # Parse options
+  set new_window 0
+  set layout_string
+  set cwd (pwd)
+
+  for arg in $argv
+    switch $arg
+      case "--new-window"
+        set new_window 1
+      case "--cwd"
+        set cwd (string trim (nextd))
+        if test -z "$cwd"
+          echo "Please provide a directory after --cwd."
+          return 1
+        end
+      case "--help"
+        echo "wezl - A simple layout manager for Wezterm."
+        echo
+        echo "Usage:"
+        echo "  wezl [OPTIONS] LAYOUT_STRING"
+        echo
+        echo "Options:"
+        echo "  --new-window        Create layout in a new window"
+        echo "  --cwd <DIRECTORY>   Specify the current working directory"
+        echo "  --help              Show this help message"
+        echo
+        echo "Layout string syntax:"
+        echo "  |  - New tab"
+        echo "  /  - Vertical split"
+        echo "  -  - Horizontal split"
+        echo
+        echo "Examples:"
+        echo "  wezl '||-//-'
+        echo "  wezl --new-window --cwd /path/to/directory ||-//-
+        return 0
+      case "*"
+        if test -z "$layout_string"
+          set layout_string $arg
+        else
+          echo "Unknown argument: $arg"
+          return 1
+        end
+    end
   end
 
-  # Use the provided current working directory or default to the present working directory
-  if test -n "$argv[2]"
-    set cwd $argv[2]
-  else
-    set cwd (pwd)
+  if test -z "$layout_string"
+    echo "Please provide a layout string."
+    return 1
   end
 
-  set second_pane_id (wezterm cli split-pane --pane-id $pane_id --right --percent 50 --cwd $cwd)
-  wezterm cli split-pane --pane-id $second_pane_id --bottom --percent 50 --cwd $cwd
+  set -g window_id
+  set -g pane_id
+
+  for symbol in (string split '' $layout_string)
+    switch $symbol
+      case "|"
+        if test -n "$window_id"
+          set pane_id (wezterm cli spawn --window-id $window_id --cwd $cwd)
+        else
+          if test $new_window -eq 1
+            set pane_id (wezterm cli spawn --new-window --cwd $cwd)
+            set window_id (wezterm cli list --format json | jq -r ".[] | select(.pane_id == $pane_id) | .window_id")
+          else
+            set pane_id $WEZTERM_PANE
+            set window_id (wezterm cli list --format json | jq -r ".[] | select(.pane_id == $pane_id) | .window_id")
+          end
+        end
+      case "/"
+        set pane_id (wezterm cli split-pane --pane-id $pane_id --right --percent 50 --cwd $cwd)
+      case "-"
+        set pane_id (wezterm cli split-pane --pane-id $pane_id --bottom --percent 50 --cwd $cwd)
+      case "*"
+        echo "Unknown symbol in layout string: $symbol"
+        return 1
+    end
+  end
 end
 
-function wezc
-  # Set the default current working directory to the present working directory if no argument is given
-  if test -n "$argv[1]"
-    set cwd $argv[1]
-  else
-    set cwd (pwd)
-  end
+complete -c wezl -l new-window -d "Create layout in a new window"
+complete -c wezl -l cwd -d "Specify the current working directory" -r
+complete -c wezl -l help -d "Show help message"
 
-  # Create the first tab with the specified current working directory and obtain the pane ID
-  set first_pane_id (wezterm cli spawn --new-window --cwd $cwd)
-
-  # Obtain the window ID associated with the pane ID
-  set window_id (wezterm cli list --format json | jq -r ".[] | select(.pane_id == $first_pane_id) | .window_id")
-
-  # Create 4 additional tabs in the same window and store the pane IDs
-  set -g pane_ids $first_pane_id
-  for i in (seq 1 4)
-    set pane_id (wezterm cli spawn --window-id $window_id --cwd $cwd)
-    set pane_ids $pane_ids $pane_id
-  end
-
-  # Split the second tab with a 50%|50%/50% layout using the stored pane ID
-  set second_tab_pane_id $pane_ids[2]
-  wezs $second_tab_pane_id $cwd
-end
+alias wezs "wezl '||/-'"
+alias wezc "wezl --new-window '||/-'"
