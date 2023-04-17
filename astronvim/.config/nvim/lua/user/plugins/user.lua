@@ -76,5 +76,6 @@ return {
     "wakatime/vim-wakatime",
     lazy = false,
   },
-  { "mrjones2014/smart-splits.nvim", event = "VeryLazy" }
+  { "mrjones2014/smart-splits.nvim", event = "VeryLazy" },
+  { 'wintermute-cell/gitignore.nvim', event = "VeryLazy" }
 }
