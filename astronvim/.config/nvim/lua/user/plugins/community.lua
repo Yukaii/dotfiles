@@ -4,16 +4,16 @@ return {
   -- example of imporing a plugin, comment out to use it or add your own
   -- available plugins can be found at https://github.com/AstroNvim/astrocommunity
 
-  -- { import = "astrocommunity.colorscheme.catppuccin" },
-  -- { import = "astrocommunity.completion.copilot-lua-cmp" },
-  { import = "astrocommunity.colorscheme.kanagawa",                  enabled = true },
-  { import = "astrocommunity.editing-support.zen-mode-nvim",         enabled = true },
-  { import = "astrocommunity.motion.nvim-surround",                  enabled = true },
-  { import = "astrocommunity.project.nvim-spectre",                  enabled = true },
-  { import = "astrocommunity.markdown-and-latex.glow-nvim",          enabled = true },
-  { import = "astrocommunity.editing-support.todo-comments-nvim",    enabled = true },
-  { import = "astrocommunity.editing-support.nvim-ts-rainbow2",      enabled = true },
-  { import = "astrocommunity.bars-and-lines.heirline-vscode-winbar", enabled = true },
+  { import = "astrocommunity.colorscheme.catppuccin" },
+  { import = "astrocommunity.colorscheme.kanagawa" },
+  { import = "astrocommunity.editing-support.zen-mode-nvim" },
+  { import = "astrocommunity.motion.nvim-surround" },
+  { import = "astrocommunity.project.nvim-spectre" },
+  { import = "astrocommunity.markdown-and-latex.glow-nvim" },
+  { import = "astrocommunity.editing-support.todo-comments-nvim" },
+  { import = "astrocommunity.editing-support.nvim-ts-rainbow2" },
+  { import = "astrocommunity.bars-and-lines.heirline-vscode-winbar" },
+  { import = "astrocommunity.scrolling.nvim-scrollbar" },
   { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
@@ -37,7 +37,7 @@ return {
       }
     }
   },
-  -- { import = "astrocommunity.completion.copilot-lua-cmp",            enabled = true },
+  -- { import = "astrocommunity.completion.copilot-lua-cmp" },
   -- {
   --   "zbirenbaum/copilot.lua",
   --   config = function()
@@ -46,7 +46,7 @@ return {
   --         markdown = true,
   --         yaml = true,
   --       },
-  --       copilot_node_command: ~/.volta/tools/image/node/18.14.2/bin/node
+  --       copilot_node_command = "~/.volta/tools/image/node/18.14.2/bin/node"
   --     })
   --   end
   -- }
