@@ -312,7 +312,7 @@ set -g theme_title_display_process yes
 # status --is-interactive; and source (pyenv init -|psub)
 status is-login; and pyenv init --path | source
 
-# rvm default
+rvm default
 # nvm use
 set -x GPG_TTY (tty)
 
