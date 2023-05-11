@@ -88,7 +88,10 @@ return {
     ["<C-p>"] = {
       "<cmd>lua require('telescope').extensions.frecency.frecency({ show_unindexed = false })<CR>",
       desc = "Telescope Frecency",
-    }
+    },
+    ["j"] = { "v:count ? (v:count > g:jk_jumps_minimum_lines ? \"m'\" . v:count : '') . 'j' : 'gj'", expr = true, desc =
+    "Move cursor down" },
+    ["k"] = { "v:count ? (v:count > g:jk_jumps_minimum_lines ? \"m'\" . v:count : '') . 'k' : 'gk'", expr = true }
   },
   t = {
     -- setting a mapping to false will disable it

@@ -90,8 +90,4 @@ return {
   },
   { "mrjones2014/smart-splits.nvim",  event = "VeryLazy" },
   { "wintermute-cell/gitignore.nvim", event = "VeryLazy" },
-  {
-    "teranex/jk-jumps.vim",
-    event = "BufRead",
-  }
 }
