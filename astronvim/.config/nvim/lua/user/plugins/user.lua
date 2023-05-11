@@ -54,9 +54,21 @@ return {
       require 'telescope-tabs'.setup {
         -- Your custom config :^)
       }
+
+      telescope.setup {
+        defaults = {
+          preview = {
+            filesize_hook = function(filepath, bufnr, opts)
+              local max_bytes = 10000
+              local cmd = { "head", "-c", max_bytes, filepath }
+              require('telescope.previewers.utils').job_maker(cmd, bufnr, opts)
+            end
+          }
+        }
+      }
     end,
   },
-  { 'sindrets/diffview.nvim',        event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },
+  { 'sindrets/diffview.nvim',         event = "VeryLazy", dependencies = 'nvim-lua/plenary.nvim' },
   {
     'preservim/vim-markdown',
     event = "VeryLazy",
@@ -76,6 +88,10 @@ return {
     "wakatime/vim-wakatime",
     lazy = false,
   },
-  { "mrjones2014/smart-splits.nvim", event = "VeryLazy" },
-  { 'wintermute-cell/gitignore.nvim', event = "VeryLazy" }
+  { "mrjones2014/smart-splits.nvim",  event = "VeryLazy" },
+  { "wintermute-cell/gitignore.nvim", event = "VeryLazy" },
+  {
+    "teranex/jk-jumps.vim",
+    event = "BufRead",
+  }
 }

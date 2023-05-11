@@ -32,7 +32,7 @@ return {
     ["<leader>ss"] = { function() require("spectre").open() end, desc = "Search" },
     ["<leader>sw"] = { function() require("spectre").open_visual { select_word = true } end, desc = "Search current word" },
     ["<leader>fT"] = { function() require('telescope-tabs').list_tabs() end, desc = "Find tabs" },
-    ["<leader>fg"] = { function() require'telescope.builtin'.git_files() end, desc = "Find git files" },
+    ["<leader>fg"] = { function() require 'telescope.builtin'.git_files() end, desc = "Find git files" },
     ["<leader>tg"] = {
       function()
         require("astronvim.utils").toggle_term_cmd("tig")
@@ -73,8 +73,12 @@ return {
     },
     ["<leader>z"] = { name = "Folding" },
     ["<leader>Z"] = { "<cmd>ZenMode<cr>" },
-    ["<leader>fp"] = { "<cmd>Telescope file_browser path=%:p:h select_buffer=true hidden=true respect_gitignore=false<cr>" },
-    ["<leader>fP"] = { "<cmd>Telescope file_browser hidden=true<cr>" },
+    ["<leader>fp"] = {
+      "<cmd>Telescope file_browser path=%:p:h select_buffer=true hidden=true respect_gitignore=false display_stat=false<cr>", desc =
+    "Open directory relative to current buffer" },
+    ["<leader>fP"] = { "<cmd>Telescope file_browser hidden=true respect_gitignore=false display_stat=false<cr>", desc =
+    "Open Telescope  file broser" },
+    ["<leader>fj"] = { "<cmd>lua require('telescope.builtin').jumplist()<cr>", desc = "Find jumplist" },
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
     ["<C-l>"] = false,

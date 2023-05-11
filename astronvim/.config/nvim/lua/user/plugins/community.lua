@@ -11,9 +11,9 @@ return {
   { import = "astrocommunity.project.nvim-spectre" },
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
   { import = "astrocommunity.editing-support.todo-comments-nvim" },
-  { import = "astrocommunity.editing-support.nvim-ts-rainbow2" },
+  -- { import = "astrocommunity.editing-support.nvim-ts-rainbow2" },
   { import = "astrocommunity.bars-and-lines.heirline-vscode-winbar" },
-  { import = "astrocommunity.scrolling.nvim-scrollbar" },
+  -- { import = "astrocommunity.scrolling.nvim-scrollbar" },
   { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
@@ -37,6 +37,7 @@ return {
       }
     }
   },
+  { import = "astrocommunity.scrolling.satellite-nvim" },
   -- { import = "astrocommunity.completion.copilot-lua-cmp" },
   -- {
   --   "zbirenbaum/copilot.lua",
