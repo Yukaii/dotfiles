@@ -24,6 +24,7 @@ return {
     -- this is useful for naming menus
     ["<leader>b"] = { name = "Buffers" },
     ["<leader>gy"] = { desc = "Copy GitHub URL" },
+    ["<leader>gB"] = { "<cmd>Git blame<cr>", desc = "Show Git Blame" },
     ["<leader>s"] = { name = "Search and Format" },
     ["<leader>s<space>"] = {
       "<cmd>StripWhitespace<cr>",
@@ -31,6 +32,7 @@ return {
     },
     ["<leader>ss"] = { function() require("spectre").open() end, desc = "Search" },
     ["<leader>sw"] = { function() require("spectre").open_visual { select_word = true } end, desc = "Search current word" },
+    ["<leader>sr"] = { "<cmd>e!<cr>", desc = "Reload file" },
     ["<leader>fT"] = { function() require('telescope-tabs').list_tabs() end, desc = "Find tabs" },
     ["<leader>fg"] = { function() require 'telescope.builtin'.git_files() end, desc = "Find git files" },
     ["<leader>tg"] = {
@@ -79,6 +81,10 @@ return {
     ["<leader>fP"] = { "<cmd>Telescope file_browser hidden=true respect_gitignore=false display_stat=false<cr>", desc =
     "Open Telescope  file broser" },
     ["<leader>fj"] = { "<cmd>lua require('telescope.builtin').jumplist()<cr>", desc = "Find jumplist" },
+
+    -- Octo actions
+    ["<leader>Of"] = { "<cmd>Octo actions<cr>", desc = "List Octo actions" },
+
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
     ["<C-l>"] = false,

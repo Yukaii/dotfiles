@@ -4,16 +4,18 @@ return {
   -- example of imporing a plugin, comment out to use it or add your own
   -- available plugins can be found at https://github.com/AstroNvim/astrocommunity
 
+  {
+    import = "astrocommunity.colorscheme.rose-pine",
+  },
   { import = "astrocommunity.colorscheme.catppuccin" },
   { import = "astrocommunity.colorscheme.kanagawa" },
   { import = "astrocommunity.editing-support.zen-mode-nvim" },
+  { import = "astrocommunity.editing-support.todo-comments-nvim" },
+  { import = "astrocommunity.editing-support.neogen" },
   { import = "astrocommunity.motion.nvim-surround" },
   { import = "astrocommunity.project.nvim-spectre" },
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
-  { import = "astrocommunity.editing-support.todo-comments-nvim" },
-  -- { import = "astrocommunity.editing-support.nvim-ts-rainbow2" },
   { import = "astrocommunity.bars-and-lines.heirline-vscode-winbar" },
-  -- { import = "astrocommunity.scrolling.nvim-scrollbar" },
   { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
@@ -38,6 +40,9 @@ return {
     }
   },
   { import = "astrocommunity.scrolling.satellite-nvim" },
+  { import = "astrocommunity.git.octo" },
+  { import = "astrocommunity.color.modes-nvim" },
+  { import = "astrocommunity.color.tint-nvim" },
   -- { import = "astrocommunity.completion.copilot-lua-cmp" },
   -- {
   --   "zbirenbaum/copilot.lua",
