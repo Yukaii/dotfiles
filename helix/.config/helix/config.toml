@@ -1,4 +1,4 @@
-theme = "kanagawa"
+theme = "catppuccin_macchiato"
 
 [editor]
 true-color = true
@@ -24,9 +24,9 @@ hidden = false
 
 [editor.statusline]
 #left = ["mode", "spinner"]
-center = ["file-name"]
 # right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
 
+center = ["file-name"]
 separator = ""
 left = ["mode", "file-base-name", "version-control", "file-modification-indicator"]
 right = ["diagnostics", "spinner", "file-encoding", "file-type", "file-line-ending",  "spacer", "position-percentage", "position"]
