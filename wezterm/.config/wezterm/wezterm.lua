@@ -14,13 +14,20 @@ local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_right_half_circle_thick
 -- title of the active pane in that tab.
 local function tab_title(tab_info)
   local title = tab_info.tab_title
+  local output
   -- if the tab title is explicitly set, take that
   if title and #title > 0 then
-    return title
+    output = title
   end
   -- Otherwise, use the title from the active pane
   -- in that tab
-  return tab_info.active_pane.title
+  output = tab_info.active_pane.title
+
+  if tab_info.is_active then
+    return '*' .. output
+  else
+    return output
+  end
 end
 
 wezterm.on(
@@ -30,7 +37,7 @@ wezterm.on(
 
     -- ensure that the titles fit in the available space,
     -- and that we have room for the edges.
-    title = wezterm.truncate_right(title, max_width - 2)
+    title = wezterm.truncate_right(title, max_width - 5)
 
     local edge_background = colors.background
     local edge_foreground = colors.ansi[1]
@@ -44,12 +51,12 @@ wezterm.on(
       foreground = colors.brights[8]
     elseif hover then
       edge_background = colors.background
-      edge_foreground = colors.brights[8]
+      edge_foreground = colors.background
       background = colors.background
       foreground = colors.brights[8]
     end
 
-    return {
+    local tab_bar = {
       { Background = { Color = edge_background } },
       { Foreground = { Color = edge_foreground } },
       { Text = SOLID_LEFT_ARROW },
@@ -60,6 +67,31 @@ wezterm.on(
       { Foreground = { Color = edge_foreground } },
       { Text = SOLID_RIGHT_ARROW },
     }
+
+    -- prepend or append padding
+    local tab_id = tab.tab_id
+    local is_first_tab = tab_id == tabs[1].tab_id
+    -- local is_last_tab = #tabs - 1 == tab_id
+
+    local padding_arr = {
+      { Background = { Color = colors.background } },
+      { Foreground = { Color = colors.background } },
+      { Text = " " },
+    }
+
+    -- add left padding for first tab
+    if is_first_tab then
+      table.insert(tab_bar, 1, padding_arr[1])
+      table.insert(tab_bar, 2, padding_arr[2])
+      table.insert(tab_bar, 3, padding_arr[3])
+    end
+
+
+    table.insert(tab_bar, padding_arr[1])
+    table.insert(tab_bar, padding_arr[2])
+    table.insert(tab_bar, padding_arr[3])
+
+    return tab_bar
   end
 )
 
@@ -73,6 +105,7 @@ local config = {
   window_decorations = "RESIZE",
   macos_window_background_blur = 40,
   hide_tab_bar_if_only_one_tab = false,
+  tab_max_width = 25,
   font_size = 18,
   default_prog = { "/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish" },
   -- color_scheme = "Ayu Mirage",
