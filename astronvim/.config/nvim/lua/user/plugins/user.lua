@@ -16,7 +16,7 @@ return {
       require "gitlinker".setup()
     end
   },
-  { 'github/copilot.vim',             event = "BufRead" },
+  -- { 'github/copilot.vim',             event = "BufRead" },
   { 'ntpeters/vim-better-whitespace', event = "BufRead" },
   { "mg979/vim-visual-multi",         event = "VeryLazy", },
   {

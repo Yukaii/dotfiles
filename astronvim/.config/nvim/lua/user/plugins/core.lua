@@ -22,6 +22,10 @@ return {
 
       opts.section.header.val = ascii.get_random("text", "neovim")
 
+      while #opts.section.header.val > 9 do
+        opts.section.header.val = ascii.get_random("text", "neovim")
+      end
+
       return opts
     end,
   },

@@ -26,24 +26,11 @@ return {
   },
   { import = "astrocommunity.git.neogit" },
   { import = "astrocommunity.media.pets-nvim" },
-  {
-    "giusgad/pets.nvim",
-    opts = {
-      row = 8,
-      default_pet = "slime",
-      default_style = "green",
-      random = false,
-      popup = {
-        winblend = 100,
-        avoid_statusline = true
-      }
-    }
-  },
   { import = "astrocommunity.scrolling.satellite-nvim" },
   { import = "astrocommunity.git.octo" },
   { import = "astrocommunity.color.modes-nvim" },
   { import = "astrocommunity.color.tint-nvim" },
-  -- { import = "astrocommunity.completion.copilot-lua-cmp" },
+  { import = "astrocommunity.completion.copilot-lua-cmp" },
   -- {
   --   "zbirenbaum/copilot.lua",
   --   config = function()
@@ -56,5 +43,6 @@ return {
   --     })
   --   end
   -- }
-  -- { import = "astrocommunity.motion.leap-nvim",                      enabled = true },
+  { import = "astrocommunity.motion.leap-nvim" },
+  { import = "astrocommunity.motion.mini-move" },
 }
