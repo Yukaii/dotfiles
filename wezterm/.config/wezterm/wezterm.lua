@@ -2,11 +2,17 @@ local wezterm = require 'wezterm';
 
 local color_scheme = "Catppuccin Macchiato"
 -- local color_scheme = "Ayu Mirage"
+-- local color_scheme = "Kanagawa (Gogh)"
 local colors = wezterm.get_builtin_color_schemes()[color_scheme]
 
 local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_left_half_circle_thick
-
 local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_right_half_circle_thick
+
+-- hover colors
+local HOVER_BG = wezterm.color.parse(colors.brights[4])
+local HOVER_FG = wezterm.color.parse(colors.ansi[8]):darken(0.8)
+local TAB_BG = wezterm.color.parse(colors.background):lighten(0.1)
+local TAB_FG = wezterm.color.parse(colors.ansi[8]):lighten(0.5)
 
 -- This function returns the suggested title for a tab.
 -- It prefers the title that was set via `tab:set_title()`
@@ -37,13 +43,13 @@ wezterm.on(
     end
 
     local edge_background = colors.background
-    local edge_foreground = colors.ansi[1]
-    local background = colors.ansi[1]
-    local foreground = colors.ansi[8]
+    local edge_foreground = TAB_BG
+    local background = TAB_BG
+    local foreground = TAB_FG
 
     if tab.is_active or hover then
-      edge_background = wezterm.color.parse(colors.ansi[8]):darken(0.8)
-      edge_foreground = wezterm.color.parse(colors.ansi[1]):lighten(0.4)
+      edge_background = HOVER_FG
+      edge_foreground = HOVER_BG
       background = edge_foreground
       foreground = edge_background
     end
@@ -114,13 +120,13 @@ local config = {
     tab_bar = {
       background = colors.background,
       new_tab = {
-        bg_color = colors.ansi[1],
-        fg_color = colors.ansi[8],
+        bg_color = TAB_BG,
+        fg_color = TAB_FG,
         intensity = "Bold",
       },
       new_tab_hover = {
-        bg_color = wezterm.color.parse(colors.ansi[1]):lighten(0.4),
-        fg_color = wezterm.color.parse(colors.ansi[8]):darken(0.8),
+        bg_color = HOVER_BG,
+        fg_color = HOVER_FG,
       }
     }
   },
