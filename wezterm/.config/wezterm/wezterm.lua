@@ -14,20 +14,13 @@ local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_right_half_circle_thick
 -- title of the active pane in that tab.
 local function tab_title(tab_info)
   local title = tab_info.tab_title
-  local output
   -- if the tab title is explicitly set, take that
   if title and #title > 0 then
-    output = title
+    return title
   end
   -- Otherwise, use the title from the active pane
   -- in that tab
-  output = tab_info.active_pane.title
-
-  if tab_info.is_active then
-    return '*' .. output
-  else
-    return output
-  end
+  return tab_info.active_pane.title
 end
 
 wezterm.on(
@@ -37,23 +30,22 @@ wezterm.on(
 
     -- ensure that the titles fit in the available space,
     -- and that we have room for the edges.
-    title = wezterm.truncate_right(title, max_width - 5)
+    wezterm.log_info("max_width: " .. max_width .. ", " .. "title: " .. title .. ", title length" .. #title)
+    if #title > max_width - 4 then
+      title = wezterm.truncate_right(title, max_width - 4)
+      wezterm.log_info("trimmed title: " .. title .. ", title length" .. #title)
+    end
 
     local edge_background = colors.background
     local edge_foreground = colors.ansi[1]
     local background = colors.ansi[1]
     local foreground = colors.ansi[8]
 
-    if tab.is_active then
-      edge_background = colors.background
-      edge_foreground = colors.background
-      background = colors.background
-      foreground = colors.brights[8]
-    elseif hover then
-      edge_background = colors.background
-      edge_foreground = colors.background
-      background = colors.background
-      foreground = colors.brights[8]
+    if tab.is_active or hover then
+      edge_background = wezterm.color.parse(colors.ansi[8]):darken(0.8)
+      edge_foreground = wezterm.color.parse(colors.ansi[1]):lighten(0.4)
+      background = edge_foreground
+      foreground = edge_background
     end
 
     local tab_bar = {
@@ -105,7 +97,7 @@ local config = {
   window_decorations = "RESIZE",
   macos_window_background_blur = 40,
   hide_tab_bar_if_only_one_tab = false,
-  tab_max_width = 25,
+  tab_max_width = 32,
   font_size = 18,
   default_prog = { "/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish" },
   -- color_scheme = "Ayu Mirage",
@@ -121,26 +113,14 @@ local config = {
   colors = {
     tab_bar = {
       background = colors.background,
-      active_tab = {
-        bg_color = colors.background,
-        fg_color = colors.brights[8],
-        intensity = "Bold"
-      },
-      inactive_tab = {
-        bg_color = colors.ansi[1],
-        fg_color = colors.ansi[8],
-      },
-      inactive_tab_hover = {
-        bg_color = colors.background,
-        fg_color = colors.brights[8],
-      },
       new_tab = {
         bg_color = colors.ansi[1],
         fg_color = colors.ansi[8],
+        intensity = "Bold",
       },
       new_tab_hover = {
-        bg_color = colors.background,
-        fg_color = colors.brights[8],
+        bg_color = wezterm.color.parse(colors.ansi[1]):lighten(0.4),
+        fg_color = wezterm.color.parse(colors.ansi[8]):darken(0.8),
       }
     }
   },
