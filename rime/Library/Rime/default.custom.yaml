@@ -2,9 +2,8 @@ patch:
   schema_list:
     - schema: bopomofo_tw
     - schema: emoji
-
-  "switcher/hotkeys":
-    - Shift+Alt+grave
+    - schema: full_bopomofo
+    - schema: double_bopomo
 
   "key_binder/bindings":
     - { when: paging, accept: bracketleft, send: Page_Up }
