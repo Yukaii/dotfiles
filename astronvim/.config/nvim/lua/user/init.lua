@@ -96,5 +96,7 @@ return {
 
     if vim.g.neovide then
     end
+
+    require("oil").setup()
   end,
 }

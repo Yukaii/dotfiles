@@ -90,5 +90,9 @@ return {
   },
   { "mrjones2014/smart-splits.nvim",  event = "VeryLazy" },
   { "wintermute-cell/gitignore.nvim", event = "VeryLazy" },
-  { "tpope/vim-fugitive",             event = "VeryLazy" }
+  { "tpope/vim-fugitive",             event = "VeryLazy" },
+  {
+    "stevearc/oil.nvim",
+    event = "VeryLazy",
+  }
 }

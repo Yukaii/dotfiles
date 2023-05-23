@@ -84,6 +84,9 @@ return {
 
     -- Octo actions
     ["<leader>Of"] = { "<cmd>Octo actions<cr>", desc = "List Octo actions" },
+    ["<leader>-"]  = { name = "Oil" },
+    ["<leader>--"] = { require("oil").open_float, desc = "Open directory" },
+    ["<leader>-h"] = { require("oil").toggle_hidden, desc = "Toggle hidden files" },
 
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
