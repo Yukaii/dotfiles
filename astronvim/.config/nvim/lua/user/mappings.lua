@@ -65,6 +65,12 @@ return {
       end,
       desc = "ToggleTerm lazydocker"
     },
+    ["<leader>tm"] = {
+      function ()
+        require("astronvim.utils").toggle_term_cmd("mprocs --npm")
+      end,
+      desc = "ToggleTerm mprocs for package.json"
+    },
     ["<leader>c"] = {
       function()
         local bufs = vim.fn.getbufinfo { buflisted = true }
