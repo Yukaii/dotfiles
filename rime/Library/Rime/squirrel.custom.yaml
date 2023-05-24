@@ -3,7 +3,7 @@ patch:
   "style/border_height": 0
   "style/border_width": 0
   "style/color_scheme": "psionics"
-  "style/font_face": "Jetbrains Mono, Sarasa Mono TC"
+  # "style/font_face": "Jetbrains Mono, Sarasa Mono TC"
 
   "app_options/com.sublimetext.4/ascii_mode": true
   "app_options/com.google.Chrome/ascii_mode": true
