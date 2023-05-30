@@ -4,11 +4,10 @@ return {
   -- example of imporing a plugin, comment out to use it or add your own
   -- available plugins can be found at https://github.com/AstroNvim/astrocommunity
 
-  {
-    import = "astrocommunity.colorscheme.rose-pine",
-  },
+  { import = "astrocommunity.colorscheme.rose-pine" },
+  { import = "astrocommunity.colorscheme.github-nvim-theme" },
   { import = "astrocommunity.colorscheme.catppuccin" },
-  { import = "astrocommunity.colorscheme.kanagawa" },
+  { import = "astrocommunity.colorscheme.kanagawa-nvim" },
   { import = "astrocommunity.editing-support.zen-mode-nvim" },
   { import = "astrocommunity.editing-support.todo-comments-nvim" },
   { import = "astrocommunity.editing-support.neogen" },
@@ -23,7 +22,7 @@ return {
     event = { "BufReadPost" },
     opts = {
       options = {
-        diagnostics = "nvim_lsp", -- | "nvim_lsp" | "coc",
+        diagnostics = "nvim_lsp",      -- | "nvim_lsp" | "coc",
         separator_style = "slant",
         close_command = "Bdelete! %d", -- can be a string | function, see "Mouse actions"
         diagnostics_indicator = function(count, _, _, _)
@@ -37,13 +36,15 @@ return {
             filetype = "neo-tree",
             text = "EXPLORER",
             text_align = "center",
+            highlight = "Directory",
           },
         },
         hover = {
           enabled = true,
-          delay = 0,
+          delay = 200,
           reveal = { "close" },
         },
+        color_icons = false,
       },
     },
   },
@@ -75,4 +76,6 @@ return {
   -- }
   { import = "astrocommunity.motion.leap-nvim" },
   { import = "astrocommunity.motion.mini-move" },
+
+  { import = "astrocommunity.note-taking.obsidian-nvim" }
 }

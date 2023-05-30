@@ -18,6 +18,7 @@ return {
   },
   -- Set colorscheme to use
   colorscheme = "catppuccin-macchiato",
+  -- colorscheme = "github_dark_high_contrast",
   -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
   diagnostics = {
     virtual_text = false,

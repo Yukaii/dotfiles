@@ -101,6 +101,20 @@ return {
     ["<leader>--"]       = { require("oil").open_float, desc = "Open directory" },
     ["<leader>-h"]       = { require("oil").toggle_hidden, desc = "Toggle hidden files" },
 
+    -- Bufferline mappings override
+    ["<leader>bb"]       = { "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
+    ["<leader>bD"]       = { "<cmd>BufferLinePickClose<CR>", desc = "Pick to close" },
+    ["<leader>bp"]       = { "<cmd>BufferLineTogglePin<cr>", desc = "Toggle Pinning" },
+    ["<leader>bC"]       = { function()
+      local bufferline = require('bufferline')
+      for _, e in ipairs(bufferline.get_elements().elements) do
+        vim.schedule(function()
+          vim.cmd("bd " .. e.id)
+        end)
+      end
+    end, desc = "Close all buffers"
+    },
+
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
     ["<C-l>"]            = false,
