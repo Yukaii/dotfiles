@@ -36,6 +36,7 @@ return {
     ["<leader>sr"]       = { "<cmd>e!<cr>", desc = "Reload file" },
     ["<leader>fT"]       = { function() require('telescope-tabs').list_tabs() end, desc = "Find tabs" },
     ["<leader>fg"]       = { function() require 'telescope.builtin'.git_files() end, desc = "Find git files" },
+    ["<leader>fd"]       = { function() require('dropbar.api').pick() end, desc = "Pick dropbar item" },
     ["<leader>tg"]       = {
       function()
         require("astronvim.utils").toggle_term_cmd("tig")

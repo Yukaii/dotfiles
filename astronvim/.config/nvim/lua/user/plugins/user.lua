@@ -77,14 +77,6 @@ return {
     }
   },
   {
-    "xiyaowong/transparent.nvim",
-    lazy = false,
-    config = function()
-      require("transparent").setup({
-      })
-    end,
-  },
-  {
     "wakatime/vim-wakatime",
     lazy = false,
   },
@@ -99,7 +91,11 @@ return {
     "glepnir/lspsaga.nvim",
     event = "LspAttach",
     config = function()
-      require("lspsaga").setup({})
+      require("lspsaga").setup({
+        symbol_in_winbar = {
+          enable = false
+        }
+      })
     end,
     dependencies = {
       { "nvim-tree/nvim-web-devicons" },
@@ -134,5 +130,7 @@ return {
         -- Options go here
       })
     end,
-  }
+  },
+  { 'Bekaboo/dropbar.nvim', event = "VeryLazy" }
 }
+

@@ -109,5 +109,13 @@ return {
     opts = {
       level = vim.log.levels.ERROR
     }
-  }
+  },
+  {
+    "rebelot/heirline.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.winbar = nil
+      return opts
+    end
+  },
 }
