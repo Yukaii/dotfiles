@@ -131,6 +131,14 @@ return {
       })
     end,
   },
-  { 'Bekaboo/dropbar.nvim', event = "VeryLazy" }
+  { 'Bekaboo/dropbar.nvim', event = "VeryLazy" },
+  {
+    "dnlhc/glance.nvim",
+    config = function()
+      require('glance').setup({
+        -- your configuration
+      })
+    end,
+    event = "VeryLazy"
+  }
 }
-

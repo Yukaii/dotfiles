@@ -130,6 +130,10 @@ return {
     "Move cursor down" },
     ["k"]                = { "v:count ? (v:count > g:jk_jumps_minimum_lines ? \"m'\" . v:count : '') . 'k' : 'gk'", expr = true },
     ["gp"]               = { "<cmd>Lspsaga peek_definition<CR>" },
+    ['gD']               = { '<CMD>Glance definitions<CR>' },
+    ['gR']               = { '<CMD>Glance references<CR>' },
+    ['gY']               = { '<CMD>Glance type_definitions<CR>' },
+    ['gM']               = { '<CMD>Glance implementations<CR>' },
     ["K"]                = { "<cmd>Lspsaga hover_doc<CR>" }
   },
   t = {
