@@ -60,8 +60,14 @@ return {
           })
         end,
       }
+    },
+
+    setup_handlers = {
+      -- add custom handler
+      tsserver = function(_, opts) require("typescript").setup { server = opts } end
     }
   },
+
   -- Configure require("lazy").setup() options
   lazy = {
     defaults = { lazy = true },

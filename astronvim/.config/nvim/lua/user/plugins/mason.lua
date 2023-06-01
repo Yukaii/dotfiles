@@ -1,11 +1,12 @@
 -- customize mason plugins
 return {
   -- use mason-lspconfig to configure LSP installations
+  { "jose-elias-alvarez/typescript.nvim" },
   {
     "williamboman/mason-lspconfig.nvim",
     -- overrides `require("mason-lspconfig").setup(...)`
     opts = {
-      -- ensure_installed = { "lua_ls" },
+      ensure_installed = { "tsserver" },
     },
   },
   -- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
