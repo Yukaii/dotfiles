@@ -74,5 +74,6 @@ return {
   -- }
   { import = "astrocommunity.motion.leap-nvim" },
   { import = "astrocommunity.motion.mini-move" },
-  { import = "astrocommunity.note-taking.obsidian-nvim" }
+  { import = "astrocommunity.note-taking.obsidian-nvim" },
+  { import = "astrocommunity.pack.typescript-all-in-one" }
 }
