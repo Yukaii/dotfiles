@@ -3,6 +3,7 @@ local wezterm = require 'wezterm';
 local color_scheme = "Catppuccin Macchiato"
 -- local color_scheme = "Ayu Mirage"
 -- local color_scheme = "Kanagawa (Gogh)"
+-- local color_scheme = "kanagawabones"
 local colors = wezterm.get_builtin_color_schemes()[color_scheme]
 
 local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_left_half_circle_thick
@@ -96,15 +97,17 @@ wezterm.on(
 local config = {
   adjust_window_size_when_changing_font_size = false,
   font = wezterm.font_with_fallback({
-    "Iosevka Nerd Font Mono",
-    -- "JetbrainsMono Nerd Font",
+    -- "Iosevka Nerd Font Mono",
+    -- "FiraCode Nerd Font Mono",
+    "JetbrainsMono Nerd Font",
+    -- "BlexMono Nerd Font"
   }),
   -- window_background_opacity = 0.90,
   window_decorations = "RESIZE",
   macos_window_background_blur = 40,
   hide_tab_bar_if_only_one_tab = false,
   tab_max_width = 32,
-  font_size = 18,
+  font_size = 16,
   default_prog = { "/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish" },
   -- color_scheme = "Ayu Mirage",
   -- color_scheme = "Overnight Slumber",
