@@ -22,6 +22,9 @@ patch:
     - schema: easy_en_lcomment
     - schema: symbols_bpmf
 
+  "switcher/hotkeys":
+    - Shift+Alt+grave
+
   menu:
     page_size: 10
 
