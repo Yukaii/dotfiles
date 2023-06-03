@@ -8,6 +8,8 @@ set PATH $PATH "$HOME/.deno/bin"
 set VOLTA_HOME "$HOME/.volta"
 set PATH "$VOLTA_HOME/bin" $PATH
 
+set PATH $PATH "$HOME/.spicetify"
+
 set arc (arch)
 if string match -q "arm64" $arc
   # set PATH $PATH "/usr/local/bin"
@@ -368,3 +370,4 @@ load_wezterm_completions
 fnm env --use-on-cd | source
 zoxide init fish | source
 
+# "$HOME/.tea/tea.xyz/v*/bin/tea" --magic=fish | source
