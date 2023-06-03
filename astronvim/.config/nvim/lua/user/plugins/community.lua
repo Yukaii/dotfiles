@@ -60,20 +60,13 @@ return {
   { import = "astrocommunity.git.octo" },
   { import = "astrocommunity.color.modes-nvim" },
   { import = "astrocommunity.completion.copilot-lua-cmp" },
-  -- {
-  --   "zbirenbaum/copilot.lua",
-  --   config = function()
-  --     require("copilot").setup({
-  --       filetypes = {
-  --         markdown = true,
-  --         yaml = true,
-  --       },
-  --       copilot_node_command = "~/.volta/tools/image/node/18.14.2/bin/node"
-  --     })
-  --   end
-  -- }
   { import = "astrocommunity.motion.leap-nvim" },
   { import = "astrocommunity.motion.mini-move" },
   { import = "astrocommunity.note-taking.obsidian-nvim" },
-  { import = "astrocommunity.pack.typescript-all-in-one" }
+  { import = "astrocommunity.pack.typescript-all-in-one" },
+  { import = "astrocommunity.pack.tailwindcss" },
+  { import = "astrocommunity.pack.yaml" },
+  { import = "astrocommunity.pack.markdown" },
+  { import = "astrocommunity.pack.json" },
+  { import = "astrocommunity.pack.go" },
 }
