@@ -22,5 +22,6 @@
     },
     "buffer_font_family": "Jetbrains Mono",
     "confirm_quit": true,
-    "cursor_blink": false
+    "cursor_blink": false,
+    "show_copilot_suggestions": true
 }
