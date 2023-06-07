@@ -134,7 +134,20 @@ return {
     ['gR']               = { '<CMD>Glance references<CR>' },
     ['gY']               = { '<CMD>Glance type_definitions<CR>' },
     ['gM']               = { '<CMD>Glance implementations<CR>' },
-    ["K"]                = { "<cmd>Lspsaga hover_doc<CR>" }
+    ["K"]                = { "<cmd>Lspsaga hover_doc<CR>" },
+
+    -- extend Ctrl-W mappings
+    ["<C-w>p"]           = {
+      function()
+        local winpick = require('winpick')
+        local winid = winpick.select()
+
+        if winid then
+          vim.api.nvim_set_current_win(winid)
+        end
+      end,
+      desc = "Pick window",
+    }
   },
   t = {
     -- setting a mapping to false will disable it

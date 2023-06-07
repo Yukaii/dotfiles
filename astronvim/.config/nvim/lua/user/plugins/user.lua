@@ -140,5 +140,25 @@ return {
       })
     end,
     event = "VeryLazy"
+  },
+  {
+    'gbrlsnchs/winpick.nvim',
+    config = function()
+      require('winpick').setup({
+        format_label = function (label, _, _)
+          return string.format('%s', label)
+        end,
+        filter = function(winid, bufnr)
+          local excluded_filetypes = { "nofile" }
+          local buftype = vim.api.nvim_buf_get_option(bufnr, "buftype")
+
+          if vim.tbl_contains(excluded_filetypes, buftype) then
+            return false
+          end
+
+          return true
+        end,
+      })
+    end,
   }
 }
