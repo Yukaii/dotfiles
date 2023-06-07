@@ -174,6 +174,14 @@ return {
       require("hbac").setup({
         threshold = 15
       })
-    end
+    end,
+    event = "VeryLazy"
+  },
+  {
+    'AckslD/messages.nvim',
+    config = function()
+      require("messages").setup()
+    end,
+    event = "VeryLazy"
   }
 }
