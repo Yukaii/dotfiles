@@ -145,9 +145,10 @@ return {
     'gbrlsnchs/winpick.nvim',
     config = function()
       require('winpick').setup({
-        format_label = function (label, _, _)
+        format_label = function(label, _, _)
           return string.format('%s', label)
         end,
+        border = "rounded",
         filter = function(winid, bufnr)
           local excluded_filetypes = { "nofile" }
           local buftype = vim.api.nvim_buf_get_option(bufnr, "buftype")
@@ -160,5 +161,19 @@ return {
         end,
       })
     end,
+  },
+  {
+    'axkirillov/hbac.nvim',
+    dependencies = {
+      -- these are optional, add them, if you want the telescope module
+      'nvim-telescope/telescope.nvim',
+      'nvim-lua/plenary.nvim',
+      'nvim-tree/nvim-web-devicons'
+    },
+    config = function()
+      require("hbac").setup({
+        threshold = 15
+      })
+    end
   }
 }
