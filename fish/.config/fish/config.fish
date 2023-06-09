@@ -369,5 +369,8 @@ load_wezterm_completions
 
 fnm env --use-on-cd | source
 zoxide init fish | source
+atuin init fish | source
+
+alias ati="atuin search -i"
 
 # "$HOME/.tea/tea.xyz/v*/bin/tea" --magic=fish | source
