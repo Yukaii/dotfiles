@@ -94,20 +94,43 @@ wezterm.on(
   end
 )
 
+local function createFontConfig(fontName)
+  local fontConfigs = {
+    ["JetbrainsMono Nerd Font"] = {
+      font = wezterm.font_with_fallback({fontName}),
+      line_height = 1.2,
+      cell_width = 1.0,
+      font_size = 15.0,
+    },
+    ["FiraCode Nerd Font Mono"] = {
+      font = wezterm.font_with_fallback({fontName}),
+      line_height = 1.2,
+      font_size = 16.0,
+    },
+    ["BlexMono Nerd Font"] = {
+      font = wezterm.font_with_fallback({fontName}),
+      line_height = 1.2,
+      font_size = 16.0,
+    },
+    ["Iosevka Nerd Font Mono"] = {
+      font = wezterm.font_with_fallback({fontName}),
+      -- line_height = 1,
+      cell_width = 1.1,
+      font_size = 17.0,
+    },
+  }
+  return fontConfigs[fontName]
+end
+
 local config = {
+  front_end = "WebGpu",
   adjust_window_size_when_changing_font_size = false,
-  font = wezterm.font_with_fallback({
-    -- "Iosevka Nerd Font Mono",
-    -- "FiraCode Nerd Font Mono",
-    "JetbrainsMono Nerd Font",
-    -- "BlexMono Nerd Font"
-  }),
   -- window_background_opacity = 0.90,
   window_decorations = "RESIZE",
   macos_window_background_blur = 40,
   hide_tab_bar_if_only_one_tab = false,
   tab_max_width = 32,
-  font_size = 16,
+  font_size = 15,
   default_prog = { "/usr/bin/arch", "-arm64", "/opt/homebrew/bin/fish" },
   -- color_scheme = "Ayu Mirage",
   -- color_scheme = "Overnight Slumber",
@@ -137,5 +160,10 @@ local config = {
   command_palette_font_size = 17,
   command_palette_bg_color = colors.ansi[1],
 }
+
+local fontConfig = createFontConfig("JetbrainsMono Nerd Font")
+for k, v in pairs(fontConfig) do
+  config[k] = v
+end
 
 return config
