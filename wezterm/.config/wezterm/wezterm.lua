@@ -98,7 +98,7 @@ local function createFontConfig(fontName)
   local fontConfigs = {
     ["JetbrainsMono Nerd Font"] = {
       font = wezterm.font_with_fallback({fontName}),
-      line_height = 1.2,
+      line_height = 1.1,
       cell_width = 1.0,
       font_size = 15.0,
     },
