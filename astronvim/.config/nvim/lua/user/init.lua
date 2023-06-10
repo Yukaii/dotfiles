@@ -97,6 +97,19 @@ return {
     vim.o.langmenu = 'en_US'
 
     if vim.g.neovide then
+      local alpha = function()
+        return string.format("%x", math.floor((255 * vim.g.transparency) or 0.8))
+      end
+
+      local bg_color = vim.api.nvim_get_hl_by_name("Normal", true).background
+      local hex_color = string.format("#%x", bg_color)
+
+      -- g:neovide_transparency should be 0 if you want to unify transparency of content and title bar.
+      vim.g.neovide_transparency = 0.0
+      vim.g.transparency = 0.95
+      vim.g.neovide_background_color = hex_color .. alpha()
+
+      vim.g.neovide_cursor_vfx_mode = "railgun"
     end
 
     require("oil").setup()
