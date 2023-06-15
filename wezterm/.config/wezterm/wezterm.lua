@@ -39,7 +39,7 @@ wezterm.on(
     -- and that we have room for the edges.
     wezterm.log_info("max_width: " .. max_width .. ", " .. "title: " .. title .. ", title length" .. #title)
     if #title > max_width - 4 then
-      title = wezterm.truncate_right(title, max_width - 4)
+      title = wezterm.truncate_right(title, max_width - 3)
       wezterm.log_info("trimmed title: " .. title .. ", title length" .. #title)
     end
 
