@@ -15,6 +15,14 @@ return {
   { import = "astrocommunity.motion.nvim-surround" },
   { import = "astrocommunity.project.nvim-spectre" },
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
+  {
+    "ellisonleao/glow.nvim",
+    config = function()
+      require('glow').setup({
+        width = 120,
+      })
+    end
+  },
   { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
   { import = "astrocommunity.bars-and-lines.bufferline-nvim" },
   {
@@ -48,6 +56,7 @@ return {
       },
     },
   },
+  -- { import = "astrocommunity.bars-and-lines.lualine-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
     opts = {
@@ -61,6 +70,15 @@ return {
   { import = "astrocommunity.git.octo-nvim" },
   { import = "astrocommunity.color.modes-nvim" },
   { import = "astrocommunity.completion.copilot-lua-cmp" },
+  {
+    "zbirenbaum/copilot.lua",
+    config = function()
+      require("copilot").setup({
+        suggestion = { auto_trigger = true, debounce = 150 },
+        copilot_node_command = vim.fn.expand("$HOME") .. "/.volta/tools/image/node/18.14.2/bin/node"
+      })
+    end,
+  },
   { import = "astrocommunity.motion.leap-nvim" },
   { import = "astrocommunity.motion.mini-move" },
   { import = "astrocommunity.note-taking.obsidian-nvim" },
@@ -70,4 +88,5 @@ return {
   { import = "astrocommunity.pack.markdown" },
   { import = "astrocommunity.pack.json" },
   { import = "astrocommunity.pack.go" },
+  { import = "astrocommunity.pack.prisma" },
 }

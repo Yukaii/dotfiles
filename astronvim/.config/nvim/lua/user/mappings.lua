@@ -34,6 +34,7 @@ return {
     ["<leader>sw"]       = { function() require("spectre").open_visual { select_word = true } end, desc =
     "Search current word" },
     ["<leader>sr"]       = { "<cmd>e!<cr>", desc = "Reload file" },
+    ["<leader>sg"]       = { "<cmd>Glow<cr>", desc = "Preview markdown with glow" },
     ["<leader>fT"]       = { function() require('telescope-tabs').list_tabs() end, desc = "Find tabs" },
     ["<leader>fg"]       = { function() require 'telescope.builtin'.git_files() end, desc = "Find git files" },
     ["<leader>fd"]       = { function() require('dropbar.api').pick() end, desc = "Pick dropbar item" },
@@ -87,6 +88,8 @@ return {
       end,
       desc = "Close buffer",
     },
+    ["<leader>y"]        = { name = "Yank commands" },
+    ["<leader>yp"]       = { "<cmd>let @+ = expand('%')<cr>", desc = "Copy file relative path" },
     ["<leader>z"]        = { name = "Folding" },
     ["<leader>Z"]        = { "<cmd>ZenMode<cr>" },
     ["<leader>fp"]       = {
