@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tt++ -G ~/.config/tintin/main.tin
