@@ -97,23 +97,23 @@ wezterm.on(
 local function createFontConfig(fontName)
   local fontConfigs = {
     ["JetbrainsMono Nerd Font"] = {
-      font = wezterm.font_with_fallback({fontName}),
+      font = wezterm.font_with_fallback({ fontName }),
       line_height = 1.08,
       cell_width = 1.0,
       font_size = 15.0,
     },
     ["FiraCode Nerd Font Mono"] = {
-      font = wezterm.font_with_fallback({fontName}),
+      font = wezterm.font_with_fallback({ fontName }),
       line_height = 1.2,
       font_size = 16.0,
     },
     ["BlexMono Nerd Font"] = {
-      font = wezterm.font_with_fallback({fontName}),
+      font = wezterm.font_with_fallback({ fontName }),
       line_height = 1.2,
       font_size = 16.0,
     },
     ["Iosevka Nerd Font Mono"] = {
-      font = wezterm.font_with_fallback({fontName}),
+      font = wezterm.font_with_fallback({ fontName }),
       -- line_height = 1,
       cell_width = 1.1,
       font_size = 17.0,
@@ -137,8 +137,8 @@ local config = {
   -- color_scheme = "GitHub Dark",
   color_scheme = color_scheme,
   window_padding = {
-    top = 15,
-    bottom = 15,
+    top = 10,
+    bottom = 10,
   },
   use_fancy_tab_bar = false,
   tab_bar_at_bottom = true,
@@ -159,6 +159,11 @@ local config = {
   -- scrollback_lines = 1000000
   command_palette_font_size = 17,
   command_palette_bg_color = colors.ansi[1],
+
+  inactive_pane_hsb = {
+    saturation = 0.7,
+    brightness = 0.6,
+  }
 }
 
 local fontConfig = createFontConfig("JetbrainsMono Nerd Font")
