@@ -89,4 +89,5 @@ return {
   { import = "astrocommunity.pack.json" },
   { import = "astrocommunity.pack.go" },
   { import = "astrocommunity.pack.prisma" },
+  { import = "astrocommunity.pack.java" },
 }

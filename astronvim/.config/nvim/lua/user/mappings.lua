@@ -98,6 +98,10 @@ return {
     ["<leader>fP"]       = { "<cmd>Telescope file_browser hidden=true respect_gitignore=false display_stat=false<cr>", desc =
     "Open Telescope  file broser" },
     ["<leader>fj"]       = { "<cmd>lua require('telescope.builtin').jumplist()<cr>", desc = "Find jumplist" },
+    ["<leader><leader>"] = {
+      "<Cmd>lua require('telescope').extensions.smart_open.smart_open({ cwd_only = true })<CR>",
+      desc = "Smart open"
+    },
 
     -- Octo actions
     ["<leader>Of"]       = { "<cmd>Octo actions<cr>", desc = "List Octo actions" },
