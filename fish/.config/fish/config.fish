@@ -370,6 +370,9 @@ load_wezterm_completions
 fnm env --use-on-cd | source
 zoxide init fish | source
 atuin init fish | source
+kubectl completion fish | source
+
+alias kbc="kubectl"
 
 alias ati="atuin search -i"
 
