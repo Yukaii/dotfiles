@@ -118,6 +118,11 @@ local function createFontConfig(fontName)
       cell_width = 1.1,
       font_size = 17.0,
     },
+    ["iA Writer Mono S"] = {
+      font = wezterm.font_with_fallback({ fontName }),
+      line_height = 1.1,
+      font_size = 15.0,
+    }
   }
   return fontConfigs[fontName]
 end
