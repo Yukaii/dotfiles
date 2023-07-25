@@ -13,3 +13,5 @@ fish/.config/configstore
 fish/.config/fisherman
 fish/.config/fish/fishd.*
 fish/.config/fish/secrets.fish
+
+zed/.config/zed/conversations/*
