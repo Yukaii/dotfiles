@@ -12,6 +12,7 @@ return {
   -- { import = "astrocommunity.editing-support.true-zen-nvim" },
   { import = "astrocommunity.editing-support.todo-comments-nvim" },
   { import = "astrocommunity.editing-support.neogen" },
+  -- { import = "astrocommunity.workflow.hardtime-nvim" },
   { import = "astrocommunity.motion.nvim-surround" },
   { import = "astrocommunity.project.nvim-spectre" },
   { import = "astrocommunity.markdown-and-latex.glow-nvim" },
@@ -23,22 +24,23 @@ return {
       })
     end
   },
-  { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
+  -- { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
   { import = "astrocommunity.bars-and-lines.bufferline-nvim" },
+  -- { import = "astrocommunity.bars-and-lines.heirline-vscode-winbar" },
+  { import = "astrocommunity.bars-and-lines.dropbar-nvim" },
   {
     "akinsho/bufferline.nvim",
     event = { "BufReadPost" },
     opts = {
       options = {
-        diagnostics = "nvim_lsp",      -- | "nvim_lsp" | "coc",
-        separator_style = "slant",
-        close_command = "Bdelete! %d", -- can be a string | function, see "Mouse actions"
-        diagnostics_indicator = function(count, _, _, _)
-          if count > 9 then
-            return "9+"
-          end
-          return tostring(count)
-        end,
+        diagnostics = "nvim_lsp", -- | "nvim_lsp" | "coc",
+        separator_style = "thin",
+        -- diagnostics_indicator = function(count, _, _, _)
+        --   if count > 9 then
+        --     return "9+"
+        --   end
+        --   return tostring(count)
+        -- end,
         offsets = {
           {
             filetype = "neo-tree",
@@ -46,11 +48,6 @@ return {
             text_align = "center",
             highlight = "Directory",
           },
-        },
-        hover = {
-          enabled = true,
-          delay = 200,
-          reveal = { "close" },
         },
         color_icons = false,
       },
@@ -67,9 +64,11 @@ return {
   { import = "astrocommunity.git.neogit" },
   { import = "astrocommunity.media.pets-nvim" },
   { import = "astrocommunity.scrolling.satellite-nvim" },
+  -- { import = "astrocommunity.split-and-window.minimap-vim" },
   { import = "astrocommunity.git.octo-nvim" },
   { import = "astrocommunity.color.modes-nvim" },
   { import = "astrocommunity.completion.copilot-lua-cmp" },
+  { import = "astrocommunity.completion.cmp-cmdline" },
   {
     "zbirenbaum/copilot.lua",
     config = function()
@@ -80,6 +79,7 @@ return {
     end,
   },
   { import = "astrocommunity.motion.leap-nvim" },
+  { import = "astrocommunity.motion.flit-nvim" },
   { import = "astrocommunity.motion.mini-move" },
   { import = "astrocommunity.note-taking.obsidian-nvim" },
   { import = "astrocommunity.pack.typescript-all-in-one" },
@@ -90,4 +90,5 @@ return {
   { import = "astrocommunity.pack.go" },
   { import = "astrocommunity.pack.prisma" },
   { import = "astrocommunity.pack.java" },
+  { import = "astrocommunity.register.nvim-neoclip-lua" },
 }
