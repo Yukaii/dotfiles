@@ -24,7 +24,8 @@ return {
     lazy = false,
     dependencies = {
       "MunifTanjim/nui.nvim"
-    }
+    },
+    commit = "f4d165c"
   },
   {
     "nvim-telescope/telescope.nvim",
@@ -88,22 +89,6 @@ return {
     event = "VeryLazy",
   },
   {
-    "glepnir/lspsaga.nvim",
-    event = "LspAttach",
-    config = function()
-      require("lspsaga").setup({
-        symbol_in_winbar = {
-          enable = false
-        }
-      })
-    end,
-    dependencies = {
-      { "nvim-tree/nvim-web-devicons" },
-      --Please make sure you install markdown and markdown_inline parser
-      { "nvim-treesitter/nvim-treesitter" }
-    }
-  },
-  {
     "Bryley/neoai.nvim",
     dependencies = {
       "MunifTanjim/nui.nvim",
@@ -131,7 +116,7 @@ return {
       })
     end,
   },
-  { 'Bekaboo/dropbar.nvim', event = "VeryLazy" },
+  -- { 'Bekaboo/dropbar.nvim', event = "VeryLazy" },
   {
     "dnlhc/glance.nvim",
     config = function()
@@ -214,5 +199,27 @@ return {
     dependencies = {
       "kkharji/sqlite.lua",
     }
-  }
+  },
+  {
+    "nacro90/numb.nvim",
+    config = function()
+      require("numb").setup {
+      }
+    end,
+    event = "BufRead",
+  },
+  -- {
+  --   'echasnovski/mini.map',
+  --   version = '*',
+  --   config = function()
+  --     require('mini.map').setup({
+  --       -- config
+  --     })
+  --   end,
+  --   event = "BufRead",
+  -- },
+  -- {
+  --   "wfxr/minimap.vim",
+  --   event = "BufRead",
+  -- }
 }

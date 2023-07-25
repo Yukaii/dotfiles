@@ -4,22 +4,21 @@
 -- lower level configuration and more robust one. (which-key will
 -- automatically pick-up stored data by this setting.)
 
-
 return {
   -- first key is the mode
   n = {
     -- second key is the lefthand side of the map
     -- mappings seen under group name "Buffer"
     ["<leader>bn"]       = { "<cmd>tabnew<cr>", desc = "New tab" },
-    ["<leader>bD"]       = {
-      function()
-        require("astronvim.utils.status").heirline.buffer_picker(function(bufnr)
-          require("astronvim.utils.buffer").close(
-            bufnr)
-        end)
-      end,
-      desc = "Pick to close",
-    },
+    -- ["<leader>bD"]       = {
+    --   function()
+    --     require("astronvim.utils.status").heirline.buffer_picker(function(bufnr)
+    --       require("astronvim.utils.buffer").close(
+    --         bufnr)
+    --     end)
+    --   end,
+    --   desc = "Pick to close",
+    -- },
     -- tables with the `name` key will be registered with which-key if it's installed
     -- this is useful for naming menus
     ["<leader>b"]        = { name = "Buffers" },
@@ -113,15 +112,6 @@ return {
     ["<leader>bb"]       = { "<cmd>BufferLinePick<cr>", desc = "Pick buffer" },
     ["<leader>bD"]       = { "<cmd>BufferLinePickClose<CR>", desc = "Pick to close" },
     ["<leader>bp"]       = { "<cmd>BufferLineTogglePin<cr>", desc = "Toggle Pinning" },
-    ["<leader>bC"]       = { function()
-      local bufferline = require('bufferline')
-      for _, e in ipairs(bufferline.get_elements().elements) do
-        vim.schedule(function()
-          vim.cmd("bd " .. e.id)
-        end)
-      end
-    end, desc = "Close all buffers"
-    },
 
     -- quick save
     -- ["<C-s>"] = { ":w!<cr>", desc = "Save File" },  -- change description but the same command
@@ -136,12 +126,12 @@ return {
     ["j"]                = { "v:count ? (v:count > g:jk_jumps_minimum_lines ? \"m'\" . v:count : '') . 'j' : 'gj'", expr = true, desc =
     "Move cursor down" },
     ["k"]                = { "v:count ? (v:count > g:jk_jumps_minimum_lines ? \"m'\" . v:count : '') . 'k' : 'gk'", expr = true },
-    ["gp"]               = { "<cmd>Lspsaga peek_definition<CR>" },
+    -- ["gp"]               = { "<cmd>Lspsaga peek_definition<CR>" },
     ['gD']               = { '<CMD>Glance definitions<CR>' },
     ['gR']               = { '<CMD>Glance references<CR>' },
     ['gY']               = { '<CMD>Glance type_definitions<CR>' },
     ['gM']               = { '<CMD>Glance implementations<CR>' },
-    ["K"]                = { "<cmd>Lspsaga hover_doc<CR>" },
+    -- ["K"]                = { "<cmd>Lspsaga hover_doc<CR>" },
 
     -- extend Ctrl-W mappings
     ["<C-w>p"]           = {

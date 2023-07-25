@@ -4,12 +4,14 @@ return {
     -- set to true or false etc.
     relativenumber = true, -- sets vim.opt.relativenumber
     number = true,         -- sets vim.opt.number
-    spell = false,         -- sets vim.opt.spell
+    spell = false,          -- sets vim.opt.spell
     signcolumn = "auto",   -- sets vim.opt.signcolumn to auto
     wrap = true,           -- sets vim.opt.wrap
     guifont = "JetbrainsMono Nerd Font:h15:#h-normal",
     -- cursorcolumn = true,
     conceallevel = 2,
+    jumpoptions = "stack",
+    -- spelllang = 'en_us',
   },
   g = {
     mapleader = " ",                 -- sets vim.g.mapleader
@@ -41,7 +43,13 @@ return {
     neovide_transparency = 0.9,
     neovide_floating_blur_amount_x = 2.0,
     neovide_floating_blur_amount_y = 2.0,
-    jk_jumps_minimum_lines = 4
+    jk_jumps_minimum_lines = 4,
+    minimap_auto_start = 1,
+    minimap_auto_start_win_enter = 1,
+    minimap_width = 7,
+    minimap_git_colors = 1,
+
+    -- inlay_hints_enabled = true
   },
 }
 -- If you need more control, you can use the function()...end notation
