@@ -232,6 +232,7 @@ return {
       "typescript",
       "typescriptreact",
       "typescript.tsx",
+      "vue",
     },
     opts = function()
       local lsp_utils = require "astronvim.utils.lsp"
@@ -251,7 +252,7 @@ return {
         -- base = 'buffer',
         column = 1,
         signs_on_startup = { 'all' },
-        diagnostics_severities = { vim.diagnostic.severity.ERROR }
+        -- diagnostics_severities = { vim.diagnostic.severity.ERROR }
       })
     end
   }
