@@ -240,5 +240,19 @@ return {
         capabilities = lsp_utils.capabilities,
       }
     end,
+  },
+  {
+    'dstein64/nvim-scrollview',
+    event = "BufRead",
+    config = function()
+      require('scrollview').setup({
+        excluded_filetypes = { 'neo-tree' },
+        winblend = 30,
+        -- base = 'buffer',
+        column = 1,
+        signs_on_startup = { 'all' },
+        diagnostics_severities = { vim.diagnostic.severity.ERROR }
+      })
+    end
   }
 }

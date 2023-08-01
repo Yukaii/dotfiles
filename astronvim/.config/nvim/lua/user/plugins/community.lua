@@ -63,7 +63,7 @@ return {
   },
   { import = "astrocommunity.git.neogit" },
   { import = "astrocommunity.media.pets-nvim" },
-  { import = "astrocommunity.scrolling.satellite-nvim" },
+  -- { import = "astrocommunity.scrolling.satellite-nvim" },
   -- { import = "astrocommunity.split-and-window.minimap-vim" },
   { import = "astrocommunity.git.octo-nvim" },
   { import = "astrocommunity.color.modes-nvim" },
