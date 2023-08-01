@@ -37,3 +37,4 @@ patch:
   "app_options/company.thebrowser.Browser/ascii_mode": true
   "app_options/com.readdle.SparkDesktop/ascii_mode": true
   "app_options/dev.zed.Zed/ascii_mode": true
+  "app_options/com.yourcompany.cool-retro-term/ascii_mode": true
