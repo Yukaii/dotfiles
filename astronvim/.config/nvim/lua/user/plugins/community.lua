@@ -82,7 +82,7 @@ return {
   { import = "astrocommunity.motion.flit-nvim" },
   { import = "astrocommunity.motion.mini-move" },
   { import = "astrocommunity.note-taking.obsidian-nvim" },
-  { import = "astrocommunity.pack.typescript-all-in-one" },
+  -- { import = "astrocommunity.pack.typescript-all-in-one" },
   { import = "astrocommunity.pack.tailwindcss" },
   { import = "astrocommunity.pack.yaml" },
   { import = "astrocommunity.pack.markdown" },

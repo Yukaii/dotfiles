@@ -222,4 +222,23 @@ return {
   --   "wfxr/minimap.vim",
   --   event = "BufRead",
   -- }
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    ft = {
+      "javascript",
+      "javascriptreact",
+      "javascript.jsx",
+      "typescript",
+      "typescriptreact",
+      "typescript.tsx",
+    },
+    opts = function()
+      local lsp_utils = require "astronvim.utils.lsp"
+      return {
+        on_attach = lsp_utils.on_attach,
+        capabilities = lsp_utils.capabilities,
+      }
+    end,
+  }
 }
