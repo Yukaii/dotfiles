@@ -334,10 +334,6 @@ set PATH $PNPM_HOME $PATH
 # GCloud
 source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
 
-for completion in (fnm completions --shell fish)
-  eval $completion
-end
-
 for completion in (volta completions fish)
   eval $completion
 end
