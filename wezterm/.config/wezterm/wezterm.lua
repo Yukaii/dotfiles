@@ -101,11 +101,32 @@ local function createFontConfig(fontName)
       line_height = 1.08,
       cell_width = 1.0,
       font_size = 15.0,
+      harfbuzz_features = {
+        -- https://github.com/JetBrains/JetBrainsMono/wiki/OpenType-features
+
+        "calt",
+        -- subsitute zero with slashed zero
+        "zero",
+
+        "cv06",
+        "cv07",
+        "cv08",
+        "cv14",
+        "cv16",
+
+        "cv99",
+
+        -- Closed construction. Change the rhythm to a more lively one.
+        -- "ss02",
+
+        -- Shift horizontal stroke in f to match x-height.
+        "ss20"
+      }
     },
     ["FiraCode Nerd Font Mono"] = {
       font = wezterm.font_with_fallback({ fontName }),
-      line_height = 1.2,
-      font_size = 16.0,
+      line_height = 1.1,
+      font_size = 15.0,
     },
     ["BlexMono Nerd Font"] = {
       font = wezterm.font_with_fallback({ fontName }),
@@ -126,6 +147,11 @@ local function createFontConfig(fontName)
     ["iA Writer Mono V"] = {
       font = wezterm.font_with_fallback({ fontName }),
       line_height = 1.1,
+      font_size = 15.0,
+    },
+    ["CaskaydiaCove Nerd Font"] = {
+      font = wezterm.font_with_fallback({ fontName }),
+      line_height = 1.25,
       font_size = 15.0,
     }
   }
