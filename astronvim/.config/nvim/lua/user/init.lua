@@ -17,9 +17,11 @@ return {
     },
   },
   -- Set colorscheme to use
-  colorscheme = "catppuccin-macchiato",
+  -- colorscheme = "catppuccin-macchiato",
+  colorscheme = "kanagawa",
+  -- colorscheme = "tokyonight",
   -- colorscheme = "astromars",
-  -- colorscheme = "github_dark_high_contrast",
+  -- colorscheme = "github_dark",
   -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
   diagnostics = {
     virtual_text = false,
