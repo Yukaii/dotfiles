@@ -92,7 +92,34 @@ return {
     --     ["~/%.config/foo/.*"] = "fooscript",
     --   },
     -- }
-    --
+
+    vim.cmd [[
+      function! SaveJump(motion)
+        if exists('#SaveJump#CursorMoved')
+          autocmd! SaveJump
+        else
+          normal! m'
+        endif
+        let m = a:motion
+        if v:count
+          let m = v:count.m
+        endif
+        execute 'normal!' m
+      endfunction
+
+      function! SetJump()
+        augroup SaveJump
+          autocmd!
+          autocmd CursorMoved * autocmd! SaveJump
+        augroup END
+      endfunction
+
+      nnoremap <silent> <C-u> :<C-u>call SaveJump("\<lt>C-u>")<CR>:call SetJump()<CR>
+      nnoremap <silent> <C-d> :<C-u>call SaveJump("\<lt>C-d>")<CR>:call SetJump()<CR>
+      nnoremap <silent> <C-f> :<C-u>call SaveJump("\<lt>C-f>")<CR>:call SetJump()<CR>
+      nnoremap <silent> <C-b> :<C-u>call SaveJump("\<lt>C-b>")<CR>:call SetJump()<CR>
+    ]]
+
     require('toggleterm').setup {
       shell = 'fish'
     }
