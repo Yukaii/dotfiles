@@ -1,8 +1,8 @@
 local wezterm = require 'wezterm';
 
-local color_scheme = "Catppuccin Macchiato"
+-- local color_scheme = "Catppuccin Macchiato"
 -- local color_scheme = "Ayu Mirage"
--- local color_scheme = "Kanagawa (Gogh)"
+local color_scheme = "Kanagawa (Gogh)"
 -- local color_scheme = "kanagawabones"
 local colors = wezterm.get_builtin_color_schemes()[color_scheme]
 
@@ -10,7 +10,7 @@ local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_left_half_circle_thick
 local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_right_half_circle_thick
 
 -- hover colors
-local HOVER_BG = wezterm.color.parse(colors.brights[4])
+local HOVER_BG = wezterm.color.parse(colors.brights[8]):lighten(0.3)
 local HOVER_FG = wezterm.color.parse(colors.ansi[8]):darken(0.8)
 local TAB_BG = wezterm.color.parse(colors.background):lighten(0.1)
 local TAB_FG = wezterm.color.parse(colors.ansi[8]):lighten(0.5)
