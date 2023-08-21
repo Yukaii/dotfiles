@@ -262,8 +262,28 @@ return {
       { "<leader>sv", "<cmd>TWValues<cr>", desc = "Show tailwind CSS values" },
     },
     opts = {
-      border = "rounded",           -- Valid window border style,
-      show_unknown_classes = true   -- Shows the unknown classes popup
+      border = "rounded",         -- Valid window border style,
+      show_unknown_classes = true -- Shows the unknown classes popup
     }
   },
+  {
+    "sustech-data/wildfire.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    config = function()
+      require("wildfire").setup()
+    end,
+  },
+  {
+    'antosha417/nvim-lsp-file-operations',
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-neo-tree/neo-tree.nvim",
+    },
+    event = "BufRead",
+    config = function()
+      require('lsp-file-operations').setup {
+      }
+    end
+  }
 }

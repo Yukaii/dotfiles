@@ -111,7 +111,11 @@ return {
     config = function()
       require("copilot").setup({
         suggestion = { auto_trigger = true, debounce = 150 },
-        copilot_node_command = vim.fn.expand("$HOME") .. "/.volta/tools/image/node/18.14.2/bin/node"
+        copilot_node_command = vim.fn.expand("$HOME") .. "/.volta/tools/image/node/18.14.2/bin/node",
+        filetypes = {
+          yaml = true,
+          markdown = true,
+        }
       })
     end,
   },
