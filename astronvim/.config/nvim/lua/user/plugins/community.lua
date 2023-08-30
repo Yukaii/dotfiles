@@ -90,7 +90,7 @@ return {
       },
     },
   },
-  -- { import = "astrocommunity.bars-and-lines.lualine-nvim" },
+  { import = "astrocommunity.bars-and-lines.lualine-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
     opts = {
@@ -99,6 +99,7 @@ return {
     },
   },
   { import = "astrocommunity.git.neogit" },
+  { import = "astrocommunity.git.blame-nvim" },
   { import = "astrocommunity.media.pets-nvim" },
   -- { import = "astrocommunity.scrolling.satellite-nvim" },
   -- { import = "astrocommunity.split-and-window.minimap-vim" },
@@ -133,3 +134,4 @@ return {
   { import = "astrocommunity.pack.java" },
   { import = "astrocommunity.register.nvim-neoclip-lua" },
 }
+

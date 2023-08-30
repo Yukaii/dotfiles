@@ -23,7 +23,7 @@ return {
     -- this is useful for naming menus
     ["<leader>b"]        = { name = "Buffers" },
     ["<leader>gy"]       = { desc = "Copy GitHub URL" },
-    ["<leader>gB"]       = { "<cmd>Git blame<cr>", desc = "Show Git Blame" },
+    ["<leader>gB"]       = { "<cmd>ToggleBlame virtual<cr>", desc = "Toggle Git Blame" },
     ["<leader>s"]        = { name = "Search and Format" },
     ["<leader>s<space>"] = {
       "<cmd>StripWhitespace<cr>",

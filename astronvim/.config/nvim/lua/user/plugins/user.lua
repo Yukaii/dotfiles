@@ -285,5 +285,32 @@ return {
       require('lsp-file-operations').setup {
       }
     end
-  }
+  },
+  {
+    "mcchrish/zenbones.nvim",
+    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
+    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+    -- In Vim, compat mode is turned on as Lush only works in Neovim.
+    dependencies = {
+      "rktjmp/lush.nvim"
+    }
+  },
+  -- {
+  --   "huggingface/llm.nvim",
+  --   event = "BufRead",
+  --   config = function()
+  --     require("llm").setup({
+  --       model = "bigcode/starcoder",
+  --     })
+  --   end,
+  -- },
+  {
+    "askfiy/visual_studio_code",
+    priority = 100,
+    config = function()
+      require("visual_studio_code").setup({
+        mode = "dark",
+      })
+    end,
+  },
 }

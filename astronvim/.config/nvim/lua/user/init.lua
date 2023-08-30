@@ -22,6 +22,7 @@ return {
   -- colorscheme = "tokyonight",
   -- colorscheme = "astromars",
   -- colorscheme = "github_dark",
+  -- colorscheme = "kanagawabones",
   -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
   diagnostics = {
     virtual_text = false,

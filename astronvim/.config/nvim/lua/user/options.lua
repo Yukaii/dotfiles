@@ -50,6 +50,9 @@ return {
     minimap_git_colors = 1,
 
     -- inlay_hints_enabled = true
+    kanagawabones = {
+      darkness = 'warm'
+    }
   },
 }
 -- If you need more control, you can use the function()...end notation
