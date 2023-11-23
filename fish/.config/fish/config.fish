@@ -57,6 +57,8 @@ set -x PIPENV_IGNORE_VIRTUALENVS 1
 
 set --export FZF_DEFAULT_OPTS --height 50% --no-extended +i
 
+set NNN_OPENER "nnn-hx.sh"
+
 # Aliases
 alias ping='prettyping --nolegend'
 alias pg8='ping 8.8.8.8'
@@ -64,6 +66,9 @@ alias vim='nvim'
 alias cat='bat'
 alias preview="fzf --preview 'bat --color \"always\" {}'"
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
+alias pn="pnpm"
+alias ed="ed -p ':'"
+# alias eza="ls"
 
 # source $HOME/.cargo/env
 
@@ -327,7 +332,7 @@ oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/uew.o
 
 # pnpm setup
 set PNPM_HOME "$HOME/Library/pnpm"
-set PATH $PNPM_HOME $PATH
+# set PATH $PNPM_HOME $PATH
 
 # tabtab source for packages
 # uninstall by removing these lines
