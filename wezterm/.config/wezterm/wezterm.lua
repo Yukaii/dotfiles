@@ -1,10 +1,44 @@
 local wezterm = require 'wezterm';
 
+local default_color_scheme = "Kanagawa (Gogh)"
+
 -- local color_scheme = "Catppuccin Macchiato"
 -- local color_scheme = "Ayu Mirage"
 local color_scheme = "Kanagawa (Gogh)"
+-- local color_scheme = "Flexoki Dark"
 -- local color_scheme = "kanagawabones"
-local colors = wezterm.get_builtin_color_schemes()[color_scheme]
+
+-- init colors variable
+local colors = {}
+
+-- check if color scheme exists
+local function isColorSchemeAvailableAsBultin(c)
+  local color_schemes = wezterm.get_builtin_color_schemes()
+  for key in pairs(color_schemes) do
+    if key == c then
+      return true
+    end
+  end
+  return false
+end
+
+-- get colors with fallback to default color scheme
+if isColorSchemeAvailableAsBultin(color_scheme) then
+  colors = wezterm.get_builtin_color_schemes()[color_scheme]
+else
+  -- try loaded from $HOME/wezterm/config/colors/:name.toml first
+  local filepath = os.getenv("HOME") .. "/.config/wezterm/colors/" .. color_scheme .. ".toml"
+  local f = io.open(filepath, "r")
+
+  if f ~= nil then
+    io.close(f)
+    colors = wezterm.color.load_scheme(filepath)
+  else
+    -- fallback to default color scheme
+    colors = wezterm.get_builtin_color_schemes()[default_color_scheme]
+  end
+end
+
 
 local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_left_half_circle_thick
 local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_right_half_circle_thick
@@ -37,10 +71,10 @@ wezterm.on(
 
     -- ensure that the titles fit in the available space,
     -- and that we have room for the edges.
-    wezterm.log_info("max_width: " .. max_width .. ", " .. "title: " .. title .. ", title length" .. #title)
+    -- wezterm.log_info("max_width: " .. max_width .. ", " .. "title: " .. title .. ", title length" .. #title)
     if #title > max_width - 4 then
       title = wezterm.truncate_right(title, max_width - 3)
-      wezterm.log_info("trimmed title: " .. title .. ", title length" .. #title)
+      -- wezterm.log_info("trimmed title: " .. title .. ", title length" .. #title)
     end
 
     local edge_background = colors.background
@@ -153,6 +187,23 @@ local function createFontConfig(fontName)
       font = wezterm.font_with_fallback({ fontName }),
       line_height = 1.25,
       font_size = 15.0,
+    },
+    ["Monaspace Argon"] = {
+      font = wezterm.font_with_fallback({ fontName }),
+      line_height = 1.20,
+      font_size = 15.0,
+      harfbuzz_features = {
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "ss05",
+        "ss06",
+        "ss07",
+        "ss08",
+        "calt",
+        "dlig"
+      }
     }
   }
   return fontConfigs[fontName]
@@ -192,7 +243,7 @@ local config = {
       }
     }
   },
-  -- scrollback_lines = 1000000
+  scrollback_lines = 1000000,
   command_palette_font_size = 17,
   command_palette_bg_color = colors.ansi[1],
 
@@ -203,6 +254,7 @@ local config = {
 }
 
 local fontConfig = createFontConfig("JetbrainsMono Nerd Font")
+-- local fontConfig = createFontConfig("Monaspace Argon")
 for k, v in pairs(fontConfig) do
   config[k] = v
 end
