@@ -379,4 +379,6 @@ alias kbc="kubectl"
 
 alias ati="atuin search -i"
 
+alias pm2lc="pm2_logs_chooser"
+
 # "$HOME/.tea/tea.xyz/v*/bin/tea" --magic=fish | source
