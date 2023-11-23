@@ -1,0 +1,4 @@
+patch:
+  menu:
+    alternative_select_keys: 'ABCDEFGHIJ'
+

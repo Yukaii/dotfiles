@@ -2,6 +2,9 @@ patch:
   schema_list:
     - schema: bopomofo_tw
     - schema: emoji
+    - schema: luna_pinyin
+    - schema: iridium_bpmf
+
     # - schema: full_bopomofo
     # - schema: double_bopomo
 ######## 洋蔥注音 plus 版 ########
