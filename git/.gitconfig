@@ -5,6 +5,7 @@
 	pager = git-split-diffs --color | less -RFX
 	excludesfile = ~/.gitignore_global
 	editor = nvim
+	difftool = true
 [delta]
     plus-style = "syntax #012800"
     minus-style = "syntax #340001"
@@ -18,6 +19,15 @@
 	gpgsign = true
 [init]
 	defaultBranch = main
+[diff]
+	external = difft
+  tool = difftastic
+
+[difftool]
+  prompt = false
+
+[difftool "difftastic"]
+  cmd = difft "$LOCAL" "$REMOTE"
 [alias]
     # list files which have changed since REVIEW_BASE
     # (REVIEW_BASE defaults to 'master' in my zshrc)
@@ -26,6 +36,8 @@
     # Same as above, but with a diff stat instead of just names
     # (better for interactive use)
     stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
+
+    dft = difftool
 
     delete-squashed = "!f() { \
       local targetBranch=${1:-main}; \
@@ -38,9 +50,11 @@
         while read branch; do \
           if [[ ! $branch =~ ^(develop|main|master|production|deploy)$ ]]; then \
             local mergeBase=$(git merge-base $targetBranch $branch); \
-            local isSquashed=$(git cherry $targetBranch $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)); \
-            if [[ $isSquashed == \"-\"* ]]; then \
-              git branch -D $branch; \
+            if [[ $mergeBase != $(git rev-parse $branch) ]]; then \
+              local isSquashed=$(git cherry $targetBranch $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)); \
+              if [[ $isSquashed == \"-\"* ]]; then \
+                git branch -D $branch; \
+              fi; \
             fi; \
           fi; \
         done; \
