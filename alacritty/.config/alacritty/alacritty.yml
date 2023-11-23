@@ -108,7 +108,7 @@ font:
     #   - (macOS) Menlo
     #   - (Linux) monospace
     #   - (Windows) Consolas
-    family: "Sarasa Mono TC"
+    # family: "Sarasa Mono TC"
 
     # The `style` can be specified to pick a specific face.
     style: Regular
