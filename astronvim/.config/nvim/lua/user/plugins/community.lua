@@ -8,6 +8,7 @@ return {
   { import = "astrocommunity.colorscheme.github-nvim-theme" },
   { import = "astrocommunity.colorscheme.catppuccin" },
   { import = "astrocommunity.colorscheme.kanagawa-nvim" },
+  { import = "astrocommunity.colorscheme.nordic-nvim" },
   {
     "rebelot/kanagawa.nvim",
     config = function()
@@ -68,29 +69,34 @@ return {
   {
     "akinsho/bufferline.nvim",
     event = { "BufReadPost" },
-    opts = {
-      options = {
-        diagnostics = "nvim_lsp", -- | "nvim_lsp" | "coc",
-        separator_style = "thin",
-        -- diagnostics_indicator = function(count, _, _, _)
-        --   if count > 9 then
-        --     return "9+"
-        --   end
-        --   return tostring(count)
-        -- end,
-        offsets = {
-          {
-            filetype = "neo-tree",
-            text = "EXPLORER",
-            text_align = "center",
-            highlight = "Directory",
+    config = function()
+      require("bufferline").setup({
+        options = {
+          diagnostics = "nvim_lsp", -- | "nvim_lsp" | "coc",
+          separator_style = "thin",
+          -- diagnostics_indicator = function(count, _, _, _)
+          --   if count > 9 then
+          --     return "9+"
+          --   end
+          --   return tostring(count)
+          -- end,
+          offsets = {
+            {
+              filetype = "neo-tree",
+              text = "EXPLORER",
+              text_align = "center",
+              highlight = "Directory",
+            },
           },
+          color_icons = false,
+          -- custom_areas = {
+          --   right = require("visual_studio_code").get_bufferline_right(),
+          -- },
         },
-        color_icons = false,
-      },
-    },
+      })
+    end
   },
-  { import = "astrocommunity.bars-and-lines.lualine-nvim" },
+  -- { import = "astrocommunity.bars-and-lines.lualine-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
     opts = {
@@ -105,6 +111,7 @@ return {
   -- { import = "astrocommunity.split-and-window.minimap-vim" },
   { import = "astrocommunity.git.octo-nvim" },
   { import = "astrocommunity.color.modes-nvim" },
+  -- { import = "astrocommunity.color.transparent-nvim" },
   { import = "astrocommunity.completion.copilot-lua-cmp" },
   { import = "astrocommunity.completion.cmp-cmdline" },
   {
@@ -134,4 +141,3 @@ return {
   { import = "astrocommunity.pack.java" },
   { import = "astrocommunity.register.nvim-neoclip-lua" },
 }
-

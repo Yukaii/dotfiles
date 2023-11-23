@@ -149,16 +149,12 @@ return {
   },
   {
     'axkirillov/hbac.nvim',
-    dependencies = {
-      -- these are optional, add them, if you want the telescope module
-      'nvim-telescope/telescope.nvim',
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons'
-    },
     config = function()
       require("hbac").setup({
-        threshold = 15
+        threshold = 12
       })
+
+      require('telescope').load_extension('hbac')
     end,
     event = "VeryLazy"
   },
@@ -304,13 +300,56 @@ return {
   --     })
   --   end,
   -- },
+  -- {
+  --   "askfiy/visual_studio_code",
+  --   priority = 100,
+  --   lazy = false,
+  --   config = function()
+  --     require("visual_studio_code").setup({
+  --       mode = "dark",
+  --     })
+  --   end,
+  -- },
+  -- {
+  --   "nvim-lualine/lualine.nvim",
+  --   config = function()
+  --     require("lualine").setup({
+  --       options = {
+  --         theme = "auto",
+  --         icons_enabled = true,
+  --         component_separators = { left = "", right = "" },
+  --         section_separators = { left = "", right = "" },
+  --         disabled_filetypes = {},
+  --         globalstatus = true,
+  --         refresh = {
+  --           statusline = 100,
+  --         },
+  --       },
+  --       sections = require("visual_studio_code").get_lualine_sections(),
+  --     })
+  --   end
+  -- },
   {
-    "askfiy/visual_studio_code",
-    priority = 100,
+    "rockyzhang24/arctic.nvim",
+    branch = "v2",
+    dependencies = { "rktjmp/lush.nvim" },
+    lazy = false,
+  },
+  {
+    "roobert/surround-ui.nvim",
+    dependencies = {
+      "kylechui/nvim-surround",
+      "folke/which-key.nvim",
+    },
     config = function()
-      require("visual_studio_code").setup({
-        mode = "dark",
+      require("surround-ui").setup({
+        root_key = "sh"
       })
     end,
+    event = "BufRead",
   },
+  {
+    'stevedylandev/flexoki-nvim',
+    lazy = false
+  }
 }

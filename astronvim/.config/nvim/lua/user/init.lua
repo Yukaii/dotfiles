@@ -19,9 +19,13 @@ return {
   -- Set colorscheme to use
   -- colorscheme = "catppuccin-macchiato",
   colorscheme = "kanagawa",
+  -- colorscheme = "nordic",
+  -- colorscheme = "flexoki",
+  -- colorscheme = "arctic",
+  -- colorscheme = "visual_studio_code_dark",
   -- colorscheme = "tokyonight",
   -- colorscheme = "astromars",
-  -- colorscheme = "github_dark",
+  -- colorscheme = "github_dark_high_contrast",
   -- colorscheme = "kanagawabones",
   -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
   diagnostics = {

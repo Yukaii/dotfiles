@@ -133,6 +133,8 @@ return {
     ['gM']               = { '<CMD>Glance implementations<CR>' },
     -- ["K"]                = { "<cmd>Lspsaga hover_doc<CR>" },
 
+    ["<leader>gn"] = { name = "Neogit" },
+
     -- extend Ctrl-W mappings
     ["<C-w>p"]           = {
       function()
