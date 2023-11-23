@@ -14,8 +14,10 @@ set arc (arch)
 if string match -q "arm64" $arc
   # set PATH $PATH "/usr/local/bin"
   set PATH $PATH "/opt/homebrew/bin/"
+  set PATH $PATH "/opt/homebrew/sbin/"
 else
   set PATH $PATH "/usr/local/bin"
+  set PATH $PATH "/usr/local/sbin"
 end
 
 
