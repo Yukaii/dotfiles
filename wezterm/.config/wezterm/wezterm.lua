@@ -190,7 +190,7 @@ local function createFontConfig(fontName)
     },
     ["Monaspace Argon"] = {
       font = wezterm.font_with_fallback({ fontName }),
-      line_height = 1.20,
+      line_height = 1.30,
       font_size = 15.0,
       harfbuzz_features = {
         "ss01",
@@ -204,6 +204,11 @@ local function createFontConfig(fontName)
         "calt",
         "dlig"
       }
+    },
+    ["GeistMono NF"] = {
+      font = wezterm.font_with_fallback({ fontName }),
+      font_size = 15.0,
+      line_height = 1.3,
     }
   }
   return fontConfigs[fontName]
@@ -255,6 +260,7 @@ local config = {
 
 local fontConfig = createFontConfig("JetbrainsMono Nerd Font")
 -- local fontConfig = createFontConfig("Monaspace Argon")
+-- local fontConfig = createFontConfig("GeistMono NF")
 for k, v in pairs(fontConfig) do
   config[k] = v
 end
