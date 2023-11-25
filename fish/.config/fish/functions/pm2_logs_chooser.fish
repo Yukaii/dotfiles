@@ -1,6 +1,21 @@
 function pm2_logs_chooser
-    argparse 'appName=' 'config=' -- $argv
+   argparse 'h/help' 'appName=' 'config=' -- $argv
     or return
+
+    if set -q _flag_help
+        echo "Usage: pm2_logs_chooser [OPTIONS]"
+        echo ""
+        echo "Options:"
+        echo "  --appName=APP_NAME    Specify the application name directly."
+        echo "  --config=CONFIG_FILE  Specify the ecosystem configuration file (ecosystem.config.js or ecosystem.config.cjs)."
+        echo "  -h, --help            Display this help message and exit."
+        echo ""
+        echo "Examples:"
+        echo "  pm2_logs_chooser --appName=my_app"
+        echo "  pm2_logs_chooser --config=ecosystem.config.js"
+        echo "  pm2_logs_chooser --appName=my_app --config=ecosystem.config.js"
+        return
+    end
 
     # Default to known config file names if not set
     if not set -q _flag_config
