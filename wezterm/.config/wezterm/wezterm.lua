@@ -128,6 +128,77 @@ wezterm.on(
   end
 )
 
+-- Modified from https://gist.github.com/gsuuon/5511f0aa10c10c6cbd762e0b3e596b71
+local title_color_bg = TAB_BG
+local title_color_fg = TAB_FG
+
+local color_off = title_color_bg:lighten(0.4)
+local color_on = color_off:lighten(0.4)
+
+wezterm.on("update-right-status", function(window)
+  local bat = ''
+  local b = wezterm.battery_info()[1]
+  bat = wezterm.format {
+    { Foreground = {
+      Color =
+        b.state_of_charge > 0.2 and color_on or color_off,
+    } },
+    { Text = '▉' },
+    { Foreground = {
+      Color =
+        b.state_of_charge > 0.4 and color_on or color_off,
+    } },
+    { Text = '▉' },
+    { Foreground = {
+      Color =
+        b.state_of_charge > 0.6 and color_on or color_off,
+    } },
+    { Text = '▉' },
+    { Foreground = {
+      Color =
+        b.state_of_charge > 0.8 and color_on or color_off,
+    } },
+    { Text = '▉' },
+    { Background = {
+      Color =
+        b.state_of_charge > 0.98 and color_on or color_off,
+    } },
+    { Foreground = {
+      Color =
+        b.state == "Charging"
+          and color_on:lighten(0.3):complement()
+          or
+            (b.state_of_charge < 0.2 and wezterm.GLOBAL.count % 2 == 0)
+              and color_on:lighten(0.1):complement()
+              or color_off:darken(0.1)
+    } },
+    { Text = ' ⚡ ' },
+  }
+
+  local time = wezterm.strftime '%-l:%M %P'
+
+  local bg1 = title_color_bg:lighten(0.1)
+  local bg2 = title_color_bg:lighten(0.2)
+
+  window:set_right_status(
+    wezterm.format {
+      { Background = { Color = colors.background } },
+      { Foreground = { Color = bg1 } },
+      -- rounded left
+      { Text = '' },
+      { Background = { Color = title_color_bg:lighten(0.1) } },
+      { Foreground = { Color = title_color_fg } },
+      { Text = ' ' .. window:active_workspace() .. ' ' },
+      { Foreground = { Color = bg1 } },
+      { Background = { Color = bg2 } },
+      { Text = '' },
+      { Foreground = { Color = title_color_bg:lighten(0.4) } },
+      { Foreground = { Color = title_color_fg } },
+      { Text = ' ' .. time .. ' ' .. bat }
+    }
+  )
+end)
+
 local function createFontConfig(fontName)
   local fontConfigs = {
     ["JetbrainsMono Nerd Font"] = {
