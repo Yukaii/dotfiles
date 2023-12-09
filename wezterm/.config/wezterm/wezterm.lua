@@ -194,7 +194,16 @@ wezterm.on("update-status", function(window, pane)
   local bg2 = title_color_bg:lighten(0.2)
 
   local cols = pane:window():active_tab():get_size().cols
-  local tabs_len = #pane:window():tabs()
+  local tabs = pane:window():tabs()
+  local tabs_len = #tabs
+  local tabs_text_length = 0
+  for i, _ in ipairs(tabs) do
+    if i > 9 then
+      tabs_text_length = tabs_text_length + 2
+    else
+      tabs_text_length = tabs_text_length + 1
+    end
+  end
 
   local workspace_text = window:active_workspace()
   local time_text = time .. ' ' .. bat
@@ -204,7 +213,7 @@ wezterm.on("update-status", function(window, pane)
   title_text = title_text:sub(1, max_title_length)
 
   -- calculate for centering title
-  local space_left = cols - #workspace_text - tabs_len
+  local space_left = cols - #workspace_text - tabs_text_length - 1
   local space_left_half = math.floor((space_left - #title_text) / 2)
 
   window:set_right_status(
