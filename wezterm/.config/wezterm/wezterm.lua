@@ -185,7 +185,7 @@ wezterm.on("update-status", function(window, pane)
               and color_on:lighten(0.1):complement()
               or color_off:darken(0.1)
     } },
-    { Text = ' ⚡ ' },
+    { Text = ' ⚡' },
   }
 
   local time = wezterm.strftime '%-l:%M %P'
@@ -206,6 +206,7 @@ wezterm.on("update-status", function(window, pane)
   end
 
   local workspace_text = window:active_workspace()
+  local workspace_text_len = #workspace_text + 2
   local time_text = time .. ' ' .. bat
 
   local max_title_length = 25
@@ -213,8 +214,8 @@ wezterm.on("update-status", function(window, pane)
   title_text = title_text:sub(1, max_title_length)
 
   -- calculate for centering title
-  local space_left = cols - #workspace_text - tabs_text_length - 1
-  local space_left_half = math.floor((space_left - #title_text) / 2)
+  local space_left = cols - workspace_text_len - tabs_text_length
+  local space_left_half = math.floor((space_left - #title_text) / 2) + math.floor(#title_text / 2)
 
   window:set_right_status(
     wezterm.format {
