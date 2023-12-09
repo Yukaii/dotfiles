@@ -128,16 +128,16 @@ end
 --   end
 -- )
 
-wezterm.on('format-tab-title', function (tab, _, _, _, _)
-    -- i do not like how i can basically hide tabs if i zoom in
-    local is_zoomed = ''
-    if tab.active_pane.is_zoomed then
-        is_zoomed = 'z'
-    end
+wezterm.on('format-tab-title', function(tab, _, _, _, _)
+  -- i do not like how i can basically hide tabs if i zoom in
+  local is_zoomed = ''
+  if tab.active_pane.is_zoomed then
+    is_zoomed = ' ' .. wezterm.nerdfonts.md_arrow_expand_all
+  end
 
-    return {
-        { Text = ' ' .. tab.tab_index + 1 .. is_zoomed .. ' ' },
-    }
+  return {
+    { Text = ' ' .. tab.tab_index + 1 .. is_zoomed .. ' ' },
+  }
 end)
 
 
@@ -154,36 +154,36 @@ wezterm.on("update-status", function(window, pane)
   bat = wezterm.format {
     { Foreground = {
       Color =
-        b.state_of_charge > 0.2 and color_on or color_off,
+          b.state_of_charge > 0.2 and color_on or color_off,
     } },
     { Text = '▉' },
     { Foreground = {
       Color =
-        b.state_of_charge > 0.4 and color_on or color_off,
+          b.state_of_charge > 0.4 and color_on or color_off,
     } },
     { Text = '▉' },
     { Foreground = {
       Color =
-        b.state_of_charge > 0.6 and color_on or color_off,
+          b.state_of_charge > 0.6 and color_on or color_off,
     } },
     { Text = '▉' },
     { Foreground = {
       Color =
-        b.state_of_charge > 0.8 and color_on or color_off,
+          b.state_of_charge > 0.8 and color_on or color_off,
     } },
     { Text = '▉' },
     { Background = {
       Color =
-        b.state_of_charge > 0.98 and color_on or color_off,
+          b.state_of_charge > 0.98 and color_on or color_off,
     } },
     { Foreground = {
       Color =
-        b.state == "Charging"
+          b.state == "Charging"
           and color_on:lighten(0.3):complement()
           or
-            (b.state_of_charge < 0.2 and wezterm.GLOBAL.count % 2 == 0)
-              and color_on:lighten(0.1):complement()
-              or color_off:darken(0.1)
+          (b.state_of_charge < 0.2 and wezterm.GLOBAL.count % 2 == 0)
+          and color_on:lighten(0.1):complement()
+          or color_off:darken(0.1)
     } },
     { Text = ' ⚡' },
   }
@@ -199,11 +199,15 @@ wezterm.on("update-status", function(window, pane)
   local tabs_text_length = 0
   for i, _ in ipairs(tabs) do
     if i > 9 then
-      tabs_text_length = tabs_text_length + 2
+      -- two digits tab width
+      tabs_text_length = tabs_text_length + 5
     else
-      tabs_text_length = tabs_text_length + 1
+      -- one digit tab width
+      tabs_text_length = tabs_text_length + 2
     end
   end
+  -- new tab button
+  tabs_text_length = tabs_text_length + 2
 
   local workspace_text = window:active_workspace()
   local workspace_text_len = #workspace_text + 2
@@ -214,8 +218,9 @@ wezterm.on("update-status", function(window, pane)
   title_text = title_text:sub(1, max_title_length)
 
   -- calculate for centering title
-  local space_left = cols - workspace_text_len - tabs_text_length
-  local space_left_half = math.floor((space_left - #title_text) / 2) + math.floor(#title_text / 2)
+  -- 9 is for time_text, 7 is for battery info
+  local space_left = cols - workspace_text_len - tabs_text_length - 9 - 7
+  local space_left_half = math.ceil((space_left - #title_text) / 2) + math.floor(#title_text / 2)
 
   window:set_right_status(
     wezterm.format {
@@ -366,7 +371,11 @@ local config = {
   inactive_pane_hsb = {
     saturation = 0.7,
     brightness = 0.6,
-  }
+  },
+
+  -- unix_domains = {
+  --   { name = "unix" }
+  -- }
 }
 
 local fontConfig = createFontConfig("JetbrainsMono Nerd Font")
@@ -375,5 +384,33 @@ local fontConfig = createFontConfig("JetbrainsMono Nerd Font")
 for k, v in pairs(fontConfig) do
   config[k] = v
 end
+
+-- multiplexing setup
+local mux = wezterm.mux
+
+-- Decide whether cmd represents a default startup invocation
+function is_default_startup(cmd)
+  if not cmd then
+    -- we were started with `wezterm` or `wezterm start` with
+    -- no other arguments
+    return true
+  end
+  if cmd.domain == "DefaultDomain" and not cmd.args then
+    -- Launched via `wezterm start --cwd something`
+    return true
+  end
+  -- we were launched some other way
+  return false
+end
+
+-- wezterm.on('gui-startup', function(cmd)
+--   if is_default_startup(cmd) then
+--     -- for the default startup case, we want to switch to the unix domain instead
+--     local unix = mux.get_domain("unix")
+--     mux.set_default_domain(unix)
+--     -- ensure that it is attached
+--     unix:attach()
+--   end
+-- end)
 
 return config
