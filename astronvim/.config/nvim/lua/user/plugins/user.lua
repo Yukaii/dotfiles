@@ -147,17 +147,17 @@ return {
       })
     end,
   },
-  {
-    'axkirillov/hbac.nvim',
-    config = function()
-      require("hbac").setup({
-        threshold = 12
-      })
-
-      require('telescope').load_extension('hbac')
-    end,
-    event = "VeryLazy"
-  },
+  -- {
+  --   'axkirillov/hbac.nvim',
+  --   config = function()
+  --     require("hbac").setup({
+  --       threshold = 12
+  --     })
+  --
+  --     require('telescope').load_extension('hbac')
+  --   end,
+  --   event = "VeryLazy"
+  -- },
   {
     'AckslD/messages.nvim',
     config = function()
