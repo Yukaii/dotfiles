@@ -151,41 +151,22 @@ local color_on = color_off:lighten(0.4)
 wezterm.on("update-status", function(window, pane)
   local bat = ''
   local b = wezterm.battery_info()[1]
+
+  local icons = {
+    wezterm.nerdfonts.fa_battery_empty,
+    wezterm.nerdfonts.fa_battery_quarter,
+    wezterm.nerdfonts.fa_battery_half,
+    wezterm.nerdfonts.fa_battery_three_quarters,
+    wezterm.nerdfonts.fa_battery_full,
+  }
+
+  -- state_of_charge is a float between 0 and 1
+  -- convert to 1 to 5
+  local battery_index = math.floor(b.state_of_charge * 5 + 0.5)
+  local icon = icons[battery_index]
+
   bat = wezterm.format {
-    { Foreground = {
-      Color =
-          b.state_of_charge > 0.2 and color_on or color_off,
-    } },
-    { Text = '▉' },
-    { Foreground = {
-      Color =
-          b.state_of_charge > 0.4 and color_on or color_off,
-    } },
-    { Text = '▉' },
-    { Foreground = {
-      Color =
-          b.state_of_charge > 0.6 and color_on or color_off,
-    } },
-    { Text = '▉' },
-    { Foreground = {
-      Color =
-          b.state_of_charge > 0.8 and color_on or color_off,
-    } },
-    { Text = '▉' },
-    { Background = {
-      Color =
-          b.state_of_charge > 0.98 and color_on or color_off,
-    } },
-    { Foreground = {
-      Color =
-          b.state == "Charging"
-          and color_on:lighten(0.3):complement()
-          or
-          (b.state_of_charge < 0.2 and wezterm.GLOBAL.count % 2 == 0)
-          and color_on:lighten(0.1):complement()
-          or color_off:darken(0.1)
-    } },
-    { Text = ' ⚡' },
+    { Text = ' ' .. icon .. '  ' },
   }
 
   local time = wezterm.strftime '%-l:%M %P'
@@ -230,13 +211,13 @@ wezterm.on("update-status", function(window, pane)
       { Background = { Color = colors.background } },
       { Foreground = { Color = bg1 } },
       -- rounded left
-      { Text = wezterm.nerdfonts.ple_left_half_circle_thick },
+      { Text = SOLID_LEFT_ARROW },
       { Background = { Color = title_color_bg:lighten(0.1) } },
       { Foreground = { Color = title_color_fg } },
       { Text = ' ' .. workspace_text .. ' ' },
       { Foreground = { Color = bg1 } },
       { Background = { Color = bg2 } },
-      { Text = wezterm.nerdfonts.ple_right_half_circle_thick },
+      { Text = SOLID_RIGHT_ARROW },
       { Foreground = { Color = title_color_bg:lighten(0.4) } },
       { Foreground = { Color = title_color_fg } },
       { Text = ' ' .. time_text }
