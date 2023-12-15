@@ -148,25 +148,49 @@ local title_color_fg = TAB_FG
 local color_off = title_color_bg:lighten(0.4)
 local color_on = color_off:lighten(0.4)
 
+local discharging_icons = {
+  wezterm.nerdfonts.md_battery_10,
+  wezterm.nerdfonts.md_battery_20,
+  wezterm.nerdfonts.md_battery_30,
+  wezterm.nerdfonts.md_battery_40,
+  wezterm.nerdfonts.md_battery_50,
+  wezterm.nerdfonts.md_battery_60,
+  wezterm.nerdfonts.md_battery_70,
+  wezterm.nerdfonts.md_battery_80,
+  wezterm.nerdfonts.md_battery_90,
+  wezterm.nerdfonts.md_battery,
+}
+
+local charging_icons = {
+  wezterm.nerdfonts.md_battery_charging_10,
+  wezterm.nerdfonts.md_battery_charging_20,
+  wezterm.nerdfonts.md_battery_charging_30,
+  wezterm.nerdfonts.md_battery_charging_40,
+  wezterm.nerdfonts.md_battery_charging_50,
+  wezterm.nerdfonts.md_battery_charging_60,
+  wezterm.nerdfonts.md_battery_charging_70,
+  wezterm.nerdfonts.md_battery_charging_80,
+  wezterm.nerdfonts.md_battery_charging_90,
+  wezterm.nerdfonts.md_battery_charging_100,
+}
+
 wezterm.on("update-status", function(window, pane)
   local bat = ''
   local b = wezterm.battery_info()[1]
 
-  local icons = {
-    wezterm.nerdfonts.fa_battery_empty,
-    wezterm.nerdfonts.fa_battery_quarter,
-    wezterm.nerdfonts.fa_battery_half,
-    wezterm.nerdfonts.fa_battery_three_quarters,
-    wezterm.nerdfonts.fa_battery_full,
-  }
-
   -- state_of_charge is a float between 0 and 1
-  -- convert to 1 to 5
-  local battery_index = math.floor(b.state_of_charge * 5 + 0.5)
+  -- convert to 1 to 10
+  local battery_index = math.floor(b.state_of_charge * 10 + 0.5)
+  local is_charging = b.state == 'Charging'
+  local icons = is_charging and charging_icons or discharging_icons
   local icon = icons[battery_index]
 
+  -- convert to 2 digits
+  local battery_percentage = math.floor(b.state_of_charge * 100 + 0.5)
+
   bat = wezterm.format {
-    { Text = ' ' .. icon .. '  ' },
+    { Text = ' ' .. icon .. ' ' },
+    { Text = battery_percentage .. '% ' },
   }
 
   local time = wezterm.strftime '%-l:%M %P'
