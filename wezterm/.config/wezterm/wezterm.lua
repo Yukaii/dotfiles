@@ -146,6 +146,8 @@ local charging_icons = {
   wezterm.nerdfonts.md_battery_charging_100,
 }
 
+local charged_icon = wezterm.nerdfonts.md_battery_heart_variant
+
 wezterm.on("update-status", function(window, pane)
   local bat = ''
   local b = wezterm.battery_info()[1]
@@ -156,6 +158,10 @@ wezterm.on("update-status", function(window, pane)
   local is_charging = b.state == 'Charging'
   local icons = is_charging and charging_icons or discharging_icons
   local icon = icons[battery_index]
+
+  if b.state_of_charge == 1 then
+    icon = charged_icon
+  end
 
   -- convert to 2 digits
   local battery_percentage = math.floor(b.state_of_charge * 100 + 0.5)
