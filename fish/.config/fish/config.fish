@@ -379,6 +379,9 @@ alias kbc="kubectl"
 
 alias ati="atuin search -i"
 
-alias pm2lc="pm2_logs_chooser"
+alias pm2lc="pm2_app_selector logs"
+alias pm2s="pm2_app_selector start"
+alias pm2rs="pm2_app_selector restart"
+alias pm2st="pm2_app_selector stop"
 
 # "$HOME/.tea/tea.xyz/v*/bin/tea" --magic=fish | source
