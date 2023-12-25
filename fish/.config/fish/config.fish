@@ -366,6 +366,8 @@ function load_wezterm_completions
   if test -n "$current_completion"
       eval $current_completion
   end
+
+  complete -c wezterm -n "__fish_seen_subcommand_from ssh" -a '(__fish_print_hostnames)'
 end
 
 load_wezterm_completions
