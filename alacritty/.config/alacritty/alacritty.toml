@@ -1,2 +1,4 @@
-font:
-  macOS: { family = "JetbrainsMono Nerd Font", style = "Regular" }
+[font]
+
+normal = { family = "JetbrainsMono Nerd Font", style = "Regular" }
+size = 16
