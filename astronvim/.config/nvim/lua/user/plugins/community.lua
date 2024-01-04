@@ -96,7 +96,7 @@ return {
       })
     end
   },
-  -- { import = "astrocommunity.bars-and-lines.lualine-nvim" },
+  { import = "astrocommunity.bars-and-lines.lualine-nvim" },
   {
     "m4xshen/smartcolumn.nvim",
     opts = {
