@@ -1,4 +1,17 @@
-[font]
 
-normal = { family = "JetbrainsMono Nerd Font", style = "Regular" }
-size = 16
+import = [
+  "~/.config/alacritty/themes/themes/kanagawa_wave.toml"
+]
+
+[font]
+normal = { family = "FiraCode Nerd Font" }
+size = 15
+
+[window]
+decorations = "Buttonless"
+padding = { x = 10, y = 10 }
+
+
+[shell]
+program = "/opt/homebrew/bin/fish"
+
