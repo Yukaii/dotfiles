@@ -63,4 +63,6 @@
     # delete-squashed = "!f() { local targetBranch=${1:-main} && git checkout -q $targetBranch && git branch --merged | grep -v \"\\*\" | grep -vE '^(develop|main|master|production|deploy)$' | xargs -n 1 git branch -d && git for-each-ref refs/heads/ \"--format=%(refname:short)\" | while read branch; do mergeBase=$(git merge-base $targetBranch $branch) && [[ $(git cherry $targetBranch $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)) == \"-\"* ]] && [[ ! $branch =~ ^(develop|main|master|production|deploy)$ ]] && git branch -D $branch; done; }; f"
 
 
-    ff-branch = "!f() { git fetch ${2:-origin} $1:$1; }; f"
+  ff-branch = "!f() { git fetch ${2:-origin} $1:$1; }; f"
+
+  pr-diff = "!f() { git diff $(git merge-base HEAD $1) HEAD; }; f"
