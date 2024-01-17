@@ -19,9 +19,9 @@
 	gpgsign = true
 [init]
 	defaultBranch = main
-[diff]
-	external = difft
-  tool = difftastic
+; [diff]
+; 	external = difft
+;   tool = difftastic
 
 [difftool]
   prompt = false
