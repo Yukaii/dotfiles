@@ -29,14 +29,6 @@
 [difftool "difftastic"]
   cmd = difft "$LOCAL" "$REMOTE"
 [alias]
-    # list files which have changed since REVIEW_BASE
-    # (REVIEW_BASE defaults to 'master' in my zshrc)
-    files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
-
-    # Same as above, but with a diff stat instead of just names
-    # (better for interactive use)
-    stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
-
     dft = difftool
 
     delete-squashed = "!f() { \
@@ -60,9 +52,8 @@
         done; \
     }; f"
 
-    # delete-squashed = "!f() { local targetBranch=${1:-main} && git checkout -q $targetBranch && git branch --merged | grep -v \"\\*\" | grep -vE '^(develop|main|master|production|deploy)$' | xargs -n 1 git branch -d && git for-each-ref refs/heads/ \"--format=%(refname:short)\" | while read branch; do mergeBase=$(git merge-base $targetBranch $branch) && [[ $(git cherry $targetBranch $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)) == \"-\"* ]] && [[ ! $branch =~ ^(develop|main|master|production|deploy)$ ]] && git branch -D $branch; done; }; f"
-
-
   ff-branch = "!f() { git fetch ${2:-origin} $1:$1; }; f"
 
   pr-diff = "!f() { git diff $(git merge-base HEAD $1) HEAD; }; f"
+  pr-diff-stat = "!f() { git diff --stat $(git merge-base HEAD $1) HEAD; }; f"
+  pr-diff-files = "!f() { git diff --name-only $(git merge-base HEAD $1) HEAD; }; f"
