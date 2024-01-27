@@ -133,6 +133,7 @@ return {
   { import = "astrocommunity.note-taking.obsidian-nvim" },
   -- { import = "astrocommunity.pack.typescript-all-in-one" },
   { import = "astrocommunity.pack.tailwindcss" },
+  { import = "astrocommunity.pack.rust" },
   { import = "astrocommunity.pack.yaml" },
   { import = "astrocommunity.pack.markdown" },
   { import = "astrocommunity.pack.json" },
