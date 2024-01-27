@@ -16,3 +16,4 @@ fish/.config/fish/secrets.fish
 
 zed/.config/zed/conversations/*
 zed/.config/zed/embeddings/*
+zed/.config/zed/.tmp*
