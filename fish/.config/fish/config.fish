@@ -36,19 +36,22 @@ set PATH $PATH "$HOME/.local/share/solana/install/active_release/bin"
 set PATH $PATH "$HOME/.bun/bin"
 
 # mysql
-set PATH $PATH "/usr/local/mysql/bin:"
+set PATH $PATH "/usr/local/mysql/bin"
 
 # For Android development
 set ANT_HOME "/usr/local/opt/ant"
 set MAVEN_HOME "/usr/local/opt/maven"
 set GRADLE_HOME "/usr/local/opt/gradle"
 
-set ANDROID_HOME "/Users/yukai/Library/Android/sdk"
+set ANDROID_HOME "$HOME/Library/Android/sdk"
 set ANDROID_NDK_HOME "/usr/local/share/android-ndk"
-set ANDROID_SDK_ROOT "/Users/yukai/Library/Android/sdk"
+set ANDROID_SDK_ROOT "$HOME/Library/Android/sdk"
 
 # Python 3
-set PATH $PATH "/Users/yukai/Library/Python/3.8/bin:"
+set PATH $PATH "$HOME/Library/Python/3.8/bin"
+
+# mason
+set PATH $PATH "$HOME/.local/share/nvim/mason/bin"
 
 set LANG "en_US.UTF-8"
 
@@ -391,3 +394,17 @@ alias pm2rs="pm2_app_selector restart"
 alias pm2st="pm2_app_selector stop"
 
 # "$HOME/.tea/tea.xyz/v*/bin/tea" --magic=fish | source
+
+function set_current_docker_host
+  set -x DOCKER_HOST (docker context inspect --format '{{.Endpoints.docker.Host}}')
+end
+
+function start_iodine
+  sudo iodine -r -I1 -T CNAME -m 212 -M 100 -f -P $IODINE_PASSWORD $DNS_TUNNEL
+end
+
+function start_dnstt
+  # -doh https://cloudflare-dns.com/dns-query
+  # -dot cloudflare-dns.com:853
+  dnstt-client -doh https://cloudflare-dns.com/dns-query -pubkey-file $DNSTT_PUB_KEY_PATH $DNS_TUNNEL 127.0.0.1:8000
+end
