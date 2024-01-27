@@ -19,6 +19,7 @@ return {
   -- Set colorscheme to use
   -- colorscheme = "catppuccin-macchiato",
   colorscheme = "kanagawa",
+  -- colorscheme = "rose-pine-main",
   -- colorscheme = "nordic",
   -- colorscheme = "flexoki",
   -- colorscheme = "arctic",
