@@ -354,6 +354,11 @@ end
 
 # https://shareg.pt/9HvnQ77 made with GPT-4
 function load_wezterm_completions
+  # check if wezterm cli is available
+  if not command -v wezterm > /dev/null
+      return
+  end
+
   set -l completions (wezterm shell-completion --shell fish)
   set -l current_completion ""
   for line in $completions
