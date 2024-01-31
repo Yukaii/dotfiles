@@ -14,21 +14,34 @@ from kitty.tab_bar import (
     draw_attributed_string,
     draw_title,
 )
+import platform
 
 opts = get_options()
 icon_fg = as_rgb(color_as_int(opts.background))
 icon_bg = as_rgb(color_as_int(opts.color6))
 
 date_fgcolor = as_rgb(color_as_int(opts.tab_bar_background))
-# date_bgcolor = as_rgb(color_as_int(opts.color9))
-date_bgcolor = as_rgb(color_as_int(Color(251, 74, 52)))
+date_bgcolor = as_rgb(color_as_int(opts.color6))
+# date_bgcolor = as_rgb(color_as_int(Color(251, 74, 52)))
 
 separator_fg = as_rgb(color_as_int(opts.color9))
 
 bat_text_color = as_rgb(color_as_int(opts.color15))
 SEPARATOR_SYMBOL, SOFT_SEPARATOR_SYMBOL = ("", "")
 RIGHT_MARGIN = 0
-ICON = "  "
+
+def get_os_icon () -> str:
+    os = platform.system()
+    if os == 'Darwin':
+        return "  "
+    elif os == 'Linux':
+        return "  "
+    elif os == 'Windows':
+        return "  "
+    else:
+        return "  "
+
+ICON = get_os_icon()
 
 def _draw_icon(screen: Screen, index: int) -> int:
     if index != 1:
@@ -121,7 +134,7 @@ def draw_tab(
     extra_data: ExtraData,
 ) -> int:
     global right_status_length
-    date = datetime.now().strftime(" %d.%m.%Y")
+    date = datetime.now().strftime(" %I:%M %p ")
     cells = [(date_bgcolor, date_fgcolor, date)]
     right_status_length = RIGHT_MARGIN
     for cell in cells:
