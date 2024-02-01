@@ -60,7 +60,7 @@ set -x PIPENV_IGNORE_VIRTUALENVS 1
 
 set --export FZF_DEFAULT_OPTS --height 50% --no-extended +i
 
-set NNN_OPENER "nnn-hx.sh"
+set -g -x NNN_OPENER "hx-wez"
 
 # Aliases
 alias ping='prettyping --nolegend'
