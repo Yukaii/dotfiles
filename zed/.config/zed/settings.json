@@ -8,15 +8,15 @@
 // from the command palette or from `Zed` application menu.
 {
   "buffer_font_size": 15,
-  "theme": "Ayu Mirage",
+  "theme": "Kanagawa Waves",
   "vim_mode": true,
   "auto_update": true,
   "terminal": {
     "shell": {
       "program": "/opt/homebrew/bin/fish"
     },
-    "font_family": "Iosevka Nerd Font Mono",
-    "font_size": 16,
+    "font_family": "JetBrainsMono Nerd Font",
+    "font_size": 15,
     "blinking": "off",
     "option_as_meta": true
   },
