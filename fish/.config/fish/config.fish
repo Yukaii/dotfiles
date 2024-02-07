@@ -260,7 +260,7 @@ alias scheme="rlwrap /usr/local/bin/scheme"
 set LESSOPEN "| /usr/local/bin/src-hilite-lesspipe.sh %s"
 set LESS '-R'
 
-set EDITOR "nvim"
+set -g -x EDITOR "hx"
 alias l='ls -alh'
 
 alias em="emacs -nw"

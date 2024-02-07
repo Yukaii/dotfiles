@@ -41,10 +41,10 @@ verbs: [
     }
 
     {
-        invocation: edit
-        shortcut: e
+        invocation: hx
+        shortcut: h
         key: enter
-        execution: "$EDITOR +{line} {file}"
+        execution: "hx-wez {file}"
         leave_broot: false
     }
 

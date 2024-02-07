@@ -130,6 +130,10 @@ c   = ":buffer-close"
 C   = ":config-reload"
 ',' = ":config-open"
 o = "file_picker_in_current_buffer_directory"
+e = ":sh hx-wezterm.sh explorer"
+
+[keys.normal.space.t]
+l = ":sh hx-wezterm.sh lazygit"
 
 [keys.insert]
 C-space = "completion"
