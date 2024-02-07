@@ -1,2 +1,2 @@
 os:
-  editPreset: 'nvim'
+  editPreset: helix
