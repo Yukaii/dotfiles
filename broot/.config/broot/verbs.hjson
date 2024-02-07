@@ -146,4 +146,8 @@ verbs: [
         internal: ":open_stay"
     }
 
+    {
+        key: "alt-h"
+        internal: ":parent"
+    }
 ]
