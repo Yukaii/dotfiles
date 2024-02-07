@@ -1,0 +1,8 @@
+# /usr/bin/env bash
+
+ghpr() {
+    GH_FORCE_TTY=100% gh pr list --limit 300 | fzf --ansi --preview 'GH_FORCE_TTY=100% gh pr view {1}' --header-lines 4 --preview-window 'up:70%'
+}
+
+ghpr
+
