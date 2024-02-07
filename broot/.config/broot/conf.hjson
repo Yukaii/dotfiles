@@ -14,6 +14,7 @@
 # properties are commented out. To enable them, remove the `#`.
 #
 ###############################################################
+syntax_theme: GitHub
 
 ###############################################################
 # Default flags
