@@ -141,7 +141,11 @@ e = ":sh hx-wezterm.sh explorer"
 
 [keys.normal.space.t]
 l = ":sh hx-wezterm.sh lazygit"
-G = ":sh hx-wezterm.sh open"
+
+[keys.normal.";"]
+b = ":sh hx-wezterm.sh blame"
+o = ":sh hx-wezterm.sh open"
+f = ":sh hx-wezterm.sh fzf"
 
 [keys.insert]
 C-space = "completion"
