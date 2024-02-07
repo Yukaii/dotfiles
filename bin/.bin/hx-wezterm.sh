@@ -36,7 +36,7 @@ case "$1" in
   "explorer")
     left_pane_id=$(wezterm cli get-pane-direction left)
     if [ -z "${left_pane_id}" ]; then
-      left_pane_id=$(wezterm cli split-pane --left --percent 20)
+      left_pane_id=$(wezterm cli split-pane --left --percent 23)
     fi
 
     left_program=$(wezterm cli list | awk -v pane_id="$left_pane_id" '$3==pane_id { print $6 }')
