@@ -24,7 +24,7 @@ syntax_theme: GitHub
 # if you don't want the hidden files you can launch `br -H`)
 # A popular flag is the `g` one which displays git related info.
 #
-# default_flags:
+default_flags: -g
 
 ###############################################################
 # Date/Time format

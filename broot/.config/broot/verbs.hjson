@@ -36,14 +36,7 @@ verbs: [
         invocation: edit
         shortcut: e
         key: ctrl-e
-        execution: "$EDITOR +{line} {file}"
-        leave_broot: false
-    }
-
-    {
-        invocation: hx
-        shortcut: h
-        key: enter
+        # execution: "$EDITOR +{line} {file}"
         execution: "hx-wez {file}"
         leave_broot: false
     }
