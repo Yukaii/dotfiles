@@ -60,7 +60,11 @@ set -x PIPENV_IGNORE_VIRTUALENVS 1
 
 set --export FZF_DEFAULT_OPTS --no-height --no-reverse
 
+# NNN configs
 set -g -x NNN_OPENER "hx-wez"
+set -g -x NNN_PLUG 'o:fzopen;d:diffs;v:preview-tui;p:fzplug;c:fzhist;f:fzcd'
+set -g -x NNN_FIFO '/tmp/nnn.fifo'
+alias nn="env EDITOR=hx-wez nnn -c"
 
 # Aliases
 alias ping='prettyping --nolegend'
