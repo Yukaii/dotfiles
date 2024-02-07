@@ -1,26 +1,84 @@
-# [[language]]
-# name = "typescript"
+[language-server.eslint]
+command = "vscode-eslint-language-server"
+args = ["--stdio"]
+
+[language-server.eslint.config]
+codeActionsOnSave = { mode = "all", "source.fixAll.eslint" = true }
+format = { enable = true }
+nodePath = ""
+quiet = false
+rulesCustomizations = []
+run = "onType"
+validate = "on"
+experimental = {}
+problems = { shortenToSingleLine = false }
+
+[language-server.eslint.config.codeAction]
+disableRuleComment = { enable = true, location = "separateLine" }
+showDocumentation = { enable = false }
+
+[language-server.vscode-json-language-server.config]
+json = { validate = { enable = true }, format = { enable = true } }
+provideFormatter = true
+
+[language-server.vscode-css-language-server.config]
+css = { validate = { enable = true } }
+scss = { validate = { enable = true } }
+less = { validate = { enable = true } }
+provideFormatter = true
+
+[language-server.gpt]
+command = "helix-gpt"
+args = ["--logFile", "/tmp/helix-gpt.log"]
+
+[[language]]
+name = "typescript"
+language-servers = [ "typescript-language-server", "eslint", "gpt" ]
+# formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
+# formatter = { command = "dprint", args = [ "fmt", "--stdin", "typescript" ] }
 # auto-format = true
-# formatter = { command = "prettier", args = ["--parser", "typescript"] }
 
-# language-servers = ["typescript-language-server", "eslint"]
+[[language]]
+name = "markdown"
+language-servers = ["gpt"]
 
-# [language-server.eslint]
-# args = ["--stdio"]
-# command = "vscode-eslint-language-server"
+[[language]]
+name = "tsx"
+language-servers = [ "deno", "eslint",  "gpt"]
+# formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
+# formatter = { command = "dprint", args = [ "fmt", "--stdin", "tsx" ] }
+# auto-format = true
 
-# [language-server.eslint.config]
-# format = true
-# nodePath = ""
-# onIgnoredFiles = "off"
-# packageManager = "yarn"
-# quiet = false
-# rulesCustomizations = []
-# run = "onType"
-# useESLintClass = false
-# validate = "on"
-# codeAction = { disableRuleComment = { enable = true, location = "separateLine" }, showDocumentation = { enable = true } }
-# codeActionOnSave = { mode = "all" }
-# experimental = { }
-# problems = { shortenToSingleLine = false }
-# workingDirectory = { mode = "auto" }
+[[language]]
+name = "javascript"
+language-servers = [ "typescript-language-server", "eslint", "gpt"]
+# formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
+# formatter = { command = "dprint", args = [ "fmt", "--stdin", "javascript" ] }
+# auto-format = true
+
+[[language]]
+name = "jsx"
+language-servers = [ "typescript-language-server", "eslint",  "gpt"]
+# formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
+# formatter = { command = "dprint", args = [ "fmt", "--stdin", "jsx" ] }
+# auto-format = true
+
+[[language]]
+name = "json"
+language-servers = ["gpt"]
+# formatter = { command = "prettier", args = [ "--parser", "json" ] }
+# formatter = { command = "dprint", args = [ "fmt", "--stdin", "json" ] }
+auto-format = true
+
+[[language]]
+name = "html"
+language-servers = [ "vscode-html-language-server", "gpt" ]
+# formatter = { command = 'prettier', args = ["--parser", "html"] }
+# auto-format = true
+
+[[language]]
+name = "css"
+language-servers = [ "vscode-css-language-server", "gpt" ]
+# formatter = { command = 'prettier', args = ["--parser", "css"] }
+# auto-format = true
+

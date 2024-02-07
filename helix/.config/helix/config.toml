@@ -126,8 +126,10 @@ g = { g = ["select_mode", "extend_to_line_bounds", "goto_file_start", "extend_to
 [keys.normal.space]
 w   = ":write"
 q   = ":quit"
-c   = ":config-reload"
+c   = ":buffer-close"
+C   = ":config-reload"
 ',' = ":config-open"
+o = "file_picker_in_current_buffer_directory"
 
 [keys.insert]
 C-space = "completion"
