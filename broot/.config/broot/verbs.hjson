@@ -38,6 +38,7 @@ verbs: [
         key: ctrl-e
         # execution: "$EDITOR +{line} {file}"
         execution: "hx-wez {file}"
+        apply_to: file
         leave_broot: false
     }
 
