@@ -6,6 +6,8 @@ status_line=$(wezterm cli get-text | rg -e "(?:NORMAL|INSERT|SELECT)\s+[\x{2800}
 filename=$(echo $status_line | awk '{ print $1}')
 line_number=$(echo $status_line | awk '{ print $2}')
 
+session_name=$(echo $PWD | sed "s:$HOME:~:" | tr '/' '_')
+
 split_pane_down() {
   bottom_pane_id=$(wezterm cli get-pane-direction down)
   if [ -z "${bottom_pane_id}" ]; then
@@ -39,7 +41,9 @@ case "$1" in
 
     left_program=$(wezterm cli list | awk -v pane_id="$left_pane_id" '$3==pane_id { print $6 }')
     if [ "$left_program" != "br" ]; then
-      echo "br" | wezterm cli send-text --pane-id $left_pane_id --no-paste
+      echo "br --listen $session_name" | wezterm cli send-text --pane-id $left_pane_id --no-paste
+    else
+      broot --send $session_name -c ":focus $PWD/$basedir"
     fi
 
     wezterm cli activate-pane-direction left
