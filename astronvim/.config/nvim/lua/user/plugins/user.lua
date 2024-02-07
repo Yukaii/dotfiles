@@ -355,5 +355,10 @@ return {
   {
     'stevedylandev/flexoki-nvim',
     lazy = false
+  },
+  {
+    '0xAdk/full_visual_line.nvim',
+    keys = 'V',
+    opts = {},
   }
 }
