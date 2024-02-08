@@ -78,8 +78,8 @@ D = ["extend_to_line_end", "yank_main_selection_to_clipboard", "delete_selection
 S = "surround_add" # Would be nice to be able to do something after this but it isn't chainable
 
 # Search for word under cursor
-"*" = ["move_char_right", "move_prev_word_start", "move_next_word_end", "search_selection", "search_next"]
-"#" = ["move_char_right", "move_prev_word_start", "move_next_word_end", "search_selection", "search_prev"]
+"*" = ["move_char_right", "move_prev_word_start", "move_next_word_end", "search_selection", "make_search_word_bounded", "search_next"]
+"#" = ["move_char_right", "move_prev_word_start", "move_next_word_end", "search_selection", "make_search_word_bounded", "search_prev"]
 
 # Clipboards over registers ye ye
 x = "delete_selection"
@@ -128,7 +128,6 @@ W = ["move_next_long_word_start", "yank_main_selection_to_clipboard", "collapse_
 e = ["move_next_word_end", "yank_main_selection_to_clipboard", "collapse_selection", "normal_mode"]
 E = ["move_next_long_word_end", "yank_main_selection_to_clipboard", "collapse_selection", "normal_mode"]
 g = { g = ["select_mode", "extend_to_line_bounds", "goto_file_start", "extend_to_line_bounds", "yank_main_selection_to_clipboard", "collapse_selection", "normal_mode"] }
-
 
 [keys.normal.space]
 w   = ":write"
