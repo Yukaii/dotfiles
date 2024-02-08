@@ -23,6 +23,28 @@ split_pane_down() {
   fi
 }
 
+# the first argument would be the command to spawn the pane
+# the second argument is the percentage of the pane to be spawned
+spawn_pane_bottom() {
+  bottom_pane_id=$(wezterm cli get-pane-direction down)
+  if [ -z "${bottom_pane_id}" ]; then
+    # spawn a new pane directly since there is no pane below
+    wezterm cli split-pane --bottom --percent $2 -- $1
+  else
+    wezterm cli activate-pane-direction --pane-id $bottom_pane_id down
+  fi
+}
+
+spawn_pane_left() {
+  left_pane_id=$(wezterm cli get-pane-direction left)
+  if [ -z "${left_pane_id}" ]; then
+    # spawn a new pane directly since there is no pane below
+    wezterm cli split-pane --left --percent $2 -- $1
+  else
+    wezterm cli activate-pane-direction --pane-id $left_pane_id left
+  fi
+}
+
 basedir=$(dirname "$filename")
 basename=$(basename "$filename")
 basename_without_extension="${basename%.*}"
@@ -30,23 +52,17 @@ extension="${filename##*.}"
 
 case "$1" in
   "blame")
-    split_pane_down
-    echo "tig blame $filename +$line_number" | $send_to_bottom_pane
+    spawn_pane_bottom "tig blame $filename +$line_number" 50
     ;;
   "explorer")
     left_pane_id=$(wezterm cli get-pane-direction left)
     if [ -z "${left_pane_id}" ]; then
-      left_pane_id=$(wezterm cli split-pane --left --percent 23)
-    fi
-
-    left_program=$(wezterm cli list | awk -v pane_id="$left_pane_id" '$3==pane_id { print $6 }')
-    if [ "$left_program" != "br" ]; then
-      echo "br --listen $session_name" | wezterm cli send-text --pane-id $left_pane_id --no-paste
+      # left_pane_id=$(wezterm cli split-pane --left --percent 23)
+      spawn_pane_left "broot --listen $session_name" 23
     else
       broot --send $session_name -c ":focus $PWD/$basedir"
+      wezterm cli activate-pane-direction left
     fi
-
-    wezterm cli activate-pane-direction left
     ;;
   "fzf")
     split_pane_down
@@ -57,13 +73,7 @@ case "$1" in
     echo "howdoi -c `pbpaste`" | $send_to_bottom_pane
     ;;
   "lazygit")
-    split_pane_down
-    program=$(wezterm cli list | awk -v pane_id="$pane_id" '$3==pane_id { print $6 }')
-    if [ "$program" = "lazygit" ]; then
-        wezterm cli activate-pane-direction down
-    else
-        echo "lazygit" | $send_to_bottom_pane
-    fi
+    spawn_pane_bottom "lazygit" 30
     ;;
   "open")
     gh browse $filename:$line_number  
