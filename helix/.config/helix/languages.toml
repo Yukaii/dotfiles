@@ -40,7 +40,7 @@ language-servers = [ "typescript-language-server", "eslint", "gpt" ]
 
 [[language]]
 name = "markdown"
-language-servers = ["gpt"]
+language-servers = ["gpt", "marksman"]
 
 [[language]]
 name = "tsx"

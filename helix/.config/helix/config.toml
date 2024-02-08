@@ -31,19 +31,7 @@ right = ["diagnostics", "selections", "position", "file-encoding", "file-line-en
 separator = "│"
 mode.normal = "NORMAL"
 mode.insert = "INSERT"
-mode.select = "SELECT"#left = ["mode", "spinner"]
-# right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
-
-# center = ["file-name"]
-# separator = ""
-# left = ["mode", "file-base-name", "version-control", "file-modification-indicator"]
-# right = ["diagnostics", "spinner", "file-encoding", "file-type", "file-line-ending",  "spacer", "position-percentage", "position"]
-
-
-# separator = "│"
-# mode.normal = "NORMAL"
-# mode.insert = "INSERT"
-# mode.select = "SELECT"
+mode.select = "SELECT"
 
 [editor.lsp]
 display-messages = true
@@ -73,8 +61,8 @@ g = { d = "goto_definition", D = ["vsplit", "goto_definition"] }
 G = "goto_file_end"
 "%" = "match_brackets"
 V = ["select_mode", "extend_to_line_bounds"]
-C = ["extend_to_line_end", "yank_main_selection_to_clipboard", "delete_selection", "insert_mode"]
-D = ["extend_to_line_end", "yank_main_selection_to_clipboard", "delete_selection"]
+# C = ["extend_to_line_end", "yank_main_selection_to_clipboard", "delete_selection", "insert_mode"]
+# D = ["extend_to_line_end", "yank_main_selection_to_clipboard", "delete_selection"]
 S = "surround_add" # Would be nice to be able to do something after this but it isn't chainable
 
 # Search for word under cursor
