@@ -82,3 +82,6 @@ language-servers = [ "vscode-css-language-server", "gpt" ]
 # formatter = { command = 'prettier', args = ["--parser", "css"] }
 # auto-format = true
 
+[[language]]
+name = "toml"
+language-servers = ["gpt"]
