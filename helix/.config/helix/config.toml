@@ -86,6 +86,7 @@ B = ["move_prev_long_word_start", "collapse_selection"]
 
 # Undoing the 'd' + motion commands restores the selection which is annoying
 u = ["undo", "collapse_selection"]
+C-r = ["redo", "collapse_selection"]
 
 [keys.normal.d]
 d = ["extend_to_line_bounds", "yank_main_selection_to_clipboard", "delete_selection"]
