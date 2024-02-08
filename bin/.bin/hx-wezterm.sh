@@ -91,10 +91,6 @@ case "$1" in
     split_pane_down
     echo "hx-fzf.sh \$(rg --line-number --column --no-heading --smart-case . | fzf --delimiter : --preview 'bat --style=full --color=always --highlight-line {2} {1}' --preview-window '~3,+{2}+3/2' | awk '{ print \$1 }' | cut -d: -f1,2,3)" | $send_to_bottom_pane
     ;;
-  "howdoi")
-    split_pane_down
-    echo "howdoi -c `pbpaste`" | $send_to_bottom_pane
-    ;;
   "lazygit")
     spawn_pane "bottom" "lazygit" 30 "true"
     ;;
@@ -103,52 +99,5 @@ case "$1" in
     ;;
   "open")
     gh browse $filename:$line_number  
-    ;;
-  "run")
-    split_pane_down
-    case "$extension" in
-      "c")
-        run_command="clang -lcmocka -lmpfr -Wall -g -O1 $filename -o $basedir/$basename_without_extension && $basedir/$basename_without_extension"
-        ;;
-      "go")
-        run_command="go run $basedir/*.go"
-        ;;
-      "md")
-        run_command="mdcat -p $filename"
-        ;;
-      "rkt"|"scm")
-        run_command="racket $filename"
-        ;;
-      "rs")
-        run_command="cd $PWD/$(dirname "$basedir"); cargo run; if [ \$status = 0 ]; wezterm cli activate-pane-direction up; end; cd -"
-        ;;
-      "sh")
-        run_command="sh $filename"
-        ;;
-    esac
-    echo "$run_command" | $send_to_bottom_pane
-    ;;
-  "test_all")
-    split_pane_down
-    case "$extension" in
-      "rs")
-        run_command="cd $PWD/$(dirname "$basedir"); cargo test; if [ \$status = 0 ]; wezterm cli activate-pane-direction up; end;"
-        ;;
-    esac
-    echo "$run_command" | $send_to_bottom_pane
-    ;;
-  "test_single")
-    test_name=$(head -$line_number $filename | tail -1 | sed -n 's/^.*fn \([^ ]*\)().*$/\1/p')
-    split_pane_down
-    case "$extension" in
-      "rs")
-        run_command="cd $PWD/$(dirname "$basedir"); cargo test $test_name; if [ \$status = 0 ]; wezterm cli activate-pane-direction up; end;"
-        ;;
-    esac
-    echo "$run_command" | $send_to_bottom_pane
-    ;;
-  "tgpt")
-    split_pane_down
-    echo "tgpt '`pbpaste`'" | $send_to_bottom_pane
     ;;
 esac
