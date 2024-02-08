@@ -92,7 +92,7 @@ case "$1" in
     echo "hx-fzf.sh \$(rg --line-number --column --no-heading --smart-case . | fzf --delimiter : --preview 'bat --style=full --color=always --highlight-line {2} {1}' --preview-window '~3,+{2}+3/2' | awk '{ print \$1 }' | cut -d: -f1,2,3)" | $send_to_bottom_pane
     ;;
   "lazygit")
-    spawn_pane "bottom" "lazygit" 30 "true"
+    spawn_pane "bottom" "lazygit" 1 "true"
     ;;
   "terminal")
     spawn_pane "bottom" "fish" 1 "true"
