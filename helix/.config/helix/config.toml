@@ -145,6 +145,7 @@ l = ":sh hx-wezterm.sh lazygit"
 b = ":sh hx-wezterm.sh blame"
 o = ":sh hx-wezterm.sh open"
 f = ":sh hx-wezterm.sh fzf"
+t = ":sh hx-wezterm.sh terminal"
 
 [keys.insert]
 C-space = "completion"

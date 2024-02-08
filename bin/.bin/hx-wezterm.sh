@@ -23,25 +23,48 @@ split_pane_down() {
   fi
 }
 
-# the first argument would be the command to spawn the pane
-# the second argument is the percentage of the pane to be spawned
-spawn_pane_bottom() {
-  bottom_pane_id=$(wezterm cli get-pane-direction down)
-  if [ -z "${bottom_pane_id}" ]; then
-    # spawn a new pane directly since there is no pane below
-    wezterm cli split-pane --bottom --percent $2 -- $1
-  else
-    wezterm cli activate-pane-direction --pane-id $bottom_pane_id down
-  fi
+get_pane_direction() {
+  general_direction=$1
+
+  case $general_direction in
+    bottom)
+      echo "down"
+      ;;
+    left)
+      echo "left"
+      ;;
+    *)
+      echo "Error: Invalid direction. Only 'bottom' and 'left' are supported." >&2
+      return 1
+      ;;
+  esac
 }
 
-spawn_pane_left() {
-  left_pane_id=$(wezterm cli get-pane-direction left)
-  if [ -z "${left_pane_id}" ]; then
-    # spawn a new pane directly since there is no pane below
-    wezterm cli split-pane --left --percent $2 -- $1
+spawn_pane() {
+  direction=$1 # The direction to spawn or activate the pane (e.g., bottom, left)
+  command=$2   # The command to spawn the pane
+  percent=$3   # The percentage of the pane to be spawned
+  zoom=$4      # Whether to zoom the pane or not
+
+
+  pane_direction=$(get_pane_direction $direction)
+
+  # Exit if get_pane_direction returned an error
+  if [ $? -ne 0 ]; then
+    return 1
+  fi
+
+  pane_id=$(wezterm cli get-pane-direction $pane_direction)
+
+  if [ -z "${pane_id}" ]; then
+    # Spawn a new pane directly since there is no pane in the specified direction
+    pid=$(wezterm cli split-pane --${direction} --percent $percent -- $command)
+    if [ "$zoom" = "true" ]; then
+      wezterm cli zoom-pane --pane-id $pid
+    fi
   else
-    wezterm cli activate-pane-direction --pane-id $left_pane_id left
+    # Activate the pane in the specified direction if it exists
+    wezterm cli activate-pane-direction --pane-id $pane_id $pane_direction
   fi
 }
 
@@ -52,13 +75,13 @@ extension="${filename##*.}"
 
 case "$1" in
   "blame")
-    spawn_pane_bottom "tig blame $filename +$line_number" 50
+    spawn_pane "bottom" "tig blame $filename +$line_number" 50
     ;;
   "explorer")
     left_pane_id=$(wezterm cli get-pane-direction left)
     if [ -z "${left_pane_id}" ]; then
       # left_pane_id=$(wezterm cli split-pane --left --percent 23)
-      spawn_pane_left "broot --listen $session_name" 23
+      spawn_pane "left" "broot --listen $session_name" 23
     else
       broot --send $session_name -c ":focus $PWD/$basedir"
       wezterm cli activate-pane-direction left
@@ -73,7 +96,10 @@ case "$1" in
     echo "howdoi -c `pbpaste`" | $send_to_bottom_pane
     ;;
   "lazygit")
-    spawn_pane_bottom "lazygit" 30
+    spawn_pane "bottom" "lazygit" 30 "true"
+    ;;
+  "terminal")
+    spawn_pane "bottom" "fish" 1 "true"
     ;;
   "open")
     gh browse $filename:$line_number  
