@@ -125,6 +125,8 @@ C   = ":config-reload"
 ',' = ":config-open"
 o = "file_picker_in_current_buffer_directory"
 e = ":sh hx-wezterm.sh explorer"
+# Zen mode
+z = ":toggle gutters.line-numbers.min-width 24 3"
 
 [keys.normal.space.t]
 l = ":sh hx-wezterm.sh lazygit"
