@@ -7,7 +7,6 @@ line-number = "relative"
 bufferline = "always"
 rulers = [120]
 cursorline = true
-cursorcolumn = true
 
 [editor.indent-guides]
 render = true
