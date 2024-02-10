@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Check if an argument was provided
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <string_to_copy>"
+    exit 1
+fi
+
+# Copy the argument to the clipboard using pbcopy
+echo "$1" | pbcopy
