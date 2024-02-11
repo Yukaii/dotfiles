@@ -29,6 +29,9 @@ fpath="$1"
 # top/bottom/left/right 
 direction="${2:-right}"
 
+# none, v, h
+split="$3"
+
 # up/down/left/right
 pane_direction=$(get_pane_direction $direction)
 
@@ -42,7 +45,17 @@ fi
 program=$(wezterm cli list | awk -v pane_id="$pane_id" '$3==pane_id { print $6 }')
 if [ "$program" = "hx" ]; then
   # Send :open command to hx in the specified pane
-  echo ":open ${fpath}\r" | wezterm cli send-text --pane-id $pane_id --no-paste
+  if [ -n "$split" ]; then
+    case $split in
+      v)
+        echo ":vs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
+        ;;
+      h)
+        echo ":hs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
+        ;;
+    esac
+    echo ":open ${fpath}\r" | wezterm cli send-text --pane-id $pane_id --no-paste
+  fi
 else
   # Start hx with the given file path in the specified pane
   echo "hx ${fpath}" | wezterm cli send-text --pane-id $pane_id --no-paste
