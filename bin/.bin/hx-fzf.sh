@@ -1,29 +1,15 @@
 #!/bin/sh
 
-selected_file=$1
-top_pane_id=$(wezterm cli get-pane-direction Up)
-if [ -z "$selected_file" ]; then
-    if [ -n "${top_pane_id}" ]; then
-        wezterm cli activate-pane-direction --pane-id $top_pane_id Up
-        # wezterm cli toggle-pane-zoom-state
-    fi
-    exit 0
+# selected_file=$1
+
+
+selected_file=$(rg --line-number --column --no-heading --smart-case . | fzf --delimiter : --preview 'bat --style=full --color=always --highlight-line {2} {1}' --preview-window '~3,+{2}+3/2' | awk '{ print $1 }' | cut -d: -f1,2,3)
+
+echo $selected_file
+
+if [ -n "$selected_file" ]; then
+    echo "noooo"
+    hx-wez $selected_file top
 fi
 
-if [ -z "${top_pane_id}" ]; then
-    top_pane_id=$(wezterm cli split-pane --top)
-fi
-
-wezterm cli activate-pane-direction --pane-id $top_pane_id Up
-
-send_to_top_pane="wezterm cli send-text --pane-id $top_pane_id --no-paste"
-
-program=$(wezterm cli list | awk -v pane_id="$top_pane_id" '$3==pane_id { print $6 }')
-if [ "$program" = "hx" ]; then
-    echo ":open $selected_file\r" | $send_to_top_pane
-else
-    echo "hx $selected_file" | $send_to_top_pane
-fi
-
-wezterm cli kill-pane
-# wezterm cli toggle-pane-zoom-state
+exit 0

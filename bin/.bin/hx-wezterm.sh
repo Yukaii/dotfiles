@@ -33,6 +33,12 @@ get_pane_direction() {
     left)
       echo "left"
       ;;
+    right)
+      echo "right"
+      ;;
+    top)
+      echo "up"
+      ;;
     *)
       echo "Error: Invalid direction. Only 'bottom' and 'left' are supported." >&2
       return 1
@@ -88,8 +94,7 @@ case "$1" in
     fi
     ;;
   "fzf")
-    split_pane_down
-    echo "hx-fzf.sh \$(rg --line-number --column --no-heading --smart-case . | fzf --delimiter : --preview 'bat --style=full --color=always --highlight-line {2} {1}' --preview-window '~3,+{2}+3/2' | awk '{ print \$1 }' | cut -d: -f1,2,3)" | $send_to_bottom_pane
+    spawn_pane "bottom" "sh hx-fzf.sh" 33 "true"
     ;;
   "lazygit")
     spawn_pane "bottom" "lazygit" 1 "true"

@@ -1,17 +1,52 @@
 #!/usr/bin/env sh
 
-fpath="$1"
+get_pane_direction() {
+  general_direction=$1
 
-pane_id=$(wezterm cli get-pane-direction right)
+  case $general_direction in
+    bottom)
+      echo "down"
+      ;;
+    left)
+      echo "left"
+      ;;
+    right)
+      echo "right"
+      ;;
+    top)
+      echo "up"
+      ;;
+    *)
+      echo "Error: Invalid direction. Only 'bottom' and 'left' are supported." >&2
+      return 1
+      ;;
+  esac
+}
+
+fpath="$1"
+# Set the panel direction to the second argument, defaulting to 'right' if not provided
+
+# top/bottom/left/right 
+direction="${2:-right}"
+
+# up/down/left/right
+pane_direction=$(get_pane_direction $direction)
+
+# Use the pane_direction variable for get-pane-direction and split-pane commands
+pane_id=$(wezterm cli get-pane-direction $pane_direction)
 if [ -z "${pane_id}" ]; then
-  pane_id=$(wezterm cli split-pane --right --percent 80)
+  # Use --$pane_direction to dynamically construct the argument for split-pane
+  pane_id=$(wezterm cli split-pane --$direction --percent 80)
 fi
 
 program=$(wezterm cli list | awk -v pane_id="$pane_id" '$3==pane_id { print $6 }')
 if [ "$program" = "hx" ]; then
+  # Send :open command to hx in the specified pane
   echo ":open ${fpath}\r" | wezterm cli send-text --pane-id $pane_id --no-paste
 else
+  # Start hx with the given file path in the specified pane
   echo "hx ${fpath}" | wezterm cli send-text --pane-id $pane_id --no-paste
 fi
 
-wezterm cli activate-pane-direction --pane-id $pane_id right
+# Activate the pane in the specified direction
+wezterm cli activate-pane-direction --pane-id $pane_id $pane_direction
