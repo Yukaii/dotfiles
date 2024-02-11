@@ -54,8 +54,8 @@ if [ "$program" = "hx" ]; then
         echo ":hs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
         ;;
     esac
-    echo ":open ${fpath}\r" | wezterm cli send-text --pane-id $pane_id --no-paste
   fi
+  echo ":open ${fpath}\r" | wezterm cli send-text --pane-id $pane_id --no-paste
 else
   # Start hx with the given file path in the specified pane
   echo "hx ${fpath}" | wezterm cli send-text --pane-id $pane_id --no-paste
