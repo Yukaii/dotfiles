@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+read file
+
+hx-wez $file top

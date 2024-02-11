@@ -20,6 +20,6 @@ if [ -n "$selected_files" ]; then
             }
             printf "\n"
         }' > "$qf_tmp"
-        hx-wez "$qf_tmp" top h
+        wezterm cli split-pane --bottom --percent 25 -- hx "$qf_tmp"
     fi
 fi

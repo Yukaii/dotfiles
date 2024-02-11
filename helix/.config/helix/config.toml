@@ -140,6 +140,7 @@ b = ":sh hx-wezterm.sh blame"
 o = ":sh hx-wezterm.sh open"
 f = ":sh hx-wezterm.sh fzf"
 t = ":sh hx-wezterm.sh terminal"
+q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
 
 [keys.insert]
 C-space = "completion"
