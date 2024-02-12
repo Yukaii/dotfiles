@@ -7,9 +7,12 @@ line-number = "relative"
 bufferline = "always"
 rulers = [120]
 cursorline = true
+completion-trigger-len = 1
+scroll-lines = 1
 
 [editor.indent-guides]
 render = true
+character = "▏"
 
 [editor.soft-wrap]
 enable = true
@@ -21,6 +24,7 @@ select = "underline"
 
 [editor.file-picker]
 hidden = false
+git-ignore = false
 
 [editor.statusline]
 
