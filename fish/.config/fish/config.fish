@@ -59,6 +59,7 @@ set -x PIPENV_SHELL_FANCY 1
 set -x PIPENV_IGNORE_VIRTUALENVS 1
 
 set --export FZF_DEFAULT_OPTS --no-height --no-reverse --marker=+ --margin=1,3
+set --export FZF_DEFAULT_COMMAND 'rg --hidden -l ""'
 
 # NNN configs
 set -g -x NNN_OPENER "hx-wez"
