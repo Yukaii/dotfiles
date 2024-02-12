@@ -1,0 +1,12 @@
+colorscheme kanagawa
+
+set global indentwidth 2
+set global tabstop 2
+set global indentwidth 2
+
+add-highlighter global/git-diff flag-lines Default git_diff_flags
+add-highlighter global/number-lines number-lines -hlcursor
+
+# comment
+map global user / ':comment-line<ret>' -docstring 'comment line'
+
