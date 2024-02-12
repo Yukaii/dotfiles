@@ -18,6 +18,7 @@ map global user n ':e -scratch<ret>' -docstring 'create buffer'
 map global user c ':db<ret>' -docstring 'delete buffer'
 map global user q ':q<ret>' -docstring 'quit'
 map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
+map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
 
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
@@ -34,4 +35,14 @@ define-command lazygit -hidden -docstring 'Launch lazygit' %{
 }
 
 map global wezterm-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
+
+define-command -hidden open_buffer_picker %{
+  prompt buffer: -menu -buffer-completion %{
+    buffer %val{text}
+  }
+}
+
+
+declare-user-mode find-actions
+map global find-actions 'b' ':open_buffer_picker<ret>' -docstring 'pick buffer'
 
