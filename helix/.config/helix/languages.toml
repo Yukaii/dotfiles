@@ -31,57 +31,75 @@ provideFormatter = true
 command = "helix-gpt"
 args = ["--logFile", "/tmp/helix-gpt.log"]
 
+[language-server.scls]
+command = "simple-completion-language-server"
+
+[language-server.scls.config]
+max_completion_items = 20     # set max completion results len for each group: words, snippets, unicode-input
+snippets_first = true         # completions will return before snippets by default
+feature_words = true          # enable completion by word
+feature_snippets = true       # enable snippets
+feature_unicode_input = true  # enable "unicode input"
+
+[language-server.scls.environment]
+RUST_LOG = "info,simple-completion-langauge-server=info"
+LOG_FILE = "/tmp/completion.log"
+
+[[language]]
+name = "git-commit"
+language-servers = [ "scls", "gpt" ]
+
 [[language]]
 name = "typescript"
-language-servers = [ "typescript-language-server", "eslint", "gpt" ]
+language-servers = [ "typescript-language-server", "eslint", "gpt", "scls" ]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "typescript" ] }
 # auto-format = true
 
 [[language]]
 name = "markdown"
-language-servers = ["gpt", "marksman"]
+language-servers = ["gpt", "marksman", "scls"]
 
 [[language]]
 name = "tsx"
-language-servers = [ "deno", "eslint",  "gpt"]
+language-servers = [ "deno", "eslint",  "gpt", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "tsx" ] }
 # auto-format = true
 
 [[language]]
 name = "javascript"
-language-servers = [ "typescript-language-server", "eslint", "gpt"]
+language-servers = [ "typescript-language-server", "eslint", "gpt", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "javascript" ] }
 # auto-format = true
 
 [[language]]
 name = "jsx"
-language-servers = [ "typescript-language-server", "eslint",  "gpt"]
+language-servers = [ "typescript-language-server", "eslint",  "gpt", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "jsx" ] }
 # auto-format = true
 
 [[language]]
 name = "json"
-language-servers = ["gpt"]
+language-servers = ["gpt", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "json" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "json" ] }
 auto-format = true
 
 [[language]]
 name = "html"
-language-servers = [ "vscode-html-language-server", "gpt" ]
+language-servers = [ "vscode-html-language-server", "gpt", "scls"]
 # formatter = { command = 'prettier', args = ["--parser", "html"] }
 # auto-format = true
 
 [[language]]
 name = "css"
-language-servers = [ "vscode-css-language-server", "gpt" ]
+language-servers = [ "vscode-css-language-server", "gpt", "scls"]
 # formatter = { command = 'prettier', args = ["--parser", "css"] }
 # auto-format = true
 
 [[language]]
 name = "toml"
-language-servers = ["gpt"]
+language-servers = ["gpt", "scls"]
