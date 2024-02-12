@@ -6,7 +6,7 @@ set global indentwidth 2
 
 
 add-highlighter global/git-diff flag-lines Default git_diff_flags
-add-highlighter global/number-lines number-lines -hlcursor
+add-highlighter global/number-lines number-lines -hlcursor -relative
 add-highlighter global/ show-matching
 
 add-highlighter global/ wrap -word
@@ -17,11 +17,21 @@ map global user / ':comment-line<ret>' -docstring 'comment line'
 map global user n ':e -scratch<ret>' -docstring 'create buffer'
 map global user c ':db<ret>' -docstring 'delete buffer'
 map global user q ':q<ret>' -docstring 'quit'
+map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
 
-
+# wezterm custom commands
 define-command vsp -docstring "split vertically" %{
   nop %sh{
 		wezterm cli split-pane --right -- kak -c $kak_session
   }
 }
+
+declare-user-mode wezterm-actions
+define-command lazygit -hidden -docstring 'Launch lazygit' %{
+  nop %sh{
+		hx-wezterm.sh lazygit
+  }
+}
+
+map global wezterm-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
 
