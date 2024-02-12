@@ -4,9 +4,24 @@ set global indentwidth 2
 set global tabstop 2
 set global indentwidth 2
 
+
 add-highlighter global/git-diff flag-lines Default git_diff_flags
 add-highlighter global/number-lines number-lines -hlcursor
+add-highlighter global/ show-matching
+
+add-highlighter global/ wrap -word
 
 # comment
 map global user / ':comment-line<ret>' -docstring 'comment line'
+
+map global user n ':e -scratch<ret>' -docstring 'create buffer'
+map global user c ':db<ret>' -docstring 'delete buffer'
+map global user q ':q<ret>' -docstring 'quit'
+
+
+define-command vsp -docstring "split vertically" %{
+  nop %sh{
+		wezterm cli split-pane --right -- kak -c $kak_session
+  }
+}
 
