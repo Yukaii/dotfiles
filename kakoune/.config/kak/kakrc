@@ -14,16 +14,18 @@ add-highlighter global/ wrap -word
 
 # comment
 map global user / ':comment-line<ret>' -docstring 'comment line'
-
 map global user n ':e -scratch<ret>' -docstring 'create buffer'
 map global user c ':db<ret>' -docstring 'delete buffer'
 map global user q ':q<ret>' -docstring 'quit'
-map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
-map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
 map global user P '!pbpaste<ret>' -docstring 'paste from clipboard'
 map global user p '<a-!>pbpaste<ret>' -docstring 'paste before from clipboard'
 map global user R '|pbpaste<ret>' -docstring 'replace selection with clipaboard content'
 map global user -docstring 'recent files'     '<space>' ': kks-connect terminal kks-mru<ret>'
+
+# user mode shortcuts
+map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
+map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
+map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'window actions'
 
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
@@ -35,6 +37,29 @@ define-command vsp -docstring "split vertically" %{
 define-command sp -docstring "split horizontally" %{
   nop %sh{
 		wezterm cli split-pane --bottom --pane-id "${kak_client_env_WEZTERM_PANE}" -- kak -c $kak_session
+  }
+}
+
+define-command focus-left -hidden -docstring "focus left pane" %{
+  nop %sh{
+    wezterm cli activate-pane-direction left
+  }
+}
+
+define-command focus-right -hidden -docstring "focus right pane" %{
+  nop %sh{
+    wezterm cli activate-pane-direction right
+  }
+}
+define-command focus-up -hidden -docstring "focus up pane" %{
+  nop %sh{
+    wezterm cli activate-pane-direction up
+  }
+}
+
+define-command focus-down -hidden -docstring "focus down pane" %{
+  nop %sh{
+    wezterm cli activate-pane-direction down
   }
 }
 
@@ -64,6 +89,12 @@ map global find-actions -docstring 'live grep'        'w' ': kks-connect termina
 # map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect terminal-popup kks-lines<ret>'
 map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal lazygit<ret>'
 map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal kks-lf<ret>'
+
+declare-user-mode window-actions
+map global window-actions 'h' ':focus-left<ret>' -docstring 'focus left pane'
+map global window-actions 'j' ':focus-down<ret>' -docstring 'focus down pane'
+map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
+map global window-actions 'k' ':focus-up<ret>' -docstring 'focus up pane'
 
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
