@@ -37,13 +37,13 @@ verbs: [
         shortcut: e
         key: ctrl-e
         # execution: "$EDITOR +{line} {file}"
-        execution: "hx-wez {file}"
+        execution: "$EDITOR {file}"
         apply_to: file
         leave_broot: false
     }
     {
         key: enter
-        execution: "hx-wez {file}"
+        execution: "$EDITOR {file}"
         apply_to: file
         leave_broot: false
     }
