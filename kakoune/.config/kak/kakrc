@@ -2,7 +2,6 @@ colorscheme kanagawa
 
 set global indentwidth 2
 set global tabstop 2
-set global indentwidth 2
 set-option global ui_options terminal_assistant=cat
 
 
@@ -13,14 +12,33 @@ add-highlighter global/ show-matching
 add-highlighter global/ wrap -word
 
 # comment
-map global user / ':comment-line<ret>' -docstring 'comment line'
+map global user -docstring 'recent files'     '<space>' ': kks-connect terminal kks-mru<ret>'
 map global user n ':e -scratch<ret>' -docstring 'create buffer'
 map global user c ':db<ret>' -docstring 'delete buffer'
 map global user q ':q<ret>' -docstring 'quit'
 map global user P '!pbpaste<ret>' -docstring 'paste from clipboard'
 map global user p '<a-!>pbpaste<ret>' -docstring 'paste before from clipboard'
 map global user R '|pbpaste<ret>' -docstring 'replace selection with clipaboard content'
-map global user -docstring 'recent files'     '<space>' ': kks-connect terminal kks-mru<ret>'
+map global user / ':comment-line<ret>' -docstring 'comment line'
+map global user e ':open-broot<ret>' -docstring 'explorer'
+
+
+define-command open-broot -docstring 'open broot' %{
+  evaluate-commands nop %sh{
+    export EDITOR="kks edit"
+    export KKS_SESSION="$kak_session"
+    export KKS_CLIENT="$kak_client"
+
+		tab_id=$(wezterm cli list --format json | jq -r ".[] | select(.pane_id==$WEZTERM_PANE) | .tab_id")
+		broot_pane_id=$(wezterm cli list --format json | jq -r ".[] | select((.tab_id=$tab_id) and (.title==\"broot\")) | .pane_id")
+
+		if [ -z "$broot_pane_id" ]; then
+      wezterm cli split-pane --left --percent 23 -- broot --listen "$kak_session"
+		else
+			wezterm cli activate-pane --pane-id $broot_pane_id
+		fi
+  }
+}
 
 # user mode shortcuts
 map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
@@ -51,6 +69,7 @@ define-command focus-right -hidden -docstring "focus right pane" %{
     wezterm cli activate-pane-direction right
   }
 }
+
 define-command focus-up -hidden -docstring "focus up pane" %{
   nop %sh{
     wezterm cli activate-pane-direction up
@@ -93,8 +112,8 @@ map global find-actions -docstring 'file browser'     'h' ': kks-connect termina
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>' -docstring 'focus left pane'
 map global window-actions 'j' ':focus-down<ret>' -docstring 'focus down pane'
-map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 map global window-actions 'k' ':focus-up<ret>' -docstring 'focus up pane'
+map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
