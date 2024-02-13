@@ -28,13 +28,13 @@ map global user -docstring 'recent files'     '<space>' ': kks-connect terminal 
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
   nop %sh{
-		wezterm cli split-pane --right -- kak -c $kak_session
+		wezterm cli split-pane --right --pane-id "${kak_client_env_WEZTERM_PANE}" -- kak -c $kak_session
   }
 }
 
 define-command sp -docstring "split horizontally" %{
   nop %sh{
-		wezterm cli split-pane --bottom -- kak -c $kak_session
+		wezterm cli split-pane --bottom --pane-id "${kak_client_env_WEZTERM_PANE}" -- kak -c $kak_session
   }
 }
 
@@ -60,7 +60,7 @@ map global find-actions 'b' ':open_buffer_picker<ret>' -docstring 'pick buffer'
 map global find-actions -docstring 'terminal'         't' ': kks-connect terminal fish<ret>'
 map global find-actions -docstring 'files'            'f' ': kks-connect terminal kks-files<ret>'
 map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal kks-buffers<ret>'
-map global find-actions -docstring 'live grep'        'g' ': kks-connect terminal kks-grep<ret>'
+map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal kks-grep<ret>'
 # map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect terminal-popup kks-lines<ret>'
 map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal lazygit<ret>'
 map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal kks-lf<ret>'
