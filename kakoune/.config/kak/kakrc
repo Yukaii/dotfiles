@@ -154,6 +154,7 @@ hook global WinDisplay .* %{
 hook global WinCreate .* %{
     add-highlighter window/git-diff flag-lines Default git_diff_flags
 }
+
 # trigger update diff if inside git dir
 hook global BufOpenFile .* %{
     evaluate-commands -draft %sh{
