@@ -107,6 +107,7 @@ define-command -hidden open_buffer_picker %{
   }
 }
 
+# kks
 eval %sh{ kks init }
 
 declare-user-mode find-actions
@@ -137,8 +138,13 @@ hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss
 lsp-inlay-hints-enable global
 lsp-inlay-diagnostics-enable global
 
+# Hooks
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
 }}
+
+hook global WinDisplay .* %{
+  focus
+}
 
 
