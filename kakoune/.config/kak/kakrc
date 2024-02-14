@@ -2,12 +2,16 @@ colorscheme kanagawa
 
 set global indentwidth 2
 set global tabstop 2
-set-option global ui_options terminal_assistant=cat
 
+set-option global ui_options terminal_assistant=none
+set-option global scrolloff 5,5
+
+set-option global autoreload yes
+
+set-option global grepcmd 'rg -Hn --no-heading --sort path --vimgrep'
 
 add-highlighter global/number-lines number-lines -hlcursor -relative
 add-highlighter global/ show-matching
-
 add-highlighter global/ wrap -word
 
 # comment
@@ -26,6 +30,13 @@ map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
 map global user h ':lsp-hover<ret>' -docstring 'lsp hover'
 map global user H ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
 map global user r ':edit <c-r>%<ret>' -docstring 'reload buffer'
+map global user s ':trim-trailing-whitespaces<ret>' -docstring 'trim trailing whitesapce'
+
+define-command trim-trailing-whitespaces -docstring 'trim trailing whitespaces' %{
+  try %{
+    execute-keys -draft \%s\h+$<ret>d
+  }
+}
 
 define-command edit-config -docstring 'edit config' %{
   edit "%val{config}/kakrc"
