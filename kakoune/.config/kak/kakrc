@@ -47,6 +47,7 @@ define-command open-broot -docstring 'open broot' %{
     export EDITOR="kks edit"
     export KKS_SESSION="$kak_session"
     export KKS_CLIENT="$kak_client"
+    # export BROOT_LOG=debug
 
     pane_id="${kak_client_env_WEZTERM_PANE}"
 
@@ -56,6 +57,13 @@ define-command open-broot -docstring 'open broot' %{
 		if [ -z "$broot_pane_id" ]; then
       wezterm cli split-pane --left --percent 23 -- broot --listen "$kak_session"
 		else
+			root=$(broot --send "$kak_session" --get-root)
+      dir=$(dirname $kak_bufname)
+      absolute=$(realpath $PWD)/$dir
+      if [ $root != $absolute ] && [ $dir != '.' ]; then
+        broot --send "$kak_session" -c ":focus $dir"
+      else
+      fi
 			wezterm cli activate-pane --pane-id $broot_pane_id
 		fi
   }
