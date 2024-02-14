@@ -5,7 +5,6 @@ set global tabstop 2
 set-option global ui_options terminal_assistant=cat
 
 
-add-highlighter global/git-diff flag-lines Default git_diff_flags
 add-highlighter global/number-lines number-lines -hlcursor -relative
 add-highlighter global/ show-matching
 
@@ -147,4 +146,19 @@ hook global WinDisplay .* %{
   focus
 }
 
-
+# from https://discuss.kakoune.com/t/enable-git-update-diff-automatically/1252/2
+# enable flag-lines hl for git diff
+hook global WinCreate .* %{
+    add-highlighter window/git-diff flag-lines Default git_diff_flags
+}
+# trigger update diff if inside git dir
+hook global BufOpenFile .* %{
+    evaluate-commands -draft %sh{
+        cd $(dirname "$kak_buffile")
+        if [ $(git rev-parse --git-dir 2>/dev/null) ]; then
+            for hook in WinCreate BufReload BufWritePost; do
+                printf "hook buffer -group git-update-diff %s .* 'git update-diff'\n" "$hook"
+            done
+        fi
+    }
+}
