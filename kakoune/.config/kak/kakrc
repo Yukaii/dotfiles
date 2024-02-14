@@ -25,6 +25,7 @@ map global user , ':edit-config<ret>' -docstring 'edit config'
 map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
 map global user h ':lsp-hover<ret>' -docstring 'lsp hover'
 map global user H ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
+map global user r ':edit <c-r>%<ret>' -docstring 'reload buffer'
 
 define-command edit-config -docstring 'edit config' %{
   edit "%val{config}/kakrc"
