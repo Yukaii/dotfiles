@@ -1,0 +1,17 @@
+[language_ids]
+javascript = "javascriptreact"
+typescript = "typescriptreact"
+
+[language_server.tsserver]
+filetypes = ["javascript", "typescript"]
+roots = ["package.json", "tsconfig.json", "jsconfig.json", ".git", ".hg"]
+command = "typescript-language-server"
+args = ["--stdio"]
+
+[language_server.tailwindcss]
+filetypes = ["javascript", "typescript"]
+roots = ["tailwind.config.ts", "tailwind.config.js"]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
+[language_server.tailwindcss.settings.tailwindcss]
+editor = {}

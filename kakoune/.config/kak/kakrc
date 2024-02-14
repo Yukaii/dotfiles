@@ -23,6 +23,8 @@ map global user / ':comment-line<ret>' -docstring 'comment line'
 map global user e ':open-broot<ret>' -docstring 'explorer'
 map global user , ':edit-config<ret>' -docstring 'edit config'
 map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
+map global user k ':lsp-hover<ret>' -docstring 'lsp hover'
+map global user K ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
 
 define-command edit-config -docstring 'edit config' %{
   edit "%val{config}/kakrc"
@@ -124,6 +126,14 @@ map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 declare-user-mode buffer-actions
 map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
+# kak-lsp
+eval %sh{kak-lsp --kakoune -s $kak_session}  # Not needed if you load it with plug.kak.
+hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss) %{
+    lsp-enable-window
+}
+lsp-inlay-hints-enable global
+lsp-inlay-diagnostics-enable global
+
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
 }}
