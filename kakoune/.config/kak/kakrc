@@ -22,6 +22,7 @@ map global user R '|pbpaste<ret>' -docstring 'replace selection with clipaboard 
 map global user / ':comment-line<ret>' -docstring 'comment line'
 map global user e ':open-broot<ret>' -docstring 'explorer'
 map global user , ':edit-config<ret>' -docstring 'edit config'
+map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
 
 define-command edit-config -docstring 'edit config' %{
   edit "%val{config}/kakrc"
@@ -48,6 +49,7 @@ define-command open-broot -docstring 'open broot' %{
 map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
 map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
 map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'window actions'
+map global user b ':enter-user-mode buffer-actions<ret>' -docstring 'buffer actions'
 
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
@@ -119,6 +121,9 @@ map global window-actions 'j' ':focus-down<ret>' -docstring 'focus down pane'
 map global window-actions 'k' ':focus-up<ret>' -docstring 'focus up pane'
 map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 
+declare-user-mode buffer-actions
+map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
+map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
 }}
