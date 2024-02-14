@@ -21,7 +21,11 @@ map global user p '<a-!>pbpaste<ret>' -docstring 'paste before from clipboard'
 map global user R '|pbpaste<ret>' -docstring 'replace selection with clipaboard content'
 map global user / ':comment-line<ret>' -docstring 'comment line'
 map global user e ':open-broot<ret>' -docstring 'explorer'
+map global user , ':edit-config<ret>' -docstring 'edit config'
 
+define-command edit-config -docstring 'edit config' %{
+  edit "%val{config}/kakrc"
+}
 
 define-command open-broot -docstring 'open broot' %{
   evaluate-commands nop %sh{
