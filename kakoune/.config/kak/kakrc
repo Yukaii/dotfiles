@@ -19,11 +19,12 @@ map global user P '!pbpaste<ret>' -docstring 'paste from clipboard'
 map global user p '<a-!>pbpaste<ret>' -docstring 'paste before from clipboard'
 map global user R '|pbpaste<ret>' -docstring 'replace selection with clipaboard content'
 map global user / ':comment-line<ret>' -docstring 'comment line'
+map global user ? ':comment-block<ret>' -docstring 'block comment selection'
 map global user e ':open-broot<ret>' -docstring 'explorer'
 map global user , ':edit-config<ret>' -docstring 'edit config'
 map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
-map global user k ':lsp-hover<ret>' -docstring 'lsp hover'
-map global user K ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
+map global user h ':lsp-hover<ret>' -docstring 'lsp hover'
+map global user H ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
 
 define-command edit-config -docstring 'edit config' %{
   edit "%val{config}/kakrc"
@@ -48,11 +49,13 @@ define-command open-broot -docstring 'open broot' %{
   }
 }
 
+
 # user mode shortcuts
 map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
 map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
 map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'window actions'
 map global user b ':enter-user-mode buffer-actions<ret>' -docstring 'buffer actions'
+map global user l ':enter-user-mode lsp<ret>' -docstring 'lsp mode'
 
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
@@ -120,9 +123,9 @@ map global find-actions -docstring 'vcs client'       'v' ': kks-connect termina
 map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal kks-lf<ret>'
 
 declare-user-mode window-actions
-map global window-actions 'h' ':focus-left<ret>' -docstring 'focus left pane'
-map global window-actions 'j' ':focus-down<ret>' -docstring 'focus down pane'
-map global window-actions 'k' ':focus-up<ret>' -docstring 'focus up pane'
+map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
+map global window-actions 'j' ':focus-down<ret>'  -docstring 'focus down pane'
+map global window-actions 'k' ':focus-up<ret>'    -docstring 'focus up pane'
 map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 
 declare-user-mode buffer-actions
@@ -134,7 +137,7 @@ eval %sh{kak-lsp --kakoune -s $kak_session}  # Not needed if you load it with pl
 hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss) %{
     lsp-enable-window
 }
-lsp-inlay-hints-enable global
+lsp-inlay-hints-enable       global
 lsp-inlay-diagnostics-enable global
 
 # Hooks
