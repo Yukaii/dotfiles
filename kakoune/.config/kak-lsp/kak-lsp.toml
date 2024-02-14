@@ -15,3 +15,9 @@ command = "tailwindcss-language-server"
 args = ["--stdio"]
 [language_server.tailwindcss.settings.tailwindcss]
 editor = {}
+
+[language_server.markdown]
+filetypes = ["markdown"]
+roots = [".marksman.toml"]
+command = "marksman"
+args = ["server"]
