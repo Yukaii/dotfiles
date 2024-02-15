@@ -197,3 +197,10 @@ hook global BufOpenFile .* %{
         fi
     }
 }
+
+hook global BufCreate [^*].* %{
+    nop %sh{
+        mru=~/.cache/kak-mru
+        echo "$kak_buffile" | awk '!seen[$0]++' - "$mru" | sponge "$mru"
+    }
+}
