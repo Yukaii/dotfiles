@@ -1,4 +1,6 @@
+# custom modules
 source ~/.config/kak/wakatime.kak
+source ~/.config/kak/wezterm.kak
 
 colorscheme kanagawa
 
@@ -81,8 +83,8 @@ map global user l ':enter-user-mode lsp<ret>' -docstring 'lsp mode'
 map global normal <c-e> ':execute-keys vj<ret>'  -docstring 'scroll oneline down'
 map global normal <c-y> ':execute-keys vk<ret>'  -docstring 'scroll oneline down'
 
-hook global ModuleLoaded 'wezterm' %{
-  source ~/.config/kak/wezterm.kak
+hook global ModuleLoaded wezterm %{
+  require-module wezterm-additional
 }
 
 declare-user-mode wezterm-actions

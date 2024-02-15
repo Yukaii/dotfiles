@@ -1,10 +1,13 @@
+provide-module wezterm-additional %{
+
+
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
-  wezterm-terminal-vertical kak -c %val{session}
+  wezterm-terminal-horizontal kak -c %val{session}
 }
 
 define-command sp -docstring "split horizontally" %{
-  wezterm-terminal-horizontal kak -c %val{session}
+  wezterm-terminal-vertical kak -c %val{session}
 }
 
 define-command focus-left -hidden -docstring "focus left pane" %{
@@ -29,4 +32,6 @@ define-command focus-down -hidden -docstring "focus down pane" %{
   nop %sh{
     wezterm cli activate-pane-direction down
   }
+}
+
 }
