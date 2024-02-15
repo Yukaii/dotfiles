@@ -13,7 +13,9 @@ filetypes = ["javascript", "typescript"]
 roots = ["tailwind.config.ts", "tailwind.config.js"]
 command = "tailwindcss-language-server"
 args = ["--stdio"]
-[language_server.tailwindcss.settings.tailwindcss]
+settings_section = "_"
+
+[language_server.tailwindcss.settings._]
 editor = {}
 
 [language_server.markdown]
@@ -21,3 +23,25 @@ filetypes = ["markdown"]
 roots = [".marksman.toml"]
 command = "marksman"
 args = ["server"]
+
+# [language_server.eslint]
+# filetypes = ["javascript", "typescript"]
+# roots = [".eslintrc", ".eslintrc.json"]
+# command = "vscode-eslint-language-server"
+# args = ["--stdio"]
+# settings_section = "_"
+
+# [language_server.eslint.settings._]
+# codeActionsOnSave = { mode = "all", "source.fixAll.eslint" = true }
+# format = { enable = true }
+# nodePath = ""
+# quiet = false
+# rulesCustomizations = []
+# run = "onType"
+# validate = "on"
+# experimental = {}
+# problems = { shortenToSingleLine = false }
+
+# [language_server.eslint.settings._.codeAction]
+# disableRuleComment = { enable = true, location = "separateLine" }
+# showDocumentation = { enable = false }
