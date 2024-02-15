@@ -1,3 +1,5 @@
+source ~/.config/kak/wakatime.kak
+
 colorscheme kanagawa
 
 set global indentwidth 2
