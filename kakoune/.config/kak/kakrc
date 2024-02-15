@@ -77,6 +77,10 @@ map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'win
 map global user b ':enter-user-mode buffer-actions<ret>' -docstring 'buffer actions'
 map global user l ':enter-user-mode lsp<ret>' -docstring 'lsp mode'
 
+# muscle memories
+map global normal <c-e> ':execute-keys vj<ret>'  -docstring 'scroll oneline down'
+map global normal <c-y> ':execute-keys vk<ret>'  -docstring 'scroll oneline down'
+
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
   nop %sh{
