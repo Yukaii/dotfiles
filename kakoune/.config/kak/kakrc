@@ -204,3 +204,16 @@ hook global BufCreate [^*].* %{
         echo "$kak_buffile" | awk '!seen[$0]++' - "$mru" | sponge "$mru"
     }
 }
+
+hook global BufCreate .* %{
+    editorconfig-load
+    autoconfigtab
+}
+
+
+# Plugins
+evaluate-commands %sh{
+  cork init
+}
+
+cork smarttab "https://github.com/andreyorst/smarttab.kak"
