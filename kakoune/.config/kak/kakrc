@@ -5,6 +5,7 @@ set global tabstop 2
 
 set-option global ui_options terminal_assistant=none
 set-option global scrolloff 5,5
+set-option global startup_info_version 10000000000000 # Don't show changelog
 
 set-option global autoreload yes
 
@@ -60,10 +61,7 @@ define-command open-broot -docstring 'open broot' %{
 			root=$(broot --send "$kak_session" --get-root)
       dir=$(dirname $kak_bufname)
       absolute=$(realpath $PWD)/$dir
-      if [ $root != $absolute ] && [ $dir != '.' ]; then
-        broot --send "$kak_session" -c ":focus $dir"
-      else
-      fi
+      [ $root != $absolute ] && [ $dir != '.' ] && broot --send "$kak_session" -c ":focus $dir"
 			wezterm cli activate-pane --pane-id $broot_pane_id
 		fi
   }
