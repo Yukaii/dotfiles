@@ -89,6 +89,9 @@ case "$1" in
   "terminal")
     spawn_pane "bottom" "fish" 1 "true"
     ;;
+  "bottom-terminal")
+    spawn_pane "bottom" "fish" 25
+    ;;
   "open")
     gh browse $filename:$line_number  
     ;;
