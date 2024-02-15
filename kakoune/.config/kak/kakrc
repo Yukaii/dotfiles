@@ -1,3 +1,9 @@
+evaluate-commands %sh{
+  kks init
+  cork init
+  kak-lsp --kakoune -s $kak_session
+}
+
 # custom modules
 source ~/.config/kak/wakatime.kak
 source ~/.config/kak/wezterm.kak
@@ -93,8 +99,14 @@ define-command lazygit -hidden -docstring 'Launch lazygit' %{
 		hx-wezterm.sh lazygit
   }
 }
+define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
+  nop %sh{
+		hx-wezterm.sh bottom-terminal
+  }
+}
 
 map global wezterm-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
+map global wezterm-actions 'b' ':bottom-terminal<ret>' -docstring 'bottom terminal'
 
 define-command -hidden open_buffer_picker %{
   prompt buffer: -menu -buffer-completion %{
@@ -102,8 +114,6 @@ define-command -hidden open_buffer_picker %{
   }
 }
 
-# kks
-eval %sh{ kks init }
 
 declare-user-mode find-actions
 map global find-actions 'b' ':open_buffer_picker<ret>' -docstring 'pick buffer'
@@ -126,7 +136,6 @@ map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
 
 # kak-lsp
-eval %sh{kak-lsp --kakoune -s $kak_session}  # Not needed if you load it with plug.kak.
 hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss) %{
     lsp-enable-window
 }
@@ -185,8 +194,4 @@ hook global BufCreate .* %{
 
 
 # Plugins
-evaluate-commands %sh{
-  cork init
-}
-
 cork smarttab "https://github.com/andreyorst/smarttab.kak"
