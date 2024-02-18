@@ -13,6 +13,9 @@ colorscheme kanagawa
 set global indentwidth 2
 set global tabstop 2
 
+# debug
+# set global lsp_cmd "kak-lsp -s %val{session} -vvvv --log /tmp/kak-lsp.log"
+
 set-option global ui_options terminal_assistant=none
 set-option global scrolloff 5,5
 set-option global startup_info_version 10000000000000 # Don't show changelog
@@ -136,7 +139,7 @@ map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
 
 # kak-lsp
-hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss) %{
+hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json) %{
     lsp-enable-window
 }
 lsp-inlay-hints-enable       global

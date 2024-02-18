@@ -24,24 +24,43 @@ roots = [".marksman.toml"]
 command = "marksman"
 args = ["server"]
 
-# [language_server.eslint]
-# filetypes = ["javascript", "typescript"]
-# roots = [".eslintrc", ".eslintrc.json"]
-# command = "vscode-eslint-language-server"
-# args = ["--stdio"]
-# settings_section = "_"
+[language_server.eslint]
+filetypes = ["javascript", "typescript"]
+roots = [".eslintrc", ".eslintrc.json"]
+command = "vscode-eslint-language-server"
+args = ["--stdio"]
+workaround_eslint = true
 
-# [language_server.eslint.settings._]
-# codeActionsOnSave = { mode = "all", "source.fixAll.eslint" = true }
-# format = { enable = true }
-# nodePath = ""
-# quiet = false
-# rulesCustomizations = []
-# run = "onType"
-# validate = "on"
-# experimental = {}
-# problems = { shortenToSingleLine = false }
+[language_server.eslint.settings]
+codeActionsOnSave = { mode = "all", "source.fixAll.eslint" = true }
+format = { enable = true }
+nodePath = ""
+quiet = false
+rulesCustomizations = []
+run = "onType"
+validate = "on"
+experimental = {}
+problems = { shortenToSingleLine = false }
 
-# [language_server.eslint.settings._.codeAction]
-# disableRuleComment = { enable = true, location = "separateLine" }
-# showDocumentation = { enable = false }
+[language_server.eslint.settings.codeAction]
+disableRuleComment = { enable = true, location = "separateLine" }
+showDocumentation = { enable = false }
+
+[language_server.json-language-server]
+filetypes = ["json"]
+roots = ["package.json"]
+command = "vscode-json-languageserver"
+args = ["--stdio"]
+
+
+[language_server.yaml-language-server]
+filetypes = ["yaml"]
+roots = [".git", ".hg"]
+command = "yaml-language-server"
+args = ["--stdio"]
+settings_section = "yaml"
+[language_server.yaml-language-server.settings.yaml-language-server]
+# See https://github.com/redhat-developer/yaml-language-server#language-server-settings
+# Defaults are at https://github.com/redhat-developer/yaml-language-server/blob/master/src/yamlSettings.ts
+format.enable = true
+
