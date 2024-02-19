@@ -18,7 +18,7 @@ set global tabstop 2
 
 set-option global ui_options terminal_assistant=none
 set-option global scrolloff 5,5
-set-option global startup_info_version 10000000000000 # Don't show changelog
+set-option global startup_info_version 20230805
 
 set-option global autoreload yes
 
@@ -29,7 +29,7 @@ add-highlighter global/ show-matching
 add-highlighter global/ wrap -word
 
 # comment
-map global user -docstring 'recent files'     '<space>' ': kks-connect terminal kks-mru<ret>'
+map global user -docstring 'recent files'     '<space>' ': kks-connect wezterm-terminal-vertical kks-mru<ret>'
 map global user n ':e -scratch<ret>' -docstring 'create buffer'
 map global user c ':db<ret>' -docstring 'delete buffer'
 map global user q ':q<ret>' -docstring 'quit'
@@ -120,13 +120,13 @@ define-command -hidden open_buffer_picker %{
 
 declare-user-mode find-actions
 map global find-actions 'b' ':open_buffer_picker<ret>' -docstring 'pick buffer'
-map global find-actions -docstring 'terminal'         't' ': kks-connect terminal fish<ret>'
-map global find-actions -docstring 'files'            'f' ': kks-connect terminal kks-files<ret>'
-map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal kks-buffers<ret>'
-map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal kks-grep<ret>'
-# map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect terminal-popup kks-lines<ret>'
-map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal lazygit<ret>'
-map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal kks-lf<ret>'
+map global find-actions -docstring 'terminal'         't' ': kks-connect wezterm-terminal-vertical fish<ret>'
+map global find-actions -docstring 'files'            'f' ': kks-connect wezterm-terminal-vertical kks-files<ret>'
+map global find-actions -docstring 'buffers'          'b' ': kks-connect wezterm-terminal-vertical kks-buffers<ret>'
+map global find-actions -docstring 'live grep'        'w' ': kks-connect wezterm-terminal-vertical kks-grep<ret>'
+# map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect wezterm-terminal-vertical kks-lines<ret>'
+map global find-actions -docstring 'vcs client'       'v' ': kks-connect wezterm-terminal-vertical lazygit<ret>'
+map global find-actions -docstring 'file browser'     'h' ': kks-connect wezterm-terminal-vertical kks-lf<ret>'
 
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
