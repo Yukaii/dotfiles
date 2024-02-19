@@ -11,6 +11,7 @@ offset = { y = 3 }
 [window]
 decorations = "Buttonless"
 padding = { x = 10, y = 10 }
+option_as_alt = "Both"
 
 [shell]
 program = "/opt/homebrew/bin/fish"
