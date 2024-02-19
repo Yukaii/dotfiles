@@ -1,0 +1,33 @@
+prSections:
+  - title: My Pull Requests
+    filters: is:open author:@me
+    layout:
+      author:
+        hidden: true
+        # width: <number of columns>
+        # grow: <bool> this will make the column grow in size
+  - title: Needs My Review
+    filters: is:open review-requested:@me
+issuesSections:
+  - title: Created
+    filters: is:open author:@me
+  - title: Assigned
+    filters: is:open assignee:@me
+defaults:
+  layout:
+    # prs:
+    #   repo:
+    #     grow: true,
+    #     width: 10
+    #     hidden: false
+    # issues: same structure as prs
+  prsLimit: 20 # global limit
+  issuesLimit: 20 # global limit
+  preview:
+    open: true # wether to have the preview pane open by default
+    width: 60 # width in columns
+  refetchIntervalMinutes: 30 # will refetch all sections every 30 minutes
+# repoPaths: # configure where to locate repos when checking out PRs
+#   default_path: ~/code/repos # fallback value if none of the other paths match
+#   dlvhdr/*: ~/code/repos/dlvhdr/* # will match dlvhdr/repo-name to ~/code/repos/dlvhdr/repo-name
+#   dlvhdr/gh-dash: ~/code/gh-dash # will not match wildcard and map to specified path
