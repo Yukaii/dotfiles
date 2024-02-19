@@ -77,6 +77,7 @@ alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias pn="pnpm"
 alias ed="ed -p ':'"
 alias k="kks edit"
+alias ts='sesh connect $(sesh list | fzf)'
 # alias eza="ls"
 
 # source $HOME/.cargo/env
