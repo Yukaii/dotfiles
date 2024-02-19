@@ -4,13 +4,13 @@ import = [
 ]
 
 [font]
-normal = { family = "FiraCode Nerd Font" }
+normal = { family = "JetbrainsMono Nerd Font" }
 size = 15
+offset = { y = 3 }
 
 [window]
 decorations = "Buttonless"
 padding = { x = 10, y = 10 }
-
 
 [shell]
 program = "/opt/homebrew/bin/fish"
