@@ -40,5 +40,33 @@ The program passed as argument will be executed in the new terminal' \
     tmux-terminal-impl 'popup -w 80% -h 70%' %arg{@}
 }
 
+define-command tmux-open-broot -docstring 'open broot' %{
+  evaluate-commands nop %sh{
+    env_line="env EDITOR=\"kks edit\" KKS_SESSION=$kak_session KKS_CLIENT=$kak_client"
+    # Optionally, set the BROOT_LOG environment variable for debugging
+    # BROOT_LOG=debug
+
+    # Use the environment variable to get the current tmux pane ID
+    current_pane_id="${kak_client_env_TMUX_PANE}"
+
+    # List all panes and check if a broot process is running in any of them, excluding the current pane
+    broot_pane_id=$(tmux list-panes -F '#{pane_title} #{pane_id}' | grep -E '^broot ' | grep -v "$current_pane_id" | cut -d ' ' -f 2)
+
+    if [ -z "$broot_pane_id" ]; then
+        # If no broot process is found, split the pane and run broot
+        tmux split-window -hb -l 23% "$env_line broot --listen $kak_session"
+    else
+        # If a broot process is already running in a different pane, prepare to send commands to it
+        root=$(broot --send "$kak_session" --get-root)
+        dir=$(dirname "$kak_bufname")
+        absolute=$(realpath "$PWD/$dir")
+        if [ "$root" != "$absolute" ] && [ "$dir" != '.' ]; then
+            broot --send "$kak_session" -c ":focus $dir"
+        fi
+        # Activate the pane with the broot process
+        tmux select-pane -t "$broot_pane_id"
+    fi
+  }
+}
 
 }

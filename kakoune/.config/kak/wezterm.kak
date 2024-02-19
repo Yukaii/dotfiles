@@ -33,4 +33,28 @@ define-command focus-down -hidden -docstring "focus down pane" %{
   }
 }
 
+define-command wezterm-open-broot -docstring 'open broot' %{
+  evaluate-commands nop %sh{
+    export EDITOR="kks edit"
+    export KKS_SESSION="$kak_session"
+    export KKS_CLIENT="$kak_client"
+    # export BROOT_LOG=debug
+
+    pane_id="${kak_client_env_WEZTERM_PANE}"
+
+		tab_id=$(wezterm cli list --format json | jq -r ".[] | select(.pane_id==$pane_id) | .tab_id")
+		broot_pane_id=$(wezterm cli list --format json | jq -r ".[] | select((.tab_id==$tab_id) and (.title==\"broot\")) | .pane_id")
+
+		if [ -z "$broot_pane_id" ]; then
+      wezterm cli split-pane --left --percent 23 -- broot --listen "$kak_session"
+		else
+			root=$(broot --send "$kak_session" --get-root)
+      dir=$(dirname $kak_bufname)
+      absolute=$(realpath $PWD)/$dir
+      [ $root != $absolute ] && [ $dir != '.' ] && broot --send "$kak_session" -c ":focus $dir"
+			wezterm cli activate-pane --pane-id $broot_pane_id
+		fi
+  }
+}
+
 }
