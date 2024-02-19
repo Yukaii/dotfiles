@@ -1,5 +1,4 @@
-provide-module wezterm-additional %{
-
+hook global ModuleLoaded wezterm %{
 
 # wezterm custom commands
 define-command vsp -docstring "split vertically" %{
