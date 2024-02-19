@@ -198,3 +198,14 @@ hook global BufCreate .* %{
 
 # Plugins
 cork smarttab "https://github.com/andreyorst/smarttab.kak"
+
+cork konflict "https://github.com/eko234/git-konflict.kak" %{
+  declare-user-mode konflict
+  map global user K ': enter-user-mode konflict<ret>' -docstring 'Konflict mode'
+  map global konflict s ': konflict-start<ret>' -docstring 'Konflict start'
+  map global konflict j ': konflict-use-mine<ret>' -docstring 'Use mine'
+  map global konflict k ': konflict-use-yours<ret>' -docstring 'Use yours'
+  map global konflict J ': konflict-use-mine-then-yours<ret>' -docstring 'Use mine then yours'
+  map global konflict K ': konflict-use-yours-then-mine<ret>' -docstring 'Use yours then mine'
+  map global konflict d ': konflict-use-none<ret>' -docstring 'Use none'
+}
