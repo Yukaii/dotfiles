@@ -17,6 +17,8 @@
 syntax_theme: GitHub
 update_work_dir: false
 
+terminal_title: broot
+
 ###############################################################
 # Default flags
 # You can set up flags you want broot to start with by
