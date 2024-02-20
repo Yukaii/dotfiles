@@ -102,13 +102,11 @@ declare-user-mode find-actions
 map global find-actions 'B' ':open_buffer_picker<ret>' -docstring 'pick buffer'
 map global find-actions -docstring 'terminal'         't' ': kks-connect terminal-vertical fish<ret>'
 map global find-actions -docstring 'files'            'f' ': kks-connect terminal-popup kks-files<ret>'
+map global find-actions -docstring 'git files'        'g' ': kks-connect terminal-popup kks-git-files<ret>'
 map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal-popup kks-buffers<ret>'
 map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal-popup kks-grep<ret>'
-map global find-actions -docstring 'browse file on github'        'g' ':browse_github<ret>'
-
-# map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect terminal-vertical kks-lines<ret>'
-# map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal-vertical lazygit<ret>'
-# map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal-vertical kks-lf<ret>'
+map global find-actions -docstring 'browse file on github'        'B' ':browse_github<ret>'
+map global find-actions -docstring 'buffers'          'y' ': kks-connect terminal-popup kks-filetypes<ret>'
 
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
@@ -175,6 +173,10 @@ hook global BufCreate [^*].* %{
 hook global BufCreate .* %{
     editorconfig-load
     autoconfigtab
+}
+
+hook global BufCreate .*\.tmux.conf %{
+    set-option buffer filetype conf
 }
 
 
