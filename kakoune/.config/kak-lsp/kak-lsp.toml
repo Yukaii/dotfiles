@@ -64,6 +64,26 @@ settings_section = "yaml"
 # Defaults are at https://github.com/redhat-developer/yaml-language-server/blob/master/src/yamlSettings.ts
 format.enable = true
 
+[language_server.rust-analyzer]
+filetypes = ["rust"]
+roots = ["Cargo.toml"]
+command = "sh"
+args = [
+    "-c",
+    """
+        if path=$(rustup which rust-analyzer 2>/dev/null); then
+            "$path"
+        else
+            rust-analyzer
+        fi
+    """,
+]
+[language_server.rust-analyzer.settings.rust-analyzer]
+# See https://rust-analyzer.github.io/manual.html#configuration
+# cargo.features = []
+check.command = "clippy"
+
+
 # [language_server.gpt]
 # roots = [".git", ".hg"]
 # filetypes = ["javascript", "typescript", "markdown", "json", "python", "rust"]
