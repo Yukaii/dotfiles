@@ -92,6 +92,11 @@ define-command -hidden open_buffer_picker %{
   }
 }
 
+define-command -hidden browse_github %{
+  evaluate-commands %sh{
+    gh browse "$kak_bufname:$kak_cursor_line"
+ }}
+
 
 declare-user-mode find-actions
 map global find-actions 'B' ':open_buffer_picker<ret>' -docstring 'pick buffer'
@@ -99,6 +104,8 @@ map global find-actions -docstring 'terminal'         't' ': kks-connect termina
 map global find-actions -docstring 'files'            'f' ': kks-connect terminal-popup kks-files<ret>'
 map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal-popup kks-buffers<ret>'
 map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal-popup kks-grep<ret>'
+map global find-actions -docstring 'browse file on github'        'g' ':browse_github<ret>'
+
 # map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect terminal-vertical kks-lines<ret>'
 # map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal-vertical lazygit<ret>'
 # map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal-vertical kks-lf<ret>'
