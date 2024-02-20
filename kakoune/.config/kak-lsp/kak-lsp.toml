@@ -64,11 +64,11 @@ settings_section = "yaml"
 # Defaults are at https://github.com/redhat-developer/yaml-language-server/blob/master/src/yamlSettings.ts
 format.enable = true
 
-[language_server.gpt]
-roots = [".git", ".hg"]
-filetypes = ["javascript", "typescript", "markdown", "json", "python", "rust"]
-command = "helix-gpt"
-args = ["--logFile", "/tmp/helix-gpt.log"]
+# [language_server.gpt]
+# roots = [".git", ".hg"]
+# filetypes = ["javascript", "typescript", "markdown", "json", "python", "rust"]
+# command = "helix-gpt"
+# args = ["--logFile", "/tmp/helix-gpt.log"]
 
 
 # [language_server.scls]
