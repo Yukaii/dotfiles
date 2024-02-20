@@ -31,7 +31,7 @@ add-highlighter global/ show-matching
 add-highlighter global/ wrap -word
 
 # comment
-map global user -docstring 'recent files'     '<space>' ': kks-connect terminal-vertical kks-mru<ret>'
+map global user -docstring 'recent files'     '<space>' ': kks-connect terminal-popup kks-mru<ret>'
 map global user n ':e -scratch<ret>' -docstring 'create buffer'
 map global user c ':db<ret>' -docstring 'delete buffer'
 map global user q ':q<ret>' -docstring 'quit'
@@ -84,7 +84,7 @@ define-command open-broot -docstring 'open broot' %{
 
 
 # user mode shortcuts
-map global user t ':enter-user-mode wezterm-actions<ret>' -docstring 'terminal actions'
+map global user t ':enter-user-mode terminal-actions<ret>' -docstring 'terminal actions'
 map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
 map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'window actions'
 map global user b ':enter-user-mode buffer-actions<ret>' -docstring 'buffer actions'
@@ -94,19 +94,22 @@ map global user l ':enter-user-mode lsp<ret>' -docstring 'lsp mode'
 map global normal <c-e> ':execute-keys vj<ret>'  -docstring 'scroll oneline down'
 map global normal <c-y> ':execute-keys vk<ret>'  -docstring 'scroll oneline down'
 
-declare-user-mode wezterm-actions
+declare-user-mode terminal-actions
 define-command lazygit -hidden -docstring 'Launch lazygit' %{
   terminal-popup lazygit
 }
 
 define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
-  nop %sh{
-		hx-wezterm.sh bottom-terminal
-  }
+  terminal-vertical fish
 }
 
-map global wezterm-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
-map global wezterm-actions 'b' ':bottom-terminal<ret>' -docstring 'bottom terminal'
+map global terminal-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
+map global terminal-actions 'b' ':bottom-terminal<ret>' -docstring 'bottom terminal'
+map global terminal-actions 'B' ':open_blame<ret>' -docstring 'Git Blame'
+
+define-command -hidden open_blame %{
+  terminal-vertical tig blame %val{buffile} "+%val{cursor_line}"
+}
 
 define-command -hidden open_buffer_picker %{
   prompt buffer: -menu -buffer-completion %{
@@ -118,12 +121,12 @@ define-command -hidden open_buffer_picker %{
 declare-user-mode find-actions
 map global find-actions 'b' ':open_buffer_picker<ret>' -docstring 'pick buffer'
 map global find-actions -docstring 'terminal'         't' ': kks-connect terminal-vertical fish<ret>'
-map global find-actions -docstring 'files'            'f' ': kks-connect terminal-vertical kks-files<ret>'
-map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal-vertical kks-buffers<ret>'
-map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal-vertical kks-grep<ret>'
+map global find-actions -docstring 'files'            'f' ': kks-connect terminal-popup kks-files<ret>'
+map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal-popup kks-buffers<ret>'
+map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal-popup kks-grep<ret>'
 # map global find-actions -docstring 'lines in buffer'  <c-l> ': kks-connect terminal-vertical kks-lines<ret>'
-map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal-vertical lazygit<ret>'
-map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal-vertical kks-lf<ret>'
+# map global find-actions -docstring 'vcs client'       'v' ': kks-connect terminal-vertical lazygit<ret>'
+# map global find-actions -docstring 'file browser'     'h' ': kks-connect terminal-vertical kks-lf<ret>'
 
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
