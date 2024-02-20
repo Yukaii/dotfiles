@@ -70,6 +70,9 @@ local config = {
     saturation = 0.7,
     brightness = 0.6,
   },
+
+  initial_cols = 120,
+  initial_rows = 30,
 }
 
 font_config_module.loadFontConfig(config, font_name)
