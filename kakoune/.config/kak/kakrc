@@ -46,7 +46,7 @@ map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
 map global user h ':lsp-hover<ret>' -docstring 'lsp hover'
 map global user H ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
 map global user r ':edit <c-r>%<ret>' -docstring 'reload buffer'
-map global user s ':trim-trailing-whitespaces<ret>' -docstring 'trim trailing whitesapce'
+map global user S ':trim-trailing-whitespaces<ret>' -docstring 'trim trailing whitesapce'
 
 define-command trim-trailing-whitespaces -docstring 'trim trailing whitespaces' %{
   try %{
@@ -193,3 +193,13 @@ cork konflict "https://github.com/eko234/git-konflict.kak" %{
   map global konflict K ': konflict-use-yours-then-mine<ret>' -docstring 'Use yours then mine'
   map global konflict d ': konflict-use-none<ret>' -docstring 'Use none'
 }
+
+cork surround "https://github.com/h-youhei/kakoune-surround" %{
+  declare-user-mode surround
+  map global surround s ':surround<ret>' -docstring 'surround'
+  map global surround c ':change-surround<ret>' -docstring 'change'
+  map global surround d ':delete-surround<ret>' -docstring 'delete'
+  map global surround t ':select-surrounding-tag<ret>' -docstring 'select tag'
+  map global user s ':enter-user-mode surround<ret>'
+}
+
