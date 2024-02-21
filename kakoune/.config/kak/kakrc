@@ -9,6 +9,7 @@ source ~/.config/kak/wakatime.kak
 source ~/.config/kak/wezterm.kak
 source ~/.config/kak/tmux.kak
 source ~/.config/kak/window-helper.kak
+source ~/.config/kak/color-highlighter.kak
 
 colorscheme kanagawa
 
