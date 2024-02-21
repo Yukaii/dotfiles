@@ -19,5 +19,6 @@ zed/.config/zed/embeddings/*
 zed/.config/zed/.tmp*
 
 tmux/.tmux/plugins/*
+tmux/.tmux/resurrect
 !tmux/.tmux/plugins/tpm
 
