@@ -62,7 +62,7 @@ local config = {
       }
     }
   },
-  scrollback_lines = 1000000,
+  scrollback_lines = 50000,
   command_palette_font_size = 17,
   command_palette_bg_color = colors.ansi[1],
 
