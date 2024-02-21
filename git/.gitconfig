@@ -4,7 +4,6 @@
 [core]
 	pager = git-split-diffs --color | less -RFX
 	excludesfile = ~/.gitignore_global
-	editor = nvim
 	difftool = true
 [delta]
     plus-style = "syntax #012800"
@@ -57,3 +56,10 @@
   pr-diff = "!f() { git diff $(git merge-base HEAD $1) HEAD; }; f"
   pr-diff-stat = "!f() { git diff --stat $(git merge-base HEAD $1) HEAD; }; f"
   pr-diff-files = "!f() { git diff --name-only $(git merge-base HEAD $1) HEAD; }; f"
+[branch]
+	sort = -committerdate
+[column]
+	ui = auto
+[rerere]
+	enabled = true
+	autoUpdate = true
