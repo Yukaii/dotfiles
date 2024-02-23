@@ -48,11 +48,11 @@ fi
 
 # Functions for tmux
 tmux_vsp() {
-    tmux split-window -h -d $PWD "$@"
+    tmux split-window -h -c $PWD "$@"
 }
 
 tmux_sp() {
-    tmux split-window -v -d $PWD "$@"
+    tmux split-window -v -c $PWD "$@"
 }
 
 tmux_focus_left() {
