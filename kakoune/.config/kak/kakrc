@@ -5,11 +5,11 @@ evaluate-commands %sh{
 }
 
 # custom modules
-source ~/.config/kak/wakatime.kak
-source ~/.config/kak/wezterm.kak
-source ~/.config/kak/tmux.kak
-source ~/.config/kak/window-helper.kak
-source ~/.config/kak/color-highlighter.kak
+source "%val{config}/wakatime.kak"
+source "%val{config}/wezterm.kak"
+source "%val{config}/tmux.kak"
+source "%val{config}/window-helper.kak"
+source "%val{config}/color-highlighter.kak"
 
 colorscheme kanagawa
 
@@ -107,7 +107,7 @@ map global find-actions -docstring 'git files'        'g' ': kks-connect termina
 map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal-popup kks-buffers<ret>'
 map global find-actions -docstring 'live grep'        'w' ': kks-connect terminal-popup kks-grep<ret>'
 map global find-actions -docstring 'browse file on github'        'B' ':browse_github<ret>'
-map global find-actions -docstring 'buffers'          'y' ': kks-connect terminal-popup kks-filetypes<ret>'
+map global find-actions -docstring 'file types'          'y' ': kks-connect terminal-popup kks-filetypes<ret>'
 
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'

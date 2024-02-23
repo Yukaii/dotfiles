@@ -12,7 +12,3 @@ hook global ModuleLoaded tmux %{
   alias global open-broot tmux-open-broot
 }
 
-
-
-
-
