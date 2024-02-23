@@ -104,13 +104,24 @@ wezterm_size_option() {
 
 wezterm_vsp() {
     local cmd="$1"
-    local size_option="$(tmux_size_option)"
+    local size_option="$(wezterm_size_option)"
 
-    wezterm cli split-pane --right --cwd $PWD $size_option -- "$cmd"
+    if [ -n "$cmd" ]; then
+      wezterm cli split-pane --bottom --cwd $PWD $size_option -- "$cmd"
+    else
+      wezterm cli split-pane --bottom --cwd $PWD $size_option
+    fi
 }
 
 wezterm_sp() {
-    wezterm cli split-pane --bottom --cwd $PWD $size_option -- "$cmd"
+    local cmd="$1"
+    local size_option="$(wezterm_size_option)"
+
+    if [ -n "$cmd" ]; then
+      wezterm cli split-pane --bottom --cwd $PWD $size_option -- "$cmd"
+    else
+      wezterm cli split-pane --bottom --cwd $PWD $size_option
+    fi
 }
 
 wezterm_focus_left() {
