@@ -48,11 +48,11 @@ fi
 
 # Functions for tmux
 tmux_vsp() {
-    tmux split-window -h "$@"
+    tmux split-window -h -d $PWD "$@"
 }
 
 tmux_sp() {
-    tmux split-window -v "$@"
+    tmux split-window -v -d $PWD "$@"
 }
 
 tmux_focus_left() {
@@ -72,16 +72,16 @@ tmux_focus_down() {
 }
 
 tmux_popup() {
-    tmux popup -w 90% -h 80% -E "$@"
+    tmux popup -w 90% -h 80% -E -d $PWD "$@"
 }
 
 # Functions for WezTerm
 wezterm_vsp() {
-    wezterm cli split-pane --right -- "$@"
+    wezterm cli split-pane --right --cwd $PWD -- "$@"
 }
 
 wezterm_sp() {
-    wezterm cli split-pane --bottom -- "$@"
+    wezterm cli split-pane --bottom --cwd $PWD -- "$@"
 }
 
 wezterm_focus_left() {
@@ -101,32 +101,32 @@ wezterm_focus_down() {
 }
 
 wezterm_popup() {
-    wezterm cli spawn --new-window -- "$@"
+    wezterm cli spawn --new-window --cwd $PWD -- "$@"
 }
 
 # Execute command
 case $MODE in
     tmux)
         case $COMMAND in
-            vsp) tmux_vsp ;;
-            sp) tmux_sp ;;
+            vsp) tmux_vsp "$@";;
+            sp) tmux_sp "$@";;
             focus-left) tmux_focus_left ;;
             focus-right) tmux_focus_right ;;
             focus-up) tmux_focus_up ;;
             focus-down) tmux_focus_down ;;
-            popup) tmux_popup ;;
+            popup) tmux_popup "$@";;
             *) echo "Unknown command for tmux mode: $COMMAND"; exit 1 ;;
         esac
         ;;
     wezterm)
         case $COMMAND in
-            vsp) wezterm_vsp ;;
-            sp) wezterm_sp ;;
+            vsp) wezterm_vsp "$@";;
+            sp) wezterm_sp "$@";;
             focus-left) wezterm_focus_left ;;
             focus-right) wezterm_focus_right ;;
             focus-up) wezterm_focus_up ;;
             focus-down) wezterm_focus_down ;;
-            popup) wezterm_popup ;;
+            popup) wezterm_popup "$@";;
             *) echo "Unknown command for wezterm mode: $COMMAND"; exit 1 ;;
         esac
         ;;
