@@ -120,7 +120,7 @@ map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
 
 # kak-lsp
-hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json) %{
+hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml) %{
     lsp-enable-window
 }
 lsp-inlay-hints-enable       global
@@ -201,6 +201,6 @@ cork surround "https://github.com/h-youhei/kakoune-surround" %{
   map global surround c ':change-surround<ret>' -docstring 'change'
   map global surround d ':delete-surround<ret>' -docstring 'delete'
   map global surround t ':select-surrounding-tag<ret>' -docstring 'select tag'
-  map global user s ':enter-user-mode surround<ret>'
+  map global user s ':enter-user-mode surround<ret>' -docstring 'surround mode'
 }
 
