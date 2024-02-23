@@ -5,6 +5,7 @@ show_help() {
     echo "Usage: winmux [OPTION]... [COMMAND] [ARGS]..."
     echo "Options:"
     echo "  -m, --mode      Set the mode to 'tmux' or 'wezterm'"
+    echo "  -p, --percent   Set the size of the panel as a percentage"
     echo "  -h, --help      Display this help and exit"
     echo "Commands:"
     echo "  vsp             Split vertically and optionally run a command"
@@ -29,6 +30,7 @@ fi
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -m|--mode) MODE="$2"; shift ;;
+        -p|--percent) PERCENT="$2"; shift ;;
         -h|--help) show_help; exit 0 ;;
         *) COMMAND="$1"; shift; break ;;
     esac
@@ -47,12 +49,26 @@ fi
 # CMD_TO_EXECUTE="$*"
 
 # Functions for tmux
+tmux_size_option() {
+    if [ -n "$PERCENT" ]; then
+        echo "-l $PERCENT%"
+    else
+        echo ""
+    fi
+}
+ 
 tmux_vsp() {
-    tmux split-window -h -c $PWD "$@"
+    local cmd="$1"
+    local size_option="$(tmux_size_option)"
+
+    tmux split-window -h $size_option "$cmd"
 }
 
 tmux_sp() {
-    tmux split-window -v -c $PWD "$@"
+    local cmd="$1"
+    local size_option="$(tmux_size_option)"
+
+    tmux split-window -v $size_option "$cmd"
 }
 
 tmux_focus_left() {
@@ -76,12 +92,25 @@ tmux_popup() {
 }
 
 # Functions for WezTerm
+
+wezterm_size_option() {
+    if [ -n "$PERCENT" ]; then
+        echo "--percent $PERCENT"
+    else
+        echo ""
+    fi
+}
+
+
 wezterm_vsp() {
-    wezterm cli split-pane --right --cwd $PWD -- "$@"
+    local cmd="$1"
+    local size_option="$(tmux_size_option)"
+
+    wezterm cli split-pane --right --cwd $PWD $size_option -- "$cmd"
 }
 
 wezterm_sp() {
-    wezterm cli split-pane --bottom --cwd $PWD -- "$@"
+    wezterm cli split-pane --bottom --cwd $PWD $size_option -- "$cmd"
 }
 
 wezterm_focus_left() {

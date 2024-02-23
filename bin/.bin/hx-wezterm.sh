@@ -68,7 +68,7 @@ extension="${filename##*.}"
 
 case "$1" in
   "blame")
-    spawn_pane "bottom" "tig blame $filename +$line_number" 50
+    winmux sp "tig blame $filename +$line_number"
     ;;
   "explorer")
     left_pane_id=$(wezterm cli get-pane-direction left)
@@ -81,16 +81,8 @@ case "$1" in
     fi
     ;;
   "fzf")
-    spawn_pane "bottom" "sh hx-fzf.sh" 33 "true"
-    ;;
-  "lazygit")
-    spawn_pane "bottom" "lazygit" 1 "true"
-    ;;
-  "terminal")
-    spawn_pane "bottom" "fish" 1 "true"
-    ;;
-  "bottom-terminal")
-    spawn_pane "bottom" "fish" 25
+    winmux popup "sh hx-fzf.sh"
+    # spawn_pane "bottom" "sh hx-fzf.sh" 33 "true"
     ;;
   "open")
     gh browse $filename:$line_number  

@@ -137,13 +137,13 @@ e = ":sh hx-wezterm.sh explorer"
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
 [keys.normal.space.t]
-l = ":sh hx-wezterm.sh lazygit"
+l = ":sh winmux popup lazygit"
 
 [keys.normal.";"]
 b = ":sh hx-wezterm.sh blame"
 o = ":sh hx-wezterm.sh open"
-f = ":sh hx-wezterm.sh fzf"
-t = ":sh hx-wezterm.sh terminal"
+f = ":sh winmux popup \"sh hx-fzf.sh\""
+t = ":sh winmux sp fish"
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
 
 [keys.insert]
