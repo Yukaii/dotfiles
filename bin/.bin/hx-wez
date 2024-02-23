@@ -56,10 +56,10 @@ if [ "$program" = "hx" ]; then
     esac
   fi
   # noted: add a little whitespace to the end to workaround the issue that inserted a "j" at the end of line
-  echo ":open ${fpath}\r " | wezterm cli send-text --pane-id $pane_id --no-paste
+  echo -e ":open ${fpath}\r" | wezterm cli send-text --pane-id $pane_id --no-paste > /dev/null
 else
   # Start hx with the given file path in the specified pane
-  echo "hx ${fpath}" | wezterm cli send-text --pane-id $pane_id --no-paste
+  echo "hx ${fpath}" | wezterm cli send-text --pane-id $pane_id --no-paste > /dev/null
 fi
 
 # Activate the pane in the specified direction
