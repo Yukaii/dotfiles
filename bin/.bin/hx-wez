@@ -48,10 +48,10 @@ if [ "$program" = "hx" ]; then
   if [ -n "$split" ]; then
     case $split in
       v)
-        echo ":vs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
+        echo -e ":vs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
         ;;
       h)
-        echo ":hs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
+        echo -e ":hs\r" | wezterm cli send-text --pane-id $pane_id --no-paste
         ;;
     esac
   fi
