@@ -30,8 +30,6 @@ while [[ "$#" -gt 0 ]]; do
   esac
 done
 
-echo $fpath
-
 if [[ -z "$fpath" ]]; then
   echo "Error: File path is required."
   show_help
