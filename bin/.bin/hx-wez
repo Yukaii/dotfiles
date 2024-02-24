@@ -117,10 +117,6 @@ handle_tmux() {
     *) echo "Error: Invalid direction '$direction'." >&2; return 1;;
   esac
 
-  # Determine the split type based on the direction
-  local split_type="-h"
-  [[ "$direction" == "top" || "$direction" == "bottom" ]] && split_type="-v"
-
   # Calculate size based on percent for horizontal or vertical splits
   local size="$percent%"
 
