@@ -16,14 +16,13 @@ fi
 
 case $mode in
   tmux)
-    buffer_text=$(tmux capture-pane -p)
+    status_line=$(tmux capture-pane -p -t $TMUX_PANE | rg -e "(?:NORMAL|INSERT|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):*.*" -o --replace '$1 $2')
     ;;
   wezterm)
-    buffer_text=$(wezterm cli get-text)
+    status_line=$(wezterm cli get-text | rg -e "(?:NORMAL|INSERT|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):*.*" -o --replace '$1 $2')
     ;;
 esac
 
-status_line=$(echo $buffer_text | rg -e "(?:NORMAL|INSERT|SELECT)\s+[\x{2800}-\x{28FF}]*\s+(\S*)\s[^│]* (\d+):*.*" -o --replace '$1 $2')
 filename=$(echo $status_line | awk '{ print $1}')
 line_number=$(echo $status_line | awk '{ print $2}')
 
