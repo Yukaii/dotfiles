@@ -22,6 +22,7 @@ while [[ "$#" -gt 0 ]]; do
   case $1 in
     -m|--mode) mode="$2"; shift ;;
     -d|--direction) direction="$2"; shift ;;
+    -p|--percent) percent="$2"; shift ;;
     -s|--split) split="$2"; shift ;;
     -h|--help) show_help; exit 0 ;;
     -*) echo "Unknown option: $1" >&2; show_help; exit 1 ;;
@@ -99,10 +100,71 @@ handle_wezterm() {
   wezterm cli activate-pane-direction --pane-id $pane_id "$pane_direction"
 }
 
+handle_tmux() {
+  local direction split percent fpath
+  direction="$1"
+  split="$2"
+  percent="$3"
+  fpath="$4"
+
+  # Convert general direction to tmux's notion of direction
+  local tmux_direction
+  case "$direction" in
+    right) tmux_direction="right";;
+    left) tmux_direction="left";;
+    top) tmux_direction="top";;
+    bottom) tmux_direction="bottom";;
+    *) echo "Error: Invalid direction '$direction'." >&2; return 1;;
+  esac
+
+  # Determine the split type based on the direction
+  local split_type="-h"
+  [[ "$direction" == "top" || "$direction" == "bottom" ]] && split_type="-v"
+
+  # Calculate size based on percent for horizontal or vertical splits
+  local size="$percent%"
+
+  # Check if a new pane needs to be created
+  local pane_id=$(tmux list-panes -F '#{pane_title} #{pane_id}' | grep -E '^hx ' | grep -v "$TMUX_PANE" | awk '{ print $NF }')
+
+  if [ -n "$pane_id" ]; then
+    if [ -n "$split" ]; then
+      case $split in
+        v)
+          tmux send-keys -t "$pane_id" ":vs"
+          tmux send-keys -t "$pane_id" Enter
+          ;;
+        h)
+          tmux send-keys -t "$pane_id" ":hs"
+          tmux send-keys -t "$pane_id" Enter
+          ;;
+      esac
+    fi
+    # noted: add a little whitespace to the end to workaround the issue that inserted a "j" at the end of line
+    tmux send-keys -t "$pane_id" ":open ${fpath}"
+    tmux send-keys -t "$pane_id" Enter
+  else
+    if [ -n "$split" ]; then
+      case $split in
+        v)
+          winmux -p 80 vsp "hx ${fpath}"
+          ;;
+        h)
+          winmux sp "hx ${fpath}"
+          ;;
+      esac
+    else
+      winmux -p 80 vsp "hx ${fpath}"
+    fi
+  fi
+}
+
+
 # Main logic based on mode
 case $mode in
   tmux)
     # tmux specific logic
+    handle_tmux "$direction" "$split" "$percent"  "$fpath"
     ;;
   wezterm)
     # wezterm specific logic
