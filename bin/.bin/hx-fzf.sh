@@ -10,7 +10,7 @@ line_count=$(echo "$selected_files" | grep -c '^')
 if [ -n "$selected_files" ]; then
     if [ "$line_count" -eq "1" ]; then
         file=$(echo $selected_files | awk -F: '{print $1 ":" $2 ":" $3}')
-        hx-wez $file top
+        hx-wez -d top $file
     else
         qf_tmp=$(mktemp)
         echo "$selected_files" | awk -F: '{
@@ -20,6 +20,6 @@ if [ -n "$selected_files" ]; then
             }
             printf "\n"
         }' > "$qf_tmp"
-        wezterm cli split-pane --bottom --percent 25 -- hx "$qf_tmp"
+        winmux -p 25 sp "hx ${qf_tmp}"
     fi
 fi

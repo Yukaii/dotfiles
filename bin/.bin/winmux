@@ -61,14 +61,14 @@ tmux_vsp() {
     local cmd="$1"
     local size_option="$(tmux_size_option)"
 
-    tmux split-window -h $size_option "$cmd"
+    tmux split-window -v $size_option "$cmd"
 }
 
 tmux_sp() {
     local cmd="$1"
     local size_option="$(tmux_size_option)"
 
-    tmux split-window -v $size_option "$cmd"
+    tmux split-window -h $size_option "$cmd"
 }
 
 tmux_focus_left() {

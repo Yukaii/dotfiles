@@ -20,15 +20,17 @@ percent=80
 # Parse command-line options
 while [[ "$#" -gt 0 ]]; do
   case $1 in
-    -m|--mode) mode="$2"; shift ;;
-    -d|--direction) direction="$2"; shift ;;
-    -p|--percent) percent="$2"; shift ;;
-    -s|--split) split="$2"; shift ;;
+    -m|--mode) mode="$2"; shift 2 ;;
+    -d|--direction) direction="$2"; shift 2 ;;
+    -p|--percent) percent="$2"; shift 2 ;;
+    -s|--split) split="$2"; shift 2 ;;
     -h|--help) show_help; exit 0 ;;
     -*) echo "Unknown option: $1" >&2; show_help; exit 1 ;;
-    *) fpath="$1"; shift; break ;;
+    *) fpath="$1"; shift ;;
   esac
 done
+
+echo $fpath
 
 if [[ -z "$fpath" ]]; then
   echo "Error: File path is required."
@@ -143,6 +145,8 @@ handle_tmux() {
     # noted: add a little whitespace to the end to workaround the issue that inserted a "j" at the end of line
     tmux send-keys -t "$pane_id" ":open ${fpath}"
     tmux send-keys -t "$pane_id" Enter
+
+    tmux select-pane -t "$pane_id"
   else
     if [ -n "$split" ]; then
       case $split in
