@@ -5,5 +5,5 @@
 	path = alacritty/.config/alacritty/themes
 	url = https://github.com/alacritty/alacritty-theme
 [submodule "kakoune/.config/kak/kak-bundle"]
-	path = kakoune/.config/kak/kak-bundle
+	path = kakoune/.config/kak/bundle/kak-bundle
 	url = https://github.com/jdugan6240/kak-bundle
