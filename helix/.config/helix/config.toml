@@ -142,7 +142,7 @@ l = ":sh winmux popup lazygit > /dev/null"
 [keys.normal.";"]
 b = ":sh hx-wezterm.sh blame"
 o = ":sh hx-wezterm.sh open"
-f = ":sh winmux vsp hx-fzf.sh > /dev/null"
+f = ":sh winmux sp hx-fzf.sh > /dev/null"
 t = ":sh winmux sp fish > /dev/null"
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
 
