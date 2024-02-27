@@ -5,7 +5,7 @@ local tab_module = require 'tab';
 
 local default_color_scheme = "Kanagawa (Gogh)"
 local font_name = "JetbrainsMono Nerd Font"
-local color_scheme = "Kanagawa (Gogh)"
+local color_scheme = "Catppuccin Macchiato (Gogh)"
 
 
 -- available color schemes
@@ -13,6 +13,7 @@ local color_scheme = "Kanagawa (Gogh)"
 -- Ayu Mirage
 -- Flexoki Dark
 -- kanagawabones
+-- Kanagawa (Gogh)
 
 -- init colors variable
 local colors = color_scheme_module.getColorScheme(color_scheme, default_color_scheme)
