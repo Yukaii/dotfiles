@@ -22,3 +22,6 @@ tmux/.tmux/plugins/*
 tmux/.tmux/resurrect
 !tmux/.tmux/plugins/tpm
 
+kakoune/Library/Application Support/kak-tree-sitter/*
+!kakoune/Library/Application Support/kak-tree-sitter/config.toml
+kakoune/.config/kak/bundle/*
