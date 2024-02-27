@@ -2,6 +2,7 @@ evaluate-commands %sh{
   kks init
   cork init
   kak-lsp --kakoune -s $kak_session
+  kak-tree-sitter -dks --session $kak_session
 }
 
 # custom modules
@@ -10,8 +11,9 @@ source "%val{config}/wezterm.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
+# source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
-colorscheme kanagawa
+colorscheme catppuccin_macchiato
 
 set global indentwidth 2
 set global tabstop 2
