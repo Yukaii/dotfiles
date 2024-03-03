@@ -2,4 +2,4 @@
 
 read file
 
-hx-wez $file top
+hx-wez --direction top $file 
