@@ -53,6 +53,9 @@ set PATH $PATH "$HOME/Library/Python/3.8/bin"
 # mason
 set PATH $PATH "$HOME/.local/share/nvim/mason/bin"
 
+# gnu getopt
+fish_add_path /opt/homebrew/opt/gnu-getopt/bin
+
 set LANG "en_US.UTF-8"
 
 set -x PIPENV_SHELL_FANCY 1
