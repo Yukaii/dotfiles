@@ -1,0 +1,141 @@
+#!/bin/sh
+
+# Function definition
+wezl() {
+  # Define short and long options
+  SHORT_OPTS=hn:c:
+  LONG_OPTS=help,new-window,cwd:
+
+  # Use getopt to parse options
+  PARSED_OPTS=$(getopt -o "$SHORT_OPTS" -l "$LONG_OPTS" --name "$0" -- "$@")
+  if [ $? != 0 ]; then
+    # getopt has reported an error
+    exit 2
+  fi
+
+  # Reorder arguments as returned by getopt
+  eval set -- "$PARSED_OPTS"
+
+  # Initialize variables
+  new_window=0
+  cwd=$(pwd)
+
+  # Process parsed options
+  while true; do
+    case "$1" in
+      -h|--help)
+        echo "wezl - A simple layout manager for Wezterm."
+        echo
+        echo "Usage:"
+        echo "  wezl [OPTIONS] LAYOUT_STRING"
+        echo
+        echo "Options:"
+        echo "  -n, --new-window        Create layout in a new window"
+        echo "  -c, --cwd <DIRECTORY>   Specify the current working directory"
+        echo "  -h, --help              Show this help message"
+        echo
+        echo "Layout string syntax:"
+        echo "  |  - New tab"
+        echo "  /  - Vertical split"
+        echo "  =  - Horizontal split"
+        echo
+        echo "The layout string is executed in sequence, meaning each character is applied sequentially to create the desired layout."
+        echo
+        echo "Examples:"
+        echo "  wezl '||=//='"
+        echo "  wezl --new-window --cwd /path/to/directory '||=//='"
+        echo
+        echo "For the example given:"
+        echo
+        echo "Tab 1:"
+        echo
+        echo "+---------------------+"
+        echo "|        Pane 1       |"
+        echo "+---------------------+"
+        echo 
+        echo "Tab 2:"
+        echo 
+        echo "+---------------------+"
+        echo "|        Pane 2       |"
+        echo "+---------------------+"
+        echo "|          |    |  5  |"
+        echo "|  Pane 3  | 4  |-----|"
+        echo "|          |    |  6  |"
+        echo "+----------+----------+"
+        shift
+        return 0
+        ;;
+      -n|--new-window)
+        new_window=1
+        shift
+        ;;
+      -c|--cwd)
+        cwd=$(echo "$2" | xargs)  # Trim whitespace using xargs
+        if [ -z "$cwd" ]; then
+          echo "Please provide a directory after --cwd."
+          return 1
+        fi
+        shift 2
+        ;;
+      --)
+        shift
+        break
+        ;;
+      *)
+        echo "Programming error"
+        exit 3
+        ;;
+    esac
+  done
+
+  # Remaining arguments after options are processed
+  layout_string="$1"
+
+  if [ -z "$layout_string" ]; then
+    echo "Please provide a layout string."
+    return 1
+  fi
+
+  window_id=""
+  pane_id=""
+
+  # Split the layout string into characters
+  layout_string_chars=$(echo "$layout_string" | sed -e 's/\(.\)/\1\n/g')
+
+  # Process each symbol in the layout string
+  echo "$layout_string_chars" | while IFS= read -r symbol; do
+    case "$symbol" in
+      "|")
+        if [ -n "$window_id" ]; then
+          pane_id=$(wezterm cli spawn --window-id "$window_id" --cwd "$cwd")
+        else
+          if [ "$new_window" -eq 1 ]; then
+            pane_id=$(wezterm cli spawn --new-window --cwd "$cwd")
+            window_id=$(wezterm cli list --format json | jq -r ".[] | select(.pane_id == $pane_id) | .window_id")
+          else
+            pane_id=$WEZTERM_PANE
+            window_id=$(wezterm cli list --format json | jq -r ".[] | select(.pane_id == $pane_id) | .window_id")
+            # Create the first tab in the active window
+            pane_id=$(wezterm cli spawn --window-id "$window_id" --cwd "$cwd")
+          fi
+        fi
+        ;;
+      "/")
+        [ -z "$pane_id" ] && pane_id=$WEZTERM_PANE
+        pane_id=$(wezterm cli split-pane --pane-id "$pane_id" --right --percent 50 --cwd "$cwd")
+        ;;
+      "=")
+        [ -z "$pane_id" ] && pane_id=$WEZTERM_PANE
+        pane_id=$(wezterm cli split-pane --pane-id "$pane_id" --bottom --percent 50 --cwd "$cwd")
+        ;;
+      *)
+        echo "Unknown symbol in layout string: $symbol"
+        return 1
+        ;;
+    esac
+  done
+}
+
+# Call the function with all passed arguments
+wezl "$@"
+
