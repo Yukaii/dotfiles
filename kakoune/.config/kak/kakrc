@@ -206,3 +206,14 @@ cork surround "https://github.com/h-youhei/kakoune-surround" %{
   map global user s ':enter-user-mode surround<ret>' -docstring 'surround mode'
 }
 
+cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
+  # Set structured commit message options here
+  set-option global git_mode_use_structured_quick_commit true
+  set-option global git_mode_commit_prefixes 'feat::fix::docs::refactor::build::test::style::BREAKING CHANGE::'
+
+  # Declare git mode with default set of mappings
+  declare-git-mode
+
+  # Suggested user mode mapping
+  map global user g ': enter-user-mode git<ret>' -docstring "git mode"
+}
