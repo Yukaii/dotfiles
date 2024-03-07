@@ -80,10 +80,14 @@ define-command lazygit -hidden -docstring 'Launch lazygit' %{
 define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
 }
+define-command floating-terminal -hidden -docstring 'Launch floating terminal' %{ nop %sh{
+  tmux-popup
+}}
 
 map global terminal-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
 map global terminal-actions 'b' ':bottom-terminal<ret>' -docstring 'bottom terminal'
 map global terminal-actions 'B' ':open_blame<ret>' -docstring 'Git Blame'
+map global terminal-actions 'f' ':floating-terminal<ret>' -docstring 'Floating terminal'
 
 define-command -hidden open_blame %{
   terminal-vertical tig blame %val{buffile} "+%val{cursor_line}"

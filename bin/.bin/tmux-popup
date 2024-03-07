@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# Automatically fetch the current window ID and session name
+window_id=$(tmux display-message -p '#I')
+current_session_name=$(tmux display-message -p '#S')
+
+# Construct the unique session name with a "floating" suffix
+session_name="floating_${current_session_name}_${window_id}"
+
+startup_command="$1"
+
+# Check if the floating popup session already exists
+if tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux popup -w 90% -h 80% -E "bash -c \"tmux attach -t $session_name\""
+else
+    if [ -z "$startup_command" ]; then
+        # If no startup command is provided, just open a shell
+        tmux new-session -d -s "$session_name"
+    else
+        # If a startup command is provided, run it in the new session
+        tmux new-session -d -s "$session_name" "$startup_command"
+    fi
+    tmux popup -w 90% -h 80% -E "bash -c \"tmux attach -t $session_name\""  # Attach to the session in a popup
+fi
+
