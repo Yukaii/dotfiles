@@ -81,7 +81,7 @@ define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
 }
 define-command floating-terminal -hidden -docstring 'Launch floating terminal' %{ nop %sh{
-  tmux-popup
+  (tmux-popup &) >/dev/null 2>/dev/null
 }}
 
 map global terminal-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
