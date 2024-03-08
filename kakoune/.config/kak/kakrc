@@ -138,6 +138,7 @@ map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 declare-user-mode buffer-actions
 map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
+map global buffer-actions '.' ':enter-user-mode buffer-actions -lock<ret>' -docstring 'Lock'
 
 # kak-lsp
 hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml) %{
