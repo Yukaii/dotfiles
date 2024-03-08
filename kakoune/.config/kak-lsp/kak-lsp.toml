@@ -91,6 +91,12 @@ command = "helix-gpt"
 args = ["--logFile", "/tmp/kakoune-helix-gpt.log"]
 
 
+[language_server.typo]
+roots = [".git", ".hg"]
+filetypes = ["javascript", "typescript", "markdown", "python", "rust", "toml"]
+command = "typos-lsp"
+
+
 # [language_server.scls]
 # roots = [".git", ".hg"]
 # command = "simple-completion-language-server"
@@ -104,6 +110,6 @@ args = ["--logFile", "/tmp/kakoune-helix-gpt.log"]
 # feature_unicode_input = true  # enable "unicode input"
 
 # [language_server.scls.settings.environment]
-# RUST_LOG = "info,simple-completion-langauge-server=info"
+# RUST_LOG = "info,simple-completion-language-server=info"
 # LOG_FILE = "/tmp/completion.log"
 
