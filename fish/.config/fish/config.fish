@@ -79,7 +79,6 @@ alias preview="fzf --preview 'bat --color \"always\" {}'"
 alias du="ncdu --color dark -rr -x --exclude .git --exclude node_modules"
 alias pn="pnpm"
 alias ed="ed -p ':'"
-alias k="kks edit"
 alias ts='sesh connect $(sesh list | fzf)'
 # alias eza="ls"
 
@@ -266,7 +265,7 @@ alias scheme="rlwrap /usr/local/bin/scheme"
 set LESSOPEN "| /usr/local/bin/src-hilite-lesspipe.sh %s"
 set LESS '-R'
 
-set -g -x EDITOR "kak"
+set -g -x EDITOR "k"
 alias l='ls -alh'
 
 alias em="emacs -nw"
