@@ -15,10 +15,10 @@ if tmux has-session -t "$session_name" 2>/dev/null; then
 else
     if [ -z "$startup_command" ]; then
         # If no startup command is provided, just open a shell
-        tmux new-session -d -s "$session_name"
+        tmux new-session -d -s "$session_name" -c $PWD
     else
         # If a startup command is provided, run it in the new session
-        tmux new-session -d -s "$session_name" "$startup_command"
+        tmux new-session -d -s "$session_name" -c $PWD "$startup_command"
     fi
     tmux popup -w 90% -h 80% -E "bash -c \"tmux attach -t $session_name\""  # Attach to the session in a popup
 fi
