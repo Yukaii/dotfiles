@@ -32,6 +32,20 @@ set-option global grepcmd 'rg -Hn --no-heading --sort path --vimgrep'
 add-highlighter global/number-lines number-lines -hlcursor -relative
 add-highlighter global/ show-matching
 add-highlighter global/ wrap -word
+# add-highlighter global/todo-highlighter regex //\h*(TODO:)[^\n]* 0:cyan 1:yellow,red
+
+add-highlighter global/ regex \b(TODO|FIXME|NOTE)\b 0:default+rb
+
+# trailing whitespaces
+define-command -hidden show-trailing-whitespaces %{ try %{ add-highlighter global/trailing-whitespaces regex '\h+$' 0:default,red } }
+define-command -hidden hide-trailing-whitespaces %{ try %{ remove-highlighter global/trailing-whitespaces } }
+hook global WinDisplay .*              show-trailing-whitespaces
+hook global ModeChange 'insert:normal' show-trailing-whitespaces
+hook global ModeChange 'normal:insert' hide-trailing-whitespaces
+
+# Search highlight
+set-face global search +bu@MatchingChar
+add-highlighter global/search dynregex '%reg{/}' 0:search
 
 # comment
 map global user -docstring 'recent files'     '<space>' ': kks-connect terminal-popup kks-mru<ret>'
