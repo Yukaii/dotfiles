@@ -64,6 +64,7 @@ map global user h ':lsp-hover<ret>' -docstring 'lsp hover'
 map global user H ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
 map global user r ':edit <c-r>%<ret>' -docstring 'reload buffer'
 map global user S ':trim-trailing-whitespaces<ret>' -docstring 'trim trailing whitesapce'
+map global user w ':w<ret>' -docstring 'write file'
 
 define-command trim-trailing-whitespaces -docstring 'trim trailing whitespaces' %{
   try %{
