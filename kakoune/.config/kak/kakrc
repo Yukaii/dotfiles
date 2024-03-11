@@ -88,9 +88,11 @@ map global normal <c-e> ':execute-keys vj<ret>'  -docstring 'scroll oneline down
 map global normal <c-y> ':execute-keys vk<ret>'  -docstring 'scroll oneline down'
 
 declare-user-mode terminal-actions
-define-command lazygit -hidden -docstring 'Launch lazygit' %{
-  terminal-popup lazygit
-}
+
+define-command lazygit -hidden -docstring 'Launch lazygit' %{ nop %sh{
+  (tmux-popup lazygit &) >/dev/null 2>/dev/null
+}}
+
 
 define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
