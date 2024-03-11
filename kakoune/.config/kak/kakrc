@@ -80,6 +80,7 @@ map global user t ':enter-user-mode terminal-actions<ret>' -docstring 'terminal 
 map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
 map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'window actions'
 map global user b ':enter-user-mode buffer-actions<ret>' -docstring 'buffer actions'
+map global user B ':enter-user-mode buffer-actions -lock<ret>' -docstring 'buffer actions (Locked)'
 map global user l ':enter-user-mode lsp<ret>' -docstring 'lsp mode'
 
 # muscle memories
@@ -138,6 +139,8 @@ map global window-actions 'l' ':focus-right<ret>' -docstring 'focus right pane'
 declare-user-mode buffer-actions
 map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
+map global buffer-actions 'c' ':db<ret>' -docstring 'close buffer'
+map global buffer-actions 'l' ':b ' -docstring 'list buffer'
 map global buffer-actions '.' ':enter-user-mode buffer-actions -lock<ret>' -docstring 'Lock'
 
 # kak-lsp
