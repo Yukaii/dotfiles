@@ -10,6 +10,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
 tap "homebrew/services"
+tap "homeport/tap"
 tap "j178/tap"
 tap "jakehilborn/jakehilborn"
 tap "jandedobbeleer/oh-my-posh"
@@ -45,11 +46,11 @@ brew "giflib"
 brew "libpng"
 brew "little-cms2"
 brew "jpeg-xl"
+brew "aom"
 brew "openssl@3"
 brew "python@3.11"
 brew "asciinema"
 brew "glib"
-brew "pkg-config"
 brew "at-spi2-core"
 brew "atuin"
 brew "autoconf"
@@ -76,6 +77,7 @@ brew "harfbuzz"
 brew "pango"
 brew "librsvg"
 brew "chafa"
+brew "openjdk"
 brew "clojurescript"
 brew "cmatrix"
 brew "code-minimap"
@@ -100,6 +102,7 @@ brew "gnutls"
 brew "openjpeg"
 brew "leptonica"
 brew "libass"
+brew "libssh"
 brew "sdl2"
 brew "srt"
 brew "tesseract"
@@ -127,6 +130,7 @@ brew "gpgme"
 brew "gnu-getopt"
 brew "gnu-sed"
 brew "go"
+brew "pkg-config"
 brew "gobject-introspection"
 brew "gping"
 brew "netpbm"
@@ -145,7 +149,6 @@ brew "inlets"
 brew "iodine"
 brew "jadx"
 brew "jj"
-brew "openjdk@17"
 brew "jmeter"
 brew "jpeg", link: true
 brew "jq"
@@ -157,7 +160,6 @@ brew "lf"
 brew "libfido2"
 brew "libpq"
 brew "libretls"
-brew "libssh"
 brew "libyaml"
 brew "python-tabulate"
 brew "litecli"
@@ -171,7 +173,7 @@ brew "micro"
 brew "mongosh"
 brew "mprocs"
 brew "mycli"
-brew "mysql", restart_service: true
+brew "mysql"
 brew "ncdu"
 brew "neofetch"
 brew "notmuch"
@@ -189,6 +191,7 @@ brew "numbat"
 brew "nyancat"
 brew "oh-my-posh"
 brew "onefetch"
+brew "openjdk@17"
 brew "pandoc"
 brew "pgcli"
 brew "pinentry-mac"
@@ -209,6 +212,7 @@ brew "qt@5"
 brew "redis", restart_service: true
 brew "ripgrep"
 brew "rust"
+brew "sad"
 brew "silicon"
 brew "sl"
 brew "slides"
@@ -236,6 +240,7 @@ brew "vifm"
 brew "vis"
 brew "w3m"
 brew "wakatime-cli"
+brew "walk"
 brew "wget"
 brew "wtfutil"
 brew "xcodegen"
@@ -250,6 +255,7 @@ brew "cloudflare/cloudflare/cloudflared", link: false
 brew "dopplerhq/cli/doppler", link: false
 brew "hashicorp/tap/terraform"
 brew "heroku/brew/heroku"
+brew "homeport/tap/termshot"
 brew "jakehilborn/jakehilborn/displayplacer"
 brew "jesseduffield/lazydocker/lazydocker"
 brew "jesseduffield/lazygit/lazygit"
@@ -339,6 +345,55 @@ cask "welly"
 cask "wezterm-nightly"
 cask "whisky"
 cask "yacreader"
+mas "1Password 7", id: 1333542190
+mas "Actions", id: 1586435171
+mas "Amphetamine", id: 937984704
+mas "Bear", id: 1091189122
+mas "Bitwarden", id: 1352778147
+mas "Color Picker", id: 1545870783
+mas "ColorSlurp", id: 1287239339
+mas "Controlly", id: 1548544614
+mas "Craft", id: 1487937127
+mas "Dato", id: 1470584107
+mas "Effekt", id: 1616146386
+mas "Eye Monitor", id: 1527031341
+mas "Focalboard", id: 1556908618
+mas "Gifski", id: 1351639930
+mas "Helium", id: 1054607607
+mas "Hidden Bar", id: 1452453066
+mas "Instapaper", id: 288545208
+mas "Irvue", id: 1039633667
+mas "Keynote", id: 409183694
+mas "KeyPad", id: 1491684442
+mas "LINE", id: 539883307
+mas "Medis", id: 1579200037
+mas "MenubarX", id: 1575588022
+mas "Messenger", id: 1480068668
+mas "Microsoft To Do", id: 1274495053
+mas "Muse", id: 1501563902
+mas "NextDNS", id: 1464122853
+mas "Numbers", id: 409203825
+mas "Pages", id: 409201541
+mas "Pandan", id: 1569600264
+mas "Pixea", id: 1507782672
+mas "Plash", id: 1494023538
+mas "Poolsuite FM", id: 1514817810
+mas "Quiver", id: 866773894
+mas "Refined GitHub", id: 1519867270
+mas "RunCat", id: 1429033973
+mas "Simplenote", id: 692867256
+mas "Slack", id: 803453959
+mas "Spark", id: 1176895641
+mas "Tailscale", id: 1475387142
+mas "Telegram", id: 747648890
+mas "TestFlight", id: 899247664
+mas "The Unarchiver", id: 425424353
+mas "TickTick", id: 966085870
+mas "Typeeto", id: 970502923
+mas "UTM", id: 1538878817
+mas "waifu2x", id: 1286485858
+mas "WireGuard", id: 1451685025
+mas "Xcode", id: 497799835
 vscode "aaron-bond.better-comments"
 vscode "alefragnani.bookmarks"
 vscode "alexkrechik.cucumberautocomplete"
@@ -462,7 +517,6 @@ vscode "vitest.explorer"
 vscode "vivaxy.vscode-conventional-commits"
 vscode "vsls-contrib.gistfs"
 vscode "vue.volar"
-vscode "vue.vscode-typescript-vue-plugin"
 vscode "waderyan.babelrc"
 vscode "wakatime.vscode-wakatime"
 vscode "xabikos.javascriptsnippets"
