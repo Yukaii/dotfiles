@@ -16,6 +16,11 @@
 # }
 
 preview_cmd="bat --color=always --line-range=:500"
+pwd=$(echo $PWD | sed 's|/|-|g')
+mru=~/.cache/kak-mru-"$pwd"
+
+
+[ ! -f "$mru" ] && touch "$mru"
 
 (fzf --height 100% --prompt 'mru> ' --preview "$preview_cmd {}" |
-	xargs -r kks edit) < ~/.cache/kak-mru
+	xargs -r kks edit) < "$mru"

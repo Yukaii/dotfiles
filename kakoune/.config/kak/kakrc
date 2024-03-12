@@ -191,9 +191,17 @@ hook global BufOpenFile .* %{
     }
 }
 
-hook global BufCreate [^*].* %{
-    nop %sh{
-        mru=~/.cache/kak-mru
+hook global WinDisplay [^*].* %{
+    evaluate-commands nop %sh{
+        pwd="${kak_client_env_PWD}"
+        mru=~/.cache/kak-mru-$(echo $pwd | sed 's|/|-|g')
+
+        # If pwd is empty, return early
+        [ -z "$pwd" ] && exit
+
+        # Check if the mru file does not exist and create it
+        [ ! -f "$mru" ] && touch "$mru"
+
         echo "$kak_buffile" | awk '!seen[$0]++' - "$mru" | sponge "$mru"
     }
 }
