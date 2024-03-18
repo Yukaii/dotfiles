@@ -1,5 +1,5 @@
-# theme = "catppuccin_macchiato"
-theme = "kanagawa"
+theme = "catppuccin_macchiato"
+# theme = "kanagawa"
 
 [editor]
 true-color = true
