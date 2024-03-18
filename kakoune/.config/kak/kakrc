@@ -250,3 +250,7 @@ cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
   # Suggested user mode mapping
   map global user g ': enter-user-mode git<ret>' -docstring "git mode"
 }
+
+cork ui 'https://github.com/kkga/ui.kak' %{
+  map global user u ': enter-user-mode ui<ret>' -docstring "ui mode"
+}
