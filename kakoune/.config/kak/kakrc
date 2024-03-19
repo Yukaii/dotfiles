@@ -249,4 +249,9 @@ cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
 
 cork ui 'https://github.com/kkga/ui.kak' %{
   map global user u ': enter-user-mode ui<ret>' -docstring "ui mode"
+
+  hook global WinCreate .* %{
+    ui-matching-toggle
+    ui-search-toggle
+  }
 }
