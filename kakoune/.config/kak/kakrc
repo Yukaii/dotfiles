@@ -43,10 +43,6 @@ hook global WinDisplay .*              show-trailing-whitespaces
 hook global ModeChange 'insert:normal' show-trailing-whitespaces
 hook global ModeChange 'normal:insert' hide-trailing-whitespaces
 
-# Search highlight
-set-face global search +bu@MatchingChar
-add-highlighter global/search dynregex '%reg{/}' 0:search
-
 # comment
 map global user -docstring 'recent files'     '<space>' ': kks-connect terminal-popup kks-mru<ret>'
 map global user n ':e -scratch<ret>' -docstring 'create buffer'
