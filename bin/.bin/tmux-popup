@@ -8,7 +8,8 @@ current_session_name=$(tmux display-message -p '#S')
 parent_session_dir=$(tmux display-message -p -F "#{pane_current_path}" -t0)
 
 # Construct the unique session name with a "floating" suffix
-session_name="floating_${current_session_name}_${window_id}"
+# session_name="floating_${current_session_name}_${window_id}"
+session_name="floating_${current_session_name}"
 
 startup_command="$1"
 
