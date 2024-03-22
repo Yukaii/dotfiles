@@ -9,7 +9,7 @@ local color_scheme = "Catppuccin Macchiato (Gogh)"
 
 
 -- available color schemes
--- Catppuccino Macchiato
+-- Catppuccin Macchiato (Gogh)
 -- Ayu Mirage
 -- Flexoki Dark
 -- kanagawabones
