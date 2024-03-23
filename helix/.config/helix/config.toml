@@ -137,7 +137,8 @@ e = ":sh hx-wezterm.sh explorer"
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
 [keys.normal.space.t]
-l = ":sh winmux popup lazygit > /dev/null"
+l = ":sh tmux-popup lazygit"
+f = ":sh tmux-popup"
 
 [keys.normal.";"]
 b = ":sh hx-wezterm.sh blame"
