@@ -255,3 +255,33 @@ cork ui 'https://github.com/kkga/ui.kak' %{
     ui-search-toggle
   }
 }
+
+cork yummy 'https://github.com/Hjagu09/yummy.kak' %{
+  # require-module yummy_devs_config
+  # yummy-enable
+}
+
+cork distraction_free 'https://github.com/TeddyDD/distraction-free.kak' %{
+}
+
+cork pokemon 'https://github.com/vbauerster/kakoune-pokemon' %{
+  map global user o ': enter-user-mode pokemon<ret>' -docstring "Enter pokemon mode"
+
+  map global pokemon l ':pokemon-list<ret>' -docstring "List pokemon"
+  map global pokemon a ':pokemon-add<ret>' -docstring "add pokemon"
+
+  map global pokemon 1 ':pokemon-open 1<ret>'
+  map global pokemon 2 ':pokemon-open 2<ret>'
+  map global pokemon 3 ':pokemon-open 3<ret>'
+  map global pokemon 4 ':pokemon-open 4<ret>'
+  map global pokemon 5 ':pokemon-open 5<ret>'
+  map global pokemon 6 ':pokemon-open 6<ret>'
+  map global pokemon 7 ':pokemon-open 7<ret>'
+  map global pokemon 8 ':pokemon-open 8<ret>'
+  map global pokemon 9 ':pokemon-open 9<ret>'
+}
+
+cork slpash 'https://github.com/Hjagu09/splash.kak'
+
+cork live_grep 'https://github.com/raiguard/kak-live-grep'
+cork grep-write https://github.com/JacobTravers/grep-write.kak
