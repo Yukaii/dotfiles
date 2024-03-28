@@ -62,6 +62,7 @@ set -x PIPENV_SHELL_FANCY 1
 set -x PIPENV_IGNORE_VIRTUALENVS 1
 
 set --export FZF_DEFAULT_OPTS '--no-height --no-reverse --marker=+ --margin=1,3 --bind ctrl-y:preview-up,ctrl-e:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down,ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down,shift-up:preview-top,shift-down:preview-bottom,alt-up:half-page-up,alt-down:half-page-down'
+set --export SKIM_DEFAULT_OPTIONS '--no-height --margin=1,3 --bind ctrl-y:preview-up,ctrl-e:preview-down,ctrl-b:preview-page-up,ctrl-f:preview-page-down,ctrl-u:preview-half-page-up,ctrl-d:preview-half-page-down,shift-up:preview-top,shift-down:preview-bottom,alt-up:half-page-up,alt-down:half-page-down'
 
 set --export FZF_DEFAULT_COMMAND 'rg --hidden -l ""'
 
