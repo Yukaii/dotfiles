@@ -293,7 +293,7 @@ cork pokemon 'https://github.com/vbauerster/kakoune-pokemon' %{
   map global pokemon 9 ':pokemon-open 9<ret>'
 }
 
-cork live_grep 'https://github.com/Yukaii/kak-live-grep' %{
+cork live_grep 'https://github.com/raiguard/kak-live-grep' %{
   map global find-actions -docstring 'live grep'   '/' ':live-grep<ret>'
 }
 cork grep-write https://github.com/JacobTravers/grep-write.kak %{
