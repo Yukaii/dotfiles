@@ -300,3 +300,5 @@ cork grep-write https://github.com/JacobTravers/grep-write.kak %{
 cork replace-mode https://github.com/tomKPZ/replace-mode.kak %{
   map global user r ':enter-user-mode replace<ret>' -docstring 'replace mode'
 }
+
+cork filetree https://github.com/occivink/kakoune-filetree
