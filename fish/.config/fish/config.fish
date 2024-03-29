@@ -55,6 +55,8 @@ set PATH $PATH "$HOME/.local/share/nvim/mason/bin"
 
 # gnu getopt
 fish_add_path /opt/homebrew/opt/gnu-getopt/bin
+# gnu make
+fish_add_path /opt/homebrew/opt/make/libexec/gnubin
 
 set LANG "en_US.UTF-8"
 
