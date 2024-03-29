@@ -11,6 +11,7 @@ source "%val{config}/wezterm.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
+source "%val{config}/ssh.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
 colorscheme catppuccin_macchiato
