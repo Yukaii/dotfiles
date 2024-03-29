@@ -117,6 +117,16 @@ define-command -hidden browse_github %{
     gh browse "$kak_bufname:$kak_cursor_line"
  }}
 
+# https://github.com/hadronized/config/blob/a1142ef783da4a1fd09b5d14f6f1234243304a18/kak/kakrc#L462C1-L469C2
+# experiment around ! and buffer-based interactive shells
+define-command -override run -shell-completion -params .. -docstring 'run command' %{
+  # this is not strictly needed on every run, but it’s easier for this experiment
+  set-option buffer filetype sh
+  execute-keys -draft "gjo# %sh{date} %sh{pwd}<ret>"
+  execute-keys -draft "gji# %arg{@}<ret>"
+  execute-keys "gj!%arg{@}<ret>"
+}
+
 
 declare-user-mode find-actions
 map global find-actions 'B' ':open_buffer_picker<ret>' -docstring 'pick buffer'
