@@ -12,6 +12,7 @@ source "%val{config}/tmux.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/ssh.kak"
+source "%val{config}/highlight.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
 colorscheme catppuccin_macchiato
@@ -225,6 +226,22 @@ hook global BufCreate .*\.tmux.conf %{
 }
 
 
+# Switch cursor color in insert mode
+# ──────────────────────────────────
+
+set-face global InsertCursor default,green+B
+
+hook global ModeChange .*:.*:insert %{
+    set-face window PrimaryCursor InsertCursor
+    set-face window PrimaryCursorEol InsertCursor
+}
+
+hook global ModeChange .*:insert:.* %{ try %{
+    unset-face window PrimaryCursor
+    unset-face window PrimaryCursorEol
+} }
+
+
 # Plugins
 cork smarttab "https://github.com/andreyorst/smarttab.kak"
 
@@ -306,3 +323,4 @@ cork replace-mode https://github.com/tomKPZ/replace-mode.kak %{
 }
 
 cork filetree https://github.com/occivink/kakoune-filetree
+
