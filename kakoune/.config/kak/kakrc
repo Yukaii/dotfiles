@@ -293,21 +293,23 @@ cork yummy 'https://github.com/Hjagu09/yummy.kak' %{
 cork distraction_free 'https://github.com/TeddyDD/distraction-free.kak' %{
 }
 
-cork pokemon 'https://github.com/vbauerster/kakoune-pokemon' %{
-  map global user o ': enter-user-mode pokemon<ret>' -docstring "Enter pokemon mode"
+cork harpoon 'https://github.com/raiguard/kak-harpoon' %{
+  declare-user-mode harpoon
+  map global user o ': enter-user-mode harpoon<ret>' -docstring "Enter harpoon mode"
 
-  map global pokemon l ':pokemon-list<ret>' -docstring "List pokemon"
-  map global pokemon a ':pokemon-add<ret>' -docstring "add pokemon"
+  map global harpoon l ':harpoon-show-list<ret>' -docstring "List harpoon"
+  map global harpoon a ':harpoon-add<ret>' -docstring "add harpoon"
 
-  map global pokemon 1 ':pokemon-open 1<ret>'
-  map global pokemon 2 ':pokemon-open 2<ret>'
-  map global pokemon 3 ':pokemon-open 3<ret>'
-  map global pokemon 4 ':pokemon-open 4<ret>'
-  map global pokemon 5 ':pokemon-open 5<ret>'
-  map global pokemon 6 ':pokemon-open 6<ret>'
-  map global pokemon 7 ':pokemon-open 7<ret>'
-  map global pokemon 8 ':pokemon-open 8<ret>'
-  map global pokemon 9 ':pokemon-open 9<ret>'
+  map global harpoon 1 ':harpoon-nav 1<ret>'
+  map global harpoon 2 ':harpoon-nav 2<ret>'
+  map global harpoon 3 ':harpoon-nav 3<ret>'
+  map global harpoon 4 ':harpoon-nav 4<ret>'
+  map global harpoon 5 ':harpoon-nav 5<ret>'
+  map global harpoon 6 ':harpoon-nav 6<ret>'
+  map global harpoon 7 ':harpoon-nav 7<ret>'
+  map global harpoon 8 ':harpoon-nav 8<ret>'
+  map global harpoon 9 ':harpoon-nav 9<ret>'
+
 }
 
 cork live_grep 'https://github.com/raiguard/kak-live-grep' %{
