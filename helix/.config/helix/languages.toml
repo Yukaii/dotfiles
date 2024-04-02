@@ -45,6 +45,12 @@ feature_unicode_input = true  # enable "unicode input"
 RUST_LOG = "info,simple-completion-langauge-server=info"
 LOG_FILE = "/tmp/completion.log"
 
+[language-server.crystal]
+filetypes = ["crystal"]
+command = "crystalline"
+args = ["--stdio"]
+
+
 [[language]]
 name = "git-commit"
 language-servers = [ "scls", "gpt" ]
@@ -103,3 +109,7 @@ language-servers = [ "vscode-css-language-server", "gpt", "scls"]
 [[language]]
 name = "toml"
 language-servers = ["gpt", "scls"]
+
+[[language]]
+name = "crystal"
+language-servers = ["crystal"]
