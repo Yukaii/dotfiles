@@ -96,6 +96,12 @@ roots = [".git", ".hg"]
 filetypes = ["javascript", "typescript", "markdown", "python", "rust", "toml"]
 command = "typos-lsp"
 
+[language_server.crystalline]
+roots = ["shard.yml"]
+filetypes = ["crystal"]
+command = "crystalline"
+args = ["--stdio"]
+
 
 # [language_server.scls]
 # roots = [".git", ".hg"]
