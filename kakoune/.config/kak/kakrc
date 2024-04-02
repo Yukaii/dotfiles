@@ -11,7 +11,6 @@ source "%val{config}/wezterm.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
-source "%val{config}/ssh.kak"
 source "%val{config}/highlight.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
@@ -324,3 +323,4 @@ cork replace-mode https://github.com/tomKPZ/replace-mode.kak %{
 
 cork filetree https://github.com/occivink/kakoune-filetree
 
+cork sshconfig https://github.com/Yukaii/ssh-config.kak
