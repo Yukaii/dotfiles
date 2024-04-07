@@ -86,6 +86,9 @@ map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'win
 
 # Normal mode commands
 map global normal X ':execute-keys xH<ret>' -docstring 'Select till line end'
+# Move line up/down
+map global normal '<a-up>' 'x"aZy<a-;>kPZ"azdz'
+map global normal '<a-down>' 'xdp'
 
 declare-user-mode terminal-actions
 
