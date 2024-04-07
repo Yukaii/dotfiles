@@ -335,3 +335,9 @@ cork case https://gitlab.com/FlyingWombat/case.kak %{
 }
 
 cork vue https://github.com/ABuffSeagull/kakoune-vue
+
+cork kak-jsts https://github.com/schemar/kak-jsts %{
+    declare-user-mode format
+    map global user F ':enter-user-mode format<ret>' -docstring 'Enter format mode'
+    map global format p ':format-prettier<ret>' -docstring 'Format with prettier'
+}
