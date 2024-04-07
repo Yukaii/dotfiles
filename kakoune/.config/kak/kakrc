@@ -333,3 +333,5 @@ cork sshconfig https://github.com/Yukaii/ssh-config.kak
 cork case https://gitlab.com/FlyingWombat/case.kak %{
   map global normal ` ': enter-user-mode case<ret>'
 }
+
+cork vue https://github.com/ABuffSeagull/kakoune-vue
