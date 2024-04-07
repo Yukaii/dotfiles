@@ -329,3 +329,7 @@ cork replace-mode https://github.com/tomKPZ/replace-mode.kak %{
 cork filetree https://github.com/occivink/kakoune-filetree
 
 cork sshconfig https://github.com/Yukaii/ssh-config.kak
+
+cork case https://gitlab.com/FlyingWombat/case.kak %{
+  map global normal ` ': enter-user-mode case<ret>'
+}
