@@ -1,5 +1,29 @@
 #!/bin/bash
 
+display_help() {
+    echo "Usage: $0 [STARTUP_COMMAND]"
+    echo
+    echo "This script creates a new tmux session in a floating popup window."
+    echo "If a startup command is provided, it will be executed in the new session."
+    echo
+    echo "Options:"
+    echo "  -h, --help    Display this help message and exit"
+    echo
+    echo "Arguments:"
+    echo "  STARTUP_COMMAND    Optional command to run in the new session"
+    echo
+    echo "If no startup command is provided, the script will open a new shell in the floating session."
+    echo "If the floating session already exists, the script will attach to it."
+    echo "If a startup command is provided and the process is already running in the session,"
+    echo "the script will switch to the corresponding window."
+}
+
+# Check if help option is provided
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    display_help
+    exit 0
+fi
+
 # Automatically fetch the current window ID and session name
 window_id=$(tmux display-message -p '#I')
 current_session_name=$(tmux display-message -p '#S')
@@ -9,7 +33,6 @@ parent_session_dir=$(tmux display-message -p -F "#{pane_current_path}" -t0)
 
 # Construct the unique session name with a "floating" suffix
 session_name="floating_${current_session_name}_${window_id}"
-# session_name="floating_${current_session_name}"
 
 startup_command="$1"
 
