@@ -7,6 +7,26 @@ generate_cache_file() {
     echo "$cache_file"
 }
 
+# Function to display help information
+display_help() {
+    echo "Usage: $0 [OPTIONS] [DIRECTORY]"
+    echo
+    echo "Perform an ncdu scan on the specified directory and generate a cache file."
+    echo "If no directory is provided, the current directory will be scanned."
+    echo
+    echo "Options:"
+    echo "  --view           View the existing cache file instead of performing a new scan."
+    echo "  --exclude <path> Exclude the specified path from the scan. Can be used multiple times."
+    echo "  --help           Display this help information."
+    echo
+    echo "Examples:"
+    echo "  $0                              # Scan the current directory"
+    echo "  $0 /path/to/directory           # Scan the specified directory"
+    echo "  $0 --view                       # View the cache file for the current directory"
+    echo "  $0 --exclude /path/to/exclude   # Exclude a specific path from the scan"
+    echo
+}
+
 # Parse command line options
 view_cache=false
 scan_dir="$(pwd)"
@@ -27,6 +47,10 @@ while [[ $# -gt 0 ]]; do
                 echo "Error: --exclude option requires an argument"
                 exit 1
             fi
+            ;;
+        --help)
+            display_help
+            exit 0
             ;;
         *)
             scan_dir="$1"
