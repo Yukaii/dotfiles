@@ -2,7 +2,8 @@ evaluate-commands %sh{
   kks init
   cork init
   kak-lsp --kakoune -s $kak_session
-  kak-tree-sitter -dks --session $kak_session
+  # kak-tree-sitter -dks --session $kak_session
+  # hop-kak --init
 }
 
 # custom modules
@@ -14,7 +15,7 @@ source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
-colorscheme catppuccin_macchiato
+colorscheme kanagawa
 
 set global indentwidth 2
 set global tabstop 2
@@ -337,7 +338,13 @@ cork case https://gitlab.com/FlyingWombat/case.kak %{
 cork vue https://github.com/ABuffSeagull/kakoune-vue
 
 cork kak-jsts https://github.com/schemar/kak-jsts %{
-    declare-user-mode format
-    map global user F ':enter-user-mode format<ret>' -docstring 'Enter format mode'
-    map global format p ':format-prettier<ret>' -docstring 'Format with prettier'
+  declare-user-mode format
+  map global user F ':enter-user-mode format<ret>' -docstring 'Enter format mode'
+  map global format p ':format-prettier<ret>' -docstring 'Format with prettier'
+  map global format e ':format-eslint<ret>' -docstring 'Format with eslint'
 }
+
+# cork easymotion https://git.sr.ht/~voroskoi/easymotion.kak %{
+#   require-module easymotion
+#   map global user ';' ': enter-user-mode easymotion<ret>' -docstring 'Enter easymotion mode'
+# }
