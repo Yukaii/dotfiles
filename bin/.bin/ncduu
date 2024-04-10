@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Function to generate a dynamic cache file name based on the scanning directory
+generate_cache_file() {
+    local scan_dir="$1"
+    local cache_file="/tmp/ncdu_$(echo "$scan_dir" | tr '/' '_').cache"
+    echo "$cache_file"
+}
+
+# Parse command line options
+view_cache=false
+scan_dir="$(pwd)"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --view)
+            view_cache=true
+            shift
+            ;;
+        *)
+            scan_dir="$1"
+            shift
+            ;;
+    esac
+done
+
+# Generate the cache file name
+cache_file="$(generate_cache_file "$scan_dir")"
+
+if [[ "$view_cache" == true ]]; then
+    # View the existing cache file
+    if [[ -f "$cache_file" ]]; then
+        cat "$cache_file" | ncdu -f- --enable-refresh
+    else
+        echo "Cache file not found: $cache_file"
+    fi
+else
+    # Perform the scan and generate the cache file
+    if [[ "$scan_dir" == "$HOME" ]]; then
+        ncdu -o- --exclude "$HOME/Library/Mobile Documents/" --exclude "$HOME/Documents" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
+    else
+        ncdu -o- "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
+    fi
+fi
+
