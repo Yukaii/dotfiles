@@ -10,12 +10,23 @@ generate_cache_file() {
 # Parse command line options
 view_cache=false
 scan_dir="$(pwd)"
+exclude_options=()
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --view)
             view_cache=true
             shift
+            ;;
+        --exclude)
+            if [[ $# -gt 1 ]]; then
+                exclude_options+=("--exclude")
+                exclude_options+=("$2")
+                shift 2
+            else
+                echo "Error: --exclude option requires an argument"
+                exit 1
+            fi
             ;;
         *)
             scan_dir="$1"
@@ -37,9 +48,8 @@ if [[ "$view_cache" == true ]]; then
 else
     # Perform the scan and generate the cache file
     if [[ "$scan_dir" == "$HOME" ]]; then
-        ncdu -o- --exclude "$HOME/Library/Mobile Documents/" --exclude "$HOME/Documents" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
+        ncdu -o- --exclude "$HOME/Library/Mobile Documents/" --exclude "$HOME/Documents" "${exclude_options[@]}" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
     else
-        ncdu -o- "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
+        ncdu -o- "${exclude_options[@]}" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
     fi
 fi
-
