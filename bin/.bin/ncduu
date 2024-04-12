@@ -15,20 +15,23 @@ display_help() {
     echo "If no directory is provided, the current directory will be scanned."
     echo
     echo "Options:"
-    echo "  --view           View the existing cache file instead of performing a new scan."
-    echo "  --exclude <path> Exclude the specified path from the scan. Can be used multiple times."
-    echo "  --help           Display this help information."
+    echo "  --view             View the existing cache file instead of performing a new scan."
+    echo "  --exclude <path>   Exclude the specified path from the scan. Can be used multiple times."
+    echo "  --enable-delete    Enable the delete functionality in ncdu."
+    echo "  --help             Display this help information."
     echo
     echo "Examples:"
     echo "  $0                              # Scan the current directory"
     echo "  $0 /path/to/directory           # Scan the specified directory"
     echo "  $0 --view                       # View the cache file for the current directory"
     echo "  $0 --exclude /path/to/exclude   # Exclude a specific path from the scan"
+    echo "  $0 --enable-delete              # Enable the delete functionality in ncdu"
     echo
 }
 
 # Parse command line options
 view_cache=false
+enable_delete=false
 scan_dir="$(pwd)"
 exclude_options=()
 
@@ -48,6 +51,10 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;
+        --enable-delete)
+            enable_delete=true
+            shift
+            ;;
         --help)
             display_help
             exit 0
@@ -65,15 +72,15 @@ cache_file="$(generate_cache_file "$scan_dir")"
 if [[ "$view_cache" == true ]]; then
     # View the existing cache file
     if [[ -f "$cache_file" ]]; then
-        cat "$cache_file" | ncdu -f- --enable-refresh
+        cat "$cache_file" | ncdu -f- --enable-refresh ${enable_delete:+--enable-delete}
     else
         echo "Cache file not found: $cache_file"
     fi
 else
     # Perform the scan and generate the cache file
     if [[ "$scan_dir" == "$HOME" ]]; then
-        ncdu -o- --exclude "$HOME/Library/Mobile Documents/" --exclude "$HOME/Documents" "${exclude_options[@]}" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
+        ncdu -o- --exclude "$HOME/Library/Mobile Documents/" --exclude "$HOME/Documents" "${exclude_options[@]}" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh ${enable_delete:+--enable-delete}
     else
-        ncdu -o- "${exclude_options[@]}" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh
+        ncdu -o- "${exclude_options[@]}" "$scan_dir" | tee "$cache_file" | ncdu -f- --enable-refresh ${enable_delete:+--enable-delete}
     fi
 fi
