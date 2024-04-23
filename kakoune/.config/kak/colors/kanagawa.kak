@@ -1,7 +1,6 @@
 # Kanagawa theme for Kakoune
 
 # Color palette
-# declare-option str black 'rgb:0a0e14'
 declare-option str black default
 declare-option str dark 'rgb:090618'
 declare-option str gray 'rgb:727169'
@@ -26,9 +25,7 @@ declare-option str background %opt{black}
 declare-option str dimmed_background %opt{gray}
 declare-option str foreground %opt{white}
 
-# Reference
-# https://github.com/mawww/kakoune/blob/master/colors/default.kak
-# For code
+# Code
 set-face global value "%opt{yellow}"
 set-face global type "%opt{cyan}"
 set-face global variable "%opt{yellow}"
@@ -47,7 +44,7 @@ set-face global comment "%opt{gray}+i"
 set-face global meta "%opt{aqua}"
 set-face global builtin "%opt{cyan}+b"
 
-# For markup
+# Markup
 set-face global title "%opt{pink}"
 set-face global header "%opt{orange}"
 set-face global bold "%opt{pink}"
@@ -60,7 +57,6 @@ set-face global list "%opt{white}"
 
 # Builtin faces
 set-face global Default "%opt{white},%opt{black}"
-# set-face global Default "%opt{white},default"
 set-face global PrimarySelection "default,%opt{psel}"
 set-face global SecondarySelection "default,%opt{ssel}"
 set-face global PrimaryCursor "%opt{dark},%opt{cyan}"
@@ -85,3 +81,78 @@ set-face global MatchingChar "%opt{blue},%opt{black}"
 set-face global Whitespace "%opt{dimgray},%opt{black}+f"
 set-face global WrapMarker Whitespace
 set-face global BufferPadding "%opt{black},%opt{black}"
+
+# Tree-sitter
+set-face global ts_attribute "%opt{blue_green}"
+set-face global ts_comment "%opt{gray}+i"
+set-face global ts_conceal "%opt{pink}"
+set-face global ts_constant "%opt{yellow}"
+set-face global ts_constant_builtin_boolean "%opt{blue}+b"
+set-face global ts_constant_character "%opt{orange}+b"
+set-face global ts_constant_macro "%opt{purple}+b"
+set-face global ts_constructor "%opt{cyan}"
+set-face global ts_diff_plus "%opt{green}+b"
+set-face global ts_diff_minus "%opt{red}+b"
+set-face global ts_diff_delta "%opt{blue}"
+set-face global ts_diff_delta_moved "%opt{aqua}+i"
+set-face global ts_error "%opt{red}"
+set-face global ts_function "%opt{blue}"
+set-face global ts_function_builtin "%opt{cyan}+b"
+set-face global ts_function_macro "%opt{purple}+b"
+set-face global ts_hint "%opt{orange}+b"
+set-face global ts_info "%opt{blue_green}+b"
+set-face global ts_keyword "%opt{purple}"
+set-face global ts_keyword_conditional "%opt{purple}+i"
+set-face global ts_keyword_control_conditional "%opt{purple}+b"
+set-face global ts_keyword_control_directive "%opt{purple}+b"
+set-face global ts_keyword_control_import "%opt{purple}+b"
+set-face global ts_keyword_directive "%opt{purple}+i"
+set-face global ts_label "%opt{orange}+i"
+set-face global ts_markup_bold "%opt{pink}+b"
+set-face global ts_markup_heading "%opt{orange}"
+set-face global ts_markup_heading_1 "%opt{orange}"
+set-face global ts_markup_heading_2 "%opt{orange}+i"
+set-face global ts_markup_heading_3 "%opt{yellow}"
+set-face global ts_markup_heading_4 "%opt{green}"
+set-face global ts_markup_heading_5 "%opt{blue}"
+set-face global ts_markup_heading_6 "%opt{purple}"
+set-face global ts_markup_heading_marker "%opt{pink}+b"
+set-face global ts_markup_italic "%opt{purple}+i"
+set-face global ts_markup_list_checked "%opt{green}+b"
+set-face global ts_markup_list_numbered "%opt{blue}+i"
+set-face global ts_markup_list_unchecked "%opt{yellow}"
+set-face global ts_markup_list_unnumbered "%opt{orange}"
+set-face global ts_markup_link_label "%opt{blue}"
+set-face global ts_markup_link_url "%opt{green}+u"
+set-face global ts_markup_link_uri "%opt{green}+u"
+set-face global ts_markup_link_text "%opt{blue}"
+set-face global ts_markup_quote "%opt{gray}+i"
+set-face global ts_markup_raw "%opt{aqua}"
+set-face global ts_markup_strikethrough "%opt{gray}+s"
+set-face global ts_namespace "%opt{white}"
+set-face global ts_operator "%opt{lime}"
+set-face global ts_property "%opt{yellow}"
+set-face global ts_punctuation "%opt{white}"
+set-face global ts_punctuation_special "%opt{lime}"
+set-face global ts_special "%opt{pink}"
+set-face global ts_spell "%opt{red}+u"
+set-face global ts_string "%opt{green}"
+set-face global ts_string_regex "%opt{light_orange}"
+set-face global ts_string_regexp "%opt{light_orange}"
+set-face global ts_string_escape "%opt{purple}"
+set-face global ts_string_special "%opt{orange}"
+set-face global ts_string_special_path "%opt{green}+u"
+set-face global ts_string_special_symbol "%opt{purple}+b"
+set-face global ts_string_symbol "%opt{pink}+b"
+set-face global ts_tag "%opt{blue_green}"
+set-face global ts_tag_error "%opt{red}"
+set-face global ts_text "%opt{white}"
+set-face global ts_text_title "%opt{cyan}"
+set-face global ts_type "%opt{cyan}"
+set-face global ts_type_enum_variant "%opt{yellow}"
+set-face global ts_variable "%opt{white}"
+set-face global ts_variable_builtin "%opt{orange}"
+set-face global ts_variable_other_member "%opt{aqua}"
+set-face global ts_variable_parameter "%opt{light_orange}+i"
+set-face global ts_warning "%opt{yellow}+b"
+
