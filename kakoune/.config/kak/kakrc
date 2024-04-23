@@ -2,8 +2,9 @@ evaluate-commands %sh{
   kks init
   cork init
   kak-lsp --kakoune -s $kak_session
-  # kak-tree-sitter -dks --session $kak_session
+  kak-tree-sitter -dks --session $kak_session -vvv
   # hop-kak --init
+  gitlinker init kakoune
 }
 
 # custom modules
@@ -13,9 +14,11 @@ source "%val{config}/tmux.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
+source "%val{config}/jump_mode.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
 colorscheme kanagawa
+# colorscheme catppuccin_macchiato
 
 set global indentwidth 2
 set global tabstop 2
@@ -159,6 +162,12 @@ map global buffer-actions 'c' ':db<ret>' -docstring 'close buffer'
 map global buffer-actions 'l' ':b ' -docstring 'list buffer'
 map global buffer-actions '.' ':enter-user-mode buffer-actions -lock<ret>' -docstring 'Lock'
 
+declare-user-mode jump-actions
+map -docstring 'enter jump mode (select mode: replace)' global jump-actions f ':enter_jump_mode_with_replace_select_mode<ret>'
+map -docstring 'enter jump mode (select mode: extend)' global jump-actions F ':enter_jump_mode_with_extend_select_mode<ret>'
+map -docstring 'enter jump mode (select mode: append)' global jump-actions <a-f> ':enter_jump_mode_with_append_select_mode<ret>'
+map globa user 'j' -docstring 'Enter jump mode' ':enter-user-mode jump-actions<ret>'
+
 # kak-lsp
 hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml) %{
     lsp-enable-window
@@ -278,6 +287,7 @@ cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
 
   # Suggested user mode mapping
   map global user g ': enter-user-mode git<ret>' -docstring "git mode"
+  map global git 'y' ':gitlinker<ret>' -docstring 'Copy Permalink'
 }
 
 cork ui 'https://github.com/kkga/ui.kak' %{
@@ -342,6 +352,15 @@ cork kak-jsts https://github.com/schemar/kak-jsts %{
   map global user F ':enter-user-mode format<ret>' -docstring 'Enter format mode'
   map global format p ':format-prettier<ret>' -docstring 'Format with prettier'
   map global format e ':format-eslint<ret>' -docstring 'Format with eslint'
+}
+
+cork visual-mode https://gitlab.com/dead10ck/visual-mode.kak.git %{
+  require-module visual-mode
+  map global normal v ': visual-mode v<ret>'
+  map global normal V ': visual-line-mode V<ret>'
+  map global normal <a-v> 'v'
+  map global normal <a-s-v> '<s-v>'
+  map global normal <a-s-v> '<s-v>'
 }
 
 # cork easymotion https://git.sr.ht/~voroskoi/easymotion.kak %{
