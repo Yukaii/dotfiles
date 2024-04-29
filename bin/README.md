@@ -51,3 +51,33 @@ tmux-popup lazygit
 tmux-popup htop
 ```
 
+## [`wezl`](././.bin/wezl)
+
+A simple layout manager for Wezterm.
+
+Usage:
+
+```bash
+wezl [OPTIONS] LAYOUT_STRING
+```
+
+Options:
+- `-n, --new-window`: Create layout in a new window
+- `-c, --cwd <DIRECTORY>`: Specify the current working directory
+- `-h, --help`: Show this help message
+
+Layout string syntax:
+- `|` - New tab
+- `/` - Vertical split
+- `=` - Horizontal split
+
+The layout string is executed in sequence, meaning each character is applied sequentially to create the desired layout.
+
+Examples:
+
+```bash
+wezl '||=//='
+wezl --new-window --cwd /path/to/directory '||=//='
+```
+
+Note: The wezl tool is a script and requires Wezterm to be installed and configured properly.
