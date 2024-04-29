@@ -7,8 +7,10 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
-  "buffer_font_size": 15,
-  "theme": "Catppuccin Macchiato",
+  "ui_font_family": "Input Sans Compressed",
+  "buffer_font_size": 16,
+  "buffer_font_family": "Input Mono Condensed",
+  "theme": "Kanagawa Waves",
   "vim_mode": true,
   "auto_update": true,
   "terminal": {
@@ -20,7 +22,6 @@
     "blinking": "off",
     "option_as_meta": true
   },
-  "buffer_font_family": "JetBrainsMono Nerd Font",
   "confirm_quit": true,
   "cursor_blink": false,
   "show_copilot_suggestions": true,
