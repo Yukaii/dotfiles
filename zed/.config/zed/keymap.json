@@ -56,7 +56,8 @@
       "cmd-shift-k": "pane::ActivateNextItem",
       "cmd-shift-j": "pane::ActivatePrevItem",
       "ctrl-`": "workspace::ToggleZoom",
-      "ctrl-shift-k": "pane::CloseActiveItem"
+      "ctrl-shift-k": "pane::CloseActiveItem",
+      "cmd-t": "workspace::NewTerminal"
     }
   },
 
