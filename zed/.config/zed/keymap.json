@@ -1,0 +1,70 @@
+[
+  {
+    "context": "Editor && VimControl && !VimWaiting && !menu",
+    "bindings": {
+      "ctrl-w z": "workspace::ToggleZoom",
+      "g ]": "editor::GoToDiagnostic",
+      "g [": "editor::GoToPrevDiagnostic",
+      "g r": "editor::FindAllReferences",
+      "shift-k": "editor::Hover",
+      "space l a": "editor::ToggleCodeActions",
+      "space l r": "editor::Rename",
+      "space l f": "editor::Format",
+      "space l l": "diagnostics::Deploy",
+      "space f f": "file_finder::Toggle",
+      "space f b": "tab_switcher::Toggle",
+      "space e": "workspace::ToggleLeftDock",
+      "space p": "outline::Toggle",
+      "space v": "editor::GoToDefinitionSplit",
+      "space c": "pane::CloseActiveItem"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      "K": "editor::Hover"
+    }
+  },
+  {
+    "context": "Editor && (vim_mode == normal || vim_mode == visual || vim_mode == visual_line)",
+    "bindings": {
+      "alt-k": "editor::MoveLineUp",
+      "alt-j": "editor::MoveLineDown",
+      "alt-h": "editor::Outdent",
+      "alt-l": "editor::Indent",
+      // kakoune styled
+      "g a": ["workspace::SendKeystrokes", "space f b enter"]
+    }
+  },
+  {
+    "context": "Terminal",
+    "bindings": {
+      "cmd-ctrl-k": "pane::ActivateNextItem",
+      "cmd-ctrl-j": "pane::ActivatePrevItem"
+    }
+  },
+
+  // Global rewrites
+  {
+    "bindings": {
+      "ctrl-'": "workspace::ToggleBottomDock",
+      "cmd-shift-i": "terminal_panel::ToggleFocus"
+    }
+  },
+
+  {
+    "context": "Pane",
+    "bindings": {
+      "cmd-1": ["pane::ActivateItem", 0],
+      "cmd-2": ["pane::ActivateItem", 1],
+      "cmd-3": ["pane::ActivateItem", 2],
+      "cmd-4": ["pane::ActivateItem", 3],
+      "cmd-5": ["pane::ActivateItem", 4],
+      "cmd-6": ["pane::ActivateItem", 5],
+      "cmd-7": ["pane::ActivateItem", 6],
+      "cmd-8": ["pane::ActivateItem", 7],
+      "cmd-9": ["pane::ActivateItem", 8],
+      "cmd-0": "pane::ActivateLastItem"
+    }
+  }
+]

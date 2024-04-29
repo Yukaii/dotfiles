@@ -25,5 +25,9 @@
   "confirm_quit": true,
   "cursor_blink": false,
   "show_copilot_suggestions": true,
-  "relative_line_numbers": true
+  "relative_line_numbers": true,
+  "inlay_hints": {
+    "enabled": false
+  },
+  "soft_wrap": "editor_width"
 }
