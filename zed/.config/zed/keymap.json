@@ -19,8 +19,11 @@
       "space v": "editor::GoToDefinitionSplit",
       "space c": "pane::CloseActiveItem",
       "space g b": "editor::ToggleGitBlame",
-      // things like floating term
-      "space t f": ["workspace::SendKeystrokes", "cmd-shift-i ctrl-shift-m"]
+      "space /": "editor::ToggleComments",
+
+      // things like bottom term
+      "space t b": ["workspace::SendKeystrokes", "cmd-shift-i"],
+      "space t l": ["workspace::SendKeystrokes", "alt-shift-t lazygit enter"]
     }
   },
   {
@@ -50,9 +53,10 @@
   {
     "context": "Terminal",
     "bindings": {
-      "cmd-ctrl-k": "pane::ActivateNextItem",
-      "cmd-ctrl-j": "pane::ActivatePrevItem",
-      "ctrl-shift-m": "workspace::ToggleZoom"
+      "cmd-shift-k": "pane::ActivateNextItem",
+      "cmd-shift-j": "pane::ActivatePrevItem",
+      "ctrl-`": "workspace::ToggleZoom",
+      "ctrl-shift-k": "pane::CloseActiveItem"
     }
   },
 
