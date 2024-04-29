@@ -81,9 +81,22 @@ local function createFontConfig(fontName)
       font = wezterm.font_with_fallback({ fontName }),
       font_size = 15.0,
       line_height = 1.3,
+    },
+    ["Input Mono Light"] = {
+      font = wezterm.font_with_fallback({ family = "Input Mono", weight = 'Light' }),
+      font_size = 15.5,
+      line_height = 1.1,
     }
   }
-  return fontConfigs[fontName]
+
+  -- Set a default config if no config is specified
+  if not fontConfigs[fontName] then
+    return {
+      font = wezterm.font_with_fallback({ fontName }),
+    }
+  else
+    return fontConfigs[fontName]
+  end
 end
 
 
