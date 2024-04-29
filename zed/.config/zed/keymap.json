@@ -13,16 +13,27 @@
       "space l l": "diagnostics::Deploy",
       "space f f": "file_finder::Toggle",
       "space f b": "tab_switcher::Toggle",
+      "space f C": "command_palette::Toggle",
       "space e": "workspace::ToggleLeftDock",
       "space p": "outline::Toggle",
       "space v": "editor::GoToDefinitionSplit",
-      "space c": "pane::CloseActiveItem"
+      "space c": "pane::CloseActiveItem",
+      "space g b": "editor::ToggleGitBlame",
+      // things like floating term
+      "space t f": ["workspace::SendKeystrokes", "cmd-shift-i ctrl-shift-m"]
     }
   },
   {
     "context": "Editor && vim_mode == normal",
     "bindings": {
-      "K": "editor::Hover"
+      "K": "editor::Hover",
+      "space o": "project_panel::ToggleFocus",
+
+      // kakoune motion
+      "g l": "vim::EndOfLine",
+      "g h": "vim::StartOfLine",
+      "g j": "vim::EndOfDocument",
+      "g k": "vim::StartOfDocument"
     }
   },
   {
@@ -40,7 +51,8 @@
     "context": "Terminal",
     "bindings": {
       "cmd-ctrl-k": "pane::ActivateNextItem",
-      "cmd-ctrl-j": "pane::ActivatePrevItem"
+      "cmd-ctrl-j": "pane::ActivatePrevItem",
+      "ctrl-shift-m": "workspace::ToggleZoom"
     }
   },
 

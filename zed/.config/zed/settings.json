@@ -8,8 +8,8 @@
 // from the command palette or from `Zed` application menu.
 {
   "ui_font_family": "Input Sans Compressed",
-  "buffer_font_size": 16,
-  "buffer_font_family": "Input Mono Condensed",
+  "buffer_font_size": 15,
+  "buffer_font_family": "JetBrains Mono",
   "theme": "Kanagawa Waves",
   "vim_mode": true,
   "auto_update": true,
@@ -29,5 +29,10 @@
   "inlay_hints": {
     "enabled": false
   },
-  "soft_wrap": "editor_width"
+  "soft_wrap": "editor_width",
+  "git": {
+    "inline_blame": {
+      "enabled": false
+    }
+  }
 }
