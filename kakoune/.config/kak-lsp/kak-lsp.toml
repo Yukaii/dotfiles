@@ -84,11 +84,11 @@ args = [
 check.command = "clippy"
 
 
-[language_server.gpt]
-roots = [".git", ".hg"]
-filetypes = ["javascript", "typescript", "markdown", "python", "rust"]
-command = "helix-gpt"
-args = ["--logFile", "/tmp/kakoune-helix-gpt.log"]
+# [language_server.gpt]
+# roots = [".git", ".hg"]
+# filetypes = ["javascript", "typescript", "markdown", "python", "rust"]
+# command = "helix-gpt"
+# args = ["--logFile", "/tmp/kakoune-helix-gpt.log"]
 
 
 [language_server.typo]
