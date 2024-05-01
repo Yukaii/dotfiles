@@ -27,3 +27,5 @@ kakoune/Library/Application Support/kak-tree-sitter/*
 kakoune/.config/kak/bundle/*
 
 bombdadillo/.config/*
+
+lazygit/**/state*
