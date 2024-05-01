@@ -5,8 +5,6 @@ source $__fish_config_dir/secrets.fish
 set PATH $PATH "$HOME/.bin"
 set PATH $PATH "$HOME/.deno/bin"
 
-set VOLTA_HOME "$HOME/.volta"
-set PATH "$VOLTA_HOME/bin" $PATH
 
 set PATH $PATH "$HOME/.spicetify"
 
@@ -359,7 +357,11 @@ set PNPM_HOME "$HOME/Library/pnpm"
 [ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
 
 # GCloud
-source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
+# source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
+
+set VOLTA_HOME "$HOME/.volta"
+
+fish_add_path "$VOLTA_HOME/bin"
 
 for completion in (volta completions fish)
   eval $completion
@@ -426,3 +428,5 @@ function start_dnstt
   # -dot cloudflare-dns.com:853
   dnstt-client -doh https://cloudflare-dns.com/dns-query -pubkey-file $DNSTT_PUB_KEY_PATH $DNS_TUNNEL 127.0.0.1:8000
 end
+
+fish_add_path /Users/yukai/.spicetify
