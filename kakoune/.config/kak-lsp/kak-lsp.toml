@@ -49,7 +49,7 @@ showDocumentation = { enable = false }
 [language_server.json-language-server]
 filetypes = ["json"]
 roots = ["package.json"]
-command = "vscode-json-languageserver"
+command = "vscode-json-language-server"
 args = ["--stdio"]
 
 
