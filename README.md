@@ -1,30 +1,24 @@
 # Dotfiles
 
-This is [Yukai](https://github.com/Yukaii)'s dotfiles.
+Hi I'm [Yukai](https://yukai.tw). This is my dotfiles, managed with GNU stow.
 
 ## Usage
 
-Install [Homebrew](https://brew.sh/) first, then run `brew bundle` command to install all homebrew dependencies:
-
-```bash
-cd homebrew
-brew bundle
-```
-
-And recover everything with [GNU stow](https://www.gnu.org/software/stow/):
+Install [GNU stow](https://www.gnu.org/software/stow/) first, then clone the repo into home directory:
 
 ```bash
 git clone https://github.com/Yukaii/dotfiles ~/dotfiles --recursive
+```
+
+Now cd into the directory, and restore with stow command:
+
+```bash
 cd dotfiles
 stow vim neovim # ...
 ```
 
-## Available configs
+If you place `dotfiles` directory other than home directory, you may need extra argument for stow command.
 
-* bin
-* neovim
-* vim
-* ruby
-* tmux
-* termite
-* editorconfig
+## License
+
+MIT
