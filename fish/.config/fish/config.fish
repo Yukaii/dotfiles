@@ -430,3 +430,6 @@ function start_dnstt
 end
 
 fish_add_path /Users/yukai/.spicetify
+
+set -x LC_CTYPE en_US.UTF-8
+
