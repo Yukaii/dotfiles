@@ -203,3 +203,7 @@ enter_accept = true
 # This ensures that sync v2 is enabled for new installs only
 # In a later release it will become the default across the board
 records = true
+
+# [dotfiles]
+# enabled = true
+
