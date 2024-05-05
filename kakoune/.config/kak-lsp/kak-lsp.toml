@@ -8,6 +8,7 @@ roots = ["package.json", "tsconfig.json", "jsconfig.json", ".git", ".hg"]
 command = "typescript-language-server"
 args = ["--stdio"]
 
+# npm @tailwindcss/language-server
 [language_server.tailwindcss]
 filetypes = ["javascript", "typescript"]
 roots = ["tailwind.config.ts", "tailwind.config.js"]
