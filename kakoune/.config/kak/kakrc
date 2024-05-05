@@ -49,22 +49,22 @@ hook global ModeChange 'insert:normal' show-trailing-whitespaces
 hook global ModeChange 'normal:insert' hide-trailing-whitespaces
 
 # comment
-map global user -docstring 'recent files'     '<space>' ': kks-connect terminal-popup kks-mru<ret>'
-map global user n ':e -scratch<ret>' -docstring 'create buffer'
-map global user c ':db<ret>' -docstring 'delete buffer'
-map global user q ':q<ret>' -docstring 'quit'
-map global user P '!pbpaste<ret>' -docstring 'paste from clipboard'
-map global user p '<a-!>pbpaste<ret>' -docstring 'paste before from clipboard'
-map global user R '|pbpaste<ret>' -docstring 'replace selection with clipaboard content'
-map global user / ':comment-line<ret>' -docstring 'comment line'
-map global user ? ':comment-block<ret>' -docstring 'block comment selection'
-map global user e ':open-broot<ret>' -docstring 'explorer'
-map global user , ':edit-config<ret>' -docstring 'edit config'
-map global user d ':buffer *debug*<ret>' -docstring 'debug buffer'
-map global user h ':lsp-hover<ret>' -docstring 'lsp hover'
-map global user H ':lsp-hover-buffer<ret>' -docstring 'lsp hover buffer'
-map global user S ':trim-trailing-whitespaces<ret>' -docstring 'trim trailing whitesapce'
-map global user w ':w<ret>' -docstring 'write file'
+map global user -docstring 'recent files'                '<space>' ':kks-connect terminal-popup kks-mru<ret>'
+map global user -docstring 'create buffer'               n         ':e -scratch<ret>'
+map global user -docstring 'delete buffer'               c         ':db<ret>'
+map global user -docstring 'quit'                        q         ':q<ret>'
+map global user -docstring 'paste from clipboard'        P         '!pbpaste<ret>'
+map global user -docstring 'paste before from clipboard' p         '<a-!>pbpaste<ret>'
+map global user -docstring 'replace selection with clipaboard content' R '|pbpaste<ret>'
+map global user -docstring 'comment line'                /         ':comment-line<ret>'
+map global user -docstring 'block comment selection'     ?         ':comment-block<ret>'
+map global user -docstring 'explorer'                    e         ':open-broot<ret>'
+map global user -docstring 'edit config'                 ,         ':edit-config<ret>'
+map global user -docstring 'debug buffer'                d         ':buffer *debug*<ret>'
+map global user -docstring 'lsp hover'                   h         ':lsp-hover<ret>'
+map global user -docstring 'lsp hover buffer'            H         ':lsp-hover-buffer<ret>'
+map global user -docstring 'trim trailing whitesapce'    S         ':trim-trailing-whitespaces<ret>'
+map global user -docstring 'write file'                  w         ':w<ret>'
 
 define-command trim-trailing-whitespaces -docstring 'trim trailing whitespaces' %{
   try %{
@@ -77,15 +77,15 @@ define-command edit-config -docstring 'edit config' %{
 }
 
 # user mode shortcuts
-map global user t ':enter-user-mode terminal-actions<ret>' -docstring 'terminal actions'
-map global user f ':enter-user-mode find-actions<ret>' -docstring 'find actions'
-map global user b ':enter-user-mode buffer-actions<ret>' -docstring 'buffer actions'
+map global user t ':enter-user-mode terminal-actions<ret>'     -docstring 'terminal actions'
+map global user f ':enter-user-mode find-actions<ret>'         -docstring 'find actions'
+map global user b ':enter-user-mode buffer-actions<ret>'       -docstring 'buffer actions'
 map global user B ':enter-user-mode buffer-actions -lock<ret>' -docstring 'buffer actions (Locked)'
-map global user l ':enter-user-mode lsp<ret>' -docstring 'lsp mode'
+map global user l ':enter-user-mode lsp<ret>'                  -docstring 'lsp mode'
 
 # muscle memories
-map global normal <c-e> ':execute-keys vj<ret>'  -docstring 'scroll oneline down'
-map global normal <c-y> ':execute-keys vk<ret>'  -docstring 'scroll oneline down'
+map global normal <c-e> ':execute-keys vj<ret>'                  -docstring 'scroll oneline down'
+map global normal <c-y> ':execute-keys vk<ret>'                  -docstring 'scroll oneline down'
 map global normal '<c-w>' ':enter-user-mode window-actions<ret>' -docstring 'window actions'
 
 # Normal mode commands
@@ -108,9 +108,9 @@ define-command floating-terminal -hidden -docstring 'Launch floating terminal' %
   (tmux-popup &) >/dev/null 2>/dev/null
 }}
 
-map global terminal-actions 'l' ':lazygit<ret>' -docstring 'lazygit'
-map global terminal-actions 'b' ':bottom-terminal<ret>' -docstring 'bottom terminal'
-map global terminal-actions 'B' ':open_blame<ret>' -docstring 'Git Blame'
+map global terminal-actions 'l' ':lazygit<ret>'           -docstring 'lazygit'
+map global terminal-actions 'b' ':bottom-terminal<ret>'   -docstring 'bottom terminal'
+map global terminal-actions 'B' ':open_blame<ret>'        -docstring 'Git Blame'
 map global terminal-actions 'f' ':floating-terminal<ret>' -docstring 'Floating terminal'
 
 define-command -hidden open_blame %{
@@ -140,16 +140,16 @@ define-command -override run -shell-completion -params .. -docstring 'run comman
 
 
 declare-user-mode find-actions
-map global find-actions 'B' ':open_buffer_picker<ret>' -docstring 'pick buffer'
-map global find-actions -docstring 'terminal'         't' ': kks-connect terminal-vertical fish<ret>'
-map global find-actions -docstring 'files'            'f' ': kks-connect terminal-popup kks-files<ret>'
-map global find-actions -docstring 'git files'        'g' ': kks-connect terminal-popup kks-git-files<ret>'
-map global find-actions -docstring 'buffers'          'b' ': kks-connect terminal-popup kks-buffers<ret>'
-map global find-actions -docstring 'live grep(fzf)'   'w' ': kks-connect terminal-popup kks-grep<ret>'
-map global find-actions -docstring 'browse file on github'        'B' ':browse_github<ret>'
-map global find-actions -docstring 'file types'          'y' ': kks-connect terminal-popup kks-filetypes<ret>'
-map global find-actions -docstring 'file inside buffer basefolder' 'p' ':basefolder-files<ret>'
-map global find-actions -docstring 'file under buffer basefolder' 'P' ':basefolder-top-files<ret>'
+map global find-actions -docstring 'pick buffer'                       'B' ':open_buffer_picker<ret>'
+map global find-actions -docstring 'terminal'                          't' ':kks-connect terminal-vertical fish<ret>'
+map global find-actions -docstring 'files'                             'f' ':kks-connect terminal-popup kks-files<ret>'
+map global find-actions -docstring 'git files'                         'g' ':kks-connect terminal-popup kks-git-files<ret>'
+map global find-actions -docstring 'buffers'                           'b' ':kks-connect terminal-popup kks-buffers<ret>'
+map global find-actions -docstring 'live grep(fzf)'                    'w' ':kks-connect terminal-popup kks-grep<ret>'
+map global find-actions -docstring 'browse file on github'             'B' ':browse_github<ret>'
+map global find-actions -docstring 'file types'                        'y' ':kks-connect terminal-popup kks-filetypes<ret>'
+map global find-actions -docstring 'file inside buffer basefolder'     'p' ':basefolder-files<ret>'
+map global find-actions -docstring 'file under buffer basefolder'      'P' ':basefolder-top-files<ret>'
 map global find-actions -docstring 'edit file under buffer basefolder' 'e' ':basefolder-edit<ret>'
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
@@ -166,7 +166,7 @@ define-command basefolder-top-files -docstring 'toplevel file inside buffer base
 	}
 }
 
-define-command basefolder-edit -docstring 'base folder edit' %{
+  define-command basefolder-edit -docstring 'base folder edit' %{
   evaluate-commands %sh{
     dir=$(dirname "$kak_bufname")
 		echo "execute-keys :e<space>$dir/"
@@ -201,12 +201,12 @@ lsp-inlay-diagnostics-enable global
 
 # lsp related mappings
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
-map global object a '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-map global object <a-a> '<a-semicolon>lsp-object<ret>' -docstring 'LSP any symbol'
-map global object e '<a-semicolon>lsp-object Function Method<ret>' -docstring 'LSP function or method'
-map global object k '<a-semicolon>lsp-object Class Interface Struct<ret>' -docstring 'LSP class interface or struct'
+map global object a '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
+map global object <a-a> '<a-semicolon>lsp-object<ret>'                           -docstring 'LSP any symbol'
+map global object e '<a-semicolon>lsp-object Function Method<ret>'               -docstring 'LSP function or method'
+map global object k '<a-semicolon>lsp-object Class Interface Struct<ret>'        -docstring 'LSP class interface or struct'
 map global object d '<a-semicolon>lsp-diagnostic-object --include-warnings<ret>' -docstring 'LSP errors and warnings'
-map global object D '<a-semicolon>lsp-diagnostic-object<ret>' -docstring 'LSP errors'
+map global object D '<a-semicolon>lsp-diagnostic-object<ret>'                    -docstring 'LSP errors'
 
 set-option global lsp_auto_show_code_actions true
 
@@ -283,22 +283,22 @@ cork smarttab "https://github.com/andreyorst/smarttab.kak"
 
 cork konflict "https://github.com/eko234/git-konflict.kak" %{
   declare-user-mode konflict
-  map global user K ': enter-user-mode konflict<ret>' -docstring 'Konflict mode'
-  map global konflict s ': konflict-start<ret>' -docstring 'Konflict start'
-  map global konflict j ': konflict-use-mine<ret>' -docstring 'Use mine'
-  map global konflict k ': konflict-use-yours<ret>' -docstring 'Use yours'
+  map global user K ': enter-user-mode konflict<ret>'         -docstring 'Konflict mode'
+  map global konflict s ': konflict-start<ret>'               -docstring 'Konflict start'
+  map global konflict j ': konflict-use-mine<ret>'            -docstring 'Use mine'
+  map global konflict k ': konflict-use-yours<ret>'           -docstring 'Use yours'
   map global konflict J ': konflict-use-mine-then-yours<ret>' -docstring 'Use mine then yours'
   map global konflict K ': konflict-use-yours-then-mine<ret>' -docstring 'Use yours then mine'
-  map global konflict d ': konflict-use-none<ret>' -docstring 'Use none'
+  map global konflict d ': konflict-use-none<ret>'            -docstring 'Use none'
 }
 
 cork surround "https://github.com/h-youhei/kakoune-surround" %{
   declare-user-mode surround
-  map global surround s ':surround<ret>' -docstring 'surround'
-  map global surround c ':change-surround<ret>' -docstring 'change'
-  map global surround d ':delete-surround<ret>' -docstring 'delete'
+  map global surround s ':surround<ret>'               -docstring 'surround'
+  map global surround c ':change-surround<ret>'        -docstring 'change'
+  map global surround d ':delete-surround<ret>'        -docstring 'delete'
   map global surround t ':select-surrounding-tag<ret>' -docstring 'select tag'
-  map global user s ':enter-user-mode surround<ret>' -docstring 'surround mode'
+  map global user s ':enter-user-mode surround<ret>'   -docstring 'surround mode'
 }
 
 cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
@@ -311,7 +311,7 @@ cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
 
   # Suggested user mode mapping
   map global user g ': enter-user-mode git<ret>' -docstring "git mode"
-  map global git 'y' ':gitlinker<ret>' -docstring 'Copy Permalink'
+  map global git 'y' ':gitlinker<ret>'           -docstring 'Copy Permalink'
 }
 
 cork ui 'https://github.com/kkga/ui.kak' %{
@@ -335,8 +335,8 @@ cork harpoon 'https://github.com/raiguard/kak-harpoon' %{
   declare-user-mode harpoon
   map global user o ': enter-user-mode harpoon<ret>' -docstring "Enter harpoon mode"
 
-  map global harpoon l ':harpoon-show-list<ret>' -docstring "List harpoon"
-  map global harpoon a ':harpoon-add<ret>' -docstring "add harpoon"
+  map global harpoon l ':harpoon-show-list<ret>'     -docstring "List harpoon"
+  map global harpoon a ':harpoon-add<ret>'           -docstring "add harpoon"
 
   map global harpoon 1 ':harpoon-nav 1<ret>'
   map global harpoon 2 ':harpoon-nav 2<ret>'
@@ -374,8 +374,8 @@ cork vue https://github.com/ABuffSeagull/kakoune-vue
 cork kak-jsts https://github.com/schemar/kak-jsts %{
   declare-user-mode format
   map global user F ':enter-user-mode format<ret>' -docstring 'Enter format mode'
-  map global format p ':format-prettier<ret>' -docstring 'Format with prettier'
-  map global format e ':format-eslint<ret>' -docstring 'Format with eslint'
+  map global format p ':format-prettier<ret>'      -docstring 'Format with prettier'
+  map global format e ':format-eslint<ret>'        -docstring 'Format with eslint'
 }
 
 cork visual-mode https://gitlab.com/dead10ck/visual-mode.kak.git %{
