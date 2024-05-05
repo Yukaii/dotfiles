@@ -148,6 +148,30 @@ map global find-actions -docstring 'buffers'          'b' ': kks-connect termina
 map global find-actions -docstring 'live grep(fzf)'   'w' ': kks-connect terminal-popup kks-grep<ret>'
 map global find-actions -docstring 'browse file on github'        'B' ':browse_github<ret>'
 map global find-actions -docstring 'file types'          'y' ': kks-connect terminal-popup kks-filetypes<ret>'
+map global find-actions -docstring 'file inside buffer basefolder' 'p' ':basefolder-files<ret>'
+map global find-actions -docstring 'file under buffer basefolder' 'P' ':basefolder-top-files<ret>'
+map global find-actions -docstring 'edit file under buffer basefolder' 'e' ':basefolder-edit<ret>'
+
+define-command basefolder-files -docstring 'file inside buffer basefolder' %{
+	evaluate-commands %sh{
+    dir=$(dirname "$kak_bufname")
+    echo "kks-connect terminal-popup kks-files \"$dir\"<ret>"
+	}
+}
+
+define-command basefolder-top-files -docstring 'toplevel file inside buffer basefolder' %{
+	evaluate-commands %sh{
+    dir=$(dirname "$kak_bufname")
+    echo "kks-connect terminal-popup kks-files --max-depth=1 \"$dir\"<ret>"
+	}
+}
+
+define-command basefolder-edit -docstring 'base folder edit' %{
+  evaluate-commands %sh{
+    dir=$(dirname "$kak_bufname")
+		echo "execute-keys :e<space>$dir/"
+  }
+}
 
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
@@ -159,7 +183,7 @@ declare-user-mode buffer-actions
 map global buffer-actions '[' ':bp<ret>' -docstring 'previous buffer'
 map global buffer-actions ']' ':bn<ret>' -docstring 'next buffer'
 map global buffer-actions 'c' ':db<ret>' -docstring 'close buffer'
-map global buffer-actions 'l' ':b ' -docstring 'list buffer'
+map global buffer-actions 'l' ':b<space>' -docstring 'list buffer'
 map global buffer-actions '.' ':enter-user-mode buffer-actions -lock<ret>' -docstring 'Lock'
 
 declare-user-mode jump-actions
