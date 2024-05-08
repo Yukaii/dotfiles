@@ -166,7 +166,7 @@ define-command basefolder-top-files -docstring 'toplevel file inside buffer base
 	}
 }
 
-  define-command basefolder-edit -docstring 'base folder edit' %{
+define-command basefolder-edit -docstring 'base folder edit' %{
   evaluate-commands %sh{
     dir=$(dirname "$kak_bufname")
 		echo "execute-keys :e<space>$dir/"
@@ -380,11 +380,8 @@ cork kak-jsts https://github.com/schemar/kak-jsts %{
 
 cork visual-mode https://gitlab.com/dead10ck/visual-mode.kak.git %{
   require-module visual-mode
-  map global normal v ': visual-mode v<ret>'
-  map global normal V ': visual-line-mode V<ret>'
-  map global normal <a-v> 'v'
-  map global normal <a-s-v> '<s-v>'
-  map global normal <a-s-v> '<s-v>'
+  map global normal <a-v> ': visual-mode v<ret>'
+  map global normal <a-s-v> ': visual-line-mode V<ret>'
 }
 
 # cork easymotion https://git.sr.ht/~voroskoi/easymotion.kak %{
