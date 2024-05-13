@@ -76,7 +76,7 @@ local config = {
   initial_cols = 120,
   initial_rows = 30,
 
-  window_background_opacity = 0.8,
+  window_background_opacity = 0.9,
   macos_window_background_blur = 60,
 }
 
