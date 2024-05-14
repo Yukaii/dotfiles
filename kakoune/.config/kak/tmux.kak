@@ -37,8 +37,9 @@ define-command tmux-popup -params 1.. -docstring '
 tmux-popup <program> [<arguments>]: create a new terminal as a tmux popup
 The program passed as argument will be executed in the new terminal' \
 %{
-    tmux-terminal-impl "popup -w 90%% -h 80%% -E -d %val{client_env_PWD}" %arg{@}
+  tmux-terminal-impl "popup -w 90%% -h 80%% -E -d %val{client_env_PWD}" %arg{@}
 }
+complete-command tmux-popup shell
 
 define-command tmux-open-broot -docstring 'open broot' %{
   evaluate-commands nop %sh{
