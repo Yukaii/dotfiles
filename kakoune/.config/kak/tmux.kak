@@ -33,6 +33,32 @@ define-command focus-down -hidden -docstring "focus down pane" %{
   }
 }
 
+define-command -override -hidden -params 2.. tmux-terminal-impl %{
+    evaluate-commands %sh{
+        tmux=${kak_client_env_TMUX:-$TMUX}
+        if [ -z "$tmux" ]; then
+            echo "fail 'This command is only available in a tmux session'"
+            exit
+        fi
+        tmux_args="$1"
+        if [ "${1%%-*}" = split ]; then
+            tmux_args="$tmux_args -t ${kak_client_env_TMUX_PANE}"
+        elif [ "${1%% *}" = new-window ]; then
+            session_id=$(tmux display-message -p -t ${kak_client_env_TMUX_PANE} '#{session_id}')
+            tmux_args="$tmux_args -t $session_id"
+        fi
+        shift
+        # ideally we should escape single ';' to stop tmux from interpreting it as a new command
+        # but that's probably too rare to care
+        if [ -n "$TMPDIR" ]; then
+            (TMUX=$tmux tmux $tmux_args env TMPDIR="$TMPDIR" "$@" &) >/dev/null 2>/dev/null
+        else
+            (TMUX=$tmux tmux $tmux_args "$@" &) >/dev/null 2>/dev/null
+        fi
+    }
+}
+
+
 define-command tmux-popup -params 1.. -docstring '
 tmux-popup <program> [<arguments>]: create a new terminal as a tmux popup
 The program passed as argument will be executed in the new terminal' \
