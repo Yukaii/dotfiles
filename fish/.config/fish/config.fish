@@ -11,11 +11,11 @@ set PATH $PATH "$HOME/.spicetify"
 set arc (arch)
 if string match -q "arm64" $arc
   # set PATH $PATH "/usr/local/bin"
-  set PATH $PATH "/opt/homebrew/bin/"
-  set PATH $PATH "/opt/homebrew/sbin/"
+  fish_add_path "/opt/homebrew/bin/"
+  fish_add_path "/opt/homebrew/sbin/"
 else
-  set PATH $PATH "/usr/local/bin"
-  set PATH $PATH "/usr/local/sbin"
+  fish_add_path "/usr/local/bin"
+  fish_add_path "/usr/local/sbin"
 end
 
 
@@ -345,7 +345,7 @@ set -g fish_greeting
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
 
-oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/uew.omp.json" | source
+oh-my-posh --init --shell fish --config (mbrew --prefix oh-my-posh)"/themes/uew.omp.json" | source
 # oh-my-posh --init --shell fish --config (brew --prefix oh-my-posh)"/themes/takuya.omp.json" | source
 
 # pnpm setup
@@ -365,6 +365,13 @@ fish_add_path "$VOLTA_HOME/bin"
 
 for completion in (volta completions fish)
   eval $completion
+end
+
+
+if command -v sg > /dev/null
+  for completion in (sg completions)
+    eval $completion
+  end
 end
 
 # https://shareg.pt/9HvnQ77 made with GPT-4
