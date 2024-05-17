@@ -152,6 +152,7 @@ map global find-actions -docstring 'file types'                        'y' ':kks
 map global find-actions -docstring 'file inside buffer basefolder'     'p' ':basefolder-files<ret>'
 map global find-actions -docstring 'file under buffer basefolder'      'P' ':basefolder-top-files<ret>'
 map global find-actions -docstring 'edit file under buffer basefolder' 'e' ':basefolder-edit<ret>'
+map global find-actions -docstring 'switch themes'                      'S' ':colorscheme<space>'
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
 	evaluate-commands %sh{
