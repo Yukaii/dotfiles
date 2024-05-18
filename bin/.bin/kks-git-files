@@ -15,5 +15,5 @@ git ls-files --full-name "$(git rev-parse --show-toplevel)" "$@" |
 	sk --multi --height 100% --prompt 'files> ' \
 		--preview "$preview_cmd {}" --history="$history_file" |
 	while read -r file; do
-		kks edit "$file"
+		kks edit "${file}"
 	done
