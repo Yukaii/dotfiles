@@ -17,8 +17,8 @@ source "%val{config}/highlight.kak"
 source "%val{config}/jump_mode.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
-# colorscheme kanagawa
-colorscheme ayu-mirage
+colorscheme kanagawa
+# colorscheme ayu-mirage
 # colorscheme catppuccin_macchiato
 
 set global indentwidth 2
