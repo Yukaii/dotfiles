@@ -22,5 +22,7 @@ mru=~/.cache/kak-mru-"$pwd"
 
 [ ! -f "$mru" ] && touch "$mru"
 
-(fzf --height 100% --prompt 'mru> ' --preview "$preview_cmd {}" |
-	xargs -r kks edit) < "$mru"
+selected=$(fzf --height 100% --prompt 'mru> ' --preview "$preview_cmd {}" < "${mru}")
+if [ -n "$selected" ]; then
+	kks edit "${selected}"
+fi
