@@ -1,5 +1,7 @@
 os:
   editPreset: kakoune
+gui:
+  nerdFontsVersion: "3"
 theme:
   activeBorderColor:
     - '#f5a97f'
