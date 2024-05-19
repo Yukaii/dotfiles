@@ -369,7 +369,7 @@ end
 
 
 if command -v sg > /dev/null
-  for completion in (sg completions)
+  for completion in (sg completions fish)
     eval $completion
   end
 end
