@@ -9,5 +9,8 @@ eval "$(oh-my-posh init zsh --config $ompconfig/themes/uew.omp.json)"
 
 eval "$(atuin init zsh)"
 eval "$(fzf --zsh)"
+eval "$(zoxide init zsh)"
 
 export PATH="$PATH:$HOME/.bin"
+
+source "$HOME/.config/broot/launcher/bash/br"
