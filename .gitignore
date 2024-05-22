@@ -29,3 +29,5 @@ kakoune/.config/kak/bundle/*
 bombdadillo/.config/*
 
 lazygit/**/state*
+
+broot/.config/broot/launcher/
