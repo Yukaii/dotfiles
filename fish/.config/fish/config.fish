@@ -374,6 +374,9 @@ if command -v sg > /dev/null
   end
 end
 
+# Setup fzf integration
+fzf --fish | source
+
 # https://shareg.pt/9HvnQ77 made with GPT-4
 function load_wezterm_completions
   # check if wezterm cli is available
