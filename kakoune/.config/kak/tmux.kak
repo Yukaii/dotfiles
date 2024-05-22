@@ -78,14 +78,15 @@ define-command tmux-open-broot -docstring 'open broot' %{
 
     # List all panes and check if a broot process is running in any of them, excluding the current pane
     broot_pane_id=$(tmux list-panes -F '#{pane_title} #{pane_id}' | grep -E '^broot ' | grep -v "$current_pane_id" | cut -d ' ' -f 2)
+    dir=$(dirname "$kak_bufname")
+    base=$(basename "$kak_bufname")
 
     if [ -z "$broot_pane_id" ]; then
         # If no broot process is found, split the pane and run broot
-        tmux split-window -hb -l 23% "$env_line broot --listen $kak_session"
+        tmux split-window -hb -l 23% "$env_line broot --listen $kak_session $dir"
     else
         # If a broot process is already running in a different pane, prepare to send commands to it
         root=$(broot --send "$kak_session" --get-root)
-        dir=$(dirname "$kak_bufname")
         absolute=$(realpath "$PWD/$dir")
         if [ "$root" != "$absolute" ] && [ "$dir" != '.' ]; then
             broot --send "$kak_session" -c ":focus $dir"
