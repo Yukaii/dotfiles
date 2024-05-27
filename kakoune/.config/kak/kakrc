@@ -201,6 +201,8 @@ hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss
 lsp-inlay-hints-enable       global
 lsp-inlay-diagnostics-enable global
 
+map global lsp 'D' ':lsp-diagnostics<ret>' -docstring 'LSP diagnostics'
+
 # lsp related mappings
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
 map global object a '<a-semicolon>lsp-object<ret>'                               -docstring 'LSP any symbol'
@@ -340,15 +342,15 @@ cork harpoon 'https://github.com/raiguard/kak-harpoon' %{
   map global harpoon l ':harpoon-show-list<ret>'     -docstring "List harpoon"
   map global harpoon a ':harpoon-add<ret>'           -docstring "add harpoon"
 
-  map global harpoon 1 ':harpoon-nav 1<ret>'
-  map global harpoon 2 ':harpoon-nav 2<ret>'
-  map global harpoon 3 ':harpoon-nav 3<ret>'
-  map global harpoon 4 ':harpoon-nav 4<ret>'
-  map global harpoon 5 ':harpoon-nav 5<ret>'
-  map global harpoon 6 ':harpoon-nav 6<ret>'
-  map global harpoon 7 ':harpoon-nav 7<ret>'
-  map global harpoon 8 ':harpoon-nav 8<ret>'
-  map global harpoon 9 ':harpoon-nav 9<ret>'
+  map global harpoon 1 ':harpoon-nav 1<ret>'        -docstring "go harpoon"
+  map global harpoon 2 ':harpoon-nav 2<ret>'        -docstring "go harpoon"
+  map global harpoon 3 ':harpoon-nav 3<ret>'        -docstring "go harpoon"
+  map global harpoon 4 ':harpoon-nav 4<ret>'        -docstring "go harpoon"
+  map global harpoon 5 ':harpoon-nav 5<ret>'        -docstring "go harpoon"
+  map global harpoon 6 ':harpoon-nav 6<ret>'        -docstring "go harpoon"
+  map global harpoon 7 ':harpoon-nav 7<ret>'        -docstring "go harpoon"
+  map global harpoon 8 ':harpoon-nav 8<ret>'        -docstring "go harpoon"
+  map global harpoon 9 ':harpoon-nav 9<ret>'        -docstring "go harpoon"
 
 }
 
