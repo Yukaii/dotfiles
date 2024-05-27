@@ -1,0 +1,4 @@
+@tailwindcss/language-server@0.0.16
+git-split-diffs@1.1.0
+typescript-language-server@4.3.3
+vscode-langservers-extracted@4.10.0
