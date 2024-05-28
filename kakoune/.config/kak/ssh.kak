@@ -6,12 +6,9 @@ hook global BufCreate .*[.]ssh/config %{
 }
 
 # Initialization
-hook global WinSetOption filetype=ssh_config %{
-  require-module ssh_config
-  hook -once -always window WinSetOption filetype=.* %{ remove-hooks window ssh-config-.+ }
-}
-
 hook -group ssh-config-highlight global WinSetOption filetype=ssh_config %{
+  require-module ssh_config
+
   add-highlighter window/ssh_config ref ssh_config
   hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/ssh_config }
 }
