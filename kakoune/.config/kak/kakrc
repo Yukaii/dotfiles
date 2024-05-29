@@ -15,6 +15,7 @@ source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
 source "%val{config}/jump_mode.kak"
+# source "%val{config}/amber.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
 colorscheme kanagawa
@@ -373,7 +374,7 @@ cork case https://gitlab.com/FlyingWombat/case.kak.git %{
   map global normal ` ': enter-user-mode case<ret>'
 }
 
-cork vue https://github.com/ABuffSeagull/kakoune-vue
+# cork vue https://github.com/ABuffSeagull/kakoune-vue
 
 cork kak-jsts https://github.com/schemar/kak-jsts %{
   declare-user-mode format
@@ -386,6 +387,14 @@ cork visual-mode https://gitlab.com/dead10ck/visual-mode.kak.git %{
   require-module visual-mode
   map global normal <a-v> ': visual-mode v<ret>'
   map global normal <a-s-v> ': visual-line-mode V<ret>'
+}
+
+cork increment https://gitlab.com/Screwtapello/kakoune-inc-dec %{
+  declare-user-mode increment-mode
+
+  map global normal <c-a> ': enter-user-mode increment-mode<ret>'
+  map global increment-mode a ': inc-dec-modify-numbers + %val{count}<ret>' -docstring 'increment'
+  map global increment-mode x ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
 }
 
 # cork easymotion https://git.sr.ht/~voroskoi/easymotion.kak %{
