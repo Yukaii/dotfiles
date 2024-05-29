@@ -372,7 +372,7 @@ cork filetree https://github.com/occivink/kakoune-filetree
 
 cork sshconfig https://github.com/Yukaii/ssh-config.kak
 
-cork case https://gitlab.com/FlyingWombat/case.kak.git %{
+cork case 'https://gitlab.com/FlyingWombat/case.kak.git/' %{
   map global normal ` ': enter-user-mode case<ret>'
 }
 
