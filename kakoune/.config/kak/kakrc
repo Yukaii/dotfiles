@@ -15,6 +15,7 @@ source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
 source "%val{config}/jump_mode.kak"
+source "%val{config}/git.kak"
 # source "%val{config}/amber.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
@@ -195,6 +196,9 @@ map -docstring 'enter jump mode (select mode: extend)' global jump-actions F ':e
 map -docstring 'enter jump mode (select mode: append)' global jump-actions <a-f> ':enter_jump_mode_with_append_select_mode<ret>'
 map globa user 'j' -docstring 'Enter jump mode' ':enter-user-mode jump-actions<ret>'
 
+
+map global user g ': enter-user-mode git<ret>' -docstring "git mode"
+
 # kak-lsp
 hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml) %{
     lsp-enable-window
@@ -314,8 +318,6 @@ cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
   # Declare git mode with default set of mappings
   declare-git-mode
 
-  # Suggested user mode mapping
-  map global user g ': enter-user-mode git<ret>' -docstring "git mode"
   map global git 'y' ':gitlinker<ret>'           -docstring 'Copy Permalink'
 }
 
