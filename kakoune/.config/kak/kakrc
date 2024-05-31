@@ -316,9 +316,9 @@ cork git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
   set-option global git_mode_commit_prefixes 'feat::fix::docs::refactor::build::test::style::BREAKING CHANGE::'
 
   # Declare git mode with default set of mappings
-  declare-git-mode
+  # declare-git-mode
 
-  map global git 'y' ':gitlinker<ret>'           -docstring 'Copy Permalink'
+  map global git-yank 'y' ':gitlinker<ret>'           -docstring 'Copy Permalink'
 }
 
 cork ui 'https://github.com/kkga/ui.kak' %{
