@@ -2,7 +2,7 @@
 
 Scripts to manage globally installed packages using Bun.
 
-## dump.sh
+## `dump.sh`
 
 Dumps the list of globally installed packages to `packages.txt`.
 
@@ -12,7 +12,7 @@ Dumps the list of globally installed packages to `packages.txt`.
 ./dump.sh
 ```
 
-## install.sh
+## `install.sh`
 
 Reads `packages.txt` and reinstalls the listed packages globally.
 
@@ -20,6 +20,12 @@ Reads `packages.txt` and reinstalls the listed packages globally.
 
 ```sh
 ./install.sh
+```
+
+## Update all packages
+
+```bash
+bun update --global
 ```
 
 ## Prerequisites
