@@ -123,7 +123,7 @@ link_flags = ["-O3"]
 
 [language.awk.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.awk.queries]
 path = "runtime/queries/awk"
@@ -144,7 +144,7 @@ link_flags = ["-O3", "-lstdc++"]
 
 [language.bash.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.bash.queries]
 path = "runtime/queries/bash"
@@ -171,7 +171,7 @@ link_flags = ["-O3"]
 
 [language.bibtex.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.bibtex.queries]
 path = "runtime/queries/bibtex"
@@ -195,7 +195,7 @@ link_flags = ["-O3"]
 
 [language.c.queries.git.source]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.c.queries]
 path = "runtime/queries/c"
@@ -228,7 +228,7 @@ link_flags = ["-O3", "-lstdc++", "-flto=auto"]
 
 [language.cmake.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.cmake.queries]
 path = "runtime/queries/cmake"
@@ -249,7 +249,7 @@ link_flags = ["-O3"]
 
 [language.comment.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.comment.queries]
 path = "runtime/queries/comment"
@@ -321,7 +321,7 @@ link_flags = ["-O3"]
 
 [language.css.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.css.queries]
 path = "runtime/queries/css"
@@ -357,7 +357,7 @@ link_flags = ["-O3"]
 
 [language.diff.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.diff.queries]
 path = "runtime/queries/diff"
@@ -438,7 +438,7 @@ link_flags = ["-O3", "-flto=auto"]
 
 [language.fish.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.fish.queries]
 path = "runtime/queries/fish"
@@ -468,7 +468,7 @@ link_flags = ["-O3"]
 
 [language.git-commit.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.git-commit.queries]
 path = "runtime/queries/git-commit"
@@ -501,7 +501,7 @@ path = "runtime/queries/gleam"
 
 [language.gleam.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 # glsl
 # TODO
@@ -522,7 +522,7 @@ link_flags = ["-O3"]
 
 [language.go.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.go.queries]
 path = "runtime/queries/go"
@@ -561,7 +561,7 @@ link_flags = ["-O3"]
 
 [language.haskell.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.haskell.queries]
 path = "runtime/queries/haskell"
@@ -591,7 +591,7 @@ link_flags = ["-O3", "-lstdc++"]
 
 [language.html.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.html.queries]
 path = "runtime/queries/html"
@@ -621,7 +621,7 @@ link_flags = ["-O3"]
 
 [language.java.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.java.queries]
 path = "runtime/queries/java"
@@ -666,7 +666,7 @@ link_flags = ["-O3"]
 
 [language.json.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.json.queries]
 path = "runtime/queries/json"
@@ -711,7 +711,7 @@ link_flags = ["-O3"]
 
 [language.julia.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.julia.queries]
 path = "runtime/queries/julia"
@@ -759,7 +759,7 @@ link_flags = ["-O3"]
 
 [language.latex.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.latex.queries]
 path = "runtime/queries/latex"
@@ -798,7 +798,7 @@ link_flags = ["-O3"]
 
 [language.make.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.make.queries]
 path = "runtime/queries/make"
@@ -997,7 +997,7 @@ link_flags = ["-O3", "-lstdc++"]
 
 [language.python.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.python.queries]
 path = "runtime/queries/python"
@@ -1048,7 +1048,7 @@ link_flags = ["-O3", "-lstdc++"]
 
 [language.ruby.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.ruby.queries]
 path = "runtime/queries/ruby"
@@ -1117,7 +1117,7 @@ link_flags = ["-O3"]
 
 [language.scheme.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.scheme.queries]
 path = "runtime/queries/scheme"
@@ -1180,7 +1180,7 @@ link_flags = ["-O3"]
 
 [language.toml.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.toml.queries]
 path = "runtime/queries/toml"
@@ -1345,7 +1345,7 @@ link_flags = ["-O3"]
 
 [language.xml.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.xml.queries]
 path = "runtime/queries/xml"
@@ -1366,7 +1366,7 @@ link_flags = ["-O3", "-lstdc++"]
 
 [language.yaml.queries.source.git]
 url = "https://github.com/helix-editor/helix"
-pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
+pin = "2cadec0b1182332338a5a1cc3062776f834d8835"
 
 [language.yaml.queries]
 path = "runtime/queries/yaml"
