@@ -483,7 +483,25 @@ path = "runtime/queries/git-commit"
 # TODO
 
 # gleam
-# TODO
+[language.gleam.grammar.source.git]
+url = "https://github.com/gleam-lang/tree-sitter-gleam"
+pin = "02a17bf9d0553406268cdbf466d57808ae712bf3"
+
+[language.gleam.grammar]
+path = "src"
+compile = "cc"
+compile_args = ["-c", "-fpic", "../parser.c", "../scanner.c", "-I", ".."]
+compile_flags = ["-O3"]
+link = "cc"
+link_args = ["-shared", "-fpic", "parser.o", "scanner.o", "-o", "gleam.so"]
+link_flags = ["-O3"]
+
+[language.gleam.queries]
+path = "runtime/queries/gleam"
+
+[language.gleam.queries.source.git]
+url = "https://github.com/helix-editor/helix"
+pin = "dbd248fdfa680373d94fbc10094a160aafa0f7a7"
 
 # glsl
 # TODO
