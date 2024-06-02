@@ -103,6 +103,11 @@ filetypes = ["crystal"]
 command = "crystalline"
 args = ["--stdio"]
 
+[language_server.gleam]
+roots = ["gleam.toml"]
+filetypes = ["gleam"]
+command = "gleam"
+args = ["lsp"]
 
 # [language_server.scls]
 # roots = [".git", ".hg"]
