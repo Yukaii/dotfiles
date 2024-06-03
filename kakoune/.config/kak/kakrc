@@ -16,6 +16,8 @@ source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
 source "%val{config}/jump_mode.kak"
 source "%val{config}/git.kak"
+source "%val{config}/gleam.kak"
+# source "%val{config}/jump-stack.kak"
 # source "%val{config}/amber.kak"
 # source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 
@@ -200,7 +202,7 @@ map globa user 'j' -docstring 'Enter jump mode' ':enter-user-mode jump-actions<r
 map global user g ': enter-user-mode git<ret>' -docstring "git mode"
 
 # kak-lsp
-hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml) %{
+hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml|gleam) %{
     lsp-enable-window
 }
 lsp-inlay-hints-enable       global

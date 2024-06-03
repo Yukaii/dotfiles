@@ -485,7 +485,7 @@ path = "runtime/queries/git-commit"
 # gleam
 [language.gleam.grammar.source.git]
 url = "https://github.com/gleam-lang/tree-sitter-gleam"
-pin = "02a17bf9d0553406268cdbf466d57808ae712bf3"
+pin = "bcf9c45b56cbe46e9dac5eee0aee75df270000ac"
 
 [language.gleam.grammar]
 path = "src"
