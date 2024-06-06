@@ -21,6 +21,13 @@ mru=~/.cache/kak-mru-"$pwd"
 
 [ ! -f "$mru" ] && touch "$mru"
 
+# Clean up: Remove non-existing files from MRU
+temp_mru=$(mktemp)
+while read -r path; do
+    [ -e "$path" ] && echo "$path" >> "$temp_mru"
+done < "$mru"
+mv "$temp_mru" "$mru"
+
 # Create a temp file with relative paths
 relative_mru=$(mktemp)
 awk -v pwd="$PWD" '{ sub("^" pwd "/", "", $0); print }' "$mru" > "$relative_mru"
