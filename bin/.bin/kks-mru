@@ -19,10 +19,16 @@ preview_cmd="bat --color=always --line-range=:500"
 pwd=$(echo $PWD | sed 's|/|-|g')
 mru=~/.cache/kak-mru-"$pwd"
 
-
 [ ! -f "$mru" ] && touch "$mru"
 
-selected=$(fzf --height 100% --prompt 'mru> ' --preview "$preview_cmd {}" < "${mru}")
+# Create a temp file with relative paths
+relative_mru=$(mktemp)
+awk -v pwd="$PWD" '{ sub("^" pwd "/", "", $0); print }' "$mru" > "$relative_mru"
+
+selected=$(fzf --height 100% --prompt 'mru> ' --preview "$preview_cmd {}" < "$relative_mru")
 if [ -n "$selected" ]; then
-	kks edit "${selected}"
+    kks edit "$PWD/$selected"
 fi
+
+# Cleanup temporary file
+rm "$relative_mru"
