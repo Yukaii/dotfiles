@@ -236,6 +236,10 @@ hook global WinCreate .* %{
     add-highlighter window/git-diff flag-lines Default git_diff_flags
 }
 
+# from https://discord.com/channels/717163870724161556/717165513750609991/1247892374840147988
+# Keep buffer list in mru order
+hook global WinDisplay .* %{ arrange-buffers %val{hook_param} }
+
 # trigger update diff if inside git dir
 hook global BufOpenFile .* %{
     evaluate-commands -draft %sh{
