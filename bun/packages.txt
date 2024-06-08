@@ -4,4 +4,4 @@ git-split-diffs@1.1.0
 http-server@14.1.1
 license@1.0.3
 typescript-language-server@4.3.3
-vscode-langservers-extracted@4.10.0
+vscode-langservers-extracted@4.8.0
