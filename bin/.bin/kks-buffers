@@ -13,7 +13,7 @@ history_file="$HOME/.cache/kks-buffers-history"
 
 kks get '%val{buflist}' |
 	grep -F "$*" |
-	fzf --height 100% --prompt 'buf> ' --preview "kks cat -b {} | $preview_cmd" \
+	fzf --height 100% --highlight-line --prompt 'buf> ' --preview "kks cat -b {} | $preview_cmd" \
 		--header="[c-x] delete, [c-t] new scratch" \
 		--bind="ctrl-x:execute-silent(kks send -b {} delete-buffer)+reload(kks get '%val{buflist}')" \
 		--bind="ctrl-t:execute-silent(kks send edit -scratch {q})+reload(kks get '%val{buflist}')" \

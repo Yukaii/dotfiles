@@ -14,7 +14,7 @@ query=""
 [ "$(kks get %val[selection_length])" -gt 1 ] && query="$(kks get %val[selection])"
 
 rg --vimgrep --hidden '.+' "$@" |
-	SHELL=sh fzf --delimiter=":" --query="$query" --height="100%" --prompt="grep> " --history="$history_file" \
+	SHELL=sh fzf --delimiter=":" --query="$query" --height="100%" --prompt="grep> " --history="$history_file" --highlight-line \
 		--preview='range="$(echo {2}-5 | bc | sed "s/^-.*/0/"):$(echo {2}+20 | bc)"; bat -r "$range" -n --color always -H {2} {1}' |
 	awk -F':' '{print $1 " " "+" $2 ":" $3 }' |
 	xargs -r kks edit
