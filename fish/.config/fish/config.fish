@@ -413,6 +413,7 @@ fnm env --use-on-cd | source
 zoxide init fish | source
 atuin init fish | source
 kubectl completion fish | source
+mise activate fish | source
 
 alias kbc="kubectl"
 
