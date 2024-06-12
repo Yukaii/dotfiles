@@ -151,6 +151,7 @@ customCommands:
         filter: '#(?P<number>[0-9]+): (?P<title>.+) - (?P<ref_name>[^ ]+).*'
         valueFormat: '{{.number}}'
         labelFormat: '{{"#" | black | bold}}{{.number | white | bold}} {{.title | yellow | bold}}{{" [" | black | bold}}{{.ref_name | green}}{{"]" | black | bold}}'
+  # from https://github.com/jesseduffield/lazygit/issues/2579#issuecomment-2161434274
   - key: <c-a>
     description: Pick AI commit
     command: 'aichat "Please suggest 10 commit messages, given the following diff:
