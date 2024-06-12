@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+ghprco() {
+    pr_number=$(ghpr)
+    gh pr checkout "$pr_number"
+}
+
+ghprco
