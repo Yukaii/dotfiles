@@ -408,3 +408,8 @@ cork increment https://gitlab.com/Screwtapello/kakoune-inc-dec %{
   map global increment-mode x ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
 }
 
+cork edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir %{
+  unalias global e edit
+  alias global e edit-or-dir
+  set-option global edit_or_dir_hidden '-A'
+}
