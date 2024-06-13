@@ -2,7 +2,7 @@ evaluate-commands %sh{
   kks init
   cork init
   kak-lsp --kakoune -s $kak_session
-  kak-tree-sitter -dks --session $kak_session --with-highlighting
+  kak-tree-sitter -dks --init $kak_session
   # hop-kak --init
   gitlinker init kakoune
 }
