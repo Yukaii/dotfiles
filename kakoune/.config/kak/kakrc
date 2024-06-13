@@ -408,7 +408,3 @@ cork increment https://gitlab.com/Screwtapello/kakoune-inc-dec %{
   map global increment-mode x ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
 }
 
-# cork easymotion https://git.sr.ht/~voroskoi/easymotion.kak %{
-#   require-module easymotion
-#   map global user ';' ': enter-user-mode easymotion<ret>' -docstring 'Enter easymotion mode'
-# }
