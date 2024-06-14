@@ -414,11 +414,8 @@ cork visual-mode https://gitlab.com/dead10ck/visual-mode.kak.git %{
 }
 
 cork increment https://gitlab.com/Screwtapello/kakoune-inc-dec %{
-  declare-user-mode increment-mode
-
-  map global normal <c-a> ': enter-user-mode increment-mode<ret>'
-  map global increment-mode a ': inc-dec-modify-numbers + %val{count}<ret>' -docstring 'increment'
-  map global increment-mode x ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
+  map global normal <c-a> ': inc-dec-modify-numbers + %val{count}<ret>' -docstring 'increment'
+  map global normal <c-x> ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
 }
 
 cork edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir %{
