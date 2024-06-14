@@ -104,7 +104,7 @@ command = "crystalline"
 args = ["--stdio"]
 
 [language_server.gleam]
-roots = ["gleam.toml"]
+roots = ["gleam.toml", "manifest.toml"]
 filetypes = ["gleam"]
 command = "gleam"
 args = ["lsp"]
