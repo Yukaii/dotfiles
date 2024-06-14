@@ -237,7 +237,11 @@ define-command -hidden unset-k %{
 map global user J ':unset-j<ret>' -docstring 'Line move down'
 map global user K ':unset-k<ret>' -docstring 'Line move up'
 
-define-command glow -params ..1 -file-completion  %{
+define-command glow -params ..1 -file-completion -docstring %{
+  glow [<arguments>]: glow utility wrapper
+  All optional arguments are forwarded to the glow utility
+  If no arguments is passed. The current buffer will be previewed in pager mode
+} %{
   evaluate-commands %sh{
     if [ $# -eq 0 ]; then
       if [ -e "$kak_buffile" ]; then
@@ -245,11 +249,11 @@ define-command glow -params ..1 -file-completion  %{
       else
         dir="$(dirname "$kak_buffile")"
         if [ -d "$dir" ]; then
-          echo "terminal-horizontal glow -p $dir"
+          echo "terminal-horizontal glow $dir"
         fi
       fi
     else
-      echo "terminal-horizontal glow -p %arg{@}"
+      echo "terminal-horizontal glow %arg{@}"
     fi
   }
 }
