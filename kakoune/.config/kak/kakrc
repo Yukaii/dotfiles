@@ -224,6 +224,19 @@ map global object D '<a-semicolon>lsp-diagnostic-object<ret>'                   
 
 set-option global lsp_auto_show_code_actions true
 
+
+# Wrap line movement
+define-command -hidden unset-j %{
+    try %{ execute-keys "<a-:>%val(window_width)l<a-b>hl" }
+}
+
+define-command -hidden unset-k %{
+    try %{ execute-keys "<a-;>%val(window_width)h<a-b>lh" }
+}
+
+map global user J ':unset-j<ret>' -docstring 'Line move down'
+map global user K ':unset-k<ret>' -docstring 'Line move up'
+
 # Hooks
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
@@ -301,7 +314,7 @@ cork smarttab "https://github.com/andreyorst/smarttab.kak"
 
 cork konflict "https://github.com/eko234/git-konflict.kak" %{
   declare-user-mode konflict
-  map global user K ': enter-user-mode konflict<ret>'         -docstring 'Konflict mode'
+  map global user k ': enter-user-mode konflict<ret>'         -docstring 'Konflict mode'
   map global konflict s ': konflict-start<ret>'               -docstring 'Konflict start'
   map global konflict j ': konflict-use-mine<ret>'            -docstring 'Use mine'
   map global konflict k ': konflict-use-yours<ret>'           -docstring 'Use yours'
