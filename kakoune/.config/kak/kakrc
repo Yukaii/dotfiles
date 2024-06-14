@@ -237,6 +237,23 @@ define-command -hidden unset-k %{
 map global user J ':unset-j<ret>' -docstring 'Line move down'
 map global user K ':unset-k<ret>' -docstring 'Line move up'
 
+define-command glow -params ..1 -file-completion  %{
+  evaluate-commands %sh{
+    if [ $# -eq 0 ]; then
+      if [ -e "$kak_buffile" ]; then
+        echo "terminal-horizontal glow -p %val{buffile}"
+      else
+        dir="$(dirname "$kak_buffile")"
+        if [ -d "$dir" ]; then
+          echo "terminal-horizontal glow -p $dir"
+        fi
+      fi
+    else
+      echo "terminal-horizontal glow -p %arg{@}"
+    fi
+  }
+}
+
 # Hooks
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
