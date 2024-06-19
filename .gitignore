@@ -24,6 +24,7 @@ tmux/.tmux/resurrect
 
 kakoune/Library/Application Support/kak-tree-sitter/*
 !kakoune/Library/Application Support/kak-tree-sitter/config.toml
+!kakoune/Library/Application Support/kak-tree-sitter/additional
 kakoune/.config/kak/bundle/*
 
 bombdadillo/.config/*
