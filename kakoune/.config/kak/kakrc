@@ -29,7 +29,7 @@ set global indentwidth 2
 set global tabstop 2
 
 # enable autocomplete trigger
-set global autocomplete prompt
+# set global autocomplete prompt
 
 # debug
 # set global lsp_cmd "kak-lsp -s %val{session} -vvvv --log /tmp/kak-lsp.log"
