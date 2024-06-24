@@ -110,6 +110,10 @@ define-command lazygit -hidden -docstring 'Launch lazygit' %{ nop %sh{
   (tmux-popup lazygit &) >/dev/null 2>/dev/null
 }}
 
+define-command serpl -hidden -docstring 'Launch serpl' %{ nop %sh{
+  (tmux-popup serpl &) >/dev/null 2>/dev/null
+}}
+
 
 define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
@@ -122,6 +126,7 @@ map global terminal-actions 'l' ':lazygit<ret>'           -docstring 'lazygit'
 map global terminal-actions 'b' ':bottom-terminal<ret>'   -docstring 'bottom terminal'
 map global terminal-actions 'B' ':open_blame<ret>'        -docstring 'Git Blame'
 map global terminal-actions 'f' ':floating-terminal<ret>' -docstring 'Floating terminal'
+map global terminal-actions 'r' ':serpl<ret>' -docstring 'serpl'
 
 define-command -hidden open_blame %{
   terminal-vertical tig blame %val{buffile} "+%val{cursor_line}"
@@ -405,7 +410,7 @@ cork harpoon 'https://github.com/raiguard/kak-harpoon' %{
 cork live_grep 'https://github.com/raiguard/kak-live-grep' %{
   map global find-actions -docstring 'live grep'   '/' ':live-grep<ret>'
 }
-cork grep-write https://github.com/JacobTravers/grep-write.kak %{
+cork grep-write https://github.com/jtrv/grep-write.kak %{
   map global user -docstring 'grep write' W ':grep-write<ret>'
 }
 
@@ -436,12 +441,12 @@ cork visual-mode https://gitlab.com/dead10ck/visual-mode.kak.git %{
   map global normal <a-s-v> ': visual-line-mode V<ret>'
 }
 
-cork increment https://gitlab.com/Screwtapello/kakoune-inc-dec %{
+cork increment https://gitlab.com/Screwtapello/kakoune-inc-dec.git %{
   map global normal <c-a> ': inc-dec-modify-numbers + %val{count}<ret>' -docstring 'increment'
   map global normal <c-x> ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
 }
 
-cork edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir %{
+cork edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir.git/ %{
   unalias global e edit
   alias global e edit-or-dir
   set-option global edit_or_dir_hidden '-A'
