@@ -7,21 +7,28 @@
 # @raycast.inputType text
 # @raycast.icon 🔨
 
-# Function to format each line
-format_line() {
-    local line="$1"
+# Function to format a pair of lines
+format_pair() {
+    local name="$1"
+    local arn="$2"
 
-    # Check if the line contains 'arn:aws'
-    if [[ "$line" =~ arn:aws:ecs:[^:]+:[^:]+:task-definition/([-A-Za-z0-9]+):([0-9]+) ]]; then
-        local name="${BASH_REMATCH[1]}"
-        local revision="${BASH_REMATCH[2]}"
+    # Remove '_revision' suffix if it exists
+    name="${name%_revision}"
+
+    if [[ "$arn" =~ arn:aws:ecs:[^:]+:[^:]+:task-definition/[^:]+:([0-9]+) ]]; then
+        local revision="${BASH_REMATCH[1]}"
         echo "- [ ] ${name}: ${revision}"
-    # else
-    #     echo "Unrecognized format: $line"
+    else
+        echo "Unrecognized format: $arn"
     fi
 }
 
-# Read lines from input
-while IFS= read -r line; do
-    format_line "$line"
+# Read all input into a variable
+input=$(cat)
+
+# Process pairs of lines
+echo "$input" | while IFS= read -r name && IFS= read -r arn; do
+    if [ -n "$name" ] || [ -n "$arn" ]; then
+        format_pair "$name" "$arn"
+    fi
 done
