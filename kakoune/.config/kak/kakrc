@@ -3,7 +3,6 @@ evaluate-commands %sh{
   cork init
   kak-lsp --kakoune -s $kak_session
   kak-tree-sitter -dks --init $kak_session
-  # hop-kak --init
   gitlinker init kakoune
 }
 
