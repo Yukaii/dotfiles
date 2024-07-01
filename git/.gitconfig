@@ -63,3 +63,6 @@
 [rerere]
 	enabled = true
 	autoUpdate = true
+[split-diffs]
+	theme-name = github-dark-dim
+	min-line-width = 40
