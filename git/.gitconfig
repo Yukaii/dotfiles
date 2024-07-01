@@ -31,7 +31,8 @@
     dft = difftool
 
     delete-squashed = "!f() { \
-      local targetBranch=${1:-main}; \
+      local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
+      local targetBranch=${1:-$defaultBranch}; \
       git checkout -q $targetBranch; \
       git branch --merged | \
         grep -v \"\\*\" | \
