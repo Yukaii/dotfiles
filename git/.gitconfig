@@ -54,9 +54,24 @@
 
   ff-branch = "!f() { git fetch ${2:-origin} $1:$1; }; f"
 
-  pr-diff = "!f() { git diff $(git merge-base HEAD $1) HEAD; }; f"
-  pr-diff-stat = "!f() { git diff --stat $(git merge-base HEAD $1) HEAD; }; f"
-  pr-diff-files = "!f() { git diff --name-only $(git merge-base HEAD $1) HEAD; }; f"
+  pr-diff = "!f() { \
+    local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
+    local compareBranch=${1:-$defaultBranch}; \
+    git diff $(git merge-base HEAD $compareBranch) HEAD; \
+  }; f"
+
+  pr-diff-stat = "!f() { \
+    local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
+    local compareBranch=${1:-$defaultBranch}; \
+    git diff --stat $(git merge-base HEAD $compareBranch) HEAD; \
+  }; f"
+
+  pr-diff-files = "!f() { \
+    local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
+    local compareBranch=${1:-$defaultBranch}; \
+    git diff --name-only $(git merge-base HEAD $compareBranch) HEAD; \
+  }; f"
+
 [branch]
 	sort = -committerdate
 [column]
