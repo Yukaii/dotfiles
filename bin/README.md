@@ -74,6 +74,21 @@ This will terminate all sessions that match the name "mysession", including both
 
 #### Create or attach to a floating popup session
 
+The `popup` command in `tsm` is a unique feature that sets it apart from standard tmux session management. It creates and manages special "floating" popup sessions that offer several advantages:
+
+1. **Persistence**: Everything you do in these popup sessions is persistent across tmux restarts.
+2. **Context-Awareness**: Each popup session is tied to the tmux window it was created from, allowing for context-specific popups.
+3. **Automatic Management**: The script handles creation, attachment, and window management automatically.
+
+### Why `tsm`?
+
+I developed `tsm` to address limitations in existing tmux session management tools:
+
+1. **Unified Popup and Session Management**: Most tools don't integrate popup functionality with session management. `tsm` brings these together seamlessly.
+2. **Smart Session Naming**: `tsm` uses a naming convention that allows for multiple floating sessions tied to different contexts, yet presents them as a single entity for easier management.
+3. **Intelligent Process Handling**: When launching a program in a popup, `tsm` checks if it's already running and switches to it instead of creating duplicates.
+
+
 ```bash
 # Launch a tmux popup with a persistent session
 tsm popup
