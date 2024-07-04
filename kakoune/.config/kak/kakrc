@@ -106,11 +106,11 @@ map global normal '<a-down>' 'xdp'
 declare-user-mode terminal-actions
 
 define-command lazygit -hidden -docstring 'Launch lazygit' %{ nop %sh{
-  (tmux-popup lazygit &) >/dev/null 2>/dev/null
+  (tsm popup lazygit &) >/dev/null 2>/dev/null
 }}
 
 define-command serpl -hidden -docstring 'Launch serpl' %{ nop %sh{
-  (tmux-popup serpl &) >/dev/null 2>/dev/null
+  (tsm popup serpl &) >/dev/null 2>/dev/null
 }}
 
 
@@ -118,7 +118,7 @@ define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
 }
 define-command floating-terminal -hidden -docstring 'Launch floating terminal' %{ nop %sh{
-  (tmux-popup &) >/dev/null 2>/dev/null
+  (tsm popup &) >/dev/null 2>/dev/null
 }}
 
 map global terminal-actions 'l' ':lazygit<ret>'           -docstring 'lazygit'
