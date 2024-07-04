@@ -32,24 +32,95 @@ ncduu --view
 ncduu /path/to/directory --view
 ```
 
-## [`tmux-popup`](././.bin/tmux-popup)
+## [`Tmux Session Manager (tsm)`](./.bin/tsm)
 
-A wrapper for tmux popup. It automatically instantiates a tmux popup with a mounted special session for that popup. Everything you do in the tmux popup will be persistent.
+`tsm` is a powerful command-line tool for managing tmux sessions efficiently. It combines session listing, killing, and popup functionality in one convenient script.
 
-It also accepts launching programs as arguments, such as lazygit. If the panel is already launched, it won't create a duplicate panel.
+### Features
 
-Example usage:
+- List all unique tmux session names
+- Kill tmux sessions by base name
+- Create or attach to floating popup sessions
+- Integrated help system for easy usage
+
+### Usage
+
+```bash
+tsm <command> [options]
+```
+
+#### Commands
+
+- `list`: List all unique session names
+- `kill <session>`: Kill all sessions with the given base name
+- `popup [command]`: Create or attach to a floating popup session
+- `help [command]`: Display help information for tsm or a specific command
+
+### Examples
+
+#### List all sessions
+
+```bash
+tsm list
+```
+
+#### Kill a session
+
+```bash
+tsm kill mysession
+```
+
+This will terminate all sessions that match the name "mysession", including both regular and floating sessions.
+
+#### Create or attach to a floating popup session
 
 ```bash
 # Launch a tmux popup with a persistent session
-tmux-popup
+tsm popup
 
 # Launch a tmux popup with lazygit
-tmux-popup lazygit
+tsm popup lazygit
 
 # Launch a tmux popup with htop
-tmux-popup htop
+tsm popup htop
 ```
+
+The `popup` command automatically instantiates a tmux popup with a mounted special session for that popup. Everything you do in the tmux popup will be persistent. If the panel is already launched, it won't create a duplicate panel.
+
+#### Display help
+
+```bash
+# General help
+tsm help
+
+# Help for a specific command
+tsm help popup
+```
+
+### Tmux Configuration
+
+To integrate `tsm` with your tmux configuration, you can add the following bindings to your `tmux.conf`:
+
+```tmux
+# Remove sessions
+bind-key r run-shell "echo $(tsm list | fzf-tmux -p 55%,60% \
+  --no-sort --border-label ' Remove Session ' \
+  --prompt '🗑️  ' \
+  --header '  Enter to remove session, Esc to cancel' \
+  --bind 'enter:execute(tsm kill {})+reload(tsm list)'\
+) > /dev/null"
+
+# Attach to sessions
+bind-key a run-shell "tsm list | fzf-tmux -p 55%,60% \
+  --no-sort --border-label ' Attach to Session ' \
+  --prompt '🔗  ' \
+  --header '  Enter to attach to session, Esc to cancel' \
+  --bind 'enter:execute-silent(tmux switch-client -t {})+abort' \
+  --exit-0"
+```
+
+These bindings allow you to quickly remove or attach to sessions using fzf within tmux.
+
 
 ## [`wezl`](././.bin/wezl)
 
