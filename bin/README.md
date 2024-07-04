@@ -80,7 +80,7 @@ The `popup` command in `tsm` is a unique feature that sets it apart from standar
 2. **Context-Awareness**: Each popup session is tied to the tmux window it was created from, allowing for context-specific popups.
 3. **Automatic Management**: The script handles creation, attachment, and window management automatically.
 
-### Why `tsm`?
+##### Why `tsm`?
 
 I developed `tsm` to address limitations in existing tmux session management tools:
 
