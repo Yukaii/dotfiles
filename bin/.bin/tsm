@@ -58,46 +58,118 @@ popup() {
     fi
 }
 
-# Function to display help
 display_help() {
-    echo "Usage: tsm <command> [arguments]"
-    echo
-    echo "Commands:"
-    echo "  list                  List all unique session names"
-    echo "  kill <session_name>   Kill all sessions with the given base name"
-    echo "  popup [command]       Create or attach to a floating popup session"
-    echo "  help                  Display this help message"
-    echo
-    echo "For the 'popup' command:"
-    echo "  If a command is provided, it will be executed in the new session."
-    echo "  If no command is provided, a new shell will be opened in the floating session."
-    echo "  If the floating session already exists, the script will attach to it."
-    echo "  If a command is provided and the process is already running in the session,"
-    echo "  the script will switch to the corresponding window."
+    local command="$1"
+    case "$command" in
+        "")
+            cat << EOF
+Usage: tsm <command> [options]
+
+Tmux Session Manager (tsm) - Manage tmux sessions efficiently
+
+Commands:
+  list                List all unique session names
+  kill <session>      Kill all sessions with the given base name
+  popup [command]     Create or attach to a floating popup session
+  help [command]      Display help information for tsm or a specific command
+
+Use "tsm help <command>" for more information about a specific command.
+EOF
+            ;;
+        "list")
+            cat << EOF
+Usage: tsm list
+
+List all unique tmux session names.
+
+This command displays a list of all unique session names, removing any
+"floating_" prefixes and numeric suffixes for easier readability.
+
+Example:
+  $ tsm list
+EOF
+            ;;
+        "kill")
+            cat << EOF
+Usage: tsm kill <session_name>
+
+Kill all tmux sessions with the given base name.
+
+This command will terminate all sessions that match the provided name,
+including both regular and floating sessions.
+
+Arguments:
+  <session_name>    The base name of the session(s) to kill
+
+Example:
+  $ tsm kill mysession
+EOF
+            ;;
+        "popup")
+            cat << EOF
+Usage: tsm popup [command]
+
+Create or attach to a floating popup tmux session.
+
+If no command is provided, a new shell will be opened in the floating session.
+If the floating session already exists, the script will attach to it.
+If a command is provided and the process is already running in the session,
+the script will switch to the corresponding window.
+
+Arguments:
+  [command]    Optional command to run in the new session
+
+Examples:
+  $ tsm popup
+  $ tsm popup "vim myfile.txt"
+EOF
+            ;;
+        *)
+            echo "Error: Unknown command '$command'. Use 'tsm help' for general usage information."
+            exit 1
+            ;;
+    esac
 }
 
 # Main script
 main() {
     case "$1" in
         list)
-            list_sessions
+            if [ "$2" = "--help" ] || [ "$2" = "-h" ]; then
+                display_help "list"
+            else
+                list_sessions
+            fi
             ;;
         kill)
-            if [ -z "$2" ]; then
-                echo "Error: No session name provided for kill command" >&2
+            if [ "$2" = "--help" ] || [ "$2" = "-h" ]; then
+                display_help "kill"
+            elif [ -z "$2" ]; then
+                echo "Error: No session name provided for kill command. Use 'tsm help kill' for usage information." >&2
                 exit 1
+            else
+                kill_session "$2"
             fi
-            kill_session "$2"
             ;;
         popup)
-            shift
-            popup "$@"
+            if [ "$2" = "--help" ] || [ "$2" = "-h" ]; then
+                display_help "popup"
+            else
+                shift
+                popup "$@"
+            fi
             ;;
         help)
+            display_help "$2"
+            ;;
+        --help|-h)
+            display_help
+            ;;
+        "")
             display_help
             ;;
         *)
-            echo "Error: Unknown command. Use 'tsm help' for usage information." >&2
+            echo "Error: Unknown command '$1'. Use 'tsm help' for usage information." >&2
             exit 1
             ;;
     esac
