@@ -113,6 +113,10 @@ define-command serpl -hidden -docstring 'Launch serpl' %{ nop %sh{
   (tsm popup serpl &) >/dev/null 2>/dev/null
 }}
 
+define-command lazyjj -hidden -docstring 'Launch lazyjj' %{ nop %sh{
+  (tsm popup lazyjj &) >/dev/null 2>/dev/null
+}}
+
 
 define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
@@ -122,6 +126,7 @@ define-command floating-terminal -hidden -docstring 'Launch floating terminal' %
 }}
 
 map global terminal-actions 'l' ':lazygit<ret>'           -docstring 'lazygit'
+map global terminal-actions 'j' ':lazyjj<ret>'           -docstring 'lazyjj'
 map global terminal-actions 'b' ':bottom-terminal<ret>'   -docstring 'bottom terminal'
 map global terminal-actions 'B' ':open_blame<ret>'        -docstring 'Git Blame'
 map global terminal-actions 'f' ':floating-terminal<ret>' -docstring 'Floating terminal'
