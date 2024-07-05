@@ -10,7 +10,11 @@
   "ui_font_family": "Input Sans Compressed",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrains Mono",
-  "theme": "Rosé Pine Moon",
+  "theme": {
+    "dark": "Catppuccin Macchiato",
+    "mode": "dark",
+    "light": "Rosé Pine Dawn"
+  },
   "vim_mode": true,
   "auto_update": true,
   "terminal": {
@@ -34,5 +38,22 @@
     "inline_blame": {
       "enabled": false
     }
+  },
+  "experimental.theme_overrides": {
+    "background.appearance": "blurred",
+    "background": "#2D2B40A0",
+    "editor.background": "#00000030",
+    "editor.gutter.background": "#00000030",
+    "tab_bar.background": "#00000030",
+    "terminal.background": "#00000030",
+    "toolbar.background": "#00000030",
+    "tab.active_background": "#28282820",
+    "tab.inactive_background": "#00000000",
+    "status_bar.background": "#00000030",
+    "title_bar.background": "#00000030",
+    "panel.background": "#00000030",
+    "border.variant": "#00000000",
+    "scrollbar.track.border": "#00000000",
+    "editor.active_line.background": "#00000000"
   }
 }
