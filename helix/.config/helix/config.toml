@@ -132,17 +132,19 @@ c   = ":buffer-close"
 C   = ":config-reload"
 ',' = ":config-open"
 o = "file_picker_in_current_buffer_directory"
-e = ":sh hx-wezterm.sh explorer"
+e = ":sh hx-utils explorer"
 # Zen mode
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
 [keys.normal.space.t]
-l = ":sh tmux-popup lazygit"
-f = ":sh tmux-popup"
+l = ":sh tsm popup lazygit"
+f = ":sh tsm popup"
+j = ":sh tsm popup lazyjj"
+r = ":sh tsm popup serpl"
 
 [keys.normal.";"]
-b = ":sh hx-wezterm.sh blame"
-o = ":sh hx-wezterm.sh open"
+b = ":sh hx-utils blame"
+o = ":sh hx-utils open"
 f = ":sh winmux sp hx-fzf.sh > /dev/null"
 t = ":sh winmux sp fish > /dev/null"
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
