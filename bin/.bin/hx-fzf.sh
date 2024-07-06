@@ -10,7 +10,7 @@ line_count=$(echo "$selected_files" | grep -c '^')
 if [ -n "$selected_files" ]; then
     if [ "$line_count" -eq "1" ]; then
         file=$(echo $selected_files | awk -F: '{print $1 ":" $2 ":" $3}')
-        hx-wez -d top $file
+        hx-open -d top $file
     else
         qf_tmp=$(mktemp)
         echo "$selected_files" | awk -F: '{

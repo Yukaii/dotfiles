@@ -2,7 +2,7 @@
 
 set -x
 
-export EDITOR="hx-wez"
+export EDITOR="hx-open"
 
 if [[ -n "$TMUX" ]]; then
   mode="tmux"
@@ -91,7 +91,7 @@ case "$1" in
   "explorer")
     case $mode in
       tmux)
-        env_line="EDITOR=hx-wez"
+        env_line="EDITOR=hx-open"
         current_pane_id="${TMUX_PANE}"
 
         # List all panes and check if a broot process is running in any of them, excluding the current pane
