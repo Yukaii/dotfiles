@@ -86,6 +86,21 @@ local function createFontConfig(fontName)
       font = wezterm.font_with_fallback({ family = "Input Mono", weight = 'Light' }),
       font_size = 15.5,
       line_height = 1.1,
+    },
+    ["Lilex Nerd Font Mono"] = {
+      font = wezterm.font_with_fallback({ family = "Lilex Nerd Font" }),
+      font_size = 15,
+      line_height = 1.1,
+      harfbuzz_features = {
+        "calt",
+        "ss01",
+        "ss02",
+        "ss03",
+        "ss04",
+        "cv10",
+        "cv08",
+        "cv11",
+      }
     }
   }
 
