@@ -1,0 +1,3 @@
+#!/bin/sh
+model_prompt="$*"
+magic-cli suggest "$model_prompt"
