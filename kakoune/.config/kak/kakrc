@@ -270,6 +270,23 @@ define-command glow -params ..1 -file-completion -docstring %{
   }
 }
 
+define-command grup-write -docstring "
+  grup-write: pipes the current grep-buffer to grug -w and prints the results
+" %{
+  declare-option -hidden str grug_buf
+  evaluate-commands -draft %{
+    evaluate-commands %sh{
+      echo "set-option buffer grug_buf '$(mktemp /tmp/grug_buf.XXX)'"
+    }
+    write -sync -force %opt{grug_buf}
+    evaluate-commands %sh{
+      cat "$kak_opt_grug_buf" | grug -w |
+        xargs -I{} echo "echo -debug 'grug: {}'; echo -markup {Information} 'grug: {}';"
+    }
+  }
+}
+
+
 # Hooks
 hook global RegisterModified '"' %{ nop %sh{
   printf %s "$kak_main_reg_dquote" | pbcopy
@@ -409,7 +426,6 @@ cork harpoon 'https://github.com/raiguard/kak-harpoon' %{
   map global harpoon 7 ':harpoon-nav 7<ret>'        -docstring "go harpoon"
   map global harpoon 8 ':harpoon-nav 8<ret>'        -docstring "go harpoon"
   map global harpoon 9 ':harpoon-nav 9<ret>'        -docstring "go harpoon"
-
 }
 
 cork live_grep 'https://github.com/raiguard/kak-live-grep' %{
@@ -417,6 +433,7 @@ cork live_grep 'https://github.com/raiguard/kak-live-grep' %{
 }
 cork grep-write https://github.com/jtrv/grep-write.kak %{
   map global user -docstring 'grep write' W ':grep-write<ret>'
+  # map global user -docstring 'grup write' U ':grup-write<ret>'
 }
 
 cork replace-mode https://github.com/tomKPZ/replace-mode.kak %{
