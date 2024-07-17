@@ -24,7 +24,7 @@ select = "underline"
 
 [editor.file-picker]
 hidden = false
-git-ignore = false
+git-ignore = true
 
 [editor.statusline]
 
@@ -145,7 +145,7 @@ r = ":sh tsm popup serpl"
 [keys.normal.";"]
 b = ":sh hx-utils blame"
 o = ":sh hx-utils open"
-f = ":sh winmux sp hx-fzf.sh > /dev/null"
+f = ":sh winmux sp hx-fzf > /dev/null"
 t = ":sh winmux sp fish > /dev/null"
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
 
