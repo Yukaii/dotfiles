@@ -360,10 +360,9 @@ set PNPM_HOME "$HOME/Library/pnpm"
 # source "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.fish.inc"
 
 set VOLTA_HOME "$HOME/.volta"
-
 fish_add_path "$VOLTA_HOME/bin"
-
 volta completions fish | source
+
 sg completions fish | source
 fzf --fish | source
 wezterm shell-completion --shell fish | source
