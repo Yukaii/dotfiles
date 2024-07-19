@@ -21,9 +21,15 @@ editor = {}
 
 [language_server.markdown]
 filetypes = ["markdown"]
-roots = [".marksman.toml"]
+roots = [".marksman.toml", ".git", ".obsidian", ".hg"]
 command = "marksman"
 args = ["server"]
+
+
+[language_server.markdown-oxide]
+filetypes = ["markdown"]
+roots = [".git", ".hg", ".obsidian"]
+command = "markdown-oxide"
 
 [language_server.eslint]
 filetypes = ["javascript", "typescript"]
