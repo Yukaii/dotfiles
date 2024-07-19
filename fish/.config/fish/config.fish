@@ -363,52 +363,10 @@ set VOLTA_HOME "$HOME/.volta"
 
 fish_add_path "$VOLTA_HOME/bin"
 
-for completion in (volta completions fish)
-  eval $completion
-end
-
-
-if command -v sg > /dev/null
-  for completion in (sg completions fish)
-    eval $completion
-  end
-end
-
-# Setup fzf integration
+volta completions fish | source
+sg completions fish | source
 fzf --fish | source
-
-# https://shareg.pt/9HvnQ77 made with GPT-4
-function load_wezterm_completions
-  # check if wezterm cli is available
-  if not command -v wezterm > /dev/null
-      return
-  end
-
-  set -l completions (wezterm shell-completion --shell fish)
-  set -l current_completion ""
-  for line in $completions
-      if string match -qr '^complete -c wezterm -n' -- $line
-          # If a valid completion is stored, evaluate it before processing the next one
-          if test -n "$current_completion"
-              eval $current_completion
-              set -e current_completion
-          end
-      end
-
-      # Append the line to the current completion, removing line breaks and adding a space
-      set current_completion (string join " " -- $current_completion $line)
-  end
-
-  # Evaluate the last completion if it's not empty
-  if test -n "$current_completion"
-      eval $current_completion
-  end
-
-  complete -c wezterm -n "__fish_seen_subcommand_from ssh" -a '(__fish_print_hostnames)'
-end
-
-load_wezterm_completions
-
+wezterm shell-completion --shell fish | source
 fnm env --use-on-cd | source
 zoxide init fish | source
 atuin init fish | source
