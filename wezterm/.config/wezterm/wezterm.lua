@@ -4,7 +4,7 @@ local font_config_module = require 'font_config';
 local tab_module = require 'tab';
 
 local default_color_scheme = "Kanagawa (Gogh)"
-local font_name = "Lilex Nerd Font Mono"
+local font_name = "JetbrainsMono Nerd Font"
 local color_scheme = "Kanagawa (Gogh)"
 
 
@@ -15,6 +15,10 @@ local color_scheme = "Kanagawa (Gogh)"
 -- kanagawabones
 -- Kanagawa (Gogh)
 -- Dimidium
+
+-- available fonts
+-- JetbrainsMono Nerd Font
+-- Lilex Nerd Font Mono
 
 -- init colors variable
 local colors = color_scheme_module.getColorScheme(color_scheme, default_color_scheme)
