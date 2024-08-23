@@ -72,6 +72,11 @@
     git diff --name-only $(git merge-base HEAD $compareBranch) HEAD; \
   }; f"
 
+  checkout-default = "!f() { \
+    local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
+    git checkout $defaultBranch; \
+  }; f"
+
 [branch]
 	sort = -committerdate
 [column]
