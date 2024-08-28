@@ -13,6 +13,9 @@ if string match -q "arm64" $arc
   # set PATH $PATH "/usr/local/bin"
   fish_add_path "/opt/homebrew/bin/"
   fish_add_path "/opt/homebrew/sbin/"
+
+  # openJDK
+  fish_add_path "/opt/homebrew/opt/openjdk/bin/"
 else
   fish_add_path "/usr/local/bin"
   fish_add_path "/usr/local/sbin"
