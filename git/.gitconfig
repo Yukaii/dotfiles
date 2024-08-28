@@ -77,6 +77,18 @@
     git checkout $defaultBranch; \
   }; f"
 
+  checkout-master = "!f() { \
+    local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
+    if git rev-parse --verify main >/dev/null 2>&1; then \
+      git checkout main; \
+    elif git rev-parse --verify master >/dev/null 2>&1; then \
+      git checkout master; \
+    else \
+      git checkout $defaultBranch; \
+    fi; \
+  }; f"
+
+
 [branch]
 	sort = -committerdate
 [column]
