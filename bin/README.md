@@ -167,3 +167,91 @@ wezl --new-window --cwd /path/to/directory '||=//='
 ```
 
 Note: The wezl tool is a script and requires Wezterm to be installed and configured properly.
+
+## [ptt-login](./.bin/ptt-login)
+
+This script provides an easy way to automatically log in to the PTT BBS (Bulletin Board System).
+
+### Installation
+
+1. Ensure you have `expect` installed on your system.
+2. Save the script as `ptt-login` in a directory in your PATH (e.g., `/usr/local/bin/`).
+3. Make the script executable:
+   ```bash
+   chmod +x /path/to/ptt-login
+   ```
+4. Create a directory for profiles:
+   ```bash
+   mkdir -p ~/.ptt
+   ```
+
+### Usage
+
+```bash
+ptt-login [OPTIONS] <profile_name | username password>
+```
+
+#### Options:
+
+- `-h, --help`: Display help message
+- `-k, --keep`: Keep existing connection (default is to disconnect)
+
+#### Arguments:
+
+- `<profile_name>`: Name of the profile in ~/.ptt/ directory
+- `<username>`: PTT username (if not using a profile)
+- `<password>`: PTT password (if not using a profile)
+
+### Examples
+
+1. Using a profile:
+   ```
+   ptt-login myprofile
+   ```
+
+2. Using a profile and keeping existing connections:
+   ```
+   ptt-login -k myprofile
+   ```
+
+3. Providing username and password directly:
+   ```
+   ptt-login username password
+   ```
+
+4. Providing username and password and keeping existing connections:
+   ```
+   ptt-login -k username password
+   ```
+
+### Profiles
+
+Profiles are stored in the `~/.ptt/` directory. Each profile is a text file containing:
+
+```bash
+username
+password
+keep_connection_flag
+```
+
+The `keep_connection_flag` is optional (0 to disconnect existing sessions, 1 to keep them).
+
+### Security Considerations
+
+1. Ensure that your `~/.ptt` directory and profile files have restricted permissions:
+   ```bash
+   chmod 700 ~/.ptt
+   chmod 600 ~/.ptt/*
+   ```
+2. Be cautious when using command-line arguments for credentials, as they may be visible in your shell history or to other users via the `ps` command.
+
+### Troubleshooting
+
+If you encounter issues:
+1. Ensure you have the latest version of the script.
+2. Check that your profile files are correctly formatted.
+3. Verify that you have the necessary permissions to execute the script and read the profile files.
+
+For further assistance, please open an issue on the project's repository.
+
+

@@ -1,0 +1,118 @@
+#!/usr/bin/expect -f
+
+# Function to display help menu
+proc display_help {} {
+    puts "Usage: ptt-login \[OPTIONS\] <profile_name | username password>"
+    puts "Connect to PTT BBS with automatic login."
+    puts ""
+    puts "Options:"
+    puts "  -h, --help     Display this help message"
+    puts "  -k, --keep     Keep existing connection (default is to disconnect)"
+    puts ""
+    puts "Arguments:"
+    puts "  <profile_name>   Name of the profile in ~/.ptt/ directory"
+    puts "  <username>       PTT username (if not using a profile)"
+    puts "  <password>       PTT password (if not using a profile)"
+    puts ""
+    puts "Examples:"
+    puts "  ptt-login myprofile"
+    puts "  ptt-login -k myprofile"
+    puts "  ptt-login username password"
+    puts "  ptt-login -k username password"
+}
+
+# Default settings
+set timeout 30
+set username ""
+set password ""
+set keep_existing_connection 0
+set profile_dir "~/.ptt"
+
+# Parse command-line arguments
+set args $argv
+set args_length [llength $args]
+set i 0
+
+while {$i < $args_length} {
+    set arg [lindex $args $i]
+    switch -glob -- $arg {
+        -h - --help {
+            display_help
+            exit 0
+        }
+        -k - --keep {
+            set keep_existing_connection 1
+            incr i
+        }
+        default {
+            break
+        }
+    }
+}
+
+set remaining_args [lrange $args $i end]
+set remaining_length [llength $remaining_args]
+
+if {$remaining_length == 1} {
+    set profile_name [lindex $remaining_args 0]
+    if {[file exists "$profile_dir/$profile_name"]} {
+        set profile_file [open "$profile_dir/$profile_name" r]
+        set profile_data [split [read $profile_file] "\n"]
+        close $profile_file
+
+        set username [lindex $profile_data 0]
+        set password [lindex $profile_data 1]
+        if {[llength $profile_data] > 2} {
+            set keep_existing_connection [lindex $profile_data 2]
+        }
+    } else {
+        puts "Error: Profile '$profile_name' not found in $profile_dir"
+        exit 1
+    }
+} elseif {$remaining_length == 2} {
+    set username [lindex $remaining_args 0]
+    set password [lindex $remaining_args 1]
+} else {
+    display_help
+    exit 1
+}
+
+# Ensure we have username and password
+if {$username == "" || $password == ""} {
+    puts "Error: Username or password is missing."
+    exit 1
+}
+
+# Connect to PTT
+spawn ssh bbsu@ptt.cc
+
+# Wait for the login prompt
+expect "請輸入代號"
+send "$username\r"
+
+# Wait for the password prompt
+expect "請輸入您的密碼"
+send "$password\r"
+
+# Handle potential prompts
+expect {
+    "您想刪除其他重複登入的連線嗎？" {
+        if {$keep_existing_connection == 1} {
+            send "n\r"
+        } else {
+            send "Y\r"
+        }
+        exp_continue
+    }
+    "請按任意鍵繼續" {
+        send "\r"
+        exp_continue
+    }
+    "主功能表" {
+        # We've reached the main menu, do nothing and proceed
+    }
+}
+
+# Transfer control to the user
+interact
+
