@@ -1,0 +1,168 @@
+{
+    "pipx_spec_version": "0.1",
+    "venvs": {
+        "aider-chat": {
+            "metadata": {
+                "injected_packages": {},
+                "main_package": {
+                    "app_paths": [
+                        {
+                            "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/aider",
+                            "__type__": "Path"
+                        }
+                    ],
+                    "app_paths_of_dependencies": {
+                        "charset-normalizer": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/normalizer",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "distro": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/distro",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "flake8": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/flake8",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "grep-ast": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/gast",
+                                "__type__": "Path"
+                            },
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/grep-ast",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "httpx": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/httpx",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "huggingface-hub": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/huggingface-cli",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "json5": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/pyjson5",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "jsonschema": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/jsonschema",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "litellm": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/litellm",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "markdown-it-py": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/markdown-it",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "numpy": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/f2py",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "openai": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/openai",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "pycodestyle": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/pycodestyle",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "pyflakes": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/pyflakes",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "pygments": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/pygmentize",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "python-dotenv": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/dotenv",
+                                "__type__": "Path"
+                            }
+                        ],
+                        "tqdm": [
+                            {
+                                "__Path__": "/Users/yukai/.local/pipx/venvs/aider-chat/bin/tqdm",
+                                "__type__": "Path"
+                            }
+                        ]
+                    },
+                    "apps": [
+                        "aider"
+                    ],
+                    "apps_of_dependencies": [
+                        "normalizer",
+                        "distro",
+                        "flake8",
+                        "pycodestyle",
+                        "pyflakes",
+                        "gast",
+                        "grep-ast",
+                        "httpx",
+                        "huggingface-cli",
+                        "tqdm",
+                        "pyjson5",
+                        "jsonschema",
+                        "litellm",
+                        "openai",
+                        "dotenv",
+                        "markdown-it",
+                        "f2py",
+                        "pygmentize"
+                    ],
+                    "include_apps": true,
+                    "include_dependencies": false,
+                    "man_pages": [],
+                    "man_pages_of_dependencies": [],
+                    "man_paths": [],
+                    "man_paths_of_dependencies": {},
+                    "package": "aider-chat",
+                    "package_or_url": "aider-chat",
+                    "package_version": "0.55.0",
+                    "pinned": false,
+                    "pip_args": [],
+                    "suffix": ""
+                },
+                "pipx_metadata_version": "0.5",
+                "python_version": "Python 3.12.5",
+                "source_interpreter": {
+                    "__Path__": "/opt/homebrew/opt/python@3.12/libexec/bin/python",
+                    "__type__": "Path"
+                },
+                "venv_args": []
+            }
+        }
+    }
+}
