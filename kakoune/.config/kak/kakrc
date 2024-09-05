@@ -249,7 +249,7 @@ define-command -hidden unset-k %{
 map global user J ':unset-j<ret>' -docstring 'Line move down'
 map global user K ':unset-k<ret>' -docstring 'Line move up'
 
-define-command glow -params ..1 -file-completion -docstring %{
+define-command glow -params .. -file-completion -docstring %{
   glow [<arguments>]: glow utility wrapper
   All optional arguments are forwarded to the glow utility
   If no arguments is passed. The current buffer will be previewed in pager mode
