@@ -163,6 +163,7 @@ map global find-actions -docstring 'pick buffer'                       'B' ':ope
 map global find-actions -docstring 'terminal'                          't' ':kks-connect terminal-vertical fish<ret>'
 map global find-actions -docstring 'files'                             'f' ':kks-connect terminal-popup kks-files<ret>'
 map global find-actions -docstring 'git files'                         'g' ':kks-connect terminal-popup kks-git-files<ret>'
+map global find-actions -docstring 'git changed files'                         'd' ':kks-connect terminal-popup kks-git-changed-files<ret>'
 map global find-actions -docstring 'buffers'                           'b' ':kks-connect terminal-popup kks-buffers<ret>'
 map global find-actions -docstring 'live grep(fzf)'                    'w' ':kks-connect terminal-popup kks-grep<ret>'
 map global find-actions -docstring 'browse file on github'             'B' ':browse_github<ret>'
