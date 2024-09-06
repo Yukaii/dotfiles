@@ -120,6 +120,10 @@ local function loadFontConfig(config, fontName)
   for key, value in pairs(fontConfig) do
     config[key] = value
   end
+
+  config.window_frame = {
+    font = fontConfig["font"]
+  }
 end
 
 

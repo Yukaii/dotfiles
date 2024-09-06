@@ -69,7 +69,6 @@ local config = {
     }
   },
   scrollback_lines = 50000,
-  command_palette_font_size = 17,
   command_palette_bg_color = colors.ansi[1],
 
   inactive_pane_hsb = {
@@ -82,6 +81,8 @@ local config = {
 
   window_background_opacity = 0.9,
   macos_window_background_blur = 60,
+  command_palette_bg_color = TAB_BG,
+  command_palette_fg_color = TAB_FG,
 }
 
 font_config_module.loadFontConfig(config, font_name)
