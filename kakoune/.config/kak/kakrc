@@ -474,3 +474,7 @@ cork edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir.git/ %{
   alias global e edit-or-dir
   set-option global edit_or_dir_hidden '-A'
 }
+
+cork bookmark.kak https://github.com/Aelerinya/bookmarks.kak %{
+  hook global WinCreate .* bookmarks-enable
+}
