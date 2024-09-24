@@ -14,11 +14,11 @@
     },
     "version": "2"
   },
-  "ui_font_family": "Input Sans Compressed",
+  "ui_font_family": "JetBrains Mono",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrains Mono",
   "theme": {
-    "dark": "Catppuccin Macchiato",
+    "dark": "Github Dark",
     "mode": "dark",
     "light": "Rosé Pine Dawn"
   },
