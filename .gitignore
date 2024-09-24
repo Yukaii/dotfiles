@@ -8,6 +8,8 @@ vim/.vim/spell/*.spl
 vim/.vim/sessions
 vim/.vim/undodir
 
+micro/.config/micro/buffers/*
+
 fish/.config/fish/fish_history
 fish/.config/configstore
 fish/.config/fisherman
