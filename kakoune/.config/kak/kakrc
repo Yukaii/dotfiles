@@ -220,6 +220,8 @@ map global user T ': enter-user-mode tree-sitter<ret>' -docstring "Tree sitter m
 # kak-lsp
 hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml|gleam) %{
     lsp-enable-window
+    set-face global DiagnosticTagDeprecated +s
+    set-face global DiagnosticTagUnnecessary dim
 }
 lsp-inlay-hints-enable       global
 lsp-inlay-diagnostics-enable global
