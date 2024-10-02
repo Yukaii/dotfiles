@@ -7,3 +7,6 @@
 [submodule "kakoune/.config/kak/kak-bundle"]
 	path = kakoune/.config/kak/bundle/kak-bundle
 	url = https://github.com/jdugan6240/kak-bundle
+[submodule "bin/.bin/moreutils"]
+	path = bin/.bin/moreutils
+	url = git://git.joeyh.name/moreutils
