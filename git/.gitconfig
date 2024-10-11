@@ -97,5 +97,7 @@
 	enabled = true
 	autoUpdate = true
 [split-diffs]
-	theme-name = github-dark-dim
+  theme-directory = "/Users/yukai/.git-split-diffs/themes/"
+	theme-name = min-dark
+	; theme-name = solarized-dark
 	min-line-width = 40
