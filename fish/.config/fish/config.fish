@@ -21,6 +21,7 @@ else
   fish_add_path "/usr/local/sbin"
 end
 
+fish_add_path "$HOME/.local/bin/hx-utils-bin"
 
 set PATH $PATH "$HOME/.cargo/bin"
 
