@@ -10,6 +10,9 @@ cursorline = true
 completion-trigger-len = 1
 scroll-lines = 1
 
+[editor.whitespace.render]
+newline = "all"
+
 [editor.indent-guides]
 render = true
 character = "▏"
