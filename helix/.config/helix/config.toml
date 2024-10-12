@@ -64,6 +64,18 @@ e = ":sh hx-utils explorer"
 # Zen mode
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
+# lsp actions no move under space.l
+S = "no_op"
+s = "no_op"
+r = "no_op"
+d = "no_op"
+D = "no_op"
+a = "no_op"
+
+# swap command palette
+'?' = "no_op"
+space = "command_palette"
+
 # Terminal actions
 [keys.normal.space.t]
 l = ":sh tsm popup lazygit"
@@ -74,6 +86,15 @@ r = ":sh tsm popup serpl"
 b = ":sh winmux sp fish > /dev/null"
 B = ":sh hx-utils blame > /dev/null"
 
+# LSP commans
+[keys.normal.space.l]
+r = "rename_symbol"
+a = "code_action"
+s = "symbol_picker"
+S = "workspace_symbol_picker"
+d = "diagnostics_picker"
+D = "workspace_diagnostics_picker"
+
 [keys.normal.";"]
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
 
@@ -81,12 +102,12 @@ q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_h
 f = "file_picker"
 g = ":sh hx-utils git-files > /dev/null"
 w = ":sh hx-utils grep > /dev/null"
+d = ":sh hx-utils git-changed-files > /dev/null"
 
 [keys.insert]
 C-space = "completion"
 S-tab = "unindent"
 esc = ["collapse_selection", "normal_mode"]
-d = ":sh hx-utils git-changed-files > /dev/null"
 
 [keys.select]
 # Escape the madness! No more fighting with the cursor! Or with multiple cursors!
