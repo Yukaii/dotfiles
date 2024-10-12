@@ -42,8 +42,6 @@ display-inlay-hints = true
 
 # Keymap things
 [keys.normal]
-
-# Some nice Helix stuff
 C-h = "select_prev_sibling"
 C-j = "shrink_selection"
 C-k = "expand_selection"
