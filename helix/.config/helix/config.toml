@@ -55,6 +55,7 @@ C-e = ["scroll_down"]
 esc = ["collapse_selection", "keep_primary_selection"]
 g = { d = "goto_definition", D = ["vsplit", "goto_definition"], j = "goto_last_line", k = "goto_file_start" }
 C-p = [":new", ":insert-output lf-pick", ":theme default", "select_all", "split_selection_on_newline", "goto_file", "goto_last_modified_file", ":buffer-close!", ":theme catppuccin_mocha"]
+ret = ["goto_word"]
 
 [keys.normal.space]
 w   = ":write"
