@@ -42,7 +42,7 @@ feature_snippets = true       # enable snippets
 feature_unicode_input = true  # enable "unicode input"
 
 [language-server.scls.environment]
-RUST_LOG = "info,simple-completion-langauge-server=info"
+RUST_LOG = "info,simple-completion-language-server=info"
 LOG_FILE = "/tmp/completion.log"
 
 [language-server.crystal]
@@ -68,7 +68,7 @@ language-servers = ["gpt", "marksman", "scls"]
 
 [[language]]
 name = "tsx"
-language-servers = [ "deno", "eslint",  "gpt", "scls"]
+language-servers = [ "typescript-language-server", "eslint",  "gpt", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "tsx" ] }
 # auto-format = true
