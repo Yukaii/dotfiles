@@ -213,7 +213,6 @@ map -docstring 'enter jump mode (select mode: extend)' global jump-actions F ':e
 map -docstring 'enter jump mode (select mode: append)' global jump-actions <a-f> ':enter_jump_mode_with_append_select_mode<ret>'
 map globa user 'j' -docstring 'Enter jump mode' ':enter-user-mode jump-actions<ret>'
 
-
 map global user g ': enter-user-mode git<ret>' -docstring "git mode"
 map global user T ': enter-user-mode tree-sitter<ret>' -docstring "Tree sitter mode"
 
@@ -477,6 +476,6 @@ cork edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir.git/ %{
   set-option global edit_or_dir_hidden '-A'
 }
 
-cork bookmark.kak https://github.com/Aelerinya/bookmarks.kak %{
-  hook global WinCreate .* bookmarks-enable
-}
+# cork bookmark.kak https://github.com/Aelerinya/bookmarks.kak %{
+#   # hook global WinCreate .* bookmarks-enable
+# }
