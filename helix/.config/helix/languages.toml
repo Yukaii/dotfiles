@@ -56,62 +56,62 @@ args = ["--stdio"]
 
 [[language]]
 name = "git-commit"
-language-servers = [ "scls", "gpt" ]
+language-servers = ["scls"]
 
 [[language]]
 name = "typescript"
-language-servers = [ "typescript-language-server", "eslint", "gpt", "scls" ]
+language-servers = ["typescript-language-server", "eslint", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "typescript" ] }
 # auto-format = true
 
 [[language]]
 name = "markdown"
-language-servers = ["gpt", "marksman", "scls"]
+language-servers = ["marksman", "scls"]
 
 [[language]]
 name = "tsx"
-language-servers = [ "typescript-language-server", "eslint",  "gpt", "scls"]
+language-servers = ["typescript-language-server", "eslint", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "tsx" ] }
 # auto-format = true
 
 [[language]]
 name = "javascript"
-language-servers = [ "typescript-language-server", "eslint", "gpt", "scls"]
+language-servers = ["typescript-language-server", "eslint", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "javascript" ] }
 # auto-format = true
 
 [[language]]
 name = "jsx"
-language-servers = [ "typescript-language-server", "eslint",  "gpt", "scls"]
+language-servers = ["typescript-language-server", "eslint", "scls"]
 # formatter = { command = "prettier", args = [ "--parser", "typescript" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "jsx" ] }
 # auto-format = true
 
 [[language]]
 name = "json"
-language-servers = ["gpt", "scls"]
+language-servers = ["scls"]
 # formatter = { command = "prettier", args = [ "--parser", "json" ] }
 # formatter = { command = "dprint", args = [ "fmt", "--stdin", "json" ] }
 auto-format = true
 
 [[language]]
 name = "html"
-language-servers = [ "vscode-html-language-server", "gpt", "scls"]
+language-servers = ["vscode-html-language-server", "scls"]
 # formatter = { command = 'prettier', args = ["--parser", "html"] }
 # auto-format = true
 
 [[language]]
 name = "css"
-language-servers = [ "vscode-css-language-server", "gpt", "scls"]
+language-servers = ["vscode-css-language-server", "scls"]
 # formatter = { command = 'prettier', args = ["--parser", "css"] }
 # auto-format = true
 
 [[language]]
 name = "toml"
-language-servers = ["gpt", "scls", "taplo"]
+language-servers = ["scls", "taplo"]
 
 [[language]]
 name = "crystal"
