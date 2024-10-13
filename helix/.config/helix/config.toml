@@ -63,15 +63,15 @@ q   = ":quit"
 c   = ":buffer-close"
 C   = ":config-reload"
 ',' = ":config-open"
-o = "file_picker_in_current_buffer_directory"
-e = ":sh hx-utils explorer"
+minus = "file_picker_in_current_buffer_directory"
+e = ":sh hx-utils explorer > /dev/null"
 # Zen mode
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
 # lsp actions no move under space.l
 S = "no_op"
 s = "no_op"
-r = "no_op"
+r = ":rl"
 d = "no_op"
 D = "no_op"
 a = "no_op"
@@ -98,6 +98,23 @@ s = "symbol_picker"
 S = "workspace_symbol_picker"
 d = "diagnostics_picker"
 D = "workspace_diagnostics_picker"
+
+# Harpoon mode
+[keys.normal.space.o]
+l = ":sh hx-utils harpoon list"
+a = ":sh hx-utils harpoon add"
+d = ":sh hx-utils harpoon remove"
+e = ":sh hx-utils harpoon edit"
+1 = ":sh winmux -p 1 sp 'hx-utils harpoon open 1' > /dev/null"
+2 = ":sh winmux -p 1 sp 'hx-utils harpoon open 2' > /dev/null"
+3 = ":sh winmux -p 1 sp 'hx-utils harpoon open 3' > /dev/null"
+4 = ":sh winmux -p 1 sp 'hx-utils harpoon open 4' > /dev/null"
+5 = ":sh winmux -p 1 sp 'hx-utils harpoon open 5' > /dev/null"
+6 = ":sh winmux -p 1 sp 'hx-utils harpoon open 6' > /dev/null"
+7 = ":sh winmux -p 1 sp 'hx-utils harpoon open 7' > /dev/null"
+8 = ":sh winmux -p 1 sp 'hx-utils harpoon open 8' > /dev/null"
+9 = ":sh winmux -p 1 sp 'hx-utils harpoon open 9' > /dev/null"
+
 
 [keys.normal.";"]
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
