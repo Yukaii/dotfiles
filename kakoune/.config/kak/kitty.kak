@@ -62,7 +62,7 @@ The program passed as argument will be executed in the new terminal' \
             listen="--to=$kak_client_env_KITTY_LISTEN_ON"
         fi
 
-        kitty @ $listen action --no-response --copy-env $match "$@"
+        kitty @ $listen action --no-response $match "$@"
     }
 }
 complete-command kitty-terminal-action shell
