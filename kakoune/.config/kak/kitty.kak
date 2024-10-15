@@ -88,7 +88,7 @@ define-command kitty-popup -params 1.. -docstring '
 kitty-popup <program> [<arguments>]: create a new terminal as a kitty popup
 The program passed as argument will be executed in the new terminal' \
 %{
-  kitty-terminal-impl --type=overlay --copy-env %arg{@}
+  kitty-terminal-impl --type=os-window --copy-env %arg{@}
 }
 complete-command kitty-popup shell
 
