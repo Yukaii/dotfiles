@@ -10,6 +10,7 @@ evaluate-commands %sh{
 source "%val{config}/wakatime.kak"
 source "%val{config}/wezterm.kak"
 source "%val{config}/tmux.kak"
+source "%val{config}/kitty.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
