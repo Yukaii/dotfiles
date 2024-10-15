@@ -31,7 +31,7 @@ define-command kitty-terminal-impl -params 1.. -docstring '
 kitty-terminal-tab <program> [<arguments>]: create a new terminal as kitty tab
 The program passed as argument will be executed in the new terminal' \
 %{
-    nop %sh{
+    evaluate-commands %sh{
         match=""
         if [ -n "$kak_client_env_KITTY_WINDOW_ID" ]; then
             match="--match=window_id:$kak_client_env_KITTY_WINDOW_ID"
@@ -46,7 +46,6 @@ The program passed as argument will be executed in the new terminal' \
     }
 }
 complete-command kitty-terminal-impl shell
-
 
 define-command kitty-terminal-action -params 1.. -docstring '
 kitty-terminal-action <program> [<arguments>]: create a new terminal as kitty tab
@@ -63,7 +62,7 @@ The program passed as argument will be executed in the new terminal' \
             listen="--to=$kak_client_env_KITTY_LISTEN_ON"
         fi
 
-        kitty @ $listen action --no-response $match "$@"
+        kitty @ $listen action --no-response --copy-env $match "$@"
     }
 }
 complete-command kitty-terminal-action shell
@@ -89,7 +88,7 @@ define-command kitty-popup -params 1.. -docstring '
 kitty-popup <program> [<arguments>]: create a new terminal as a kitty popup
 The program passed as argument will be executed in the new terminal' \
 %{
-  kitty-terminal-impl --bias=30 --type=os-window  %arg{@}
+  kitty-terminal-impl --type=overlay --copy-env %arg{@}
 }
 complete-command kitty-popup shell
 

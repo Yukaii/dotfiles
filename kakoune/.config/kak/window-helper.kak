@@ -12,3 +12,9 @@ hook global ModuleLoaded tmux %{
   alias global open-broot tmux-open-broot
 }
 
+hook global ModuleLoaded kitty %{
+  alias global terminal-vertical kitty-terminal-vertical
+  alias global terminal-horizontal kitty-terminal-horizontal
+  alias global terminal-popup kitty-popup
+  # alias global open-broot kitty-open-broot
+}
