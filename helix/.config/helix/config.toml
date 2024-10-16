@@ -65,6 +65,10 @@ e = ":sh hx-utils explorer > /dev/null"
 # Zen mode
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
+# Legacy pickers
+b = "no_op"
+j = "no_op"
+
 # lsp actions no move under space.l
 S = "no_op"
 s = "no_op"
@@ -117,12 +121,15 @@ e = ":sh hx-utils harpoon edit"
 [keys.normal.";"]
 q = ["goto_line_start", "select_mode", "move_next_long_word_end", ":pipe-to qf_hx_open", "collapse_selection", "normal_mode"]
 
+# Find actions
 [keys.normal.space.f]
+b = "buffer_picker"
 f = "file_picker"
 g = ":sh hx-utils git-files > /dev/null"
 w = ":sh hx-utils grep > /dev/null"
 d = ":sh hx-utils git-changed-files > /dev/null"
 p = "file_picker_in_current_buffer_directory"
+j = "jumplist_picker"
 
 [keys.insert]
 C-space = "completion"
