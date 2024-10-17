@@ -222,7 +222,7 @@ hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss
     lsp-enable-window
     set-face global DiagnosticTagDeprecated +s
     set-face global DiagnosticTagUnnecessary dim
-    lsp-diagnostic-lines-enable
+    lsp-diagnostic-lines-enable global
 }
 
 lsp-inlay-hints-enable       global
