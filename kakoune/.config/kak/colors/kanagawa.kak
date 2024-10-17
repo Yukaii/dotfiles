@@ -82,6 +82,37 @@ set-face global Whitespace "%opt{dimgray},%opt{black}+f"
 set-face global WrapMarker Whitespace
 set-face global BufferPadding "%opt{black},%opt{black}"
 
+# kak-lsp
+set-face global InlayHint "+d@type"
+set-face global parameter "+i@variable"
+set-face global enum "%opt{cyan}"
+set-face global InlayDiagnosticError "%opt{red}"
+set-face global InlayDiagnosticWarning "%opt{light_orange}"
+set-face global InlayDiagnosticInfo "%opt{blue}"
+set-face global InlayDiagnosticHint "%opt{green}"
+set-face global LineFlagError "%opt{red}"
+set-face global LineFlagWarning "%opt{light_orange}"
+set-face global LineFlagInfo "%opt{blue}"
+set-face global LineFlagHint "%opt{green}"
+set-face global DiagnosticError ",,%opt{red}+c"
+set-face global DiagnosticWarning ",,%opt{light_orange}+c"
+set-face global DiagnosticInfo ",,%opt{blue}+c"
+set-face global DiagnosticHint ",,%opt{green}+c"
+# Infobox faces
+set-face global InfoDefault Information
+set-face global InfoBlock block
+set-face global InfoBlockQuote block
+set-face global InfoBullet bullet
+set-face global InfoHeader header
+set-face global InfoLink link
+set-face global InfoLinkMono header
+set-face global InfoMono mono
+set-face global InfoRule comment
+set-face global InfoDiagnosticError InlayDiagnosticError
+set-face global InfoDiagnosticHint InlayDiagnosticHint
+set-face global InfoDiagnosticInformation InlayDiagnosticInfo
+set-face global InfoDiagnosticWarning InlayDiagnosticWarning
+
 # Tree-sitter
 set-face global ts_attribute "%opt{blue_green}"
 set-face global ts_comment "%opt{gray}+i"
