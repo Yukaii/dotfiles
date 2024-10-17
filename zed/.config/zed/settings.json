@@ -49,5 +49,6 @@
   "tabs": {
     "file_icons": true,
     "git_status": true
-  }
+  },
+  "format_on_save": "off"
 }
