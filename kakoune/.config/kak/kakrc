@@ -222,11 +222,16 @@ hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss
     lsp-enable-window
     set-face global DiagnosticTagDeprecated +s
     set-face global DiagnosticTagUnnecessary dim
+    lsp-diagnostic-lines-enable
 }
+
 lsp-inlay-hints-enable       global
 lsp-inlay-diagnostics-enable global
 
+set-option global lsp_hover_anchor true
+
 map global lsp 'D' ':lsp-diagnostics<ret>' -docstring 'LSP diagnostics'
+map global lsp 'w' ':lsp-workspace-symbol-incr<ret>' -docstring 'LSP workspace symbol'
 
 # lsp related mappings
 map global insert <tab> '<a-;>:try lsp-snippets-select-next-placeholders catch %{ execute-keys -with-hooks <lt>tab> }<ret>' -docstring 'Select next snippet placeholder'
