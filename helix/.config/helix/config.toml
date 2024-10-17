@@ -54,6 +54,8 @@ C-e = ["scroll_down"]
 esc = ["collapse_selection", "keep_primary_selection"]
 g = { d = "goto_definition", D = ["vsplit", "goto_definition"], j = "goto_last_line", k = "goto_file_start" }
 ret = ["goto_word"]
+'{' = "goto_prev_paragraph"
+'}' = "goto_next_paragraph"
 
 [keys.normal.space]
 w   = ":write"
@@ -139,3 +141,9 @@ esc = ["collapse_selection", "normal_mode"]
 [keys.select]
 # Escape the madness! No more fighting with the cursor! Or with multiple cursors!
 esc = ["collapse_selection", "keep_primary_selection", "normal_mode"]
+'{' = "goto_prev_paragraph"
+'}' = "goto_next_paragraph"
+
+[keys.select.g]
+j = "goto_last_line"
+k = "goto_file_start"
