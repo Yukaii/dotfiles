@@ -59,8 +59,8 @@ keybind = ctrl+'=text:\x11'
 # tmux navigation
 keybind = ctrl+alt+p=text:\x11p
 keybind = ctrl+alt+n=text:\x11n
-# keybind = ctrl+shift+tab=text:\x11p
-# keybind = ctrl+tab=text:\x11n
+keybind = ctrl+shift+tab=text:\x11p
+keybind = ctrl+tab=text:\x11n
 keybind = ctrl+alt+t=text:\x11T
 keybind = ctrl+alt+r=text:\x11r
 
