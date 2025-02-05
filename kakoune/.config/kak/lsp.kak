@@ -31,11 +31,7 @@ map global object D '<a-semicolon>lsp-diagnostic-object<ret>'                   
 set-option global lsp_auto_show_code_actions true
 
 hook -group lsp-filetype-javascript global BufSetOption filetype=(?:javascript|typescript) %{
-  set-option buffer lsp_servers %{
-    [biome]
-    root_globs = ["biome.json", "package.json", "tsconfig.json", "jsconfig.json", ".git", ".hg"]
-    args = ["lsp-proxy"]
-
+  set-option buffer lsp_servers %exp{
     [typescript-language-server]
     root_globs = ["package.json", "tsconfig.json", "jsconfig.json", ".git", ".hg"]
     args = ["--stdio"]
@@ -90,6 +86,7 @@ hook -group lsp-filetype-javascript global BufSetOption filetype=(?:javascript|t
     # [ast-grep]
     # root_globs = ["sgconfig.yml"]
     # args = ["lsp"]
+    %opt{lsp_server_biome}
   }
 }
 
