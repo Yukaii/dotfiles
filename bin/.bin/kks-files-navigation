@@ -65,6 +65,7 @@ while true; do
   selected=$(echo "$file_list" | \
     fzf --height 100% --highlight-line --prompt "files ($display_path)> " \
       --preview "if [ -d {} ]; then $folder_preview_cmd {}; else $preview_cmd {}; fi" \
+      --style=full \
       --history="$history_file" \
       --header="[ctrl-l] send files to grep buffer | [enter] open file/enter directory" \
       --bind "ctrl-l:execute(rg --hidden --no-ignore -l '' . --max-depth 1 | sed 's|^\./||' | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort")

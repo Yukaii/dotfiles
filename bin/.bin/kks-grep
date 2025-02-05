@@ -43,6 +43,7 @@ FZF_DEFAULT_COMMAND="$RG_PREFIX '$query'" \
     --highlight-line \
     --bind "change:reload:$RG_PREFIX {q} $* || true" \
     --bind "ctrl-l:execute($RG_PREFIX {q} $* | kks-pipe-to-grep-buffer {q})+abort" \
+    --style=full \
     --exit-0 \
     --phony \
     --header="[ctrl-l] send to grep buffer" \

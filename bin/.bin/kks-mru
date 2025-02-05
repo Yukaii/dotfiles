@@ -44,6 +44,7 @@ get_mru_list() {
 selected=$(get_mru_list | fzf --height 100% --prompt 'mru> ' \
     --preview "$preview_cmd {}" \
     --header="[c-x] remove from MRU" \
+    --style=full \
     --bind="ctrl-x:execute(case {} in /*) echo {} ;; *) echo '$PWD/{}' ;; esac | grep -vFf - '$mru' > '$mru.tmp' && mv '$mru.tmp' '$mru')+reload(awk '{if(index(\$0,\"$PWD/\")==1){sub(\"^$PWD/\",\"\");print}else{print}}' '$mru')" \
     )
 

@@ -19,6 +19,7 @@ history_file="$HOME/.cache/kks-git-changes-history"
     git ls-files --others --exclude-standard
 } | \
     fzf --multi --height 100% --prompt 'git changes> ' \
+        --style=full \
         --preview "$preview_cmd {}" --history="$history_file" \
         --bind "ctrl-d:preview-page-down,ctrl-u:preview-page-up" |
     while read -r file; do

@@ -19,6 +19,7 @@ compareBranch=${1:-$defaultBranch}
 git diff --name-only "$(git merge-base HEAD $compareBranch)" HEAD |
     fzf --multi --height 100% --prompt 'Select files to view changes> ' \
         --preview "$preview_cmd {}" --history="$history_file" \
+        --style=full \
         --bind "ctrl-d:preview-page-down,ctrl-u:preview-page-up" |
     while read -r file; do
         kks edit "${file}"
