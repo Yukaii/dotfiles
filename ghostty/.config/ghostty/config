@@ -31,7 +31,8 @@ quick-terminal-animation-duration = 0
 quick-terminal-position           = bottom
 
 # Shaders
-# custom-shader = shaders/retro-terminal.glsl
+# custom-shader = shaders/bettercrt.glsl
+# custom-shader = shaders/underwater.glsl
 
 # Keybindings
 keybind = ctrl+shift+right=goto_split:right
