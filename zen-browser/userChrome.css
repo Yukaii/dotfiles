@@ -1,4 +1,5 @@
 /* @import "natsumi/natsumi.css"; */
+@import "./tab-group.css";
 
 #zen-tabbox-wrapper {
   border-radius: 6px !important;
