@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# Dependencies:
+# - GitHub CLI (gh): https://cli.github.com/
+# - gql-cli: pip install gql-cli
+# - jq: https://stedolan.github.io/jq/download/
+# - LINEAR_API_KEY environment variable must be set
+#
+# Usage: ./create_pr.sh [additional gh pr create options]
+# Example: ./create_pr.sh --base develop --title "My PR Title" --reviewer someone
+
+# Check dependencies
+command -v gh >/dev/null 2>&1 || { echo "GitHub CLI (gh) is required but not installed. Aborting." >&2; exit 1; }
+command -v gql-cli >/dev/null 2>&1 || { echo "gql-cli is required but not installed. Aborting." >&2; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo "jq is required but not installed. Aborting." >&2; exit 1; }
+
+# Check LINEAR_API_KEY
+if [ -z "$LINEAR_API_KEY" ]; then
+    echo "LINEAR_API_KEY environment variable is not set. Aborting."
+    exit 1
+fi
+
+# Get current branch name
+BRANCH_NAME=$(git branch --show-current)
+
+# Create temporary files
+QUERY_FILE=$(mktemp)
+TEMPLATE_FILE=$(mktemp)
+
+# Write GraphQL query to temporary file
+cat > "$QUERY_FILE" << EOF
+query ExampleQuery(\$branchName: String!) {
+  issueVcsBranchSearch(branchName: \$branchName) {
+    description
+  }
+}
+EOF
+
+# Fetch issue description from Linear
+RESPONSE=$(gql-cli \
+    -H "Authorization:$LINEAR_API_KEY" \
+    -V "branchName:$BRANCH_NAME" \
+    "https://api.linear.app/graphql" \
+    < "$QUERY_FILE")
+
+# Extract description using jq and write to template file
+echo "$RESPONSE" | jq -r '.data.issueVcsBranchSearch.description' > "$TEMPLATE_FILE"
+
+# Create PR using the template and pass through all additional arguments
+gh pr create --template "$TEMPLATE_FILE" "$@"
+
+# Cleanup temporary files
+rm "$QUERY_FILE" "$TEMPLATE_FILE"
+
