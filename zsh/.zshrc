@@ -20,3 +20,6 @@ source "$HOME/.config/broot/launcher/bash/br"
 export PATH="/Users/yukai/.codeium/windsurf/bin:$PATH"
 
 source /Users/yukai/Library/Application\ Support/org.dystroy.broot/launcher/bash/br
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/yukai/.cache/lm-studio/bin"
