@@ -36,19 +36,17 @@ query ExampleQuery(\$branchName: String!) {
 }
 EOF
 
-# Fetch issue description from Linear
-RESPONSE=$(gql-cli \
+# Fetch issue description from Linear using pipe
+RESPONSE=$(cat "$QUERY_FILE" | gql-cli "https://api.linear.app/graphql" \
     -H "Authorization:$LINEAR_API_KEY" \
     -V "branchName:$BRANCH_NAME" \
-    "https://api.linear.app/graphql" \
-    < "$QUERY_FILE")
+)
 
 # Extract description using jq and write to template file
-echo "$RESPONSE" | jq -r '.data.issueVcsBranchSearch.description' > "$TEMPLATE_FILE"
+echo "$RESPONSE" | jq -r '.issueVcsBranchSearch.description' > "$TEMPLATE_FILE"
 
 # Create PR using the template and pass through all additional arguments
-gh pr create --template "$TEMPLATE_FILE" "$@"
+gh pr create --body-file "$TEMPLATE_FILE" "$@"
 
 # Cleanup temporary files
 rm "$QUERY_FILE" "$TEMPLATE_FILE"
-
