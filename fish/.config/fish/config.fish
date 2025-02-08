@@ -120,3 +120,6 @@ end
 
 zoxide init fish | source
 
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /Users/yukai/.cache/lm-studio/bin
