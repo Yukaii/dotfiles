@@ -55,6 +55,7 @@ get_display_path() {
 
 while true; do
   display_path="$(get_display_path "$current_dir")"
+  [ "$display_path" = "." ] && rel_prefix="" || rel_prefix="$display_path/"
 
   # Change to current directory for relative operations
   cd "$current_dir" || exit 1
@@ -68,7 +69,7 @@ while true; do
       --style=full \
       --history="$history_file" \
       --header="[ctrl-l] send files to grep buffer | [enter] open file/enter directory" \
-      --bind "ctrl-l:execute(rg --hidden --no-ignore -l '' . --max-depth 1 | sed 's|^\./||' | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort")
+      --bind "ctrl-l:execute(rg --hidden --no-ignore -l '' . --max-depth 1 | sed 's|^\./||' | sed \"s|^|$rel_prefix|\" | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort")
 
   # Store the current absolute path before changing directory back
   current_abs_dir="$current_dir"
