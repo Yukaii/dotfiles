@@ -3,7 +3,7 @@
 # set global lsp_debug true
 
 # kak-lsp
-hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml|gleam|sh|yaml|dockerfile|vue|elixir) %{
+hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml|gleam|sh|yaml|dockerfile|vue|elixir|crystal) %{
   lsp-enable-window
 }
 
@@ -234,4 +234,12 @@ hook -group lsp-filetype-vue global BufSetOption filetype=(?:elixir) %{
     [elixir-ls]
     root_globs = ["mix.exs", "mix.lock"]
   }
+}
+
+hook -group lsp-filetype-crystal global BufSetOption filetype=crystal %{
+    set-option buffer lsp_servers %{
+        [crystalline]
+        args = ["--stdio"]
+        root_globs = ["shard.yml"]
+    }
 }
