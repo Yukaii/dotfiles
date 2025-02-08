@@ -42,8 +42,13 @@ RESPONSE=$(cat "$QUERY_FILE" | gql-cli "https://api.linear.app/graphql" \
     -V "branchName:$BRANCH_NAME" \
 )
 
-# Extract description using jq and write to template file
-echo "$RESPONSE" | jq -r '.issueVcsBranchSearch.description' > "$TEMPLATE_FILE"
+# Create merged template with Linear description prepended
+{
+    echo "### Linear Issue Description"
+    echo "$RESPONSE" | jq -r '.issueVcsBranchSearch.description'
+    echo -e "\n---\n"
+    cat .github/PULL_REQUEST_TEMPLATE.md
+} > "$TEMPLATE_FILE"
 
 # Create PR using the template and pass through all additional arguments
 gh pr create --body-file "$TEMPLATE_FILE" "$@"
