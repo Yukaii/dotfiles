@@ -68,8 +68,18 @@ while true; do
       --preview "if [ -d {} ]; then $folder_preview_cmd {}; else $preview_cmd {}; fi" \
       --style=full \
       --history="$history_file" \
+      --expect=alt-h \
       --header="[ctrl-l] send files to grep buffer | [enter] open file/enter directory" \
       --bind "ctrl-l:execute(rg --hidden --no-ignore -l '' . --max-depth 1 | sed 's|^\./||' | sed \"s|^|$rel_prefix|\" | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort")
+
+  # Process fzf output to check for alt-h keybinding
+  key=$(echo "$selected" | head -n1)
+  selection=$(echo "$selected" | tail -n +2)
+  if [ "$key" = "alt-h" ]; then
+    selected=".."
+  else
+    selected="${selection:-$key}"
+  fi
 
   # Store the current absolute path before changing directory back
   current_abs_dir="$current_dir"
