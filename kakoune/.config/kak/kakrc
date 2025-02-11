@@ -524,6 +524,14 @@ bundle wrap-calculator https://github.com/Yukaii/wrap-calculator.kak %{
   map global goto K '<esc>:unset-k<ret>' -docstring 'Line move up'
 }
 
+# bundle kakpipe "https://github.com/eburghar/kakpipe" %{
+#   require-module kakpipe
+# }
+
+# bundle-install-hook kakpipe %{
+# 	cargo install --force --path . --root ~/.local
+# }
+
 bundle kak-ansi https://github.com/eraserhd/kak-ansi %{
   declare-user-mode ansi-mode
   map global ansi-mode r ':ansi-render<ret>'           -docstring 'ansi-render'
