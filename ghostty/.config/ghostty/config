@@ -1,4 +1,3 @@
-font-family                = JetBrainsMono Nerd Font
 font-size                  = 15
 theme                      = kanagawabones
 
@@ -24,6 +23,13 @@ window-title-font-family   = JetBrainsMono Nerd Font
 background-opacity         = 0.9
 background-blur-radius     = 25
 unfocused-split-opacity    = 0.85
+
+# Font specific config
+font-family                = JetBrainsMono Nerd Font
+adjust-cell-height         = 3
+
+# font-family                = Berkeley Mono Trial
+# adjust-cell-height         = 6
 
 # Quick terminal
 
