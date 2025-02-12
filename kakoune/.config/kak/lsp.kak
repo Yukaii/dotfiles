@@ -124,6 +124,13 @@ declare-option -hidden str lsp_server_ai_lsp %{
     content = "{CODE}"
 }
 
+declare-option -hidden str lsp_server_copilot_lsp %{
+  [copilot-language-server]
+  settings_section = "_"
+  args = ["--stdio"]
+  root_globs = [".git", ".hg"]
+}
+
 # [ast-grep]
 # root_globs = ["sgconfig.yml"]
 # args = ["lsp"]
@@ -182,7 +189,8 @@ hook -group lsp-filetype-markdown global BufSetOption filetype=markdown %{
     root_globs = [".git", ".hg"]
 
     %opt{lsp_server_simple_completion}
-    %opt{lsp_server_ai_lsp}
+    # %opt{lsp_server_ai_lsp}
+    %opt{lsp_server_copilot_lsp}
   }
 }
 
