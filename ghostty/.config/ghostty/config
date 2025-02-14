@@ -36,6 +36,8 @@ adjust-cell-height         = 3
 quick-terminal-animation-duration = 0
 quick-terminal-position           = bottom
 
+macos-icon = xray
+
 # Shaders
 # custom-shader = shaders/bettercrt.glsl
 # custom-shader = shaders/underwater.glsl
