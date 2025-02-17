@@ -91,28 +91,28 @@ keybind = ctrl+alt+/=text:\x11|
 keybind = ctrl+alt+z=text:\x11z
 
 # tmux panel jump
-keybind = ctrl+alt+physical:zero=text:\x110
-keybind = ctrl+alt+physical:one=text:\x111
-keybind = ctrl+alt+physical:two=text:\x112
-keybind = ctrl+alt+physical:three=text:\x113
-keybind = ctrl+alt+physical:four=text:\x114
-keybind = ctrl+alt+physical:five=text:\x115
-keybind = ctrl+alt+physical:six=text:\x116
-keybind = ctrl+alt+physical:seven=text:\x117
-keybind = ctrl+alt+physical:eight=text:\x118
-keybind = ctrl+alt+physical:nine=text:\x119
+keybind = cmd+physical:zero=text:\x110
+keybind = cmd+physical:one=text:\x111
+keybind = cmd+physical:two=text:\x112
+keybind = cmd+physical:three=text:\x113
+keybind = cmd+physical:four=text:\x114
+keybind = cmd+physical:five=text:\x115
+keybind = cmd+physical:six=text:\x116
+keybind = cmd+physical:seven=text:\x117
+keybind = cmd+physical:eight=text:\x118
+keybind = cmd+physical:nine=text:\x119
 
 # regular tmux panel jump (combine with remote session with default prefix)
-keybind = ctrl+alt+shift+physical:zero=text:\x020
-keybind = ctrl+alt+shift+physical:one=text:\x021
-keybind = ctrl+alt+shift+physical:two=text:\x022
-keybind = ctrl+alt+shift+physical:three=text:\x023
-keybind = ctrl+alt+shift+physical:four=text:\x024
-keybind = ctrl+alt+shift+physical:five=text:\x025
-keybind = ctrl+alt+shift+physical:six=text:\x026
-keybind = ctrl+alt+shift+physical:seven=text:\x027
-keybind = ctrl+alt+shift+physical:eight=text:\x028
-keybind = ctrl+alt+shift+physical:nine=text:\x029
+keybind = ctrl+alt+physical:zero=text:\x020
+keybind = ctrl+alt+physical:one=text:\x021
+keybind = ctrl+alt+physical:two=text:\x022
+keybind = ctrl+alt+physical:three=text:\x023
+keybind = ctrl+alt+physical:four=text:\x024
+keybind = ctrl+alt+physical:five=text:\x025
+keybind = ctrl+alt+physical:six=text:\x026
+keybind = ctrl+alt+physical:seven=text:\x027
+keybind = ctrl+alt+physical:eight=text:\x028
+keybind = ctrl+alt+physical:nine=text:\x029
 
-keybind = ctrl+alt+shift+left=text:\x02p
-keybind = ctrl+alt+shift+right=text:\x02n
+keybind = ctrl+alt+left=text:\x02p
+keybind = ctrl+alt+right=text:\x02n
