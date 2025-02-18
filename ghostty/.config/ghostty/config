@@ -72,10 +72,10 @@ keybind = ctrl+tab=text:\x11n
 keybind = ctrl+alt+t=text:\x11T
 keybind = ctrl+alt+r=text:\x11r
 
-keybind = ctrl+alt+left=text:\x11h
-keybind = ctrl+alt+right=text:\x11l
-keybind = ctrl+alt+up=text:\x11k
-keybind = ctrl+alt+down=text:\x11j
+keybind = ctrl+shift+left=text:\x11h
+keybind = ctrl+shift+right=text:\x11l
+keybind = ctrl+shift+up=text:\x11k
+keybind = ctrl+shift+down=text:\x11j
 
 # other tmux goods
 
