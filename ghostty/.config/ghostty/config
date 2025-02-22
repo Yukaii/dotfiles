@@ -69,6 +69,8 @@ keybind = ctrl+alt+p=text:\x11p
 keybind = ctrl+alt+n=text:\x11n
 keybind = ctrl+shift+tab=text:\x11p
 keybind = ctrl+tab=text:\x11n
+keybind = super+shift+[=text:\x11p
+keybind = super+shift+]=text:\x11n
 keybind = ctrl+alt+t=text:\x11T
 keybind = ctrl+alt+r=text:\x11r
 
