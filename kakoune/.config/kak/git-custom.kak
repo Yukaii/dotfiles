@@ -94,11 +94,15 @@ define-command -override git-jump-at-commit -docstring %{
 
     # Save file content at commit to temp file and open it
     nop %sh{
-      tmp_dir="${TMPDIR:-/tmp}/kakoune-git-show"
+      # Create unique hash from repo path and commit
+      repo_path=$(git rev-parse --show-toplevel)
+      repo_hash=$(echo "$repo_path" | sha256sum | cut -c1-8)
+      tmp_dir="${TMPDIR:-/tmp}/kakoune-git-show/$repo_hash/${kak_reg_h}"
       mkdir -p "$tmp_dir"
-      # Create temp directory structure
-      tmp_file="$tmp_dir/${kak_reg_f##*/}"
-      mkdir -p "$tmp_dir"
+      # Create temp directory structure matching original path
+      tmp_file="$tmp_dir/${kak_reg_f}"
+      tmp_dir_path=$(dirname "$tmp_file")
+      mkdir -p "$tmp_dir_path"
 
       # Try to show file content at commit
       if git show "${kak_reg_h}:${kak_reg_f}" > "$tmp_file" 2>/dev/null; then
