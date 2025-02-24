@@ -1,4 +1,4 @@
-theme = "github_dark"
+theme = "flexoki_dark"
 # theme = "darkvoid"
 
 [editor]
@@ -121,7 +121,7 @@ b = "no_op"
 j = "no_op"
 
 # lsp actions no move under space.l
-S = "no_op"
+# S = "no_op"
 s = "no_op"
 r = ":rl"
 d = "no_op"
@@ -132,6 +132,15 @@ F = "no_op"
 # swap command palette
 '?' = "no_op"
 space = "command_palette"
+
+# Trim whitespace
+S = [
+    "save_selection",
+    "select_all",
+    ":pipe sed 's/[[:space:]]*$//'",
+    "collapse_selection",
+    "jump_backward",
+]
 
 [keys.select.space]
 w   = ":write"
