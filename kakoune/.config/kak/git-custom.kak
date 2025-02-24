@@ -37,14 +37,17 @@ define-command -override git-jump-at-commit -docstring %{
         execute-keys 'xs^commit ([a-f0-9]+)<ret>'
         set-register h %reg{1}
         echo -debug "git-jump-at-commit: Commit hash: %reg{1}"
+      }
 
+      evaluate-commands -draft %{
         # Find filename in current paragraph
-        execute-keys '<a-i>p'
-        execute-keys '/^diff --git<ret>'
-        execute-keys 'xs^diff --git a/(.*) b/.*$<ret>'
+        execute-keys '<a-?>^diff --git<ret>'
+        execute-keys ';xs^diff --git a/(.*) b/.*$<ret>'
         set-register f %reg{1}
         echo -debug "git-jump-at-commit: Filename: %reg{1}"
+      }
 
+      evaluate-commands -draft %{
         # Try to find the line number from hunk header and current position
         execute-keys -save-regs 'p' '<a-i>p"py'  # Save current paragraph
         execute-keys '?^@@.*@@<ret>'  # Find previous @@ mark
