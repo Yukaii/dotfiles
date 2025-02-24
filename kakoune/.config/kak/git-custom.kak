@@ -1,3 +1,6 @@
+declare-user-mode custom-git-actions
+map global git g ':enter-user-mode custom-git-actions<ret>' -docstring "custom git actions"
+
 define-command -params ..1 git-pr-diff -docstring %{
   Show pull request diff against the default branch or a specified base branch.
 } %{
@@ -10,3 +13,13 @@ define-command -params ..1 git-pr-diff -docstring %{
 }
 
 map global git P ':git-pr-diff<ret>' -docstring "PR diff against base branch"
+
+define-command git-file-logs -docstring %{
+  Show git commits of current buffer
+} %{
+  git-log --follow -- %val{bufname}
+}
+
+map global custom-git-actions p ':git-pr-diff<ret>' -docstring "PR diff against base branch"
+map global custom-git-actions l ':git-file-logs<ret>' -docstring "Git logs against buffer file"
+
