@@ -44,6 +44,23 @@ define-command -override git-jump-at-commit -docstring %{
             execute-keys 'xs^diff --git a/(.*) b/.*$<ret>'
             set-register f %reg{1}
             echo -debug "git-jump-at-commit: Filename: %reg{1}"
+
+            # Try to find the line number from hunk header and current position
+            execute-keys -save-regs 'p' '<a-i>p"py'  # Save current paragraph
+            execute-keys '?^@@.*@@<ret>'  # Find previous @@ mark
+            execute-keys 'xs^@@ -\d+(?:,\d+)? \+(\d+).*@@.*$<ret>'  # Extract start line
+            set-register s %reg{1}  # Save start line
+            echo -debug "git-jump-at-commit: Hunk start line: %reg{1}"
+
+            execute-keys '"pR'  # Restore paragraph
+            execute-keys '<a-_>'  # Count lines from hunk start to cursor
+            set-register l %sh{
+                # Calculate actual line number
+                start_line=$kak_reg_s
+                rel_lines=$((${kak_cursor_line} - ${kak_selection_desc%,*}))
+                echo $((start_line + rel_lines - 1))
+            }
+            echo -debug "git-jump-at-commit: Target line: %reg{l}"
         }
 
         # Save file content at commit to temp file and open it
@@ -59,7 +76,11 @@ define-command -override git-jump-at-commit -docstring %{
             mkdir -p "$tmp_dir_path"
 
             if git show "${kak_reg_h}:${kak_reg_f}" > "$tmp_file" 2>/dev/null; then
-                printf "edit! -existing '%s'" "$tmp_file" > "$kak_command_fifo"
+                if [ -n "${kak_reg_l}" ]; then
+                    printf "edit! -existing '%s'; execute-keys '%sg'" "$tmp_file" "${kak_reg_l}" > "$kak_command_fifo"
+                else
+                    printf "edit! -existing '%s'" "$tmp_file" > "$kak_command_fifo"
+                fi
             else
                 printf "fail 'git-jump-at-commit: Failed to show file at commit'" > "$kak_command_fifo"
             fi
