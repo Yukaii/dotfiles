@@ -22,13 +22,12 @@ define-command git-file-logs -docstring %{
 
 # Alternative git jump command that shows file at commit time
 define-command -override git-jump-at-commit -docstring %{
-    If inside a diff, show the file content at commit time,
+    If inside a diff, show the file at commit time,
     Else behave like git-jump
 } %{ evaluate-commands %{
     try %{
-        # Try to detect if we're in a diff section and store the paragraph
+        # Try to detect if we're in a diff section
         execute-keys -draft '<a-i>p<a-k>^diff<ret>'
-        execute-keys -draft -save-regs 'p' '<a-i>p"py'
         echo -debug "git-jump-at-commit: Found diff section"
 
         evaluate-commands -draft %{
@@ -39,22 +38,34 @@ define-command -override git-jump-at-commit -docstring %{
             set-register h %reg{1}
             echo -debug "git-jump-at-commit: Commit hash: %reg{1}"
 
-            # Use the stored paragraph to find filename
-            execute-keys '"pR'  # Restore paragraph and select it
-            execute-keys '/^diff --git<ret>'  # Find diff line
-            execute-keys 'xs^diff --git a/(.*) b/.*$<ret>'  # Extract filename
+            # Find filename in current paragraph
+            execute-keys '<a-i>p'
+            execute-keys '/^diff --git<ret>'
+            execute-keys 'xs^diff --git a/(.*) b/.*$<ret>'
             set-register f %reg{1}
             echo -debug "git-jump-at-commit: Filename: %reg{1}"
-            echo -debug "git-jump-at-commit: Diff paragraph: %reg{p}"
         }
 
-        # Show file at that commit
-        evaluate-commands %sh{
-            printf %s "echo -debug 'git-jump-at-commit: Running git show ${kak_reg_h}:${kak_reg_f}'; git show ${kak_reg_h}:${kak_reg_f}"
+        # Save file content at commit to temp file and open it
+        nop %sh{
+            tmp_dir="${TMPDIR:-/tmp}/kakoune-git-show"
+            mkdir -p "$tmp_dir"
+            # Get git root directory
+            git_root=$(git rev-parse --show-toplevel)
+            # Keep the full path structure under temp dir
+            rel_path="${kak_reg_f#$git_root/}"
+            tmp_file="$tmp_dir/$rel_path"
+            tmp_dir_path=$(dirname "$tmp_file")
+            mkdir -p "$tmp_dir_path"
+
+            if git show "${kak_reg_h}:${kak_reg_f}" > "$tmp_file" 2>/dev/null; then
+                printf "edit! -existing '%s'" "$tmp_file" > "$kak_command_fifo"
+            else
+                printf "fail 'git-jump-at-commit: Failed to show file at commit'" > "$kak_command_fifo"
+            fi
         }
     } catch %{
-        echo -debug "git-jump-at-commit: Failed to parse diff"
-        fail "git-jump-at-commit: Failed to parse diff"
+        git-jump
     }
 }}
 
