@@ -49,35 +49,58 @@ define-command -override git-jump-at-commit -docstring %{
 
       evaluate-commands -draft %{
         # Try to find the line number from hunk header and current position
-        execute-keys -save-regs 'p' '<a-i>p"py'  # Save current paragraph
-        execute-keys '?^@@.*@@<ret>'  # Find previous @@ mark
-        execute-keys 'xs^@@ -\d+(?:,\d+)? \+(\d+).*@@.*$<ret>'  # Extract start line
-        set-register s %reg{1}  # Save start line
-        echo -debug "git-jump-at-commit: Hunk start line: %reg{1}"
+        try %{
+          echo -debug "git-jump-at-commit: Trying to find hunk header..."
+          execute-keys '<a-?>^@@.*?@@<ret>'  # Find previous hunk header
+          echo -debug "git-jump-at-commit: Found hunk header"
+          execute-keys 'xs^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@.*$<ret>'  # Extract start line
+          echo -debug "git-jump-at-commit: Extracted line number pattern"
+          set-register s %reg{1}  # Save start line
+          echo -debug "git-jump-at-commit: Hunk start line: %reg{1}"
 
-        execute-keys '"pR'  # Restore paragraph
-        execute-keys '<a-_>'  # Count lines from hunk start to cursor
-        set-register l %sh{
-          # Calculate actual line number
-          start_line=$kak_reg_s
-          rel_lines=$((${kak_cursor_line} - ${kak_selection_desc%,*}))
-          echo $((start_line + rel_lines - 1))
+          execute-keys '<a-_>'
+          set-register l %sh{
+            # Calculate actual line number, accounting for diff +/- lines
+            start_line=$kak_reg_s
+            current_pos=${kak_cursor_line}
+            # Extract just the integer part of the line number
+            hunk_start=$(echo "${kak_selection_desc}" | cut -d'.' -f1)
+
+            echo "DEBUG: start_line=$start_line" >&2
+            echo "DEBUG: current_pos=$current_pos" >&2
+            echo "DEBUG: hunk_start=$hunk_start" >&2
+
+            # Get the content between hunk start and cursor
+            content=$(printf '%s\n' "${kak_selection}")
+            # Count added/removed lines
+            added_lines=$(printf '%s\n' "$content" | grep -c '^+')
+            removed_lines=$(printf '%s\n' "$content" | grep -c '^-')
+
+            echo "DEBUG: added_lines=$added_lines" >&2
+            echo "DEBUG: removed_lines=$removed_lines" >&2
+
+            # Adjust relative position by removing the effect of diff markers
+            rel_lines=$((current_pos - hunk_start - removed_lines))
+            final_line=$((start_line + rel_lines - 1))
+
+            echo "DEBUG: rel_lines=$rel_lines" >&2
+            echo "DEBUG: final_line=$final_line" >&2
+
+            echo $final_line
+          }
+          echo -debug "git-jump-at-commit: Target line: %reg{l}"
         }
-        echo -debug "git-jump-at-commit: Target line: %reg{l}"
       }
 
     # Save file content at commit to temp file and open it
     nop %sh{
       tmp_dir="${TMPDIR:-/tmp}/kakoune-git-show"
       mkdir -p "$tmp_dir"
-      # Get git root directory
-      git_root=$(git rev-parse --show-toplevel)
-      # Keep the full path structure under temp dir
-      rel_path="${kak_reg_f#$git_root/}"
-      tmp_file="$tmp_dir/$rel_path"
-      tmp_dir_path=$(dirname "$tmp_file")
-      mkdir -p "$tmp_dir_path"
+      # Create temp directory structure
+      tmp_file="$tmp_dir/${kak_reg_f##*/}"
+      mkdir -p "$tmp_dir"
 
+      # Try to show file content at commit
       if git show "${kak_reg_h}:${kak_reg_f}" > "$tmp_file" 2>/dev/null; then
         if [ -n "${kak_reg_l}" ]; then
           printf "edit! -existing '%s'; execute-keys '%sg'" "$tmp_file" "${kak_reg_l}" > "$kak_command_fifo"
