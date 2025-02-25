@@ -23,6 +23,7 @@ source "%val{config}/jk.kak"
 source "%val{config}/locations.kak"
 source "%val{config}/flip-boolean.kak"
 source "%val{config}/lsp.kak"
+source "%val{config}/yank.kak"
 # source "%val{config}/reasymotion.kak"
 # source "%val{config}/jump-stack.kak"
 # source "%val{config}/amber.kak"
@@ -65,6 +66,7 @@ map global user '<space>' ':kks-connect terminal-popup kks-mru<ret>'    -docstri
 map global user n         ':e -scratch<ret>'                            -docstring 'create buffer'
 map global user c         ':db<ret>'                                    -docstring 'delete buffer'
 map global user q         ':q<ret>'                                     -docstring 'quit'
+map global user y         ':enter-user-mode yank<ret>'                  -docstring 'yank operations'
 map global user P         '!pbpaste<ret>'                               -docstring 'paste from clipboard'
 map global user p         '<a-!>pbpaste<ret>'                           -docstring 'paste before from clipboard'
 map global user R         '|pbpaste<ret>'                               -docstring 'replace selection with clipaboard'
