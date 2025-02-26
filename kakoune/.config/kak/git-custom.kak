@@ -28,47 +28,39 @@ define-command -override git-jump-at-commit -docstring %{
   try %{
       # Try to detect if we're in a diff section
       execute-keys -draft '<a-i>p<a-k>^diff<ret>'
-      echo -debug "git-jump-at-commit: Found diff section"
 
+      # Extract commit hash
       evaluate-commands -draft %{
-        # Go to start of buffer to find commit info
         execute-keys 'gg'
         execute-keys '/^commit [a-f0-9]+<ret>'
         execute-keys 'xs^commit ([a-f0-9]+)<ret>'
         set-register h %reg{1}
-        echo -debug "git-jump-at-commit: Commit hash: %reg{1}"
       }
 
+      # Extract filename
       evaluate-commands -draft %{
-        # Find filename in current paragraph
         execute-keys '<a-?>^diff --git<ret>'
         execute-keys ';xs^diff --git a/(.*) b/.*$<ret>'
         set-register f %reg{1}
-        echo -debug "git-jump-at-commit: Filename: %reg{1}"
       }
 
+      # Try to find the line number from hunk header and current position
       evaluate-commands -draft %{
-        # Try to find the line number from hunk header and current position
         try %{
-          echo -debug "git-jump-at-commit: Trying to find hunk header..."
-          execute-keys '<a-?>^@@.*?@@<ret>'  # Find previous hunk header
-          echo -debug "git-jump-at-commit: Found hunk header"
-          execute-keys 'xs^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@.*$<ret>'  # Extract start line
-          echo -debug "git-jump-at-commit: Extracted line number pattern"
+          # Find previous hunk header
+          execute-keys '<a-?>^@@.*?@@<ret>'
+          # Extract start line number from hunk header
+          execute-keys 'xs^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@.*$<ret>'
           set-register s %reg{1}  # Save start line
-          echo -debug "git-jump-at-commit: Hunk start line: %reg{1}"
 
+          # Select content between hunk header and cursor position
           execute-keys '<a-_>'
+
+          # Calculate actual line number
           set-register l %sh{
-            # Calculate actual line number, accounting for diff +/- lines
             start_line=$kak_reg_s
             current_pos=${kak_cursor_line}
-            # Extract just the integer part of the line number
             hunk_start=$(echo "${kak_selection_desc}" | cut -d'.' -f1)
-
-            echo "DEBUG: start_line=$start_line" >&2
-            echo "DEBUG: current_pos=$current_pos" >&2
-            echo "DEBUG: hunk_start=$hunk_start" >&2
 
             # Get the content between hunk start and cursor
             content=$(printf '%s\n' "${kak_selection}")
@@ -76,19 +68,12 @@ define-command -override git-jump-at-commit -docstring %{
             added_lines=$(printf '%s\n' "$content" | grep -c '^+')
             removed_lines=$(printf '%s\n' "$content" | grep -c '^-')
 
-            echo "DEBUG: added_lines=$added_lines" >&2
-            echo "DEBUG: removed_lines=$removed_lines" >&2
-
             # Adjust relative position by removing the effect of diff markers
             rel_lines=$((current_pos - hunk_start - removed_lines))
             final_line=$((start_line + rel_lines - 1))
 
-            echo "DEBUG: rel_lines=$rel_lines" >&2
-            echo "DEBUG: final_line=$final_line" >&2
-
             echo $final_line
           }
-          echo -debug "git-jump-at-commit: Target line: %reg{l}"
         }
       }
 
@@ -99,6 +84,7 @@ define-command -override git-jump-at-commit -docstring %{
       repo_hash=$(echo "$repo_path" | sha256sum | cut -c1-8)
       tmp_dir="${TMPDIR:-/tmp}/kakoune-git-show/$repo_hash/${kak_reg_h}"
       mkdir -p "$tmp_dir"
+
       # Create temp directory structure matching original path
       tmp_file="$tmp_dir/${kak_reg_f}"
       tmp_dir_path=$(dirname "$tmp_file")
