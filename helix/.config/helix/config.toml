@@ -112,7 +112,7 @@ q   = ":quit"
 c   = ":buffer-close"
 C   = ":config-reload"
 ',' = ":config-open"
-e = ":sh hx-utils explorer > /dev/null"
+e = ":noop %sh{ hx-utils explorer %{buffer_name} > /dev/null }"
 # Zen mode
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
@@ -148,7 +148,7 @@ q   = ":quit"
 c   = ":buffer-close"
 C   = ":config-reload"
 ',' = ":config-open"
-e = ":sh hx-utils explorer > /dev/null"
+e = ":noop %sh{ hx-utils explorer %{buffer_name} > /dev/null }"
 # Zen mode
 z = ":toggle gutters.line-numbers.min-width 24 3"
 
