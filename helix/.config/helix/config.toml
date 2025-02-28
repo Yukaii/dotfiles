@@ -194,6 +194,7 @@ x = "@:sh rm <C-r>%"
 b = ":sh hx-utils browse --filename %{buffer_name} --line %{cursor_line} > /dev/null"
 y = ":sh hx-utils copy-permalink --filename %{buffer_name} --line %{cursor_line} > /dev/null"
 g = "changed_file_picker"
+B = ":sh git -C $(dirname $(realpath %{buffer_name} )) blame -L %{cursor_line},%{cursor_line} $(realpath %{buffer_name})"
 
 [keys.select.space]
 w   = ":write"
@@ -287,6 +288,7 @@ x = "@:sh rm <C-r>%"
 b = ":sh hx-utils browse --filename %{buffer_name} --line %{cursor_line} > /dev/null"
 y = ":sh hx-utils copy-permalink --filename %{buffer_name} --line %{cursor_line} > /dev/null"
 g = "changed_file_picker"
+B = ":sh git -C $(dirname $(realpath %{buffer_name} )) blame -L %{cursor_line},%{cursor_line} $(realpath %{buffer_name})"
 
 
 [keys.insert]
