@@ -1,25 +1,26 @@
 #!/usr/bin/env osascript
 
 (*
-Safari Profile Switcher
+Safari Profile/Tab Group Switcher
 
 USAGE:
   ./script.scpt [profile_name]
 
 DESCRIPTION:
-  This script manages Safari windows based on their profile names.
+  This script manages Safari windows based on their profile/tab group names.
   - When run without arguments, it brings the first window from a different
-    profile than the currently active one to the front.
+    profile/tab group than the currently active one to the front.
   - When run with a profile name argument, it specifically brings a window
-    from that profile to the front.
+    from that profile/tab group to the front.
 
 EXAMPLES:
-  ./script.scpt             # Switch to any different profile
-  ./script.scpt Work        # Switch specifically to the "Work" profile
-  ./script.scpt Personal    # Switch specifically to the "Personal" profile
+  ./script.scpt             # Switch to any different profile/tab group
+  ./script.scpt Work        # Switch specifically to the "Work" profile/tab group
+  ./script.scpt Personal    # Switch specifically to the "Personal" profile/tab group
 
 NOTE:
-  This script assumes that the profile name is the first word in each Safari window's title.
+  This script extracts the profile/tab group name as the text before the "—" (em dash)
+  in each Safari window's title.
 *)
 
 on run argv
@@ -32,15 +33,17 @@ on run argv
   tell application "Safari"
     set currentWindows to every window
     set activeWindowName to name of first window
-    set activeProfile to word 1 of activeWindowName
+
+    -- Extract the profile/tab group name (text before the em dash)
+    set activeProfile to my extractProfileName(activeWindowName)
 
     -- If no specific target profile was provided, use the original behavior
     if targetProfile is equal to "" then
       repeat with i from 2 to count of currentWindows
         set thisWindowName to name of item i of currentWindows
-        set thisProfile to word 1 of thisWindowName
+        set thisProfile to my extractProfileName(thisWindowName)
 
-        if thisProfile is not equal to activeProfile then
+        if thisProfile is not equal to activeProfile and thisProfile is not "" then
           set index of item i of currentWindows to 1
           exit repeat
         end if
@@ -49,7 +52,7 @@ on run argv
       -- Look specifically for the target profile
       repeat with i from 1 to count of currentWindows
         set thisWindowName to name of item i of currentWindows
-        set thisProfile to word 1 of thisWindowName
+        set thisProfile to my extractProfileName(thisWindowName)
 
         if thisProfile is equal to targetProfile then
           set index of item i of currentWindows to 1
@@ -59,3 +62,37 @@ on run argv
     end if
   end tell
 end run
+
+-- Helper function to extract profile/tab group name from window title
+on extractProfileName(windowName)
+  try
+    -- Look for text before the em dash (—)
+    if windowName contains "—" then
+      set AppleScript's text item delimiters to "—"
+      set profilePart to first text item of windowName
+      set AppleScript's text item delimiters to ""
+      -- Trim any whitespace
+      return my trim(profilePart)
+    else
+      -- Fallback to first word if no em dash is found
+      return word 1 of windowName
+    end if
+  on error
+    return ""
+  end try
+end extractProfileName
+
+-- Helper function to trim whitespace from beginning and end of text
+on trim(theText)
+  -- Remove leading whitespace
+  repeat while theText begins with " "
+    set theText to text 2 thru end of theText
+  end repeat
+
+  -- Remove trailing whitespace
+  repeat while theText ends with " "
+    set theText to text 1 thru ((length of theText) - 1) of theText
+  end repeat
+
+  return theText
+end trim
