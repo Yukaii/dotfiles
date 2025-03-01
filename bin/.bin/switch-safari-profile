@@ -1,0 +1,61 @@
+#!/usr/bin/env osascript
+
+(*
+Safari Profile Switcher
+
+USAGE:
+  ./script.scpt [profile_name]
+
+DESCRIPTION:
+  This script manages Safari windows based on their profile names.
+  - When run without arguments, it brings the first window from a different
+    profile than the currently active one to the front.
+  - When run with a profile name argument, it specifically brings a window
+    from that profile to the front.
+
+EXAMPLES:
+  ./script.scpt             # Switch to any different profile
+  ./script.scpt Work        # Switch specifically to the "Work" profile
+  ./script.scpt Personal    # Switch specifically to the "Personal" profile
+
+NOTE:
+  This script assumes that the profile name is the first word in each Safari window's title.
+*)
+
+on run argv
+  -- Default to empty string if no argument provided
+  set targetProfile to ""
+  if (count of argv) > 0 then
+    set targetProfile to item 1 of argv
+  end if
+
+  tell application "Safari"
+    set currentWindows to every window
+    set activeWindowName to name of first window
+    set activeProfile to word 1 of activeWindowName
+
+    -- If no specific target profile was provided, use the original behavior
+    if targetProfile is equal to "" then
+      repeat with i from 2 to count of currentWindows
+        set thisWindowName to name of item i of currentWindows
+        set thisProfile to word 1 of thisWindowName
+
+        if thisProfile is not equal to activeProfile then
+          set index of item i of currentWindows to 1
+          exit repeat
+        end if
+      end repeat
+    else
+      -- Look specifically for the target profile
+      repeat with i from 1 to count of currentWindows
+        set thisWindowName to name of item i of currentWindows
+        set thisProfile to word 1 of thisWindowName
+
+        if thisProfile is equal to targetProfile then
+          set index of item i of currentWindows to 1
+          exit repeat
+        end if
+      end repeat
+    end if
+  end tell
+end run
