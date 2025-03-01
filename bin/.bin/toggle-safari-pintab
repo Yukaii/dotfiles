@@ -1,0 +1,35 @@
+#!/usr/bin/env osascript
+
+(*
+Safari Tab Pin Toggle (Japanese Support)
+
+USAGE:
+  ./toggle_pin_tab.scpt
+
+DESCRIPTION:
+  This script toggles the pin status of the current tab in Safari.
+  It supports Japanese menu items:
+  - "タブを固定" (Pin Tab)
+  - "タブを固定解除" (Unpin Tab)
+
+NOTE:
+  You may need to grant Accessibility permissions to the script or application
+  running this script in System Preferences > Security & Privacy > Privacy > Accessibility.
+*)
+
+tell application "Safari" to activate
+
+tell application "System Events"
+    tell process "Safari"
+        -- Check if the tab is already pinned by looking for the unpin option
+        set windowMenu to menu "ウインドウ" of menu bar 1
+
+        if exists menu item "タブを固定解除" of windowMenu then
+            -- Tab is pinned, so unpin it
+            click menu item "タブを固定解除" of windowMenu
+        else if exists menu item "タブを固定" of windowMenu then
+            -- Tab is not pinned, so pin it
+            click menu item "タブを固定" of windowMenu
+        end if
+    end tell
+end tell

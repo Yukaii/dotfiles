@@ -1,0 +1,36 @@
+#!/usr/bin/env osascript
+
+(*
+Safari Sidebar Toggle
+
+USAGE:
+  ./toggle_safari_sidebar.scpt
+
+DESCRIPTION:
+  This script toggles the sidebar visibility in Safari.
+  It works with a Japanese macOS environment by accessing either
+  "サイドバーを表示" (Show Sidebar) or "サイドバーを非表示" (Hide Sidebar)
+  menu items under the "表示" (View) menu, depending on the current state.
+
+NOTE:
+  You may need to grant Accessibility permissions to the script or application
+  running this script in System Preferences > Security & Privacy > Privacy > Accessibility.
+*)
+
+tell application "Safari" to activate
+
+tell application "System Events"
+    tell process "Safari"
+        -- Click on the View menu (表示)
+        click menu "表示" of menu bar 1
+
+        -- Check if "サイドバーを表示" (Show Sidebar) exists in the menu
+        if exists menu item "サイドバーを表示" of menu "表示" of menu bar 1 then
+            -- If it exists, the sidebar is currently hidden, so show it
+            click menu item "サイドバーを表示" of menu "表示" of menu bar 1
+        else if exists menu item "サイドバーを非表示" of menu "表示" of menu bar 1 then
+            -- If "サイドバーを非表示" (Hide Sidebar) exists, the sidebar is currently visible, so hide it
+            click menu item "サイドバーを非表示" of menu "表示" of menu bar 1
+        end if
+    end tell
+end tell
