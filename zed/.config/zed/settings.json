@@ -18,7 +18,7 @@
     "version": "2"
   },
   "ui_font_family": "JetBrainsMono Nerd Font",
-  "buffer_font_size": 14,
+  "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
   "theme": "Kanagawa Waves",
   "vim_mode": true,
