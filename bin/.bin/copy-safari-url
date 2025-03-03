@@ -1,0 +1,39 @@
+#!/usr/bin/env osascript
+
+(*
+Safari URL Copier
+
+USAGE:
+  ./copy_safari_url.scpt
+
+DESCRIPTION:
+  This script copies the URL of the current Safari tab to the clipboard
+  and shows a notification with the copied URL.
+
+NOTE:
+  You may need to grant permissions to the script or application
+  running this script to control Safari.
+*)
+
+-- Get the URL from Safari
+tell application "Safari"
+  set currentURL to URL of current tab of front window
+  set currentTitle to name of current tab of front window
+end tell
+
+-- Copy the URL to the clipboard
+set the clipboard to currentURL
+
+-- Create a shortened version of the URL for display (max 50 characters)
+if length of currentURL > 50 then
+  set displayURL to text 1 thru 47 of currentURL & "..."
+else
+  set displayURL to currentURL
+end if
+
+-- Show a notification
+display notification displayURL with title "URL Copied" subtitle currentTitle
+
+-- Return the URL (useful if script is called from another script)
+return currentURL
+
