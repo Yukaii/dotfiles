@@ -12,19 +12,15 @@
   },
   "assistant": {
     "default_model": {
-      "provider": "anthropic",
+      "provider": "zed.dev",
       "model": "claude-3-5-sonnet-latest"
     },
     "version": "2"
   },
-  "ui_font_family": "JetBrains Mono",
-  "buffer_font_size": 15,
-  "buffer_font_family": "JetBrains Mono",
-  "theme": {
-    "dark": "Github Dark Dimmed",
-    "mode": "dark",
-    "light": "Rosé Pine Dawn"
-  },
+  "ui_font_family": "JetBrainsMono Nerd Font",
+  "buffer_font_size": 14,
+  "buffer_font_family": "JetBrainsMono Nerd Font",
+  "theme": "Kanagawa Waves",
   "vim_mode": true,
   "auto_update": true,
   "terminal": {

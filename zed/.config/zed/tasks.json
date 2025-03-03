@@ -1,8 +1,25 @@
 [
   {
-    "label": "lazygit",
+    "label": "Lazygit",
     "command": "lazygit",
     "use_new_terminal": true,
+    "hide": "always",
+    "reveal_target": "center",
     "allow_concurrent_runs": false
+  },
+  {
+    "label": "File Finder",
+    "command": "zed \"$(tv files)\"",
+    "hide": "always",
+    "allow_concurrent_runs": true,
+    "use_new_terminal": true,
+    "reveal_target": "center"
+  },
+  {
+    "label": "Find in Files",
+    "command": "zed \"$(tv text)\"",
+    "hide": "always",
+    "allow_concurrent_runs": false,
+    "use_new_terminal": true
   }
 ]

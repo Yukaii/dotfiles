@@ -14,16 +14,19 @@
       "space f f": "file_finder::Toggle",
       "space f b": "tab_switcher::Toggle",
       "space f C": "command_palette::Toggle",
+      "space f g": [ "task::Spawn", { "task_name": "File Finder", "reveal_target": "center" } ],
+      "space f w": [ "task::Spawn", { "task_name": "Find in Files", "reveal_target": "center" } ],
       "space e": "workspace::ToggleLeftDock",
       "space p": "outline::Toggle",
       "space v": "editor::GoToDefinitionSplit",
       "space c": "pane::CloseActiveItem",
       "space g b": "editor::ToggleGitBlame",
       "space /": "editor::ToggleComments",
+      "space w": "workspace::Save",
 
       // things like bottom term
       "space t b": ["workspace::SendKeystrokes", "cmd-shift-i"],
-      "space t l": ["workspace::SendKeystrokes", "alt-shift-t lazygit enter"]
+      "space t l": ["task::Spawn", { "task_name": "Lazygit" }]
     }
   },
   {
@@ -65,7 +68,8 @@
   {
     "bindings": {
       "ctrl-'": "workspace::ToggleBottomDock",
-      "cmd-shift-i": "terminal_panel::ToggleFocus"
+      "cmd-shift-i": "terminal_panel::ToggleFocus",
+      "cmd-;": "workspace::ToggleRightDock"
     }
   },
 
