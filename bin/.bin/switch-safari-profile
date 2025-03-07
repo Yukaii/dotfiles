@@ -113,7 +113,7 @@ on run argv
             log "Found window in target group with profile: " & thisProfile
             set index of w to 1
             set foundWindow to true
-            delay 0.2
+            delay 0.05
             my cycleTabGroupsUntilMatch(targetProfile)
             exit repeat
           end if
@@ -151,7 +151,7 @@ on run argv
             log "Found visible profile in target group: " & (profile of visibleProfileInfo)
             -- Switch to the window with the visible profile
             set index of (window of visibleProfileInfo) to 1
-            delay 0.1
+            delay 0.05
 
             -- Now try to switch to the target tab group
             my cycleTabGroupsUntilMatch(targetProfile)
@@ -173,7 +173,7 @@ on run argv
                       log "Found visible profile in group: " & (profile of visibleProfileInfo)
                       -- Switch to the window with the visible profile
                       set index of (window of visibleProfileInfo) to 1
-                      delay 0.2
+                      delay 0.05
 
                       -- Now try to switch to the target tab group
                       my cycleTabGroupsUntilMatch(targetProfile)
@@ -308,7 +308,7 @@ on cycleTabGroupsUntilMatch(targetGroupName)
         set index of window id targetWindowId to 1
       end tell
 
-      delay 0.1
+      delay 0.05
 
       -- Get the new tab group name
       set currentGroupName to my getCurrentTabGroupName()
@@ -337,7 +337,7 @@ on moveToNextTabGroup()
     tell process "Safari"
       log "Clicking ウインドウ menu"
       click menu "ウインドウ" of menu bar 1
-      delay 0.1
+      delay 0.05
 
       log "Clicking 次のタブグループへ移動 menu item"
       click menu item "次のタブグループへ移動" of menu "ウインドウ" of menu bar 1
