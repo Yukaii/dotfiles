@@ -54,7 +54,7 @@ on run argv
 
   tell application "Safari"
     activate
-    delay 0.1 -- Give Safari time to fully activate
+    delay 0.05 -- Give Safari time to fully activate
 
     set currentWindows to every window
     set activeWindowName to name of first window
@@ -116,7 +116,7 @@ on run argv
             log "Found visible profile in target group: " & (profile of visibleProfileInfo)
             -- Switch to the window with the visible profile
             set index of (window of visibleProfileInfo) to 1
-            delay 0.2
+            delay 0.1
 
             -- Now try to switch to the target tab group
             my cycleTabGroupsUntilMatch(targetProfile)
@@ -278,7 +278,7 @@ on cycleTabGroupsUntilMatch(targetGroupName)
         set index of window id targetWindowId to 1
       end tell
 
-      delay 0.2
+      delay 0.1
 
       -- Get the new tab group name
       set currentGroupName to my getCurrentTabGroupName()
