@@ -84,12 +84,47 @@ on run argv
       log "Target group: " & targetGroup
       log "Active group: " & activeGroup
 
-      -- If they're in the same group and not the same profile, we need to use tab groups
-      if targetGroup is equal to activeGroup and targetProfile is not equal to activeProfile then
+      -- Check if target and active profiles are in the same group
+      set inSameGroup to false
+      set targetGroupProfiles to {}
+      repeat with groupItem in profileGroups
+        set groupProfiles to item 2 of groupItem
+        if targetProfile is in groupProfiles then
+          set targetGroupProfiles to groupProfiles
+          if activeProfile is in groupProfiles then
+            set inSameGroup to true
+            exit repeat
+          end if
+        end if
+      end repeat
+
+      -- If they're in the same group, we need to use tab group switching
+      if inSameGroup then
         log "Profiles in same group, using tab group switching"
-        -- For same group profiles, only use tab group switching
         my cycleTabGroupsUntilMatch(targetProfile)
+      else if targetGroupProfiles is not {} then
+        -- Different group but we know target's group, try to find/create window in that group
+        log "Target profile in different group, looking for window in target group"
+        set foundWindow to false
+        repeat with w in currentWindows
+          set thisWindowName to name of w
+          set thisProfile to my extractProfileName(thisWindowName)
+          if thisProfile is in targetGroupProfiles then
+            log "Found window in target group with profile: " & thisProfile
+            set index of w to 1
+            set foundWindow to true
+            delay 0.2
+            my cycleTabGroupsUntilMatch(targetProfile)
+            exit repeat
+          end if
+        end repeat
+
+        if not foundWindow then
+          log "No window found in target group, switching active window's tab group"
+          my cycleTabGroupsUntilMatch(targetProfile)
+        end if
       else
+        -- Different groups, need to switch windows
         -- First try: Look specifically for the target profile in window titles
         log "Looking for target profile in window titles"
         set foundWindow to false
@@ -110,7 +145,7 @@ on run argv
         if not foundWindow then
           log "Target profile window not found, checking profile groups"
           -- First try to find any visible profile in the target's group
-          set visibleProfileInfo to my findVisibleProfileInGroup(targetGroup)
+          set visibleProfileInfo to my findVisibleProfileInGroup(targetGroup, "")
 
           if visibleProfileInfo is not false then
             log "Found visible profile in target group: " & (profile of visibleProfileInfo)
@@ -131,9 +166,9 @@ on run argv
                 log "Target profile belongs to group: " & groupName
                 -- Try to find any visible profile in this group
                 repeat with profile in profiles
-                  if profile is not equal to targetProfile then
+                  if my trim(profile) is not equal to my trim(targetProfile) then
                     log "Looking for visible profile: " & profile
-                    set visibleProfileInfo to my findVisibleProfileInGroup(groupName)
+                    set visibleProfileInfo to my findVisibleProfileInGroup(groupName, my trim(profile))
                     if visibleProfileInfo is not false then
                       log "Found visible profile in group: " & (profile of visibleProfileInfo)
                       -- Switch to the window with the visible profile
@@ -149,8 +184,7 @@ on run argv
               end if
             end repeat
 
-            log "No visible profiles found in any related group, trying direct tab group switching"
-            -- If still no visible profile found, try direct tab group switching
+            log "No visible profiles found in any related group, trying tab group switching"
             my cycleTabGroupsUntilMatch(targetProfile)
           end if
         end if
@@ -160,16 +194,29 @@ on run argv
 end run
 
 -- Function to find a visible profile from the same group
-on findVisibleProfileInGroup(targetGroup)
-  log "Searching for visible profile in group: " & targetGroup
+on findVisibleProfileInGroup(targetGroup, candidateProfile)
+  if candidateProfile is equal to missing value then set candidateProfile to ""
+  if candidateProfile is not "" then
+    set candidateStr to " with candidate profile: " & candidateProfile
+  else
+    set candidateStr to ""
+  end if
+  log "Searching for visible profile in group: " & targetGroup & candidateStr
   tell application "Safari"
     set currentWindows to every window
     repeat with w in currentWindows
       set thisWindowName to name of w
       set thisProfile to my extractProfileName(thisWindowName)
       if thisProfile is not "" and my getProfileGroup(thisProfile) is equal to targetGroup then
-        log "Found visible profile: " & thisProfile
-        return {profile:thisProfile, window:w}
+        if candidateProfile is not "" then
+          if my trim(thisProfile) is equal to my trim(candidateProfile) then
+            log "Found visible profile: " & thisProfile
+            return {profile:thisProfile, window:w}
+          end if
+        else
+          log "Found visible profile: " & thisProfile
+          return {profile:thisProfile, window:w}
+        end if
       end if
     end repeat
   end tell
@@ -187,32 +234,15 @@ on parseProfileGroups(groupsString)
   set AppleScript's text item delimiters to ""
 
   repeat with groupDef in groupDefinitions
-    -- Check if groupDef contains a colon
-    if groupDef contains ":" then
-      -- Split by colon to get group name and profiles string
-      set AppleScript's text item delimiters to ":"
-      set groupParts to text items of groupDef
-      set AppleScript's text item delimiters to ""
-      if (count of groupParts) is 2 then
-        set groupName to item 1 of groupParts
-        set profilesString to item 2 of groupParts
-      end if
-    else
-      -- No colon present, treat the entire groupDef as a comma-separated list
-      set AppleScript's text item delimiters to ","
-      set profilesList to text items of groupDef
-      set AppleScript's text item delimiters to ""
-      if (count of profilesList) > 0 then
-        set groupName to item 1 of profilesList
-        set profilesString to groupDef
-      end if
-    end if
+    -- Split by comma to get profiles in this group
+    set AppleScript's text item delimiters to ","
+    set profilesList to text items of groupDef
+    set AppleScript's text item delimiters to ""
 
-    if groupName is not equal to "" then
-      -- Split profilesString by comma to get list of profiles
-      set AppleScript's text item delimiters to ","
-      set profilesList to text items of profilesString
-      set AppleScript's text item delimiters to ""
+    -- Use first profile as group name
+    if (count of profilesList) > 0 then
+      set groupName to my trim(item 1 of profilesList)
+      -- Add the group and its profiles to parsedGroups
       set end of parsedGroups to {groupName, profilesList}
     end if
   end repeat
