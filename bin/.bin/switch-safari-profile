@@ -34,13 +34,16 @@ NOTE:
   in each Safari window's title.
 *)
 
--- Default profile groups (empty by default)
+-- Default properties
 property profileGroups : {}
+property menuLang : "en"
 
 on run argv
-  global profileGroups
-  -- Default to empty string if no argument provided
+  global profileGroups, menuLang
+  -- Initialize default values
   set targetProfile to ""
+
+  -- Parse arguments
   if (count of argv) > 0 then
     set targetProfile to item 1 of argv
   end if
@@ -50,6 +53,11 @@ on run argv
     set profileGroupsString to item 2 of argv
     set profileGroups to my parseProfileGroups(profileGroupsString)
     log "Parsed profile groups: " & profileGroups
+  end if
+
+  -- Parse menu language if provided as third argument
+  if (count of argv) > 2 then
+    set menuLang to item 3 of argv
   end if
 
   tell application "Safari"
@@ -330,17 +338,28 @@ on cycleTabGroupsUntilMatch(targetGroupName)
   end tell
 end cycleTabGroupsUntilMatch
 
+-- Function to get menu items based on language
+on getMenuItems(lang)
+  if lang is "ja" then
+    return {window:"ウインドウ", nextGroup:"次のタブグループへ移動"}
+  else
+    return {window:"Window", nextGroup:"Show Next Tab Group"}
+  end if
+end getMenuItems
+
 -- Function to move to the next tab group using menu
 on moveToNextTabGroup()
   log "Executing menu commands for next tab group..."
+  set menuItems to my getMenuItems(menuLang)
+
   tell application "System Events"
     tell process "Safari"
-      log "Clicking ウインドウ menu"
-      click menu "ウインドウ" of menu bar 1
+      log "Clicking " & (window of menuItems) & " menu"
+      click menu (window of menuItems) of menu bar 1
       delay 0.05
 
-      log "Clicking 次のタブグループへ移動 menu item"
-      click menu item "次のタブグループへ移動" of menu "ウインドウ" of menu bar 1
+      log "Clicking " & (nextGroup of menuItems) & " menu item"
+      click menu item (nextGroup of menuItems) of menu (window of menuItems) of menu bar 1
 
       log "Menu commands completed"
     end tell
