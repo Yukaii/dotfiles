@@ -1,0 +1,30 @@
+{
+  "actions" : [
+    {
+      "key" : "t",
+      "label" : "",
+      "type" : "application",
+      "value" : "/Applications/Ghostty.app"
+    },
+    {
+      "key" : "p",
+      "label" : "",
+      "type" : "application",
+      "value" : "/Applications/Alacritty.app"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "s",
+          "label" : "Search tabs",
+          "type" : "url",
+          "value" : "raycast://extensions/loris/safari/cloud-tabs"
+        }
+      ],
+      "key" : "s",
+      "label" : "Safari",
+      "type" : "group"
+    }
+  ],
+  "type" : "group"
+}
