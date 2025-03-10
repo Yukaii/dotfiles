@@ -1,28 +1,121 @@
 {
   "actions" : [
     {
-      "key" : "t",
-      "label" : "",
-      "type" : "application",
-      "value" : "/Applications/Ghostty.app"
-    },
-    {
-      "key" : "p",
-      "label" : "",
-      "type" : "application",
-      "value" : "/Applications/Alacritty.app"
-    },
-    {
       "actions" : [
         {
           "key" : "s",
           "label" : "Search tabs",
           "type" : "url",
           "value" : "raycast://extensions/loris/safari/cloud-tabs"
+        },
+        {
+          "key" : "\r",
+          "label" : "",
+          "type" : "application",
+          "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
         }
       ],
       "key" : "s",
       "label" : "Safari",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "m",
+          "label" : "Maximize",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/maximize"
+        },
+        {
+          "key" : "h",
+          "label" : "Left Half",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/left-half"
+        },
+        {
+          "key" : "l",
+          "label" : "Right Half",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/right-half"
+        },
+        {
+          "key" : "M",
+          "label" : "Maximize (no padding)",
+          "type" : "url",
+          "value" : "raycast://customWindowManagementCommand?&name=Maximize%20(no%20padding)&position=center&relativeWidth=1.0&relativeHeight=1.0"
+        },
+        {
+          "key" : "t",
+          "label" : "Terminal size",
+          "type" : "url",
+          "value" : "raycast://customWindowManagementCommand?&name=term&position=center&absoluteWidth=1155.0&absoluteHeight=755.0"
+        },
+        {
+          "key" : "L",
+          "label" : "Large window",
+          "type" : "url",
+          "value" : "raycast://customWindowManagementCommand?&name=large&position=center&absoluteWidth=1600.0&absoluteHeight=900.0"
+        },
+        {
+          "key" : "w",
+          "label" : "Switch Windows",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/navigation/switch-windows"
+        }
+      ],
+      "key" : "w",
+      "label" : "Window Management",
+      "type" : "group"
+    },
+    {
+      "key" : "m",
+      "label" : "Menu Items",
+      "type" : "url",
+      "value" : "raycast://extensions/raycast/navigation/search-menu-items"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "1",
+          "label" : "Toggle ChatGPT",
+          "type" : "url",
+          "value" : "raycast://extensions/HelloImSteven/keyboard-shortcut-sequences/run-shortcut-sequence?arguments=%7B%22sequenceName%22%3A%22Toggle%20ChatGPT%22%7D"
+        },
+        {
+          "key" : "2",
+          "label" : "Raycast AI Chat",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/raycast-ai/ai-chat"
+        }
+      ],
+      "key" : "a",
+      "label" : "AI Things",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "t",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Ghostty.app"
+        },
+        {
+          "key" : "p",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Alacritty.app"
+        },
+        {
+          "key" : "w",
+          "label" : "Switch Tailscale account",
+          "type" : "url",
+          "value" : "raycast://extensions/tailscale/tailscale/account-switcher"
+        }
+      ],
+      "key" : "o",
+      "label" : "Open",
       "type" : "group"
     }
   ],
