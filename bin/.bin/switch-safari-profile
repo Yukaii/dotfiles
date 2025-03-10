@@ -4,7 +4,7 @@
 Safari Profile/Tab Group Switcher
 
 USAGE:
-  ./script.scpt [profile_name_or_tab_group] [profile_groups_string]
+  ./script.scpt [profile_name_or_tab_group] [profile_groups_string] [menu_language] [window]
 
 DESCRIPTION:
   This script manages Safari windows based on their profile/tab group names.
@@ -14,6 +14,7 @@ DESCRIPTION:
     from that profile/tab group to the front.
   - If the profile name is not found in any window title, it attempts to
     cycle through tab groups until finding a match.
+  - If provided with the additional argument "window", it prioritizes window finding over tab group switching.
   - Supports predefined profile groups where multiple profiles may share the same window.
 
 EXAMPLES:
@@ -22,6 +23,7 @@ EXAMPLES:
   ./script.scpt Personal                       # Switch specifically to the "Personal" profile/tab group
   ./script.scpt Shopping                       # Switch specifically to the "Shopping" profile/tab group
   ./script.scpt Work "Personal,Work;Shopping"  # With profile groups
+  ./script.scpt Work "Personal,Work;Shopping" en window  # With menu language and window priority
 
 PROFILE GROUPS FORMAT:
   A semicolon-separated list of Profile definitions, where each profile is defined as:
@@ -59,6 +61,12 @@ on run argv
   if (count of argv) > 2 then
     set menuLang to item 3 of argv
   end if
+  set prioritizeWindowFinding to false
+  if (count of argv) > 3 then
+    if (item 4 of argv) is "window" then
+      set prioritizeWindowFinding to true
+    end if
+  end if
 
   tell application "Safari"
     activate
@@ -85,6 +93,22 @@ on run argv
       end repeat
     else
       log "Target profile: " & targetProfile
+      if prioritizeWindowFinding then
+        log "Prioritize window finding enabled, searching for target profile in window titles"
+        set foundWindow to false
+        repeat with i from 1 to count of currentWindows
+          set thisWindowName to name of item i of currentWindows
+          set thisProfile to my extractProfileName(thisWindowName)
+          if thisProfile is equal to targetProfile then
+            log "Found target profile window"
+            set index of item i of currentWindows to 1
+            set foundWindow to true
+            exit repeat
+          end if
+        end repeat
+        if foundWindow then return
+        log "No matching window found with target profile, proceeding with standard behavior"
+      end if
       -- Check if target profile is in the same group as active profile
       set targetGroup to my getProfileGroup(targetProfile)
       set activeGroup to my getProfileGroup(activeProfile)
