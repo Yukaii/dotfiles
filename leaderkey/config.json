@@ -112,6 +112,72 @@
           "label" : "Switch Tailscale account",
           "type" : "url",
           "value" : "raycast://extensions/tailscale/tailscale/account-switcher"
+        },
+        {
+          "key" : "m",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Messenger.app"
+        },
+        {
+          "key" : "b",
+          "label" : "Browser",
+          "type" : "application",
+          "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+        },
+        {
+          "key" : "s",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Spotify.app"
+        },
+        {
+          "key" : "d",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Discord.app"
+        },
+        {
+          "key" : "l",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Slack.app"
+        },
+        {
+          "key" : "c",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Users/yukai/Applications/Notion Calendar.app"
+        },
+        {
+          "key" : "S",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Spark Desktop.app"
+        },
+        {
+          "key" : "o",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Obsidian.app"
+        },
+        {
+          "key" : "L",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Linear.app"
+        },
+        {
+          "key" : "f",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Figma.app"
+        },
+        {
+          "key" : "v",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Visual Studio Code.app"
         }
       ],
       "key" : "o",
