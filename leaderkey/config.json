@@ -56,6 +56,42 @@
           "label" : "Switch Windows",
           "type" : "url",
           "value" : "raycast://extensions/raycast/navigation/switch-windows"
+        },
+        {
+          "key" : "]",
+          "label" : "Next Desktop",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/next-desktop"
+        },
+        {
+          "key" : "[",
+          "label" : "Previous Desktop",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/previous-desktop"
+        },
+        {
+          "key" : "c",
+          "label" : "Center",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/center"
+        },
+        {
+          "key" : "}",
+          "label" : "Next Display",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/next-display"
+        },
+        {
+          "key" : "{",
+          "label" : "Previous Display",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/window-management/previous-display"
+        },
+        {
+          "key" : "N",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/DeskPad.app"
         }
       ],
       "key" : "w",
