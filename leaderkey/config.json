@@ -7,12 +7,6 @@
           "label" : "Search tabs",
           "type" : "url",
           "value" : "raycast://extensions/loris/safari/cloud-tabs"
-        },
-        {
-          "key" : "\r",
-          "label" : "",
-          "type" : "application",
-          "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
         }
       ],
       "key" : "s",
