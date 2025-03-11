@@ -138,12 +138,6 @@
           "value" : "/Applications/Alacritty.app"
         },
         {
-          "key" : "w",
-          "label" : "Switch Tailscale account",
-          "type" : "url",
-          "value" : "raycast://extensions/tailscale/tailscale/account-switcher"
-        },
-        {
           "key" : "m",
           "label" : "",
           "type" : "application",
@@ -212,6 +206,50 @@
       ],
       "key" : "o",
       "label" : "Open",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "s",
+          "label" : "Switch Account",
+          "type" : "url",
+          "value" : "raycast://extensions/tailscale/tailscale/account-switcher"
+        },
+        {
+          "key" : "d",
+          "label" : "Devices",
+          "type" : "url",
+          "value" : "raycast://extensions/tailscale/tailscale/my-devices"
+        },
+        {
+          "key" : "e",
+          "label" : "Exit Nodes",
+          "type" : "url",
+          "value" : "raycast://extensions/tailscale/tailscale/exit"
+        },
+        {
+          "key" : "c",
+          "label" : "Connect",
+          "type" : "url",
+          "value" : "raycast://extensions/tailscale/tailscale/connect"
+        }
+      ],
+      "key" : "T",
+      "label" : "TailScale commands",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "s",
+          "label" : "Snippets",
+          "type" : "url",
+          "value" : "raycast://extensions/raycast/snippets/search-snippets"
+        }
+      ],
+      "key" : "r",
+      "label" : "Raycast Actions",
       "type" : "group"
     }
   ],
