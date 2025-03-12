@@ -168,7 +168,7 @@
           "value" : "/Applications/Slack.app"
         },
         {
-          "key" : "c",
+          "key" : "n",
           "label" : "",
           "type" : "application",
           "value" : "/Users/yukai/Applications/Notion Calendar.app"
@@ -198,10 +198,16 @@
           "value" : "/Applications/Figma.app"
         },
         {
-          "key" : "v",
+          "key" : "c",
           "label" : "",
           "type" : "application",
           "value" : "/Applications/Visual Studio Code.app"
+        },
+        {
+          "key" : "v",
+          "label" : null,
+          "type" : "application",
+          "value" : "/Applications/Vivaldi.app"
         }
       ],
       "key" : "o",
