@@ -1,5 +1,5 @@
-@
 @andresaya/edge-tts@1.2.4
+@anthropic-ai/claude-code@0.2.37
 @biomejs/biome@1.9.4
 @builder.io/micro-agent@0.0.25
 @fedify/cli@1.2.0
