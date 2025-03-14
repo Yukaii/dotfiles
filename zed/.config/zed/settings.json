@@ -7,6 +7,7 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "icon_theme": "JetBrains New UI Icons (Dark)",
   "features": {
     "edit_prediction_provider": "zed"
   },
@@ -20,7 +21,7 @@
   "ui_font_family": "JetBrainsMono Nerd Font",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
-  "theme": "Kanagawa Waves",
+  "theme": "JetBrains New Dark",
   "vim_mode": true,
   "auto_update": true,
   "terminal": {
