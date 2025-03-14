@@ -47,7 +47,7 @@ add-highlighter shared/applescript/code/builtin regex '\b(activate|log|get|set|r
 add-highlighter shared/applescript/code/commands regex '\b(do shell script|beep|choose file|open location)\b' 0:function
 
 # Operators and punctuation
-add-highlighter shared/applescript/code/operators regex '(\+|-|\*|/|÷|\^|&|=|≠|>|<|≥|>=|≤|<=|and|or|\bnot\b|div|mod|as|contains)' 0:operator
+add-highlighter shared/applescript/code/operators regex '(\+|-|\*|/|÷|\^|&|=|≠|>|<|≥|>=|≤|<=|\band\b|\bor\b|\bnot\b|\bdiv\b|\bmod\b|\bas\b|\bcontains\b)' 0:operator
 add-highlighter shared/applescript/code/punctuation regex '[:\(\)]' 0:operator
 
 §
