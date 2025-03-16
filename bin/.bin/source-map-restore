@@ -1,0 +1,107 @@
+#!/bin/bash
+
+# source-map-restore.sh - A simple CLI tool to restore source files from source maps
+
+set -e
+
+# Display usage information
+show_usage() {
+    echo "Usage: $(basename "$0") [options] <minified-js-file> [<minified-js-file> ...]"
+    echo
+    echo "Options:"
+    echo "  -o, --output-dir DIR    Output directory for restored source files (default: ./restored)"
+    echo "  -h, --help              Display this help message and exit"
+    echo
+    echo "Example:"
+    echo "  $(basename "$0") app.min.js"
+    echo "  $(basename "$0") --output-dir src app1.min.js app2.min.js"
+}
+
+# Parse command line arguments
+OUTPUT_DIR="./restored"
+declare -a MINIFIED_FILES=()
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o|--output-dir)
+            OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+        -*)
+            echo "Error: Unknown option: $1" >&2
+            show_usage
+            exit 1
+            ;;
+        *)
+            MINIFIED_FILES+=("$1")
+            shift
+            ;;
+    esac
+done
+
+if [[ ${#MINIFIED_FILES[@]} -eq 0 ]]; then
+    echo "Error: Missing required minified JavaScript file argument(s)" >&2
+    show_usage
+    exit 1
+fi
+
+# Expand globbing patterns if provided as literal strings
+expanded_files=()
+for pattern in "${MINIFIED_FILES[@]}"; do
+    files=( $pattern )
+    if [[ ${#files[@]} -gt 0 ]]; then
+         expanded_files+=( "${files[@]}" )
+    else
+         expanded_files+=( "$pattern" )
+    fi
+done
+MINIFIED_FILES=( "${expanded_files[@]}" )
+
+# Check if jq is installed
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed. Please install jq first." >&2
+    exit 1
+fi
+
+for JS_FILE in "${MINIFIED_FILES[@]}"; do
+    if [[ ! -f "$JS_FILE" ]]; then
+        echo "Error: JavaScript file not found: $JS_FILE" >&2
+        continue
+    fi
+
+    MAP_FILE="$JS_FILE.map"
+    if [[ ! -f "$MAP_FILE" ]]; then
+        # Attempt to extract the source map name from a sourceMappingURL comment
+        MAPPING_URL=$(grep -Eo 'sourceMappingURL=.+\.map' "$JS_FILE" | sed 's/sourceMappingURL=//')
+        if [[ -n "$MAPPING_URL" && -f "$(dirname "$JS_FILE")/$MAPPING_URL" ]]; then
+            MAP_FILE="$(dirname "$JS_FILE")/$MAPPING_URL"
+        else
+            echo "Error: Source map file not found for $JS_FILE" >&2
+            continue
+        fi
+    fi
+
+    OUTPUT_SUBDIR="$OUTPUT_DIR"
+    mkdir -p "$OUTPUT_SUBDIR"
+
+    echo "Restoring source files for $JS_FILE using map $MAP_FILE ..."
+
+    jq -r '.sources | to_entries[] | "\(.key)|\(.value)"' "$MAP_FILE" | while IFS='|' read -r idx path; do
+        src_dir="$OUTPUT_SUBDIR/$(dirname "$path")"
+        mkdir -p "$src_dir"
+        source_content=$(jq -r ".sourcesContent[$idx] // empty" "$MAP_FILE")
+        if [[ -n "$source_content" ]]; then
+            echo "$source_content" > "$OUTPUT_SUBDIR/$path"
+            echo "Restored: $OUTPUT_SUBDIR/$path"
+        else
+            echo "Warning: No source content found for $path" >&2
+        fi
+    done
+
+    echo "Source files have been restored for $JS_FILE"
+done
+
