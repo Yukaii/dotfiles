@@ -42,6 +42,7 @@ set -x KI_EDITOR_THEME "Github Dark"
 
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
+alias torcurl='curl --socks5-hostname 127.0.0.1:9050'
 
 # Git Aliases
 alias g='git' #compdef g=git
