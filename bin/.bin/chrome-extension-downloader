@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# chrome-ext-downloader.sh - Download and extract Chrome extensions by ID
+
+set -e
+
+# Display usage information
+show_usage() {
+    echo "Usage: $(basename "$0") [options] <extension-id>"
+    echo
+    echo "Options:"
+    echo "  -o, --output-dir DIR    Output directory for extracted extension (default: ./extension_output)"
+    echo "  -k, --keep-crx          Keep the downloaded CRX file after extraction"
+    echo "  -h, --help              Display this help message and exit"
+    echo
+    echo "Example:"
+    echo "  $(basename "$0") bgnkhhnnamicmpeenaelnjfhikgbkllg"
+    echo "  $(basename "$0") --output-dir ./extensions bgnkhhnnamicmpeenaelnjfhikgbkllg"
+    echo
+    echo "Note: This script requires curl and unzip to be installed."
+}
+
+# Parse command line arguments
+OUTPUT_DIR="./extension_output"
+KEEP_CRX=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -o|--output-dir)
+            OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        -k|--keep-crx)
+            KEEP_CRX=true
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            exit 0
+            ;;
+        -*)
+            echo "Error: Unknown option: $1" >&2
+            show_usage
+            exit 1
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+# Check if extension ID or URL is provided
+if [[ $# -ne 1 ]]; then
+    echo "Error: Extension ID or full URL is required" >&2
+    show_usage
+    exit 1
+fi
+
+EXTENSION_INPUT="$1"
+if [[ "$EXTENSION_INPUT" == http* ]]; then
+    # Extract extension ID from URL, assuming it's the last part of the path
+    EXTENSION_ID=$(basename "$EXTENSION_INPUT")
+else
+    EXTENSION_ID="$EXTENSION_INPUT"
+fi
+
+# Validate extension ID format (typically 32 characters, alphanumeric)
+if ! [[ $EXTENSION_ID =~ ^[a-zA-Z0-9]{32}$ ]]; then
+    echo "Warning: Extension ID format looks unusual. Standard Chrome extension IDs are 32 characters long."
+    echo "Continuing anyway with ID: $EXTENSION_ID"
+fi
+
+# Check for required tools
+for cmd in curl unzip; do
+    if ! command -v $cmd &> /dev/null; then
+        echo "Error: $cmd is required but not installed. Please install $cmd first." >&2
+        exit 1
+    fi
+done
+
+# Create temporary directory for download
+TEMP_DIR=$(mktemp -d)
+CRX_FILE="$TEMP_DIR/$EXTENSION_ID.crx"
+
+# Create output directory if it doesn't exist
+mkdir -p "$OUTPUT_DIR"
+
+echo "Downloading Chrome extension: $EXTENSION_ID"
+
+# Download the CRX file from Chrome Web Store
+# Using Chrome Web Store update URL format
+DOWNLOAD_URL="https://clients2.google.com/service/update2/crx?response=redirect&prodversion=133.0&acceptformat=crx2%2Ccrx3&x=id%3D${EXTENSION_ID}%26uc"
+if ! curl -L -f -s -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36" -o "$CRX_FILE" "$DOWNLOAD_URL"; then
+    echo "Error: Failed to download extension" >&2
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+
+echo "Successfully downloaded extension CRX file"
+
+# Create a directory for extraction
+EXTRACT_DIR="$OUTPUT_DIR/$EXTENSION_ID"
+mkdir -p "$EXTRACT_DIR"
+
+echo "Extracting CRX file..."
+
+# Extract the CRX file
+# CRX files are essentially ZIP files with a custom header
+# We need to skip the header to get to the ZIP data
+
+# Extract the CRX file
+# CRX files are essentially ZIP files with a custom header.
+# We need to skip the header to get to the ZIP data.
+# Determine the CRX version using od to handle little-endian values.
+CRX_VERSION=$(od -An -t u4 -j4 -N4 "$CRX_FILE" | tr -d ' ')
+
+if [ "$CRX_VERSION" -eq 2 ]; then
+    # CRX2 format: Skip first 16 bytes
+    dd if="$CRX_FILE" of="$TEMP_DIR/extension.zip" bs=1 skip=16 2>/dev/null
+elif [ "$CRX_VERSION" -eq 3 ]; then
+    # CRX3 format: Get header length from bytes 8-11 (little endian)
+    HEADER_LENGTH=$(od -An -t u4 -j8 -N4 "$CRX_FILE" | tr -d ' ')
+    dd if="$CRX_FILE" of="$TEMP_DIR/extension.zip" bs=1 skip=$((12 + HEADER_LENGTH)) 2>/dev/null
+else
+    echo "Error: Unknown CRX version: $CRX_VERSION" >&2
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+# Extract the ZIP file
+if ! unzip -q "$TEMP_DIR/extension.zip" -d "$EXTRACT_DIR"; then
+    echo "Error: Failed to extract extension" >&2
+    rm -rf "$TEMP_DIR"
+    exit 1
+fi
+
+echo "Extension successfully extracted to: $EXTRACT_DIR"
+
+# Copy the CRX file to the output directory if requested
+if [[ "$KEEP_CRX" == true ]]; then
+    cp "$CRX_FILE" "$OUTPUT_DIR/$EXTENSION_ID.crx"
+    echo "CRX file saved to: $OUTPUT_DIR/$EXTENSION_ID.crx"
+fi
+
+# Clean up temporary files
+rm -rf "$TEMP_DIR"
+
+echo "Done!"
+
