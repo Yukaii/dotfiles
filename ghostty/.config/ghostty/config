@@ -98,7 +98,6 @@ keybind = ctrl+alt+/=text:\x11|
 keybind = ctrl+alt+z=text:\x11z
 
 # tmux panel jump
-keybind = cmd+physical:zero=text:\x110
 keybind = cmd+physical:one=text:\x111
 keybind = cmd+physical:two=text:\x112
 keybind = cmd+physical:three=text:\x113
@@ -108,7 +107,7 @@ keybind = cmd+physical:six=text:\x116
 keybind = cmd+physical:seven=text:\x117
 keybind = cmd+physical:eight=text:\x118
 keybind = cmd+physical:nine=text:\x119
-keybind = cmd+physical:zero=text:\x1b[F
+keybind = cmd+physical:0=text:\x1b[F
 
 # regular tmux panel jump (combine with remote session with default prefix)
 keybind = ctrl+alt+physical:zero=text:\x020
