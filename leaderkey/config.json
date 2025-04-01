@@ -257,6 +257,12 @@
       "key" : "r",
       "label" : "Raycast Actions",
       "type" : "group"
+    },
+    {
+      "key" : "j",
+      "label" : "Japanese Helper",
+      "type" : "url",
+      "value" : "raycast://ai-commands/japanese-helper"
     }
   ],
   "type" : "group"
