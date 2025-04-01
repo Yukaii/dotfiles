@@ -1,5 +1,5 @@
 font-size                  = 15
-theme                      = kanagawabones
+theme                      = light:GitHub-Light-Default,dark:kanagawabones
 
 command                    = /opt/homebrew/bin/fish
 
