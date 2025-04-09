@@ -7,11 +7,47 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "edit_predictions": {
+    "mode": "eager",
+    "copilot": {
+      "proxy": null,
+      "proxy_no_verify": null
+    },
+    "enabled_in_assistant": false
+  },
   "icon_theme": "JetBrains New UI Icons (Dark)",
   "features": {
     "edit_prediction_provider": "zed"
   },
   "assistant": {
+    "profiles": {
+      "write": {
+        "name": "Write",
+        "tools": {
+          "open": false,
+          "bash": true,
+          "batch_tool": true,
+          "code_symbols": true,
+          "copy_path": true,
+          "create_file": true,
+          "delete_path": false,
+          "diagnostics": true,
+          "find_replace_file": true,
+          "fetch": true,
+          "list_directory": true,
+          "move_path": true,
+          "now": true,
+          "path_search": true,
+          "read_file": true,
+          "regex_search": true,
+          "symbol_info": true,
+          "thinking": true,
+          "create_directory": true
+        },
+        "enable_all_context_servers": true,
+        "context_servers": {}
+      }
+    },
     "default_model": {
       "provider": "zed.dev",
       "model": "claude-3-5-sonnet-latest"
