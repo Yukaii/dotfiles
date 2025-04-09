@@ -3,19 +3,6 @@
     {
       "actions" : [
         {
-          "key" : "s",
-          "label" : "Search tabs",
-          "type" : "url",
-          "value" : "raycast://extensions/loris/safari/cloud-tabs"
-        }
-      ],
-      "key" : "s",
-      "label" : "Safari",
-      "type" : "group"
-    },
-    {
-      "actions" : [
-        {
           "key" : "m",
           "label" : "Maximize",
           "type" : "url",
@@ -263,6 +250,48 @@
       "label" : "Japanese Helper",
       "type" : "url",
       "value" : "raycast://ai-commands/japanese-helper"
+    },
+    {
+      "key" : "s",
+      "label" : "",
+      "type" : "application",
+      "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+    },
+    {
+      "key" : "t",
+      "label" : "",
+      "type" : "application",
+      "value" : "/Applications/Ghostty.app"
+    },
+    {
+      "key" : "1",
+      "label" : "EN (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"
+    },
+    {
+      "key" : "ㄅ",
+      "label" : "EN (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"
+    },
+    {
+      "key" : "2",
+      "label" : "ZH (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select org.atelierInmu.inputmethod.vChewing.IMECHT"
+    },
+    {
+      "key" : "3",
+      "label" : "JA (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
+    },
+    {
+      "key" : "ˇ",
+      "label" : "JA (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
     }
   ],
   "type" : "group"
