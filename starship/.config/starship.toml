@@ -26,7 +26,7 @@ symbol = ' '
 fish_indicator = 'fish'
 disabled = false
 format = '[  ](bold white) [$indicator]($style)'
-style = '#BFA8BF'
+style = 'cyan'
 
 [nodejs]
 format = " [](green) [$version](dimmed white) "
@@ -57,7 +57,7 @@ success_symbol = "[~](bold green)"
 command = """p=${PWD/#$HOME/home}; p=${p#/}; echo "$p" | sed 's|/| / |g'"""
 format = "[ $output]($style)"
 shell = "bash"
-style = "#B6D6F2"
+style = "bright-cyan"
 when = true
 
 [custom.day]
