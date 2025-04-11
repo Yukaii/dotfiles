@@ -23,3 +23,6 @@ source /Users/yukai/Library/Application\ Support/org.dystroy.broot/launcher/bash
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/yukai/.cache/lm-studio/bin"
+
+# Added by Windsurf
+export PATH="/Users/yukai/.codeium/windsurf/bin:$PATH"
