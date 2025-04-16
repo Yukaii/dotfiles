@@ -188,13 +188,19 @@
           "key" : "c",
           "label" : "",
           "type" : "application",
-          "value" : "/Applications/Visual Studio Code.app"
+          "value" : "/Applications/Cursor.app"
         },
         {
           "key" : "v",
           "label" : "",
           "type" : "application",
           "value" : "/Applications/Vivaldi.app"
+        },
+        {
+          "key" : "V",
+          "label" : "",
+          "type" : "application",
+          "value" : "/Applications/Visual Studio Code - Insiders.app"
         }
       ],
       "key" : "o",
@@ -292,6 +298,12 @@
       "label" : "JA (IME)",
       "type" : "command",
       "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
+    },
+    {
+      "key" : "v",
+      "label" : "",
+      "type" : "application",
+      "value" : "/Applications/Visual Studio Code - Insiders.app"
     }
   ],
   "type" : "group"
