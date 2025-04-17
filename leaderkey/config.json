@@ -185,18 +185,6 @@
           "value" : "/Applications/Figma.app"
         },
         {
-          "key" : "c",
-          "label" : "",
-          "type" : "application",
-          "value" : "/Applications/Cursor.app"
-        },
-        {
-          "key" : "v",
-          "label" : "",
-          "type" : "application",
-          "value" : "/Applications/Vivaldi.app"
-        },
-        {
           "key" : "V",
           "label" : "",
           "type" : "application",
@@ -262,6 +250,18 @@
       "label" : "",
       "type" : "application",
       "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+    },
+    {
+      "key" : "b",
+      "label" : "",
+      "type" : "application",
+      "value" : "/Applications/Vivaldi.app"
+    },
+    {
+      "key" : "c",
+      "label" : "",
+      "type" : "application",
+      "value" : "/Applications/Cursor.app"
     },
     {
       "key" : "t",
