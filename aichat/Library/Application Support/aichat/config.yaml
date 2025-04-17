@@ -1,4 +1,4 @@
-model: openai:gpt-4o
+model: openai:gpt-4.1-mini
 clients:
 - type: openai
 
