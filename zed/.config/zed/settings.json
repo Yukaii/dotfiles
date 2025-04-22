@@ -20,6 +20,7 @@
     "edit_prediction_provider": "zed"
   },
   "assistant": {
+    "default_profile": "write",
     "profiles": {
       "write": {
         "name": "Write",
@@ -49,8 +50,8 @@
       }
     },
     "default_model": {
-      "provider": "zed.dev",
-      "model": "claude-3-5-sonnet-latest"
+      "provider": "openai",
+      "model": "gpt-4.1"
     },
     "version": "2"
   },
