@@ -1,0 +1,9 @@
+{
+  "model": "google/gemini-2.5-flash-preview",
+  "provider": "OpenRouter",
+  "history": {
+    "maxSize": 1000,
+    "saveHistory": true,
+    "sensitivePatterns": []
+  }
+}
