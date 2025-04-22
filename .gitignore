@@ -50,3 +50,6 @@ lazygit/**/state*
 broot/.config/broot/launcher/
 
 !aider/*.*
+
+codex/.codex/*
+!codex/.codex/config.json
