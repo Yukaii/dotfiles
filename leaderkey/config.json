@@ -112,7 +112,7 @@
     {
       "actions" : [
         {
-          "key" : "p",
+          "key" : "a",
           "type" : "application",
           "value" : "/Applications/Alacritty.app"
         },
@@ -129,7 +129,7 @@
         {
           "key" : "c",
           "type" : "application",
-          "value" : "/Users/yukai/Applications/Notion Calendar.app"
+          "value" : "/Users/yukai/Applications/Edge Apps.localized/Notion Calendar.app"
         },
         {
           "key" : "S",
@@ -283,6 +283,11 @@
       "label" : "Summarize YouTube",
       "type" : "url",
       "value" : "raycast://ai-commands/summarize-youtube-video"
+    },
+    {
+      "key" : "e",
+      "type" : "application",
+      "value" : "/Applications/Microsoft Edge Dev.app"
     }
   ],
   "type" : "group"
