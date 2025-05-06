@@ -1,368 +1,184 @@
-#!/usr/bin/env osascript
+#!/usr/bin/env bash
+set -euo pipefail
 
-(*
-Safari Profile/Tab Group Switcher
+usage() {
+  cat <<USAGE
+Usage: $0 [-p profile] [-g groups] [-l lang] [-w]
+  -p profile    Target profile/tab group name
+  -g groups     Semicolon-separated profile groups (e.g. "Personal,Work;Shopping")
+  -l lang       Menu language ("en" or "ja"; default: en)
+  -w            Prioritize window finding over tab-group cycling
+  -h            Show this help message
+USAGE
+  exit 1
+}
 
-USAGE:
-  ./script.scpt [profile_name_or_tab_group] [profile_groups_string] [menu_language] [window]
+TARGET_PROFILE=""
+PROFILE_GROUPS=""
+MENU_LANG="en"
+PRIORITIZE_WINDOW="false"
 
-DESCRIPTION:
-  This script manages Safari windows based on their profile/tab group names.
-  - When run without arguments, it brings the first window from a different
-    profile/tab group than the currently active one to the front.
-  - When run with a profile name argument, it specifically brings a window
-    from that profile/tab group to the front.
-  - If the profile name is not found in any window title, it attempts to
-    cycle through tab groups until finding a match.
-  - If provided with the additional argument "window", it prioritizes window finding over tab group switching.
-  - Supports predefined profile groups where multiple profiles may share the same window.
+while getopts ":p:g:l:wh" opt; do
+  case $opt in
+    p) TARGET_PROFILE=$OPTARG ;;
+    g) PROFILE_GROUPS=$OPTARG ;;
+    l) MENU_LANG=$OPTARG ;;
+    w) PRIORITIZE_WINDOW="true" ;;
+    h|*) usage ;;
+  esac
+done
 
-EXAMPLES:
-  ./script.scpt                                # Switch to any different profile/tab group
-  ./script.scpt Work                           # Switch specifically to the "Work" profile/tab group
-  ./script.scpt Personal                       # Switch specifically to the "Personal" profile/tab group
-  ./script.scpt Shopping                       # Switch specifically to the "Shopping" profile/tab group
-  ./script.scpt Work "Personal,Work;Shopping"  # With profile groups
-  ./script.scpt Work "Personal,Work;Shopping" en window  # With menu language and window priority
+osascript <<EOF
+-- === Safari Profile/Tab Group Switcher ===
 
-PROFILE GROUPS FORMAT:
-  A semicolon-separated list of Profile definitions, where each profile is defined as:
-  TabGroup1,TabGroup2;Profile2
+property profileGroupsString : "${PROFILE_GROUPS}"
+property menuLang           : "${MENU_LANG}"
+property prioritizeWindowFinding : ${PRIORITIZE_WINDOW}
 
-  Example: "Personal,Work;Shopping"
+on run
+  set targetProfile to "${TARGET_PROFILE}"
 
-NOTE:
-  This script extracts the profile/tab group name as the text before the "—" (em dash)
-  in each Safari window's title.
-*)
-
--- Default properties
-property profileGroups : {}
-property menuLang : "en"
-
-on run argv
-  global profileGroups, menuLang
-  -- Initialize default values
-  set targetProfile to ""
-
-  -- Parse arguments
-  if (count of argv) > 0 then
-    set targetProfile to item 1 of argv
-  end if
-
-  -- Parse profile groups if provided as second argument
-  if (count of argv) > 1 then
-    set profileGroupsString to item 2 of argv
+  -- parse profile groups if given
+  if profileGroupsString ≠ "" then
     set profileGroups to my parseProfileGroups(profileGroupsString)
-    log "Parsed profile groups: " & profileGroups
-  end if
-
-  -- Parse menu language if provided as third argument
-  if (count of argv) > 2 then
-    set menuLang to item 3 of argv
-  end if
-  set prioritizeWindowFinding to false
-  if (count of argv) > 3 then
-    if (item 4 of argv) is "window" then
-      set prioritizeWindowFinding to true
-    end if
+  else
+    set profileGroups to {}
   end if
 
   tell application "Safari"
     activate
-    delay 0.05 -- Give Safari time to fully activate
-
+    delay 0.1
     set currentWindows to every window
     set activeWindowName to name of first window
-
-    -- Extract the profile/tab group name (text before the em dash)
     set activeProfile to my extractProfileName(activeWindowName)
-    log "Active profile: " & activeProfile
 
-    -- If no specific target profile was provided, use the original behavior
-    if targetProfile is equal to "" then
-      log "No target profile specified, switching to next different profile"
-      repeat with i from 2 to count of currentWindows
-        set thisWindowName to name of item i of currentWindows
-        set thisProfile to my extractProfileName(thisWindowName)
-
-        if thisProfile is not equal to activeProfile and thisProfile is not "" then
-          set index of item i of currentWindows to 1
-          exit repeat
+    if targetProfile is "" then
+      -- cycle to next different profile
+      repeat with w in currentWindows
+        set thisProfile to my extractProfileName(name of w)
+        if thisProfile ≠ activeProfile and thisProfile ≠ "" then
+          set index of w to 1
+          return
         end if
       end repeat
     else
-      log "Target profile: " & targetProfile
-      if prioritizeWindowFinding then
-        log "Prioritize window finding enabled, searching for target profile in window titles"
-        set foundWindow to false
-        repeat with i from 1 to count of currentWindows
-          set thisWindowName to name of item i of currentWindows
-          set thisProfile to my extractProfileName(thisWindowName)
-          if thisProfile is equal to targetProfile then
-            log "Found target profile window"
-            set index of item i of currentWindows to 1
-            set foundWindow to true
-            exit repeat
-          end if
-        end repeat
-        if foundWindow then return
-        log "No matching window found with target profile, proceeding with standard behavior"
-      end if
-      -- Check if target profile is in the same group as active profile
-      set targetGroup to my getProfileGroup(targetProfile)
-      set activeGroup to my getProfileGroup(activeProfile)
-
-      log "Target group: " & targetGroup
-      log "Active group: " & activeGroup
-
-      -- Check if target and active profiles are in the same group
-      set inSameGroup to false
-      set targetGroupProfiles to {}
-      repeat with groupItem in profileGroups
-        set groupProfiles to item 2 of groupItem
-        if targetProfile is in groupProfiles then
-          set targetGroupProfiles to groupProfiles
-          if activeProfile is in groupProfiles then
-            set inSameGroup to true
-            exit repeat
-          end if
-        end if
-      end repeat
-
-      -- If they're in the same group, we need to use tab group switching
-      if inSameGroup then
-        log "Profiles in same group, using tab group switching"
-        my cycleTabGroupsUntilMatch(targetProfile)
-      else if targetGroupProfiles is not {} then
-        -- Different group but we know target's group, try to find/create window in that group
-        log "Target profile in different group, looking for window in target group"
-        set foundWindow to false
+      -- optionally prioritize window titles
+      if prioritizeWindowFinding is true then
         repeat with w in currentWindows
-          set thisWindowName to name of w
-          set thisProfile to my extractProfileName(thisWindowName)
-          if thisProfile is in targetGroupProfiles then
-            log "Found window in target group with profile: " & thisProfile
+          if my extractProfileName(name of w) is targetProfile then
             set index of w to 1
-            set foundWindow to true
-            delay 0.05
-            my cycleTabGroupsUntilMatch(targetProfile)
-            exit repeat
+            return
           end if
         end repeat
+      end if
 
-        if not foundWindow then
-          log "No window found in target group, switching active window's tab group"
-          my cycleTabGroupsUntilMatch(targetProfile)
-        end if
+      set targetGroup to my getProfileGroup(targetProfile, profileGroups)
+      set activeGroup to my getProfileGroup(activeProfile, profileGroups)
+
+      if targetGroup = activeGroup then
+        my cycleTabGroupsUntilMatch(targetProfile)
       else
-        -- Different groups, need to switch windows
-        -- First try: Look specifically for the target profile in window titles
-        log "Looking for target profile in window titles"
-        set foundWindow to false
-
-        repeat with i from 1 to count of currentWindows
-          set thisWindowName to name of item i of currentWindows
-          set thisProfile to my extractProfileName(thisWindowName)
-
-          if thisProfile is equal to targetProfile then
-            log "Found target profile window"
-            set index of item i of currentWindows to 1
-            set foundWindow to true
+        -- try to find any window in targetGroup
+        set found to false
+        repeat with w in currentWindows
+          set thisProfile to my extractProfileName(name of w)
+          if thisProfile is in (item 2 of (my findGroupItem(targetGroup, profileGroups))) then
+            set index of w to 1
+            delay 0.05
+            my cycleTabGroupsUntilMatch(targetProfile)
+            set found to true
             exit repeat
           end if
         end repeat
-
-        -- Second try: If no matching window found, try to find a visible profile in the same group
-        if not foundWindow then
-          log "Target profile window not found, checking profile groups"
-          -- First try to find any visible profile in the target's group
-          set visibleProfileInfo to my findVisibleProfileInGroup(targetGroup, "")
-
-          if visibleProfileInfo is not false then
-            log "Found visible profile in target group: " & (profile of visibleProfileInfo)
-            -- Switch to the window with the visible profile
-            set index of (window of visibleProfileInfo) to 1
-            delay 0.05
-
-            -- Now try to switch to the target tab group
-            my cycleTabGroupsUntilMatch(targetProfile)
-          else
-            -- If no visible profile found in target group, check if target belongs to a group
-            log "No visible profile found in target group, checking if target belongs to a group"
-            repeat with groupItem in profileGroups
-              set groupName to item 1 of groupItem
-              set profiles to item 2 of groupItem
-
-              if targetProfile is in profiles then
-                log "Target profile belongs to group: " & groupName
-                -- Try to find any visible profile in this group
-                repeat with profile in profiles
-                  if my trim(profile) is not equal to my trim(targetProfile) then
-                    log "Looking for visible profile: " & profile
-                    set visibleProfileInfo to my findVisibleProfileInGroup(groupName, my trim(profile))
-                    if visibleProfileInfo is not false then
-                      log "Found visible profile in group: " & (profile of visibleProfileInfo)
-                      -- Switch to the window with the visible profile
-                      set index of (window of visibleProfileInfo) to 1
-                      delay 0.05
-
-                      -- Now try to switch to the target tab group
-                      my cycleTabGroupsUntilMatch(targetProfile)
-                      return
-                    end if
-                  end if
-                end repeat
-              end if
-            end repeat
-
-            log "No visible profiles found in any related group, trying tab group switching"
-            my cycleTabGroupsUntilMatch(targetProfile)
-          end if
+        if not found then
+          my cycleTabGroupsUntilMatch(targetProfile)
         end if
       end if
     end if
   end tell
 end run
 
--- Function to find a visible profile from the same group
-on findVisibleProfileInGroup(targetGroup, candidateProfile)
-  if candidateProfile is equal to missing value then set candidateProfile to ""
-  if candidateProfile is not "" then
-    set candidateStr to " with candidate profile: " & candidateProfile
-  else
-    set candidateStr to ""
-  end if
-  log "Searching for visible profile in group: " & targetGroup & candidateStr
-  tell application "Safari"
-    set currentWindows to every window
-    repeat with w in currentWindows
-      set thisWindowName to name of w
-      set thisProfile to my extractProfileName(thisWindowName)
-      if thisProfile is not "" and my getProfileGroup(thisProfile) is equal to targetGroup then
-        if candidateProfile is not "" then
-          if my trim(thisProfile) is equal to my trim(candidateProfile) then
-            log "Found visible profile: " & thisProfile
-            return {profile:thisProfile, window:w}
-          end if
-        else
-          log "Found visible profile: " & thisProfile
-          return {profile:thisProfile, window:w}
-        end if
-      end if
-    end repeat
-  end tell
-  log "No visible profile found in group"
-  return false
-end findVisibleProfileInGroup
+-- ===== Helpers copied verbatim from your original script =====
 
--- Function to parse profile groups string
 on parseProfileGroups(groupsString)
-  set parsedGroups to {}
-
-  -- Split by semicolon to get group definitions
+  set parsed to {}
   set AppleScript's text item delimiters to ";"
-  set groupDefinitions to text items of groupsString
-  set AppleScript's text item delimiters to ""
-
-  repeat with groupDef in groupDefinitions
-    -- Split by comma to get profiles in this group
+  set groupDefs to text items of groupsString
+  repeat with gd in groupDefs
     set AppleScript's text item delimiters to ","
-    set profilesList to text items of groupDef
+    set profilesList to text items of gd
     set AppleScript's text item delimiters to ""
-
-    -- Use first profile as group name
     if (count of profilesList) > 0 then
       set groupName to my trim(item 1 of profilesList)
-      -- Add the group and its profiles to parsedGroups
-      set end of parsedGroups to {groupName, profilesList}
+      set end of parsed to {groupName, profilesList}
     end if
   end repeat
-
-  return parsedGroups
+  return parsed
 end parseProfileGroups
 
--- Function to determine which group a profile belongs to
-on getProfileGroup(profileName)
-  global profileGroups
-  repeat with groupItem in profileGroups
-    set groupName to item 1 of groupItem
-    set profiles to item 2 of groupItem
+on findGroupItem(targetName, groups)
+  repeat with g in groups
+    if item 1 of g is targetName then return g
+  end repeat
+  return {targetName, {targetName}}
+end findGroupItem
 
-    repeat with profile in profiles
-      if profile is equal to profileName then
-        return groupName
-      end if
+on getProfileGroup(profileName, groups)
+  repeat with g in groups
+    repeat with p in item 2 of g
+      if p is profileName then return item 1 of g
     end repeat
   end repeat
-
-  -- If not found in any group, return the profile name itself
   return profileName
 end getProfileGroup
 
--- Function to cycle through tab groups until finding a match
-on cycleTabGroupsUntilMatch(targetGroupName)
-  log "Starting tab group cycle search for target: " & targetGroupName
-
-  tell application "Safari"
-    -- Store the current window's id
-    set targetWindow to front window
-    set targetWindowId to id of targetWindow
-    log "Current window ID: " & targetWindowId
-
-    -- Get the initial tab group name
-    set initialGroupName to my getCurrentTabGroupName()
-    log "Initial group name: " & initialGroupName
-
-    if initialGroupName is equal to targetGroupName then
-      log "Already on target group, no switch needed"
-      return true
+on extractProfileName(windowName)
+  try
+    if windowName contains "—" then
+      set AppleScript's text item delimiters to "—"
+      set part to first text item of windowName
+      set AppleScript's text item delimiters to ""
+      return my trim(part)
+    else
+      return word 1 of windowName
     end if
+  on error
+    return ""
+  end try
+end extractProfileName
 
-    -- Start cycling through tab groups
-    set visitedGroups to {initialGroupName}
-    set maxAttempts to 5
-    set attemptCount to 0
-
-    log "Starting group cycle with max attempts: " & maxAttempts
-
-    repeat while attemptCount < maxAttempts
-      set attemptCount to attemptCount + 1
-      log "Attempt " & attemptCount & " of " & maxAttempts
-
-      -- Move to next tab group
-      log "Moving to next tab group..."
+on cycleTabGroupsUntilMatch(targetGroupName)
+  tell application "Safari"
+    set tw to front window
+    set tid to id of tw
+    set initial to my getCurrentTabGroupName()
+    if initial is targetGroupName then return true
+    set attempts to 0
+    repeat while attempts < 5
+      set attempts to attempts + 1
       my moveToNextTabGroup()
-
-      -- Ensure we stay in the same window
-      tell application "Safari"
-        log "Bringing window " & targetWindowId & " to front"
-        set index of window id targetWindowId to 1
-      end tell
-
+      tell application "Safari" to set index of window id tid to 1
       delay 0.05
-
-      -- Get the new tab group name
-      set currentGroupName to my getCurrentTabGroupName()
-      log "Current group after switch: " & currentGroupName
-
-      -- Check if we found the target group
-      if currentGroupName is equal to targetGroupName then
-        log "Found target group!"
-        tell application "Safari"
-          set index of window id targetWindowId to 1
-        end tell
+      if my getCurrentTabGroupName() is targetGroupName then
+        tell application "Safari" to set index of window id tid to 1
         return true
       end if
-
     end repeat
-
-    log "Max attempts reached without finding target group"
     return false
   end tell
 end cycleTabGroupsUntilMatch
 
--- Function to get menu items based on language
+on moveToNextTabGroup()
+  set mi to my getMenuItems(menuLang)
+  tell application "System Events"
+    tell process "Safari"
+      click menu (window of mi) of menu bar 1
+      delay 0.05
+      click menu item (nextGroup of mi) of menu (window of mi) of menu bar 1
+    end tell
+  end tell
+end moveToNextTabGroup
+
 on getMenuItems(lang)
   if lang is "ja" then
     return {window:"ウインドウ", nextGroup:"次のタブグループへ移動"}
@@ -371,70 +187,24 @@ on getMenuItems(lang)
   end if
 end getMenuItems
 
--- Function to move to the next tab group using menu
-on moveToNextTabGroup()
-  log "Executing menu commands for next tab group..."
-  set menuItems to my getMenuItems(menuLang)
-
-  tell application "System Events"
-    tell process "Safari"
-      log "Clicking " & (window of menuItems) & " menu"
-      click menu (window of menuItems) of menu bar 1
-      delay 0.05
-
-      log "Clicking " & (nextGroup of menuItems) & " menu item"
-      click menu item (nextGroup of menuItems) of menu (window of menuItems) of menu bar 1
-
-      log "Menu commands completed"
-    end tell
-  end tell
-end moveToNextTabGroup
-
--- Function to get the current tab group name
 on getCurrentTabGroupName()
   tell application "Safari"
     try
-      set windowName to name of front window
-      set groupName to my extractProfileName(windowName)
-      log "Got group name from window title: " & groupName
-      return groupName
-    on error errMsg
-      log "Error getting group name: " & errMsg
+      return my extractProfileName(name of front window)
+    on error
       return ""
     end try
   end tell
 end getCurrentTabGroupName
 
--- Helper function to extract profile/tab group name from window title
-on extractProfileName(windowName)
-  try
-    -- Look for text before the em dash (—)
-    if windowName contains "—" then
-      set AppleScript's text item delimiters to "—"
-      set profilePart to first text item of windowName
-      set AppleScript's text item delimiters to ""
-      -- Trim any whitespace
-      return my trim(profilePart)
-    else
-      -- Fallback to first word if no em dash is found
-      return word 1 of windowName
-    end if
-  on error
-    return ""
-  end try
-end extractProfileName
-
--- Helper function to trim whitespace from beginning and end of text
-on trim(theText)
-  -- Remove leading whitespace
-  repeat while theText begins with " "
-    set theText to text 2 thru end of theText
+on trim(t)
+  repeat while t begins with " "
+    set t to text 2 thru -1 of t
   end repeat
-
-  -- Remove trailing whitespace
-  repeat while theText ends with " "
-    set theText to text 1 thru ((length of theText) - 1) of theText
+  repeat while t ends with " "
+    set t to text 1 thru -2 of t
   end repeat
-
-  return theText
+  return t
 end trim
+
+EOF
