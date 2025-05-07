@@ -46,7 +46,11 @@ esac
 # localize menu titles
 if [[ $lang == "jp" ]]; then
   M_PROFILE="プロファイル"; M_WINDOW="ウィンドウ"
-else
+elif [[ $lang == "zh-tw" ]]; then
+  M_PROFILE="個人檔案"; M_WINDOW="視窗"
+elif [[ $lang == "zh-cn" ]]; then
+  M_PROFILE="个人资料"; M_WINDOW="窗口"
+else # default to English
   M_PROFILE="Profile";    M_WINDOW="Window"
 fi
 
