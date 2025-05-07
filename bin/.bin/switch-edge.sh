@@ -61,8 +61,6 @@ fi
 
 # AppleScript: find & click the FIRST menu item whose name contains TARGET
 osascript <<EOF
-tell application "$app" to activate
-delay 0.1
 tell application "System Events"
   tell process "$app"
     set theMenu to menu 1 of menu bar item "$MENU_BAR_ITEM" of menu bar 1
