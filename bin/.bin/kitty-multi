@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# kitty-multi-image-place.sh
+# Transmits multiple images, each once with an ID, then displays each
+# multiple times at specified locations with custom options.
+# Suppresses terminal ACK responses.
+
+# Usage:
+# ./kitty-multi-image-place.sh \
+#   <img1_file> <img1_id> "<row>,<col>[,opts1]" "<row>,<col>[,opts2]" ... \
+#   -- \
+#   <img2_file> <img2_id> "<row>,<col>[,optsA]" "<row>,<col>[,optsB]" ... \
+#   ...
+
+# Example:
+# ./kitty-multi-image-place.sh \
+#   cat.png 101 "5,10,c=20,r=10" "8,12,w=50,h=50,x=0,y=0" \
+#   -- \
+#   dog.jpg 102 "15,30,c=15,z=2"
+
+if [ -z "$BASH_VERSION" ]; then
+  echo "Error: Run with Bash." >&2
+  exit 1
+fi
+set -euo pipefail
+
+if (( $# == 0 )); then
+  echo "Usage: $0 <img1_file> <img1_id> \"<row>,<col>[,opts]\"... [-- <img2_file> <img2_id> \"<row>,<col>[,opts]\"... ]..." >&2
+  echo "Example: $0 cat.png 101 \"5,10,c=20,r=10\" -- dog.jpg 102 \"15,30,c=15\"" >&2
+  exit 1
+fi
+
+while (( "$#" > 0 )); do
+  if (( "$#" < 2 )); then # Need at least file and ID for a block
+    echo "Error: Incomplete image block. Expected image file and image ID." >&2
+    echo "Remaining arguments: $*" >&2
+    exit 1
+  fi
+
+  IMAGE_FILE="$1"
+  IMAGE_ID="$2"
+
+  if [[ ! -r "$IMAGE_FILE" ]]; then
+    echo "Error: Cannot read image file '$IMAGE_FILE'." >&2
+    exit 1
+  fi
+  shift 2 # Consumed file and ID
+
+  IMG_B64=$(base64 -b 0 < "$IMAGE_FILE" | tr -d '\n')
+
+  # Added q=1 to suppress OK/error replies
+  PARAMS_TRANSMIT=(a=T t=d f=100 "i=$IMAGE_ID" C=1 c=1 r=1 w=1 h=1 x=0 y=0 q=1)
+  PARAM_STR_TRANSMIT=$(IFS=,; echo "${PARAMS_TRANSMIT[*]}")
+
+  printf '\033_G%s;%s\033\\' "$PARAM_STR_TRANSMIT" "$IMG_B64"
+
+  while (( "$#" > 0 )); do
+    current_arg="$1"
+    if [[ "$current_arg" == "--" ]]; then
+      shift
+      break
+    fi
+
+    placement_spec="$current_arg"
+    if [[ -z "$placement_spec" ]]; then
+        echo "Warning: Empty placement specification encountered for image ID $IMAGE_ID. Skipping." >&2
+        shift
+        continue
+    fi
+
+    ROW=$(echo "$placement_spec" | cut -d, -f1)
+    COL=$(echo "$placement_spec" | cut -d, -f2)
+
+    if [[ -z "$ROW" || -z "$COL" ]]; then
+        echo "Error: Malformed placement specification '$placement_spec' for image ID $IMAGE_ID. Expected '<row>,<col>[,options]'." >&2
+        echo "Skipping placement: $placement_spec" >&2
+        shift
+        continue
+    fi
+    AP_OPTS=$(echo "$placement_spec" | cut -d, -f3-)
+
+    printf '\033[%s;%sH' "$ROW" "$COL"
+
+    # Added q=1 to suppress OK/error replies
+    PARAM_STR_PLACE="a=p,i=$IMAGE_ID,q=1"
+    if [[ -n "$AP_OPTS" ]]; then
+        is_only_row_col=0
+        # Check if AP_OPTS is non-empty *and* actually contains options beyond row,col
+        # cut -s -d, -f3- will be empty if there's no third field.
+        temp_check_opts=$(echo "$placement_spec" | cut -s -d, -f3-)
+        if [[ -z "$temp_check_opts" ]]; then
+            is_only_row_col=1
+        fi
+
+        if (( is_only_row_col == 0 )); then
+             PARAM_STR_PLACE="$PARAM_STR_PLACE,$AP_OPTS"
+        fi
+    fi
+
+    printf '\033_G%s\033\\' "$PARAM_STR_PLACE"
+
+    shift
+  done
+done
+
+printf '\n'
