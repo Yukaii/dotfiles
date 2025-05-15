@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 # kitty-multi-image-place.sh
 # Transmits multiple images, each once with an ID, then displays each
-# multiple times at specified locations with custom options.
+# multiple times at specified locations (absolute or percentage) with custom options.
 # Suppresses terminal ACK responses.
 
 # Usage:
 # ./kitty-multi-image-place.sh \
-#   <img1_file> <img1_id> "<row>,<col>[,opts1]" "<row>,<col>[,opts2]" ... \
+#   <img1_file> <img1_id> "<row|row%>,<col|col%>[,opts1]" ... \
 #   -- \
-#   <img2_file> <img2_id> "<row>,<col>[,optsA]" "<row>,<col>[,optsB]" ... \
+#   <img2_file> <img2_id> "<row|row%>,<col|col%>[,optsA]" ... \
 #   ...
 
-# Example:
+# Example with percentages and absolute:
 # ./kitty-multi-image-place.sh \
-#   cat.png 101 "5,10,c=20,r=10" "8,12,w=50,h=50,x=0,y=0" \
+#   cat.png 101 "10%,10%,c=20,r=10" "50%,50%,w=100,h=100" \
 #   -- \
-#   dog.jpg 102 "15,30,c=15,z=2"
+#   dog.jpg 102 "15,30,c=15" "90%,80%"
 
 if [ -z "$BASH_VERSION" ]; then
   echo "Error: Run with Bash." >&2
@@ -24,13 +24,59 @@ fi
 set -euo pipefail
 
 if (( $# == 0 )); then
-  echo "Usage: $0 <img1_file> <img1_id> \"<row>,<col>[,opts]\"... [-- <img2_file> <img2_id> \"<row>,<col>[,opts]\"... ]..." >&2
-  echo "Example: $0 cat.png 101 \"5,10,c=20,r=10\" -- dog.jpg 102 \"15,30,c=15\"" >&2
+  echo "Usage: $0 <img_file> <img_id> \"<R|R%>,<C|C%>[,opts]\"... [-- <img_file> <img_id> ... ]..." >&2
+  echo "Example: $0 cat.png 101 \"10,10,c=20\" \"50%,50%,r=10\"" >&2
   exit 1
 fi
 
+# Get terminal dimensions
+term_size=$(stty size 2>/dev/null) || {
+  echo "Error: Could not get terminal size using stty size." >&2
+  echo "Using default 24 rows, 80 columns. Percentage placement might be inaccurate." >&2
+  term_size="24 80"
+}
+term_rows=${term_size% *}
+term_cols=${term_size#* }
+
+# Helper function to calculate coordinate (absolute or percentage)
+# Output is always 1-based
+calculate_coordinate() {
+    local value_str="$1"
+    local dimension_size="$2"
+    local calculated_coord
+
+    if [[ "$value_str" == *% ]]; then
+        local numeric_percent=${value_str%\%}
+        if ! [[ "$numeric_percent" =~ ^[0-9]+$ ]] || (( numeric_percent < 0 || numeric_percent > 100 )); then
+            echo "Warning: Invalid percentage '$value_str'. Using 0% (results in 1)." >&2
+            numeric_percent=0
+        fi
+        # Integer arithmetic for bash: (A * B) / C
+        calculated_coord=$(( (numeric_percent * dimension_size) / 100 ))
+    else
+        calculated_coord="$value_str"
+    fi
+
+    # Ensure 1-based indexing: if 0 or less from calculation/input, make it 1.
+    # Clamp to dimension_size for percentages like 100%
+    if (( calculated_coord < 1 )); then
+        calculated_coord=1
+    elif (( calculated_coord > dimension_size )); then
+        # This can happen if value_str was an absolute number > dimension_size
+        # For percentages, (100 * D) / 100 = D, so it won't exceed.
+        # If user gives absolute coord > dim_size, let it pass, terminal will handle.
+        # Only clamp if it was a percentage calculation that somehow exceeded due to rounding artifacts
+        # (though unlikely with current floor-like division)
+        if [[ "$value_str" == *% ]]; then
+             calculated_coord=$dimension_size
+        fi
+    fi
+    echo "$calculated_coord"
+}
+
+
 while (( "$#" > 0 )); do
-  if (( "$#" < 2 )); then # Need at least file and ID for a block
+  if (( "$#" < 2 )); then
     echo "Error: Incomplete image block. Expected image file and image ID." >&2
     echo "Remaining arguments: $*" >&2
     exit 1
@@ -43,14 +89,11 @@ while (( "$#" > 0 )); do
     echo "Error: Cannot read image file '$IMAGE_FILE'." >&2
     exit 1
   fi
-  shift 2 # Consumed file and ID
+  shift 2
 
   IMG_B64=$(base64 -b 0 < "$IMAGE_FILE" | tr -d '\n')
-
-  # Added q=1 to suppress OK/error replies
   PARAMS_TRANSMIT=(a=T t=d f=100 "i=$IMAGE_ID" C=1 c=1 r=1 w=1 h=1 x=0 y=0 q=1)
   PARAM_STR_TRANSMIT=$(IFS=,; echo "${PARAMS_TRANSMIT[*]}")
-
   printf '\033_G%s;%s\033\\' "$PARAM_STR_TRANSMIT" "$IMG_B64"
 
   while (( "$#" > 0 )); do
@@ -67,37 +110,29 @@ while (( "$#" > 0 )); do
         continue
     fi
 
-    ROW=$(echo "$placement_spec" | cut -d, -f1)
-    COL=$(echo "$placement_spec" | cut -d, -f2)
+    RAW_ROW_STR=$(echo "$placement_spec" | cut -d, -f1)
+    RAW_COL_STR=$(echo "$placement_spec" | cut -d, -f2)
+    # -s: do not print lines if no delimiter (i.e., if no 3rd field)
+    AP_OPTS=$(echo "$placement_spec" | cut -s -d, -f3-)
 
-    if [[ -z "$ROW" || -z "$COL" ]]; then
-        echo "Error: Malformed placement specification '$placement_spec' for image ID $IMAGE_ID. Expected '<row>,<col>[,options]'." >&2
-        echo "Skipping placement: $placement_spec" >&2
+
+    if [[ -z "$RAW_ROW_STR" || -z "$RAW_COL_STR" ]]; then
+        echo "Error: Malformed placement spec '$placement_spec'. Expected '<R|R%>,<C|C%>[,options]'." >&2
         shift
         continue
     fi
-    AP_OPTS=$(echo "$placement_spec" | cut -d, -f3-)
+
+    ROW=$(calculate_coordinate "$RAW_ROW_STR" "$term_rows")
+    COL=$(calculate_coordinate "$RAW_COL_STR" "$term_cols")
 
     printf '\033[%s;%sH' "$ROW" "$COL"
 
-    # Added q=1 to suppress OK/error replies
     PARAM_STR_PLACE="a=p,i=$IMAGE_ID,q=1"
     if [[ -n "$AP_OPTS" ]]; then
-        is_only_row_col=0
-        # Check if AP_OPTS is non-empty *and* actually contains options beyond row,col
-        # cut -s -d, -f3- will be empty if there's no third field.
-        temp_check_opts=$(echo "$placement_spec" | cut -s -d, -f3-)
-        if [[ -z "$temp_check_opts" ]]; then
-            is_only_row_col=1
-        fi
-
-        if (( is_only_row_col == 0 )); then
-             PARAM_STR_PLACE="$PARAM_STR_PLACE,$AP_OPTS"
-        fi
+        PARAM_STR_PLACE="$PARAM_STR_PLACE,$AP_OPTS"
     fi
 
     printf '\033_G%s\033\\' "$PARAM_STR_PLACE"
-
     shift
   done
 done
