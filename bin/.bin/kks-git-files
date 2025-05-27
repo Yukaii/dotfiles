@@ -6,7 +6,6 @@
 # - fzf (https://github.com/junegunn/fzf)
 # - bat (https://github.com/sharkdp/bat)
 
-preview_cmd="bat --color=always --line-range=:500"
 history_file="$HOME/.cache/kks-files-history"
 
 [ -f "$history_file" ] || touch "$history_file"
@@ -19,7 +18,7 @@ FZF_DEFAULT_COMMAND="git ls-files --full-name $repo_root" \
     --height 100% \
     --style=full \
     --prompt 'git-files> ' \
-    --preview "$preview_cmd {}" \
+    --preview "bat --color=always --line-range=:500 $repo_root/{}" \
     --history="$history_file" \
     --header="[ctrl-l] send to files buffer" \
     --bind "ctrl-l:execute(git ls-files --full-name $repo_root | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort" |
