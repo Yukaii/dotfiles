@@ -11,6 +11,8 @@ history_file="$HOME/.cache/kks-git-changes-history"
 
 [ -f "$history_file" ] || touch "$history_file"
 
+repo_root=$(git rev-parse --show-toplevel)
+
 {
     # Get tracked changes
     git status --porcelain | grep -v "^??" | sed 's/^...//'
@@ -23,5 +25,5 @@ history_file="$HOME/.cache/kks-git-changes-history"
         --preview "$preview_cmd {}" --history="$history_file" \
         --bind "ctrl-d:preview-page-down,ctrl-u:preview-page-up" |
     while read -r file; do
-        kks edit "${file}"
+        kks edit "$repo_root/$file"
     done

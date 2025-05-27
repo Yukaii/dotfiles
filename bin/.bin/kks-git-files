@@ -11,7 +11,9 @@ history_file="$HOME/.cache/kks-files-history"
 
 [ -f "$history_file" ] || touch "$history_file"
 
-FZF_DEFAULT_COMMAND="git ls-files --full-name $(git rev-parse --show-toplevel)" \
+repo_root=$(git rev-parse --show-toplevel)
+
+FZF_DEFAULT_COMMAND="git ls-files --full-name $repo_root" \
   fzf --highlight-line \
     --multi \
     --height 100% \
@@ -20,7 +22,7 @@ FZF_DEFAULT_COMMAND="git ls-files --full-name $(git rev-parse --show-toplevel)" 
     --preview "$preview_cmd {}" \
     --history="$history_file" \
     --header="[ctrl-l] send to files buffer" \
-    --bind "ctrl-l:execute(git ls-files --full-name $(git rev-parse --show-toplevel) | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort" |
+    --bind "ctrl-l:execute(git ls-files --full-name $repo_root | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort" |
   while read -r file; do
-    kks edit "${file}"
+    kks edit "$repo_root/$file"
   done
