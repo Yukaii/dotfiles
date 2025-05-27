@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+const fs   = require('fs');
+const path = require('path');
+
+const [ fieldName = 'type', rootPkg = '' ] = process.argv.slice(2);
+const visited = new Set();
+
+if (!rootPkg) {
+  console.error('No package name specified')
+  return
+}
+
+function processPackage(pkgName) {
+  if (visited.has(pkgName)) return;
+  visited.add(pkgName);
+
+  const pkgPath = path.join('node_modules', pkgName, 'package.json');
+  if (!fs.existsSync(pkgPath)) {
+    console.warn(`⚠️  Package not found: ${pkgName}`);
+    return;
+  }
+
+  let pkg;
+  try {
+    pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+  } catch (err) {
+    console.error(`❌ Failed to parse ${pkgPath}:`, err.message);
+    return;
+  }
+
+  const value = Object.prototype.hasOwnProperty.call(pkg, fieldName)
+    ? JSON.stringify(pkg[fieldName])
+    : '‹undefined›';
+
+  console.log(`${pkg.name}@${pkg.version}: ${fieldName} = ${value}`);
+
+  const deps = [
+    ...Object.keys(pkg.dependencies   || {}),
+    // ...Object.keys(pkg.devDependencies|| {})
+  ];
+
+  deps.forEach(dep => processPackage(dep));
+}
+
+processPackage(rootPkg);
+
