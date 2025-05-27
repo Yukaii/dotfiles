@@ -548,3 +548,8 @@ bundle-install-hook kak-ansi %{
   make
   mv kak-ansi-filter ~/.local/bin/
 }
+
+bundle autospell https://git.sr.ht/~ficd/kak-autospell %{
+  require-module autospell
+  map -docstring 'spelling' global user s ': enter-user-mode spell<ret>'
+}
