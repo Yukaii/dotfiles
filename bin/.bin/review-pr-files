@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#
+# review-pr-files.sh — Interactive or argument-driven PR/commit file reviewer with bat previews
+
+set -euo pipefail
+
+# Function: pick a PR interactively
+pick_pr() {
+  gh pr list --limit 100 --json number,title,headRefName \
+    --template '{{range .}}{{.number}} {{.title}} ({{.headRefName}})\n{{end}}' |
+    fzf --ansi \
+        --header="Select a PR (or pass it as \`$0 <number>\`)" \
+        --prompt="PR> " \
+        --preview="gh pr view {1} --json body --template '{{.body}}' | bat --style=plain --paging=never" \
+        --preview-window="right:50%,border-left" \
+        --bind 'ctrl-o:execute(gh pr view {1} --web)' \
+        --bind 'ctrl-d:reload(gh pr list --limit 100 --json number,title,headRefName --template '\''{{range .}}{{.number}} {{.title}} ({{.headRefName}})\n{{end}}'\'')' \
+        --nth=1 \
+        --delimiter=' ' \
+        --with-nth=1,2 |
+    awk '{print $1}'
+}
+
+# Function: pick a commit interactively
+pick_commit() {
+  git log --oneline --color=always | fzf --ansi \
+        --header="Select a commit (or pass it as \`$0 <hash>\`)" \
+        --prompt="Commit> " \
+        --preview="git show {1} --patch --quiet | bat --style=plain --paging=never" \
+        --preview-window="right:50%,border-left" \
+        --bind 'ctrl-d:reload(git log --oneline --color=always)'
+}
+
+# Determine mode and identifier
+MODE=""
+ID=""
+
+if [[ ${1-} =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+  MODE="commit"
+  ID="$1"
+elif [[ ${1-} =~ ^[0-9]+$ ]]; then
+  MODE="pr"
+  ID="$1"
+else
+  # No valid argument: prompt user to choose mode
+  MODE=$(printf "%s\n%s" pr commit | fzf --header="Select mode:" --prompt="Mode> ")
+  case "$MODE" in
+    pr)
+      ID=$(pick_pr)
+      ;;
+    commit)
+      ID=$(pick_commit | awk '{print $1}')
+      ;;
+    *)
+      echo "No mode selected." >&2
+      exit 1
+      ;;
+  esac
+fi
+
+# Validate selection
+if [[ -z "$ID" ]]; then
+  echo "No identifier selected." >&2
+  exit 1
+fi
+
+# List files and preview diffs
+if [[ "$MODE" == "pr" ]]; then
+  HEADER="PR #$ID — select a file to preview diff"
+  LIST_CMD="gh pr view $ID --json files --template '{{range .files}}{{.path}}\n{{end}}'"
+  PREVIEW_CMD="gh pr view $ID --json diff --template '{{.diff}}' | bat --style=plain --paging=never --language=diff"
+elif [[ "$MODE" == "commit" ]]; then
+  HEADER="Commit $ID — select a file to preview diff"
+  LIST_CMD="git diff-tree --no-commit-id --name-only -r -m $ID | sort -u"
+  # Use a smart preview command that detects merge commits dynamically
+  PREVIEW_CMD='bash -c "if git rev-parse --verify \"'$ID'^2\" >/dev/null 2>&1; then git show --cc '$ID' --format= --color=always -- {} | bat --style=numbers,changes --paging=never --language=diff; else git show '$ID' --format= --color=always -- {} | bat --style=numbers,changes --paging=never --language=diff; fi"'
+fi
+
+# Run fzf for file selection
+eval "$LIST_CMD" |
+  fzf --ansi \
+      --header="$HEADER" \
+      --prompt="File> " \
+      --preview="$PREVIEW_CMD" \
+      --preview-window="right:60%,wrap,border-left"
