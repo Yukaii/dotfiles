@@ -66,8 +66,10 @@ fi
 
 # List files and preview diffs
 if [[ "$MODE" == "pr" ]]; then
-  # Simplified PR diff using gh pr diff pattern
-  preview="gh pr diff $ID --color=always"
+  # Get PR base and head commit SHAs for git diff
+  base_sha=$(gh pr view $ID --json baseRefOid --template '{{.baseRefOid}}')
+  head_sha=$(gh pr view $ID --json headRefOid --template '{{.headRefOid}}')
+  preview="git diff $base_sha $head_sha --color=always -- {}"
   gh pr diff $ID --name-only | fzf -m --ansi --preview="$preview"
 elif [[ "$MODE" == "commit" ]]; then
   # Simplified commit diff using git diff pattern
