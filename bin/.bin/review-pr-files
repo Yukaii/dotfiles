@@ -69,17 +69,16 @@ if [[ "$MODE" == "pr" ]]; then
   HEADER="PR #$ID — select a file to preview diff"
   LIST_CMD="gh pr view $ID --json files --template '{{range .files}}{{.path}}\n{{end}}'"
   PREVIEW_CMD="gh pr view $ID --json diff --template '{{.diff}}' | bat --style=plain --paging=never --language=diff"
+  
+  # Run fzf for file selection
+  eval "$LIST_CMD" |
+    fzf --ansi \
+        --header="$HEADER" \
+        --prompt="File> " \
+        --preview="$PREVIEW_CMD" \
+        --preview-window="right:60%,wrap,border-left"
 elif [[ "$MODE" == "commit" ]]; then
-  HEADER="Commit $ID — select a file to preview diff"
-  LIST_CMD="git diff-tree --no-commit-id --name-only -r -m $ID | sort -u"
-  # Use a smart preview command that detects merge commits dynamically
-  PREVIEW_CMD='bash -c "if git rev-parse --verify \"'$ID'^2\" >/dev/null 2>&1; then git show --cc '$ID' --format= --color=always -- {} | bat --style=numbers,changes --paging=never --language=diff; else git show '$ID' --format= --color=always -- {} | bat --style=numbers,changes --paging=never --language=diff; fi"'
+  # Simplified commit diff using git diff pattern
+  preview="git diff $ID~1 $ID --color=always -- {}"
+  git diff $ID~1 $ID --name-only | fzf -m --ansi --preview="$preview"
 fi
-
-# Run fzf for file selection
-eval "$LIST_CMD" |
-  fzf --ansi \
-      --header="$HEADER" \
-      --prompt="File> " \
-      --preview="$PREVIEW_CMD" \
-      --preview-window="right:60%,wrap,border-left"
