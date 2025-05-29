@@ -31,48 +31,106 @@ pick_commit() {
         --bind 'ctrl-d:reload(git log --oneline --color=always)'
 }
 
-# Determine mode and identifier
-MODE=""
-ID=""
+# Function: get preview command for PR files
+get_pr_preview_command() {
+  local pr_id="$1"
+  local base_sha head_sha
+  
+  base_sha=$(gh pr view "$pr_id" --json baseRefOid --template '{{.baseRefOid}}')
+  head_sha=$(gh pr view "$pr_id" --json headRefOid --template '{{.headRefOid}}')
+  
+  echo "git diff $base_sha $head_sha --color=always -- {}"
+}
 
-if [[ ${1-} =~ ^[0-9a-fA-F]{7,40}$ ]]; then
-  MODE="commit"
-  ID="$1"
-elif [[ ${1-} =~ ^[0-9]+$ ]]; then
-  MODE="pr"
-  ID="$1"
-else
-  # No valid argument: prompt user to choose mode
-  MODE=$(printf "%s\n%s" pr commit | fzf --header="Select mode:" --prompt="Mode> ")
+# Function: get preview command for commit files
+get_commit_preview_command() {
+  local commit_id="$1"
+  echo "git diff $commit_id~1 $commit_id --color=always -- {}"
+}
+
+# Function: get file list for PR
+get_pr_files() {
+  local pr_id="$1"
+  gh pr diff "$pr_id" --name-only
+}
+
+# Function: get file list for commit
+get_commit_files() {
+  local commit_id="$1"
+  git diff "$commit_id~1" "$commit_id" --name-only
+}
+
+# Function: browse files with fzf preview
+browse_files() {
+  local file_list_cmd="$1"
+  local preview_cmd="$2"
+  
+  eval "$file_list_cmd" | fzf -m --ansi --preview="$preview_cmd"
+}
+
+# Function: determine mode and ID from arguments or interactive selection
+determine_mode_and_id() {
+  local arg="${1:-}"
+  local mode="" id=""
+  
+  if [[ "$arg" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+    mode="commit"
+    id="$arg"
+  elif [[ "$arg" =~ ^[0-9]+$ ]]; then
+    mode="pr"
+    id="$arg"
+  else
+    # No valid argument: prompt user to choose mode
+    mode=$(printf "%s\n%s" pr commit | fzf --header="Select mode:" --prompt="Mode> ")
+    case "$mode" in
+      pr)
+        id=$(pick_pr)
+        ;;
+      commit)
+        id=$(pick_commit | awk '{print $1}')
+        ;;
+      *)
+        echo "No mode selected." >&2
+        exit 1
+        ;;
+    esac
+  fi
+  
+  # Validate selection
+  if [[ -z "$id" ]]; then
+    echo "No identifier selected." >&2
+    exit 1
+  fi
+  
+  echo "$mode $id"
+}
+
+# Main execution
+main() {
+  local mode_and_id preview_cmd file_list_cmd
+  
+  # Determine mode and identifier
+  read -r MODE ID <<< "$(determine_mode_and_id "${1:-}")"
+  
+  # Set up commands based on mode
   case "$MODE" in
     pr)
-      ID=$(pick_pr)
+      preview_cmd=$(get_pr_preview_command "$ID")
+      file_list_cmd="get_pr_files $ID"
       ;;
     commit)
-      ID=$(pick_commit | awk '{print $1}')
+      preview_cmd=$(get_commit_preview_command "$ID")
+      file_list_cmd="get_commit_files $ID"
       ;;
     *)
-      echo "No mode selected." >&2
+      echo "Invalid mode: $MODE" >&2
       exit 1
       ;;
   esac
-fi
+  
+  # Browse files with preview
+  browse_files "$file_list_cmd" "$preview_cmd"
+}
 
-# Validate selection
-if [[ -z "$ID" ]]; then
-  echo "No identifier selected." >&2
-  exit 1
-fi
-
-# List files and preview diffs
-if [[ "$MODE" == "pr" ]]; then
-  # Get PR base and head commit SHAs for git diff
-  base_sha=$(gh pr view $ID --json baseRefOid --template '{{.baseRefOid}}')
-  head_sha=$(gh pr view $ID --json headRefOid --template '{{.headRefOid}}')
-  preview="git diff $base_sha $head_sha --color=always -- {}"
-  gh pr diff $ID --name-only | fzf -m --ansi --preview="$preview"
-elif [[ "$MODE" == "commit" ]]; then
-  # Simplified commit diff using git diff pattern
-  preview="git diff $ID~1 $ID --color=always -- {}"
-  git diff $ID~1 $ID --name-only | fzf -m --ansi --preview="$preview"
-fi
+# Run main function with all arguments
+main "$@"
