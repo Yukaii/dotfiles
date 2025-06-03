@@ -64,23 +64,23 @@ keybind = global:alt+shift+q=toggle_quick_terminal
 # \x11 is ctrl+q
 
 # tsm popup shrotcut toggle
-keybind = ctrl+'=text:\x11'
+keybind = ctrl+apostrophe=text:\x11'
 
 # tmux navigation
 keybind = ctrl+alt+p=text:\x11p
 keybind = ctrl+alt+n=text:\x11n
 keybind = ctrl+shift+tab=text:\x11p
 keybind = ctrl+tab=text:\x11n
-keybind = super+shift+[=text:\x11p
-keybind = super+shift+]=text:\x11n
+keybind = cmd+shift+left_bracket=text:\x11p
+keybind = cmd+shift+right_bracket=text:\x11n
 keybind = ctrl+alt+t=text:\x11T
 keybind = ctrl+alt+r=text:\x11r
 
 # Tabs manipulcation
-keybind = super+t=text:\x11c
-keybind = super+w=text:\x11&
+keybind = cmd+t=text:\x11c
+keybind = cmd+w=text:\x11&
 
-# Panel navigation
+# # Panel navigation
 keybind = ctrl+shift+left=text:\x11h
 keybind = ctrl+shift+right=text:\x11l
 keybind = ctrl+shift+up=text:\x11k
@@ -89,13 +89,13 @@ keybind = ctrl+shift+down=text:\x11j
 # other tmux goods
 
 # copy mode
-keybind = ctrl+alt+[=text:\x11[
+keybind = ctrl+alt+left_bracket=text:\x11[
 # clear history
 keybind = ctrl+alt+k=text:\x11\x1bl
 # split
-keybind = ctrl+alt+'=text:\x11"
+keybind = ctrl+alt+apostrophe=text:\x11"
 # vertical split
-keybind = ctrl+alt+/=text:\x11|
+keybind = ctrl+alt+slash=text:\x11|
 # toggle zoom
 keybind = ctrl+alt+z=text:\x11z
 
@@ -111,7 +111,7 @@ keybind = cmd+physical:eight=text:\x118
 keybind = cmd+physical:nine=text:\x1b[F
 
 # regular tmux panel jump (combine with remote session with default prefix)
-keybind = ctrl+alt+physical:0=text:\x020
+keybind = ctrl+alt+physical:zero=text:\x020
 keybind = ctrl+alt+physical:one=text:\x021
 keybind = ctrl+alt+physical:two=text:\x022
 keybind = ctrl+alt+physical:three=text:\x023
