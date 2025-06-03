@@ -34,12 +34,24 @@ pick_commit() {
 # Function: get preview command for PR files
 get_pr_preview_command() {
   local pr_id="$1"
-  local base_sha head_sha
+  local base_ref head_ref head_repo
   
-  base_sha=$(gh pr view "$pr_id" --json baseRefOid --template '{{.baseRefOid}}')
-  head_sha=$(gh pr view "$pr_id" --json headRefOid --template '{{.headRefOid}}')
+  # Get PR details
+  base_ref=$(gh pr view "$pr_id" --json baseRefName --template '{{.baseRefName}}')
+  head_ref=$(gh pr view "$pr_id" --json headRefName --template '{{.headRefName}}')
+  head_repo=$(gh pr view "$pr_id" --json headRepositoryOwner --template '{{.headRepositoryOwner.login}}')
   
-  echo "git diff $base_sha $head_sha --color=always -- {}"
+  # Determine the correct remote for the head branch (handle forks)
+  local current_repo=$(gh repo view --json owner --template '{{.owner.login}}')
+  local head_remote_ref
+  if [[ "$head_repo" == "$current_repo" ]]; then
+    head_remote_ref="origin/$head_ref"
+  else
+    head_remote_ref="$head_repo/$head_ref"
+  fi
+  
+  # Use merge-base approach like pr-diff alias for accurate comparison
+  echo "git diff \$(git merge-base origin/$base_ref $head_remote_ref) $head_remote_ref --color=always -- {}"
 }
 
 # Function: get preview command for commit files
