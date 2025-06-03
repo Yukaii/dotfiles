@@ -553,3 +553,16 @@ bundle autospell https://git.sr.ht/~ficd/kak-autospell %{
   require-module autospell
   map -docstring 'spelling' global user s ': enter-user-mode spell<ret>'
 }
+
+bundle hump 'https://github.com/delapouite/kakoune-hump' %{
+  declare-user-mode hump-jump
+
+  map global hump-jump b      ': select-previous-hump<ret>' -docstring 'hump ←'
+  map global hump-jump w      ': select-next-hump<ret>'     -docstring 'hump →'
+  map global hump-jump B      ': extend-previous-hump<ret>' -docstring 'extend ←'
+  map global hump-jump W      ': extend-next-hump<ret>'     -docstring 'extend →'
+
+  # enter modes
+  map global user J ': enter-user-mode hump-jump -lock<ret>'   -docstring 'enter hump mode'
+}
+
