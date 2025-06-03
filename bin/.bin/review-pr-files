@@ -4,6 +4,60 @@
 
 set -euo pipefail
 
+# Function: check for required dependencies
+check_dependencies() {
+  local missing_deps=()
+
+  # Check for required commands
+  if ! command -v gh &> /dev/null; then
+    missing_deps+=("gh (GitHub CLI)")
+  fi
+
+  if ! command -v fzf &> /dev/null; then
+    missing_deps+=("fzf (fuzzy finder)")
+  fi
+
+  if ! command -v bat &> /dev/null; then
+    missing_deps+=("bat (syntax highlighter)")
+  fi
+
+  if ! command -v git &> /dev/null; then
+    missing_deps+=("git (version control)")
+  fi
+
+  # Report missing dependencies
+  if [[ ${#missing_deps[@]} -gt 0 ]]; then
+    echo "❌ Missing required dependencies:" >&2
+    for dep in "${missing_deps[@]}"; do
+      echo "  - $dep" >&2
+    done
+    echo "" >&2
+    echo "Please install the missing dependencies and try again." >&2
+    echo "Installation suggestions:" >&2
+
+    for dep in "${missing_deps[@]}"; do
+      case "$dep" in
+        *"gh"*)
+          echo "  - gh: brew install gh" >&2
+          ;;
+        *"fzf"*)
+          echo "  - fzf: brew install fzf" >&2
+          ;;
+        *"bat"*)
+          echo "  - bat: brew install bat" >&2
+          ;;
+        *"git"*)
+          echo "  - git: brew install git (or use Xcode Command Line Tools)" >&2
+          ;;
+      esac
+    done
+
+    exit 1
+  fi
+
+  echo "✅ All dependencies found"
+}
+
 # Function: pick a PR interactively
 pick_pr() {
   gh pr list --limit 100 --json number,title,headRefName \
@@ -35,12 +89,12 @@ pick_commit() {
 get_pr_preview_command() {
   local pr_id="$1"
   local base_ref head_ref head_repo
-  
+
   # Get PR details
   base_ref=$(gh pr view "$pr_id" --json baseRefName --template '{{.baseRefName}}')
   head_ref=$(gh pr view "$pr_id" --json headRefName --template '{{.headRefName}}')
   head_repo=$(gh pr view "$pr_id" --json headRepositoryOwner --template '{{.headRepositoryOwner.login}}')
-  
+
   # Determine the correct remote for the head branch (handle forks)
   local current_repo=$(gh repo view --json owner --template '{{.owner.login}}')
   local head_remote_ref
@@ -49,7 +103,7 @@ get_pr_preview_command() {
   else
     head_remote_ref="$head_repo/$head_ref"
   fi
-  
+
   # Use merge-base approach like pr-diff alias for accurate comparison
   echo "git diff \$(git merge-base origin/$base_ref $head_remote_ref) $head_remote_ref --color=always -- {}"
 }
@@ -76,7 +130,7 @@ get_commit_files() {
 browse_files() {
   local file_list_cmd="$1"
   local preview_cmd="$2"
-  
+
   eval "$file_list_cmd" | fzf -m --ansi --preview="$preview_cmd"
 }
 
@@ -84,7 +138,7 @@ browse_files() {
 determine_mode_and_id() {
   local arg="${1:-}"
   local mode="" id=""
-  
+
   if [[ "$arg" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
     mode="commit"
     id="$arg"
@@ -107,23 +161,26 @@ determine_mode_and_id() {
         ;;
     esac
   fi
-  
+
   # Validate selection
   if [[ -z "$id" ]]; then
     echo "No identifier selected." >&2
     exit 1
   fi
-  
+
   echo "$mode $id"
 }
 
 # Main execution
 main() {
+  # Check dependencies before proceeding
+  check_dependencies
+
   local mode_and_id preview_cmd file_list_cmd
-  
+
   # Determine mode and identifier
   read -r MODE ID <<< "$(determine_mode_and_id "${1:-}")"
-  
+
   # Set up commands based on mode
   case "$MODE" in
     pr)
@@ -139,7 +196,7 @@ main() {
       exit 1
       ;;
   esac
-  
+
   # Browse files with preview
   browse_files "$file_list_cmd" "$preview_cmd"
 }
