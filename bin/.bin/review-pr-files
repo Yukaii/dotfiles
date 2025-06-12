@@ -54,8 +54,6 @@ check_dependencies() {
 
     exit 1
   fi
-
-  echo "✅ All dependencies found"
 }
 
 # Function: pick a PR interactively
@@ -88,12 +86,13 @@ pick_commit() {
 # Function: get preview command for PR files
 get_pr_preview_command() {
   local pr_id="$1"
-  local base_ref head_ref head_repo
+  local base_ref head_ref head_repo head_sha
 
-  # Get PR details
+  # Get PR details including the head SHA
   base_ref=$(gh pr view "$pr_id" --json baseRefName --template '{{.baseRefName}}')
   head_ref=$(gh pr view "$pr_id" --json headRefName --template '{{.headRefName}}')
   head_repo=$(gh pr view "$pr_id" --json headRepositoryOwner --template '{{.headRepositoryOwner.login}}')
+  head_sha=$(gh pr view "$pr_id" --json headRefOid --template '{{.headRefOid}}')
 
   # Determine the correct remote for the head branch (handle forks)
   local current_repo=$(gh repo view --json owner --template '{{.owner.login}}')
@@ -104,8 +103,30 @@ get_pr_preview_command() {
     head_remote_ref="$head_repo/$head_ref"
   fi
 
+  # Try different strategies to find a valid reference
+  local head_ref_to_use=""
+  local use_fallback=false
+  
+  # Strategy 1: Try the remote ref if it exists
+  if git rev-parse --verify "$head_remote_ref" &>/dev/null; then
+    head_ref_to_use="$head_remote_ref"
+  # Strategy 2: Try the SHA if it exists locally
+  elif git rev-parse --verify "$head_sha" &>/dev/null; then
+    head_ref_to_use="$head_sha"
+  else
+    use_fallback=true
+  fi
+
+  # Check if we can use merge-base (both refs must exist locally)
+  if [[ "$use_fallback" == "true" ]] || ! git rev-parse --verify "origin/$base_ref" &>/dev/null || ! git merge-base "origin/$base_ref" "$head_ref_to_use" &>/dev/null; then
+    # Strategy 3: Fallback to gh pr diff for cases where commit isn't available locally
+    # Since gh pr diff doesn't support file paths, we need to extract the file diff manually
+    echo "gh pr diff $pr_id --color=always | grep -A 1000 \"diff --git.*{}\" | grep -B 1000 -m 1 \"^diff --git\" | head -n -1"
+    return
+  fi
+
   # Use merge-base approach like pr-diff alias for accurate comparison
-  echo "git diff \$(git merge-base origin/$base_ref $head_remote_ref) $head_remote_ref --color=always -- {}"
+  echo "git diff \$(git merge-base origin/$base_ref $head_ref_to_use) $head_ref_to_use --color=always -- {}"
 }
 
 # Function: get preview command for commit files
