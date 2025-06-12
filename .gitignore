@@ -53,3 +53,5 @@ broot/.config/broot/launcher/
 
 codex/.codex/*
 !codex/.codex/config.json
+
+.storage
