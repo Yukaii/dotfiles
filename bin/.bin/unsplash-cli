@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # unsplash-cli-viewer
 # Minimal TUI for browsing Unsplash in Kitty.
-# Requires: bash (≥3.2), curl, jq, kitty-multi
+# Requires: bash (≥3.2), curl, jq, kitty-multi (expecting PNGs)
+# Optional: convert (ImageMagick) or sips (macOS) for non-PNG images.
 
 set -euo pipefail
-IFS=$'\n'
+IFS=$'\n' # Important for loops reading lines
 
 API="https://api.unsplash.com"
 if [[ -z "${UNSPLASH_ACCESS_KEY:-}" ]]; then
@@ -18,10 +19,22 @@ FULL=0         # fullscreen toggle
 IDX=0          # current index
 declare -a URLS DESC
 LAST_URL=""    # track last downloaded URL
-LAST_TMP=""    # its tempfile
+LAST_DOWNLOADED_FILE="" # Path to the raw downloaded file
+LAST_DISPLAY_FILE=""    # Path to the file actually passed to kitty-multi (might be a converted PNG)
+
+# Check for conversion tool
+CONVERSION_TOOL=""
+if command -v convert >/dev/null 2>&1; then # ImageMagick
+    CONVERSION_TOOL="convert"
+elif command -v sips >/dev/null 2>&1; then # macOS sips
+    CONVERSION_TOOL="sips"
+else
+    echo "Warning: No image conversion tool (ImageMagick 'convert' or macOS 'sips') found." >&2
+    echo "Non-PNG images from Unsplash might not display correctly with the current kitty-multi." >&2
+fi
 
 # get terminal size
-term_size=$(stty size 2>/dev/null || echo "24 80")
+term_size=$(stty size 2>/dev/null || echo "24 80") # Provide fallback if stty fails
 term_rows=${term_size% *}
 term_cols=${term_size#* }
 
@@ -30,218 +43,226 @@ calc_coord() {
   local v="$1" dim="$2" n c
   if [[ "$v" == *% ]]; then
     n=${v%\%}
-    (( n<0 || n>100 )) && n=0
-    c=$(( n*dim/100 ))
+    # Ensure n is a valid number for percentage calculation
+    if ! [[ "$n" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then n=0; fi
+    (( $(echo "$n < 0" | bc -l) )) && n=0
+    (( $(echo "$n > 100" | bc -l) )) && n=100
+    c=$(printf "%.0f" "$(echo "$n * $dim / 100" | bc -l)") # Use bc for float math then round
   else
+    # Ensure v is a number if it's not a percentage
+    if ! [[ "$v" =~ ^[0-9]+$ ]]; then v=1; fi
     c=$v
   fi
-  (( c<1 )) && c=1
-  if [[ "$v" == *% ]] && (( c>dim )); then c=$dim; fi
+  (( c < 1 )) && c=1
+  # For percentages, if calculated c > dim, it should be dim. For absolute, let it be.
+  if [[ "$v" == *% ]] && (( c > dim )); then c=$dim; fi
   printf "%s" "$c"
 }
 
 fetch_photo() {
   if [[ -n $COL_ID ]]; then
-    resp=$(curl -s -H "Authorization: Client-ID $KEY" \
+    resp=$(curl -fsSL -H "Authorization: Client-ID $KEY" \
       "$API/collections/$COL_ID/photos?per_page=30")
   else
-    resp=$(curl -s -H "Authorization: Client-ID $KEY" \
-      "$API/photos/random?count=9")
+    resp=$(curl -fsSL -H "Authorization: Client-ID $KEY" \
+      "$API/photos/random?count=9") # Fetch 9 for the 3x3 grid
+  fi
+  
+  if [[ -z "$resp" ]]; then
+    echo "Error: Failed to fetch photos from Unsplash. Check API key or network." >&2
+    URLS=() DESC=() IDX=0
+    return
   fi
 
-  URLS=(); while IFS= read -r l; do URLS+=("$l"); done < <(
-    jq -r '(if type=="object" then [.] else . end)
-           | .[].urls.regular' <<<"$resp"
+  # Clear previous arrays before populating
+  URLS=() 
+  DESC=()
+
+  while IFS= read -r l; do URLS+=("$l"); done < <(
+    jq -r '(if type=="object" then [.] else . end) # Handle single object or array
+           | .[].urls.regular // empty' <<<"$resp" # Use // empty if urls.regular is missing
   )
-  DESC=(); while IFS= read -r l; do DESC+=("$l"); done < <(
+  while IFS= read -r l; do DESC+=("$l"); done < <(
     jq -r '(if type=="object" then [.] else . end)
-           | .[]
-           | .user.name + " – " + ( .description // "no desc" )' <<<"$resp"
+           | .[] | (.user.name // "Unknown User") + " – " + ( .description // "no description" )' <<<"$resp"
   )
   IDX=0
 }
 
 draw() {
   clear
-  # Ensure URLS and IDX are valid before proceeding
   if (( ${#URLS[@]} == 0 || IDX < 0 || IDX >= ${#URLS[@]} )); then
-    echo "Fetching photos (URLS empty or IDX out of bounds)..." >&2
-    fetch_photo # Attempt to repopulate
-    # If still no photos, display a message and wait for key press
+    echo "Fetching photos..." >&2
+    fetch_photo
     if (( ${#URLS[@]} == 0 )); then
-        echo "No photos to display. Check API key or network." >&2
-        echo "Press any key to try fetching again or q to quit." >&2
-        # Don't proceed to image display logic
+        echo "No photos to display. Check API key/network or try again." >&2
+        echo "Press any key to try fetching or q to quit." >&2
         return
     fi
     # Ensure IDX is valid after fetch
     (( IDX < 0 )) && IDX=0
     (( IDX >= ${#URLS[@]} )) && IDX=$((${#URLS[@]} - 1))
+    # If fetch_photo still resulted in no URLs, it would have returned.
+    # If it populated, IDX might be 0 for a new list.
   fi
 
-  local url=${URLS[IDX]} desc=${DESC[IDX]}
-
-  # download if URL changed
-  if [[ "$url" != "$LAST_URL" ]]; then
-    [[ -n $LAST_TMP && -f $LAST_TMP ]] && rm -f "$LAST_TMP" # Clean up old temp file
-
-    local temp_template="uspx-XXXXXX"
-    # Check mktemp -t support for macOS/BSD style
-    if mktemp --help 2>&1 | grep -q -- "-t "; then
-      LAST_TMP=$(mktemp -t "$temp_template")
-    else
-      LAST_TMP=$(mktemp "/tmp/$temp_template") # Linux style
-    fi
-
-    echo "Downloading: $url to $LAST_TMP" >&2
-    # Use curl with -f to fail silently on server errors (for script logic)
-    # and capture its exit code.
-    if curl -fsL "$url" -o "$LAST_TMP"; then
-      if [[ ! -s "$LAST_TMP" ]]; then # Check if file is empty
-        echo "Error: Downloaded file is empty. URL: $url" >&2
-        rm -f "$LAST_TMP"; LAST_TMP="" # Clean up empty file
-        LAST_URL="" # Reset last URL so it tries again
-        sleep 2 # Pause to see error
-        return # Skip drawing
+  local url desc
+  # Defensive check for array bounds, though fetch_photo should handle empty URLS
+  if (( ${#URLS[@]} > 0 && IDX < ${#URLS[@]} )); then
+      url=${URLS[IDX]}
+      desc=${DESC[IDX]}
+  else
+      echo "Error: Invalid photo index or no photos available. Attempting to refresh." >&2
+      fetch_photo # Try to recover
+      # Re-check after fetch
+      if (( ${#URLS[@]} == 0 || IDX < 0 || IDX >= ${#URLS[@]} )); then
+          echo "Still no photos after refresh. Exiting draw." >&2
+          return
       fi
-      echo "Download complete. Size: $(wc -c < "$LAST_TMP") bytes" >&2
-      LAST_URL="$url"
-    else
-      local curl_exit_code=$?
-      echo "Error: curl failed to download $url (exit code: $curl_exit_code)" >&2
-      # If LAST_TMP was created by mktemp but curl failed, remove it
-      [[ -f "$LAST_TMP" ]] && rm -f "$LAST_TMP"
-      LAST_TMP=""
-      LAST_URL="" # Reset last URL so it tries again for next draw
-      sleep 2 # Pause to see error
-      return # Skip drawing
+      url=${URLS[IDX]}
+      desc=${DESC[IDX]}
+  fi
+
+
+  local file_to_display=""
+
+  if [[ "$url" != "$LAST_URL" || -z "$LAST_DISPLAY_FILE" || ! -f "$LAST_DISPLAY_FILE" ]]; then
+    # Clean up previous temp files
+    [[ -n "$LAST_DOWNLOADED_FILE" && -f "$LAST_DOWNLOADED_FILE" ]] && rm -f "$LAST_DOWNLOADED_FILE"
+    # Only remove LAST_DISPLAY_FILE if it's different from LAST_DOWNLOADED_FILE and exists
+    if [[ "$LAST_DISPLAY_FILE" != "$LAST_DOWNLOADED_FILE" && -n "$LAST_DISPLAY_FILE" && -f "$LAST_DISPLAY_FILE" ]]; then
+      rm -f "$LAST_DISPLAY_FILE"
     fi
+    
+    local temp_template_download="uspx-download-XXXXXX"
+    local downloaded_file
+    if mktemp --help 2>&1 | grep -q -- "-t "; then
+      downloaded_file=$(mktemp -t "$temp_template_download")
+    else
+      downloaded_file=$(mktemp "/tmp/$temp_template_download")
+    fi
+    LAST_DOWNLOADED_FILE="$downloaded_file"
+
+    echo "Downloading: $url to $downloaded_file" >&2
+    if curl -fsL "$url" -o "$downloaded_file"; then
+      if [[ ! -s "$downloaded_file" ]]; then
+        echo "Error: Downloaded file is empty. URL: $url" >&2; rm -f "$downloaded_file"; LAST_URL=""; LAST_DISPLAY_FILE=""; sleep 1; return
+      fi
+      echo "Download complete. Size: $(wc -c < "$downloaded_file") bytes" >&2
+
+      local file_type
+      file_type=$(file -b --mime-type "$downloaded_file")
+      echo "Detected MIME type: $file_type for $downloaded_file" >&2
+
+      if [[ "$file_type" == "image/png" ]]; then
+        file_to_display="$downloaded_file"
+      elif [[ -n "$CONVERSION_TOOL" ]]; then
+        local temp_template_png="uspx-converted-XXXXXX.png" # Ensure PNG extension for clarity
+        local png_temp_file
+        if mktemp --help 2>&1 | grep -q -- "-t "; then
+            png_temp_file=$(mktemp -t "$temp_template_png")
+        else
+            png_temp_file=$(mktemp "/tmp/$temp_template_png")
+        fi
+        echo "Converting $file_type to PNG: $png_temp_file" >&2
+        if [[ "$CONVERSION_TOOL" == "convert" ]]; then
+          if convert "$downloaded_file" "$png_temp_file"; then
+            file_to_display="$png_temp_file"
+          else
+            echo "Error: ImageMagick conversion failed. Using original." >&2; rm -f "$png_temp_file"; file_to_display="$downloaded_file"
+          fi
+        elif [[ "$CONVERSION_TOOL" == "sips" ]]; then
+          if sips -s format png "$downloaded_file" --out "$png_temp_file" >/dev/null 2>&1; then
+            file_to_display="$png_temp_file"
+          else
+            echo "Error: sips conversion failed. Using original." >&2; rm -f "$png_temp_file"; file_to_display="$downloaded_file"
+          fi
+        fi
+      else
+        echo "Warning: Non-PNG image ($file_type) and no conversion tool. Attempting with original (may fail)." >&2
+        file_to_display="$downloaded_file"
+      fi
+      LAST_URL="$url"
+      LAST_DISPLAY_FILE="$file_to_display"
+    else
+      echo "Error: curl failed to download $url (exit code: $?)" >&2
+      [[ -f "$downloaded_file" ]] && rm -f "$downloaded_file"; LAST_URL=""; LAST_DISPLAY_FILE=""; sleep 1; return
+    fi
+  else
+    # URL hasn't changed, use the last known display file
+    file_to_display="$LAST_DISPLAY_FILE"
   fi
 
-  # If LAST_TMP is not set or not a file, something went wrong with download
-  if [[ -z "$LAST_TMP" || ! -f "$LAST_TMP" ]]; then
-    echo "Error: No valid image file to display ($LAST_TMP missing for $url)." >&2
-    # Attempt to re-fetch on next cycle if url was supposed to be current
-    # This state might occur if a download failed previously and LAST_TMP was cleared.
-    LAST_URL="" # Force re-download attempt on next draw cycle
-    sleep 1
-    return
+  if [[ -z "$file_to_display" || ! -f "$file_to_display" ]]; then
+    echo "Error: No valid image file to display ($file_to_display missing for $url)." >&2
+    LAST_URL=""; LAST_DISPLAY_FILE=""; sleep 1; return # Force re-evaluation next cycle
   fi
 
-  # Construct the kitty-multi command arguments
-  local kitty_id="$IDX" # Image ID for kitty protocol
+  local kitty_id="$IDX" # Unique ID for Kitty protocol for this image instance
   local placement_opts
   if (( FULL )); then
     placement_opts="0%,0%,c=${term_cols},r=${term_rows}"
   else
-    local slot=$(( IDX%9 ))
-    local cr=$(( slot/3 )) cc=$(( slot%3 ))
-    local w=$(( term_cols/3 )) h=$(( term_rows/3 ))
-    local r_pct=$(( cr*100/3 )) c_pct=$(( cc*100/3 ))
+    local slot=$(( IDX % 9 )) # Ensure we cycle through 9 slots for the 3x3 grid
+    local cr=$(( slot / 3 )) cc=$(( slot % 3 ))
+    local w=$(( term_cols / 3 )) h=$(( term_rows / 3 ))
+    local r_pct=$(( cr * 100 / 3 )) c_pct=$(( cc * 100 / 3 ))
     placement_opts="${r_pct}%,${c_pct}%,c=${w},r=${h}"
   fi
 
-  # For debugging: echo the command
-  echo "Executing: kitty-multi \"$LAST_TMP\" \"$kitty_id\" \"$placement_opts\"" >&2
-
-  # Execute kitty-multi
-  if ! kitty-multi "$LAST_TMP" "$kitty_id" "$placement_opts"; then
-    echo "Error: kitty-multi failed. Check path or image format." >&2
-    sleep 2
-    # Consider what to do here - maybe try to re-fetch the image or clear LAST_TMP
+  echo "Executing: kitty-multi \"$file_to_display\" \"$kitty_id\" \"$placement_opts\"" >&2
+  if ! kitty-multi "$file_to_display" "$kitty_id" "$placement_opts"; then
+    echo "Error: kitty-multi failed. Check path or image format (expected PNG by kitty-multi)." >&2; sleep 1
   fi
 
-  # Status & help text
   echo "[$((IDX+1))/${#URLS[@]}] ${desc:0:term_cols}" >&2
   echo "←/p  →/n  z=toggle fullscreen  q=quit" >&2
 }
 
 main_loop() {
-  # Set terminal for raw, single-character, non-echoing input.
-  # min 1: read waits for at least 1 char.
-  # time 0: no inter-character timeout for that 1 char, so read blocks indefinitely.
   stty -echo -icanon min 1 time 0
-  # Trap to restore terminal settings and clear screen on exit/interrupt.
-  trap 'stty sane; clear; echo "Exited."; exit' INT TERM EXIT
+  trap 'stty sane; clear; [[ -n $LAST_DOWNLOADED_FILE && -f $LAST_DOWNLOADED_FILE ]] && rm -f "$LAST_DOWNLOADED_FILE"; if [[ "$LAST_DISPLAY_FILE" != "$LAST_DOWNLOADED_FILE" && -n "$LAST_DISPLAY_FILE" && -f "$LAST_DISPLAY_FILE" ]]; then rm -f "$LAST_DISPLAY_FILE"; fi; echo "Exited."; exit' INT TERM EXIT
 
-  local k # Variable to store the read key.
+  local k 
+  draw 
 
-  # Initial draw of the UI.
-  draw
-
-  # Loop indefinitely, reading one key at a time.
-  # The loop continues as long as 'read' successfully gets a character.
   while read -rsn1 k; do
-    local state_changed=0 # Flag to indicate if a redraw is needed for this iteration.
-
+    local state_changed=0 
     case "$k" in
-      q) break ;; # Exit the loop, script will then exit via trap.
-      h|p) # Previous image
-        if (( IDX > 0 )); then
-          IDX=$((IDX-1))
-          state_changed=1
-        else
-          # At the beginning of the current list, do nothing or optionally fetch a "previous" new set.
-          # For now, we do nothing.
-          echo "Already at the first image of this batch." >&2
-        fi
+      q) break ;;
+      h|p) 
+        if (( IDX > 0 )); then IDX=$((IDX-1)); state_changed=1
+        else echo "Already at the first image of this batch." >&2; fi
         ;;
-      l|n) # Next image
-        if (( IDX < ${#URLS[@]} - 1 )); then
-          IDX=$((IDX+1))
-          state_changed=1
-        else
-          # At the end of the current batch, fetch a new set of photos.
-          echo "Fetching next set of photos..." >&2
-          fetch_photo # This function should reset IDX to 0 and repopulate URLS.
-          state_changed=1 # New photos are a state change.
-        fi
+      l|n) 
+        if (( IDX < ${#URLS[@]} - 1 )); then IDX=$((IDX+1)); state_changed=1
+        else echo "Fetching next set of photos..." >&2; fetch_photo; state_changed=1; fi
         ;;
-      z) # Toggle fullscreen
-        FULL=$((1-FULL))
-        state_changed=1
-        ;;
-      $'\x1b') # ESCAPE key, likely the start of an arrow key sequence.
-        # Try to read the rest of the escape sequence (e.g., "[D" for left arrow).
-        # Use a very short timeout for these subsequent reads.
-        read -rsn1 -t0.01 k_esc_part1 # Read '['
-        read -rsn1 -t0.01 k_esc_part2 # Read 'A', 'B', 'C', or 'D'
+      z) FULL=$((1-FULL)); state_changed=1 ;;
+      $'\x1b') 
+        read -rsn1 -t0.01 k_esc_part1 
+        read -rsn1 -t0.01 k_esc_part2 
         if [[ "$k_esc_part1" == "[" ]]; then
           case "$k_esc_part2" in
-            D) # Left Arrow Key (\e[D) - map to 'h' logic
-              if (( IDX > 0 )); then IDX=$((IDX-1)); state_changed=1
-              else echo "Already at the first image." >&2;
-              fi
-              ;;
-            C) # Right Arrow Key (\e[C) - map to 'l' logic
-              if (( IDX < ${#URLS[@]} - 1 )); then IDX=$((IDX+1)); state_changed=1
-              else echo "Fetching next set..." >&2; fetch_photo; state_changed=1
-              fi
-              ;;
-            # A) echo "Up Arrow pressed" >&2 ;; # For future use
-            # B) echo "Down Arrow pressed" >&2 ;; # For future use
+            D) if (( IDX > 0 )); then IDX=$((IDX-1)); state_changed=1; else echo "Already at first image." >&2; fi ;;
+            C) if (( IDX < ${#URLS[@]} - 1 )); then IDX=$((IDX+1)); state_changed=1; else echo "Fetching next set..." >&2; fetch_photo; state_changed=1; fi ;;
           esac
         fi
         ;;
-      *)
-        # Optional: provide feedback for unhandled keys.
-        # echo "Unknown key: '$k'" >&2
-        ;; # Ignore other keys.
     esac
-
-    if (( state_changed )); then
-      draw # Redraw the UI only if a relevant state change occurred.
-    fi
+    if (( state_changed )); then draw; fi
   done
 }
 
-# parse optional --collection <id>
 if [[ "${1:-}" == "--collection" ]]; then
-  COL_ID=$2; shift 2
+  if [[ -n "${2:-}" ]]; then
+    COL_ID=$2; shift 2
+  else
+    echo "Error: --collection option requires an ID." >&2; exit 1
+  fi
 fi
 
-# ensure deps
-for cmd in curl jq kitty-multi; do
+for cmd in curl jq kitty-multi file; do # Added 'file' to deps check
   command -v $cmd >/dev/null || { echo "$cmd required" >&2; exit 1; }
 done
 
