@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage check
+if [ $# -lt 2 ]; then
+  cat <<EOF >&2
+Usage: $0 <commit-range> <pattern>
+  <commit-range> should be sha1..sha2 or sha1...sha2
+  <pattern> is any grep-style regex (quote if it contains spaces)
+EOF
+  exit 1
+fi
+
+# 1) Parse arguments
+range=$1
+shift
+pattern="$*"
+
+# 2) Extract start/end from either .. or ... syntax
+if [[ $range == *...* ]]; then
+  start=${range%%...*}
+  end=${range##*...}
+elif [[ $range == *..* ]]; then
+  start=${range%%..*}
+  end=${range##*..}
+else
+  echo "Error: commit-range must use '..' or '...'" >&2
+  exit 1
+fi
+
+# 3) Build the list of SHAs in that two-dot range
+commits=$(git rev-list "${start}..${end}")
+
+# 4) Grep + blame + filter
+git grep -n -- "$pattern" . \
+| while IFS=: read -r file line content; do
+    # blame the exact line
+    sha=$(git blame --porcelain -L "${line},${line}" -- "$file" \
+          | sed -n 's/^commit //p')
+    # only show if that SHA lives between start..end
+    if grep -qFx "$sha" <<< "$commits"; then
+      printf '%s:%s:%s\n' "$file" "$line" "$content"
+    fi
+  done
