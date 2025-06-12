@@ -1,0 +1,8 @@
+#!/bin/sh
+
+CURRENT_TAB=$(tweety tabs get)
+URL=$(echo "$CURRENT_TAB" | jq -r .url)
+TITLE=$(echo "$CURRENT_TAB" | jq -r .title)
+
+printf "[%s](%s)" "$TITLE" "$URL" | pbcopy
+

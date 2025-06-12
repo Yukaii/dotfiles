@@ -1,0 +1,10 @@
+{
+  "command": "/opt/homebrew/bin/fish",
+  "editor": "k",
+  "xterm": {
+    "fontSize": 15,
+    "fontFamily": "JetBrainsMono Nerd Font"
+  },
+  "theme": "Raycast_Dark",
+  "themeDark": "Raycast_Dark"
+}
