@@ -14,8 +14,15 @@ build_image() {
 # Start from a base image
 FROM debian:12-slim
 
-# Install dependencies, including ping, vim, and mosh
-RUN apt-get update && apt-get install -y curl gnupg ssh iputils-ping vim mosh && rm -rf /var/lib/apt/lists/*
+# Install dependencies, including ping, vim, mosh, and locale support
+RUN apt-get update && apt-get install -y curl gnupg ssh iputils-ping vim mosh locales && rm -rf /var/lib/apt/lists/*
+
+# Configure UTF-8 locale for mosh
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 # Install Tailscale
 RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null && \
