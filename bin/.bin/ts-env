@@ -1,0 +1,283 @@
+#!/bin/sh
+set -e
+
+# The name for the Docker image
+IMAGE_NAME="tailscale-dev-env"
+
+# --- SUBCOMMANDS ---
+
+build_image() {
+  echo "Building Docker image: ${IMAGE_NAME}..."
+  # Use a heredoc to pass the Dockerfile to docker build.
+  # This makes the script self-contained, with no external Dockerfile needed.
+  docker build -t "${IMAGE_NAME}" - <<'DOCKERFILE_EOF'
+# Start from a base image
+FROM debian:12-slim
+
+# Install dependencies, including ping, vim, and mosh
+RUN apt-get update && apt-get install -y curl gnupg ssh iputils-ping vim mosh && rm -rf /var/lib/apt/lists/*
+
+# Install Tailscale
+RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null && \
+    curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.tailscale-keyring.list | tee /etc/apt/sources.list.d/tailscale.list && \
+    apt-get update && \
+    apt-get install -y tailscale && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create the startup script directly in the image using a portable printf.
+# This avoids needing a separate start.sh file.
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'set -e' \
+    'TAILSCALE_STATE_DIR=/var/lib/tailscale/tailscaled.state' \
+    'tailscaled --state=${TAILSCALE_STATE_DIR} &' \
+    'HOSTNAME=${TAILSCALE_HOSTNAME:-my-dev-container}' \
+    'tailscale up --hostname=${HOSTNAME}' \
+    'echo "Tailscale is connected. Container is ready."' \
+    'exec /bin/sh -c "trap : TERM INT; sleep infinity & wait"' \
+    > /start.sh
+
+# Make the startup script executable
+RUN chmod +x /start.sh
+
+# Set the startup script as the entrypoint
+ENTRYPOINT ["/start.sh"]
+DOCKERFILE_EOF
+  echo "Build complete."
+}
+
+run_container() {
+  UNIQUE_NAME=""
+  DATA_DIR_BASE=""
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --name)
+        UNIQUE_NAME="$2"
+        shift 2
+        ;;
+      --data-dir)
+        DATA_DIR_BASE="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option for 'run': $1" >&2
+        echo "Usage: $0 run --name <unique-name> [--data-dir <path>]" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z "$UNIQUE_NAME" ]; then
+    echo "Error: 'run' command requires a --name." >&2
+    echo "Usage: $0 run --name <unique-name>" >&2
+    exit 1
+  fi
+
+  if [ -z "$DATA_DIR_BASE" ]; then
+    # Use XDG_CONFIG_HOME if set, otherwise default to ~/.config
+    XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+    DATA_DIR_BASE="${XDG_CONFIG_HOME}/ts-env"
+  fi
+
+  CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+  DATA_DIR="${DATA_DIR_BASE}/${UNIQUE_NAME}"
+  HOSTNAME=${CONTAINER_NAME}
+
+  mkdir -p "${DATA_DIR}"
+
+  echo "Starting container ${CONTAINER_NAME}..."
+  docker run -d --rm --name="${CONTAINER_NAME}" \
+        --hostname="${HOSTNAME}" \
+        --device=/dev/net/tun \
+        --cap-add=NET_ADMIN \
+        -v "${DATA_DIR}":/var/lib/tailscale \
+        -v ~/.ssh:/root/.ssh:ro \
+        -e TAILSCALE_HOSTNAME="${HOSTNAME}" \
+        "${IMAGE_NAME}"
+
+  echo "Container ${CONTAINER_NAME} started."
+  echo "To get the auth URL, run: $0 logs --name ${UNIQUE_NAME}"
+}
+
+show_logs() {
+  UNIQUE_NAME=""
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --name)
+        UNIQUE_NAME="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option for 'logs': $1" >&2
+        echo "Usage: $0 logs --name <unique-name>" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z "$UNIQUE_NAME" ]; then
+    echo "Error: 'logs' command requires a --name." >&2
+    echo "Usage: $0 logs --name <unique-name>" >&2
+    exit 1
+  fi
+  CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+  docker logs -f "${CONTAINER_NAME}"
+}
+
+open_shell() {
+  UNIQUE_NAME=""
+  SHELL_COMMAND="/bin/bash"
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --name)
+        UNIQUE_NAME="$2"
+        shift 2
+        ;;
+      --command)
+        SHELL_COMMAND="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option for 'shell': $1" >&2
+        echo "Usage: $0 shell --name <name> [--command 'custom command']" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z "$UNIQUE_NAME" ]; then
+    echo "Error: 'shell' command requires a --name." >&2
+    echo "Usage: $0 shell --name <unique-name>" >&2
+    exit 1
+  fi
+  CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+  # Use `sh -c` to handle commands with arguments correctly.
+  docker exec -it "${CONTAINER_NAME}" sh -c "${SHELL_COMMAND}"
+}
+
+list_containers() {
+  echo "Listing running Tailscale containers..."
+  docker ps --filter "name=multi-ts-*" --format '{{json .}}' | jq -r '.Names | sub("multi-ts-"; "")'
+}
+
+stop_container() {
+  UNIQUE_NAME=""
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --name)
+        UNIQUE_NAME="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option for 'stop': $1" >&2
+        echo "Usage: $0 stop --name <unique-name>" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  if [ -z "$UNIQUE_NAME" ]; then
+    echo "Error: 'stop' command requires a --name." >&2
+    echo "Usage: $0 stop --name <unique-name>" >&2
+    exit 1
+  fi
+  CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+  echo "Stopping container ${CONTAINER_NAME}..."
+  docker stop "${CONTAINER_NAME}"
+}
+
+wipe_data() {
+    UNIQUE_NAME=""
+    DATA_DIR_BASE=""
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --name)
+                UNIQUE_NAME="$2"
+                shift 2
+                ;;
+            --data-dir)
+                DATA_DIR_BASE="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown option for 'wipe': $1" >&2
+                echo "Usage: $0 wipe --name <unique-name> [--data-dir <path>]" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [ -z "$UNIQUE_NAME" ]; then
+        echo "Error: 'wipe' command requires a --name." >&2
+        echo "Usage: $0 wipe --name <unique-name>" >&2
+        exit 1
+    fi
+
+    if [ -z "$DATA_DIR_BASE" ]; then
+        XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+        DATA_DIR_BASE="${XDG_CONFIG_HOME}/ts-env"
+    fi
+
+    DATA_DIR="${DATA_DIR_BASE}/${UNIQUE_NAME}"
+
+    if [ -d "${DATA_DIR}" ]; then
+        echo "Are you sure you want to delete ${DATA_DIR}? [y/N]"
+        read -r confirmation
+        if [ "$confirmation" = "y" ] || [ "$confirmation" = "Y" ]; then
+            echo "Wiping data directory: ${DATA_DIR}"
+            rm -rf "${DATA_DIR}"
+            echo "Data wiped."
+        else
+            echo "Wipe cancelled."
+        fi
+    else
+        echo "Data directory not found: ${DATA_DIR}"
+    fi
+}
+
+# --- MAIN LOGIC ---
+
+COMMAND=$1
+shift || true # Shift arguments to the left, ignore error if no args
+
+case "$COMMAND" in
+  build)
+    build_image
+    ;;
+  run)
+    run_container "$@"
+    ;;
+  logs)
+    show_logs "$@"
+    ;;
+  shell)
+    open_shell "$@"
+    ;;
+  list)
+    list_containers
+    ;;
+  stop)
+    stop_container "$@"
+    ;;
+  wipe)
+    wipe_data "$@"
+    ;;
+  *)
+    echo "Usage: $0 {build|run|logs|shell|list|stop|wipe} [options]" >&2
+    echo "Commands:" >&2
+    echo "  build                      Build the Docker image." >&2
+    echo "  run --name <name> [--data-dir <path>]" >&2
+    echo "                             Run a new container with a unique name." >&2
+    echo "  logs --name <name>         Follow the logs of a container." >&2
+    echo "  shell --name <name> [--command 'cmd']" >&2
+    echo "                             Get an interactive shell or run a command in a container." >&2
+    echo "  list                       List all running multi-ts containers." >&2
+    echo "  stop --name <name>         Stop a specific container." >&2
+    echo "  wipe --name <name> [--data-dir <path>]" >&2
+    echo "                             Wipe the data for a specific container." >&2
+    exit 1
+    ;;
+esac
