@@ -7,10 +7,29 @@ IMAGE_NAME="tailscale-dev-env"
 # --- SUBCOMMANDS ---
 
 build_image() {
-  echo "Building Docker image: ${IMAGE_NAME}..."
+  CUSTOM_IMAGE_NAME=""
+  
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --image-name)
+        CUSTOM_IMAGE_NAME="$2"
+        shift 2
+        ;;
+      *)
+        echo "Unknown option for 'build': $1" >&2
+        echo "Usage: $0 build [--image-name <custom-name>]" >&2
+        exit 1
+        ;;
+    esac
+  done
+
+  # Use custom image name if provided, otherwise use default
+  BUILD_IMAGE_NAME="${CUSTOM_IMAGE_NAME:-$IMAGE_NAME}"
+  
+  echo "Building Docker image: ${BUILD_IMAGE_NAME}..."
   # Use a heredoc to pass the Dockerfile to docker build.
   # This makes the script self-contained, with no external Dockerfile needed.
-  docker build -t "${IMAGE_NAME}" - <<'DOCKERFILE_EOF'
+  docker build -t "${BUILD_IMAGE_NAME}" - <<'DOCKERFILE_EOF'
 # Start from a base image
 FROM debian:12-slim
 
@@ -56,6 +75,7 @@ DOCKERFILE_EOF
 run_container() {
   UNIQUE_NAME=""
   DATA_DIR_BASE=""
+  CUSTOM_IMAGE_NAME=""
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -67,9 +87,13 @@ run_container() {
         DATA_DIR_BASE="$2"
         shift 2
         ;;
+      --image-name)
+        CUSTOM_IMAGE_NAME="$2"
+        shift 2
+        ;;
       *)
         echo "Unknown option for 'run': $1" >&2
-        echo "Usage: $0 run --name <unique-name> [--data-dir <path>]" >&2
+        echo "Usage: $0 run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>]" >&2
         exit 1
         ;;
     esac
@@ -93,6 +117,9 @@ run_container() {
 
   mkdir -p "${DATA_DIR}"
 
+  # Use custom image name if provided, otherwise use default
+  RUN_IMAGE_NAME="${CUSTOM_IMAGE_NAME:-$IMAGE_NAME}"
+  
   echo "Starting container ${CONTAINER_NAME}..."
   docker run -d --rm --name="${CONTAINER_NAME}" \
         --hostname="${HOSTNAME}" \
@@ -101,7 +128,7 @@ run_container() {
         -v "${DATA_DIR}":/var/lib/tailscale \
         -v ~/.ssh:/root/.ssh:ro \
         -e TAILSCALE_HOSTNAME="${HOSTNAME}" \
-        "${IMAGE_NAME}"
+        "${RUN_IMAGE_NAME}"
 
   echo "Container ${CONTAINER_NAME} started."
   echo "To get the auth URL, run: $0 logs --name ${UNIQUE_NAME}"
@@ -273,18 +300,54 @@ case "$COMMAND" in
     wipe_data "$@"
     ;;
   *)
+    echo "Tailscale Development Environment Manager" >&2
+    echo "" >&2
+    echo "REQUIREMENTS:" >&2
+    echo "  - Docker daemon must be running" >&2
+    echo "  - jq (required for 'list' command)" >&2
+    echo "" >&2
+    echo "FIRST TIME SETUP:" >&2
+    echo "  1. Ensure Docker is running: docker info" >&2
+    echo "  2. Build the image: $0 build" >&2
+    echo "  3. Run a container: $0 run --name mydev" >&2
+    echo "" >&2
     echo "Usage: $0 {build|run|logs|shell|list|stop|wipe} [options]" >&2
+    echo "" >&2
     echo "Commands:" >&2
-    echo "  build                      Build the Docker image." >&2
-    echo "  run --name <name> [--data-dir <path>]" >&2
+    echo "  build [--image-name <name>]" >&2
+    echo "                             Build the Docker image with UTF-8 locale support." >&2
+    echo "                             Optional: specify custom image name." >&2
+    echo "" >&2
+    echo "  run --name <name> [--data-dir <path>] [--image-name <name>]" >&2
     echo "                             Run a new container with a unique name." >&2
-    echo "  logs --name <name>         Follow the logs of a container." >&2
+    echo "                             Optional: specify custom data directory and image name." >&2
+    echo "" >&2
+    echo "  logs --name <name>         Follow the logs of a container to get auth URL." >&2
+    echo "" >&2
     echo "  shell --name <name> [--command 'cmd']" >&2
     echo "                             Get an interactive shell or run a command in a container." >&2
+    echo "                             Default shell: /bin/bash" >&2
+    echo "" >&2
     echo "  list                       List all running multi-ts containers." >&2
+    echo "                             (requires jq)" >&2
+    echo "" >&2
     echo "  stop --name <name>         Stop a specific container." >&2
+    echo "" >&2
     echo "  wipe --name <name> [--data-dir <path>]" >&2
     echo "                             Wipe the data for a specific container." >&2
+    echo "                             Optional: specify custom data directory." >&2
+    echo "" >&2
+    echo "EXAMPLES:" >&2
+    echo "  $0 build" >&2
+    echo "  $0 build --image-name my-tailscale-dev" >&2
+    echo "  $0 run --name dev1" >&2
+    echo "  $0 run --name dev2 --image-name my-tailscale-dev" >&2
+    echo "  $0 logs --name dev1" >&2
+    echo "  $0 shell --name dev1" >&2
+    echo "  $0 shell --name dev1 --command 'ping google.com'" >&2
+    echo "  $0 list" >&2
+    echo "  $0 stop --name dev1" >&2
+    echo "  $0 wipe --name dev1" >&2
     exit 1
     ;;
 esac
