@@ -1,0 +1,156 @@
+#!/bin/sh
+set -e
+
+# SOCKS5 Proxy Test Script
+# Usage: test-socks5-proxy [--proxy <host:port>] [--verbose]
+
+PROXY_HOST="127.0.0.1"
+PROXY_PORT="1080"
+VERBOSE=false
+
+# Parse command line arguments
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --proxy)
+            PROXY="$2"
+            PROXY_HOST="${PROXY%:*}"
+            PROXY_PORT="${PROXY#*:}"
+            shift 2
+            ;;
+        --verbose)
+            VERBOSE=true
+            shift
+            ;;
+        --help|-h)
+            echo "SOCKS5 Proxy Test Script"
+            echo ""
+            echo "Usage: $0 [--proxy <host:port>] [--verbose]"
+            echo ""
+            echo "Options:"
+            echo "  --proxy <host:port>    SOCKS5 proxy address (default: 127.0.0.1:1080)"
+            echo "  --verbose              Show detailed curl output"
+            echo "  --help, -h             Show this help message"
+            echo ""
+            echo "Tests performed:"
+            echo "  1. Basic connectivity test (httpbin.org/ip)"
+            echo "  2. DNS resolution test (google.com)"
+            echo "  3. HTTPS test (httpbin.org/get)"
+            echo "  4. Geolocation test (ipinfo.io)"
+            echo ""
+            echo "Examples:"
+            echo "  $0                           # Test default proxy (127.0.0.1:1080)"
+            echo "  $0 --proxy 127.0.0.1:9090   # Test custom proxy port"
+            echo "  $0 --verbose                 # Show detailed output"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            echo "Use --help for usage information" >&2
+            exit 1
+            ;;
+    esac
+done
+
+echo "=== SOCKS5 Proxy Test ==="
+echo "Proxy: ${PROXY_HOST}:${PROXY_PORT}"
+echo "Time: $(date)"
+echo ""
+
+# Prepare curl options
+CURL_OPTS="--socks5-hostname ${PROXY_HOST}:${PROXY_PORT} --connect-timeout 10 --max-time 30"
+if [ "$VERBOSE" = "true" ]; then
+    CURL_OPTS="$CURL_OPTS -v"
+else
+    CURL_OPTS="$CURL_OPTS -s"
+fi
+
+# Test counter
+TESTS_PASSED=0
+TESTS_TOTAL=0
+
+# Helper function to run test
+run_test() {
+    local test_name="$1"
+    local url="$2"
+    local expected_pattern="$3"
+    
+    TESTS_TOTAL=$((TESTS_TOTAL + 1))
+    echo "Test $TESTS_TOTAL: $test_name"
+    echo "URL: $url"
+    
+    if [ "$VERBOSE" = "true" ]; then
+        echo "Command: curl $CURL_OPTS \"$url\""
+        echo "---"
+    fi
+    
+    # Run the curl command and capture output
+    if response=$(curl $CURL_OPTS "$url" 2>&1); then
+        if [ -n "$expected_pattern" ] && echo "$response" | grep -q "$expected_pattern"; then
+            echo "✓ PASS - Response contains expected pattern"
+            TESTS_PASSED=$((TESTS_PASSED + 1))
+        elif [ -z "$expected_pattern" ]; then
+            echo "✓ PASS - Request successful"
+            TESTS_PASSED=$((TESTS_PASSED + 1))
+        else
+            echo "✗ FAIL - Response does not contain expected pattern"
+            echo "Expected pattern: $expected_pattern"
+        fi
+        
+        if [ "$VERBOSE" = "true" ]; then
+            echo "Response:"
+            echo "$response"
+        else
+            # Show first few lines of response for non-verbose mode
+            echo "Response preview:"
+            echo "$response" | head -3
+        fi
+    else
+        echo "✗ FAIL - Request failed"
+        if [ "$VERBOSE" = "true" ]; then
+            echo "Error output:"
+            echo "$response"
+        fi
+    fi
+    echo ""
+}
+
+# Test 1: Basic IP check
+run_test "Basic IP connectivity" "http://httpbin.org/ip" "origin"
+
+# Test 2: DNS resolution test
+run_test "DNS resolution" "http://google.com" ""
+
+# Test 3: HTTPS test
+run_test "HTTPS connectivity" "https://httpbin.org/get" "args"
+
+# Test 4: Geolocation test
+run_test "IP geolocation" "http://ipinfo.io/json" "ip"
+
+# Test 5: Test without proxy (for comparison)
+echo "Test $((TESTS_TOTAL + 1)): Direct connection (no proxy) for comparison"
+echo "URL: http://httpbin.org/ip"
+if response=$(curl -s --connect-timeout 10 --max-time 30 "http://httpbin.org/ip" 2>&1); then
+    echo "✓ Direct connection successful"
+    echo "Your real IP:"
+    echo "$response" | head -3
+else
+    echo "✗ Direct connection failed"
+fi
+echo ""
+
+# Summary
+echo "=== Test Summary ==="
+echo "Tests passed: $TESTS_PASSED/$TESTS_TOTAL"
+if [ "$TESTS_PASSED" -eq "$TESTS_TOTAL" ]; then
+    echo "✓ All tests passed! SOCKS5 proxy is working correctly."
+    exit 0
+else
+    echo "✗ Some tests failed. Check your SOCKS5 proxy configuration."
+    echo ""
+    echo "Troubleshooting tips:"
+    echo "1. Ensure the proxy is running: netstat -an | grep $PROXY_PORT"
+    echo "2. Check proxy logs for errors"
+    echo "3. Try connecting directly: ssh root@<container-ip>"
+    echo "4. Verify container has internet access: docker exec <container> ping google.com"
+    exit 1
+fi

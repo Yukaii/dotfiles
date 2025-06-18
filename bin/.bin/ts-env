@@ -33,8 +33,18 @@ build_image() {
 # Start from a base image
 FROM debian:12-slim
 
-# Install dependencies, including ping, vim, mosh, and locale support
-RUN apt-get update && apt-get install -y curl gnupg ssh iputils-ping vim mosh locales && rm -rf /var/lib/apt/lists/*
+# Install dependencies, including ping, vim, mosh, openssh-server, net-tools, and locale support
+RUN apt-get update && apt-get install -y curl gnupg ssh openssh-server net-tools iputils-ping vim mosh locales && rm -rf /var/lib/apt/lists/*
+
+# Configure SSH
+RUN mkdir -p /var/run/sshd /root/.ssh_writable && \
+    echo 'root:tailscale' | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
+    sed -i 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config && \
+    sed -i 's|#AuthorizedKeysFile.*|AuthorizedKeysFile /root/.ssh_writable/authorized_keys|' /etc/ssh/sshd_config && \
+    ssh-keygen -A
 
 # Configure UTF-8 locale for mosh
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
@@ -56,10 +66,22 @@ RUN printf '%s\n' \
     '#!/bin/sh' \
     'set -e' \
     'TAILSCALE_STATE_DIR=/var/lib/tailscale/tailscaled.state' \
+    'echo "Starting SSH server..."' \
+    'service ssh start' \
+    'sleep 1' \
+    'echo "SSH server status:"' \
+    'service ssh status || true' \
+    'netstat -tlnp | grep :22 || echo "SSH not listening on port 22"' \
+    'echo "Starting Tailscale daemon..."' \
     'tailscaled --state=${TAILSCALE_STATE_DIR} &' \
+    'sleep 2' \
     'HOSTNAME=${TAILSCALE_HOSTNAME:-my-dev-container}' \
+    'echo "Connecting to Tailscale network..."' \
     'tailscale up --hostname=${HOSTNAME}' \
     'echo "Tailscale is connected. Container is ready."' \
+    'echo "SSH server is running. Root password: tailscale"' \
+    'echo "Container IP: $(hostname -i)"' \
+    'echo "SSH test: ssh root@$(hostname -i)"' \
     'exec /bin/sh -c "trap : TERM INT; sleep infinity & wait"' \
     > /start.sh
 
@@ -76,6 +98,7 @@ run_container() {
   UNIQUE_NAME=""
   DATA_DIR_BASE=""
   CUSTOM_IMAGE_NAME=""
+  SOCKS5_PORT=""
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -91,9 +114,13 @@ run_container() {
         CUSTOM_IMAGE_NAME="$2"
         shift 2
         ;;
+      --socks5-port)
+        SOCKS5_PORT="$2"
+        shift 2
+        ;;
       *)
         echo "Unknown option for 'run': $1" >&2
-        echo "Usage: $0 run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>]" >&2
+        echo "Usage: $0 run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>] [--socks5-port <port>]" >&2
         exit 1
         ;;
     esac
@@ -120,6 +147,12 @@ run_container() {
   # Use custom image name if provided, otherwise use default
   RUN_IMAGE_NAME="${CUSTOM_IMAGE_NAME:-$IMAGE_NAME}"
   
+  # Build Docker run command with optional SOCKS5 port mapping
+  DOCKER_PORTS=""
+  if [ -n "$SOCKS5_PORT" ]; then
+    DOCKER_PORTS="-p ${SOCKS5_PORT}:1080"
+  fi
+  
   echo "Starting container ${CONTAINER_NAME}..."
   docker run -d --rm --name="${CONTAINER_NAME}" \
         --hostname="${HOSTNAME}" \
@@ -128,9 +161,13 @@ run_container() {
         -v "${DATA_DIR}":/var/lib/tailscale \
         -v ~/.ssh:/root/.ssh:ro \
         -e TAILSCALE_HOSTNAME="${HOSTNAME}" \
+        ${DOCKER_PORTS} \
         "${RUN_IMAGE_NAME}"
 
   echo "Container ${CONTAINER_NAME} started."
+  if [ -n "$SOCKS5_PORT" ]; then
+    echo "SOCKS5 proxy will be available on localhost:${SOCKS5_PORT} once started"
+  fi
   echo "To get the auth URL, run: $0 logs --name ${UNIQUE_NAME}"
 }
 
@@ -272,6 +309,233 @@ wipe_data() {
     fi
 }
 
+debug_container() {
+    UNIQUE_NAME=""
+    
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --name)
+                UNIQUE_NAME="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown option for 'debug': $1" >&2
+                echo "Usage: $0 debug --name <unique-name>" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [ -z "$UNIQUE_NAME" ]; then
+        echo "Error: 'debug' command requires a --name." >&2
+        echo "Usage: $0 debug --name <unique-name>" >&2
+        exit 1
+    fi
+
+    CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+    
+    echo "=== Container Debug Information ==="
+    echo "Container name: ${CONTAINER_NAME}"
+    echo ""
+    
+    # Check if container exists and is running
+    if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+        echo "❌ Container is not running"
+        echo "Available containers:"
+        docker ps --filter "name=multi-ts-*" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+        return 1
+    fi
+    
+    echo "✅ Container is running"
+    
+    # Get container info
+    CONTAINER_IP=$(docker inspect "${CONTAINER_NAME}" --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 2>/dev/null || echo "")
+    echo "Container IP: ${CONTAINER_IP}"
+    
+    # Check SSH server status
+    echo ""
+    echo "=== SSH Server Status ==="
+    docker exec "${CONTAINER_NAME}" sh -c "ps aux | grep sshd | grep -v grep" || echo "SSH server not running"
+    
+    # Check if SSH port is listening
+    echo ""
+    echo "=== Network Status ==="
+    docker exec "${CONTAINER_NAME}" sh -c "netstat -tlnp | grep :22" || echo "SSH port 22 not listening"
+    
+    # Test SSH connectivity
+    echo ""
+    echo "=== SSH Connectivity Test ==="
+    if ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=3 \
+       -o BatchMode=yes "root@${CONTAINER_IP}" "echo 'SSH working'" 2>/dev/null; then
+        echo "✅ SSH connection successful"
+    else
+        echo "❌ SSH connection failed"
+        echo "Try manual SSH: ssh root@${CONTAINER_IP} (password: tailscale)"
+    fi
+    
+    # Check Tailscale status
+    echo ""
+    echo "=== Tailscale Status ==="
+    docker exec "${CONTAINER_NAME}" tailscale status || echo "Tailscale not connected"
+}
+
+proxy_docker_command() {
+    UNIQUE_NAME=""
+    LOCAL_PORT="1080"
+    
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --name)
+                UNIQUE_NAME="$2"
+                shift 2
+                ;;
+            --port)
+                LOCAL_PORT="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown option for 'proxy-docker': $1" >&2
+                echo "Usage: $0 proxy-docker --name <unique-name> [--port <local-port>]" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [ -z "$UNIQUE_NAME" ]; then
+        echo "Error: 'proxy-docker' command requires a --name." >&2
+        echo "Usage: $0 proxy-docker --name <unique-name> [--port <local-port>]" >&2
+        exit 1
+    fi
+
+    CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+    
+    # Check if container was started with port mapping
+    CONTAINER_PORTS=$(docker inspect "${CONTAINER_NAME}" --format '{{.NetworkSettings.Ports}}' 2>/dev/null || echo "")
+    if echo "$CONTAINER_PORTS" | grep -q "${LOCAL_PORT}/tcp"; then
+        echo "✓ Container has port mapping for ${LOCAL_PORT}"
+        echo "Starting Docker-based SOCKS5 proxy on localhost:${LOCAL_PORT}..."
+        echo "This approach uses Docker exec with port mapping"
+        echo "Press Ctrl+C to stop the proxy"
+        echo ""
+        
+        # Start SOCKS proxy using Docker exec with port mapping
+        docker exec -it "${CONTAINER_NAME}" sh -c "
+            echo 'Starting SOCKS5 proxy inside container on port ${LOCAL_PORT}...'
+            
+            # Create SSH keys in a writable location
+            SSH_DIR='/tmp/.ssh'
+            mkdir -p \$SSH_DIR
+            chmod 700 \$SSH_DIR
+            
+            if [ ! -f \$SSH_DIR/id_ed25519 ]; then
+                echo 'Creating SSH keys in writable location...'
+                ssh-keygen -t ed25519 -f \$SSH_DIR/id_ed25519 -N \"\"
+                cp \$SSH_DIR/id_ed25519.pub \$SSH_DIR/authorized_keys
+                chmod 600 \$SSH_DIR/authorized_keys
+            fi
+            
+            # Update SSH config to use our keys
+            mkdir -p /root/.ssh_writable
+            cp \$SSH_DIR/authorized_keys /root/.ssh_writable/
+            chmod 600 /root/.ssh_writable/authorized_keys
+            
+            echo 'Starting SSH tunnel with key authentication...'
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+                -o BatchMode=yes -i \$SSH_DIR/id_ed25519 \
+                -N -D 0.0.0.0:${LOCAL_PORT} root@localhost &
+            SSH_PID=\$!
+            echo 'SOCKS5 proxy started with PID '\$SSH_PID
+            echo 'Configure your applications to use SOCKS5 proxy: 127.0.0.1:${LOCAL_PORT}'
+            trap 'kill \$SSH_PID 2>/dev/null || true; exit' INT TERM
+            wait \$SSH_PID
+        "
+    else
+        echo "❌ Container not started with port mapping for ${LOCAL_PORT}"
+        echo "To use proxy-docker, restart container with port mapping:"
+        echo "  $0 stop --name ${UNIQUE_NAME}"
+        echo "  $0 run --name ${UNIQUE_NAME} --socks5-port ${LOCAL_PORT}"
+        echo "  $0 proxy-docker --name ${UNIQUE_NAME}"
+        echo ""
+        echo "Or use the regular proxy command (external SSH):"
+        echo "  $0 proxy --name ${UNIQUE_NAME}"
+        exit 1
+    fi
+}
+
+proxy_command() {
+    UNIQUE_NAME=""
+    LOCAL_PORT="1080"
+    
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --name)
+                UNIQUE_NAME="$2"
+                shift 2
+                ;;
+            --port)
+                LOCAL_PORT="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown option for 'proxy': $1" >&2
+                echo "Usage: $0 proxy --name <unique-name> [--port <local-port>]" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [ -z "$UNIQUE_NAME" ]; then
+        echo "Error: 'proxy' command requires a --name." >&2
+        echo "Usage: $0 proxy --name <unique-name> [--port <local-port>]" >&2
+        exit 1
+    fi
+
+    CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+    
+    # Get container IP address
+    CONTAINER_IP=$(docker inspect "${CONTAINER_NAME}" --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 2>/dev/null || echo "")
+    
+    if [ -z "$CONTAINER_IP" ]; then
+        echo "Error: Container ${CONTAINER_NAME} not found or not running" >&2
+        exit 1
+    fi
+
+    # Check if SSH tunnel is already running
+    if pgrep -f "ssh.*${CONTAINER_IP}.*-D ${LOCAL_PORT}" > /dev/null; then
+        echo "SOCKS5 proxy is already running on localhost:${LOCAL_PORT}"
+        echo "To stop it, run: pkill -f \"ssh.*${CONTAINER_IP}.*-D ${LOCAL_PORT}\""
+        exit 1
+    fi
+    
+    echo "Starting SOCKS5 proxy on localhost:${LOCAL_PORT} via SSH to container..."
+    echo "Container IP: ${CONTAINER_IP}"
+    echo ""
+    echo "Testing SSH connectivity first..."
+    
+    # Test SSH connectivity first
+    if ! ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 \
+         -o BatchMode=yes "root@${CONTAINER_IP}" "echo 'SSH connection successful'" 2>/dev/null; then
+        echo "✗ SSH connection failed!"
+        echo ""
+        echo "Troubleshooting steps:"
+        echo "1. Check if container is running: docker ps | grep ${CONTAINER_NAME}"
+        echo "2. Check container logs: $0 logs --name ${UNIQUE_NAME}"
+        echo "3. Test SSH manually: ssh root@${CONTAINER_IP} (password: tailscale)"
+        echo "4. Check if SSH is running in container: $0 shell --name ${UNIQUE_NAME} --command 'ps aux | grep ssh'"
+        echo "5. Rebuild image with SSH fixes: $0 build"
+        exit 1
+    fi
+    
+    echo "✓ SSH connection successful!"
+    echo "Configure your applications to use SOCKS5 proxy: 127.0.0.1:${LOCAL_PORT}"
+    echo "Press Ctrl+C to stop the proxy"
+    echo ""
+    
+    # Start SSH SOCKS proxy (foreground, will run until interrupted)
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
+        -N -D "${LOCAL_PORT}" "root@${CONTAINER_IP}"
+}
+
 # --- MAIN LOGIC ---
 
 COMMAND=$1
@@ -279,7 +543,7 @@ shift || true # Shift arguments to the left, ignore error if no args
 
 case "$COMMAND" in
   build)
-    build_image
+    build_image "$@"
     ;;
   run)
     run_container "$@"
@@ -299,6 +563,15 @@ case "$COMMAND" in
   wipe)
     wipe_data "$@"
     ;;
+  debug)
+    debug_container "$@"
+    ;;
+  proxy)
+    proxy_command "$@"
+    ;;
+  proxy-docker)
+    proxy_docker_command "$@"
+    ;;
   *)
     echo "Tailscale Development Environment Manager" >&2
     echo "" >&2
@@ -311,16 +584,16 @@ case "$COMMAND" in
     echo "  2. Build the image: $0 build" >&2
     echo "  3. Run a container: $0 run --name mydev" >&2
     echo "" >&2
-    echo "Usage: $0 {build|run|logs|shell|list|stop|wipe} [options]" >&2
+    echo "Usage: $0 {build|run|logs|shell|list|stop|wipe|proxy} [options]" >&2
     echo "" >&2
     echo "Commands:" >&2
     echo "  build [--image-name <name>]" >&2
     echo "                             Build the Docker image with UTF-8 locale support." >&2
     echo "                             Optional: specify custom image name." >&2
     echo "" >&2
-    echo "  run --name <name> [--data-dir <path>] [--image-name <name>]" >&2
+    echo "  run --name <name> [--data-dir <path>] [--image-name <name>] [--socks5-port <port>]" >&2
     echo "                             Run a new container with a unique name." >&2
-    echo "                             Optional: specify custom data directory and image name." >&2
+    echo "                             Optional: specify custom data directory, image name, and SOCKS5 port mapping." >&2
     echo "" >&2
     echo "  logs --name <name>         Follow the logs of a container to get auth URL." >&2
     echo "" >&2
@@ -337,17 +610,31 @@ case "$COMMAND" in
     echo "                             Wipe the data for a specific container." >&2
     echo "                             Optional: specify custom data directory." >&2
     echo "" >&2
+    echo "  proxy --name <name> [--port <local-port>]" >&2
+    echo "                             Start SSH SOCKS5 proxy to a running container." >&2
+    echo "                             Runs in foreground, press Ctrl+C to stop. Default port: 1080" >&2
+    echo "" >&2
     echo "EXAMPLES:" >&2
     echo "  $0 build" >&2
     echo "  $0 build --image-name my-tailscale-dev" >&2
     echo "  $0 run --name dev1" >&2
+    echo "  $0 run --name dev1 --socks5-port 1080" >&2
     echo "  $0 run --name dev2 --image-name my-tailscale-dev" >&2
     echo "  $0 logs --name dev1" >&2
     echo "  $0 shell --name dev1" >&2
     echo "  $0 shell --name dev1 --command 'ping google.com'" >&2
+    echo "  $0 proxy --name dev1" >&2
+    echo "  $0 proxy --name dev1 --port 9090" >&2
     echo "  $0 list" >&2
     echo "  $0 stop --name dev1" >&2
     echo "  $0 wipe --name dev1" >&2
+    echo "" >&2
+    echo "SOCKS5 PROXY USAGE:" >&2
+    echo "  1. Run container with port mapping: $0 run --name proxy1 --socks5-port 1080" >&2
+    echo "  2. Wait for Tailscale to connect (check logs)" >&2
+    echo "  3. Start SOCKS5 proxy: $0 proxy --name proxy1 --action start" >&2
+    echo "  4. Configure your applications to use SOCKS5 proxy at localhost:1080" >&2
+    echo "  5. All traffic will be routed through the Tailscale network" >&2
     exit 1
     ;;
 esac
