@@ -77,7 +77,12 @@ RUN printf '%s\n' \
     'sleep 2' \
     'HOSTNAME=${TAILSCALE_HOSTNAME:-my-dev-container}' \
     'echo "Connecting to Tailscale network..."' \
-    'tailscale up --hostname=${HOSTNAME}' \
+    'TAILSCALE_FLAGS="--hostname=${HOSTNAME}"' \
+    'if [ "${TAILSCALE_EPHEMERAL}" = "true" ]; then' \
+    '  TAILSCALE_FLAGS="${TAILSCALE_FLAGS} --ephemeral"' \
+    '  echo "Using ephemeral mode - node will be automatically removed when container stops"' \
+    'fi' \
+    'tailscale up ${TAILSCALE_FLAGS}' \
     'echo "Tailscale is connected. Container is ready."' \
     'echo "SSH server is running. Root password: tailscale"' \
     'echo "Container IP: $(hostname -i)"' \
@@ -99,6 +104,7 @@ run_container() {
   DATA_DIR_BASE=""
   CUSTOM_IMAGE_NAME=""
   SOCKS5_PORT=""
+  EPHEMERAL=""
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -118,9 +124,13 @@ run_container() {
         SOCKS5_PORT="$2"
         shift 2
         ;;
+      --ephemeral)
+        EPHEMERAL="true"
+        shift 1
+        ;;
       *)
         echo "Unknown option for 'run': $1" >&2
-        echo "Usage: $0 run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>] [--socks5-port <port>]" >&2
+        echo "Usage: $0 run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>] [--socks5-port <port>] [--ephemeral]" >&2
         exit 1
         ;;
     esac
@@ -153,6 +163,12 @@ run_container() {
     DOCKER_PORTS="-p ${SOCKS5_PORT}:1080"
   fi
   
+  # Build environment variables
+  DOCKER_ENV="-e TAILSCALE_HOSTNAME=${HOSTNAME}"
+  if [ -n "$EPHEMERAL" ]; then
+    DOCKER_ENV="${DOCKER_ENV} -e TAILSCALE_EPHEMERAL=true"
+  fi
+  
   echo "Starting container ${CONTAINER_NAME}..."
   docker run -d --rm --name="${CONTAINER_NAME}" \
         --hostname="${HOSTNAME}" \
@@ -160,7 +176,7 @@ run_container() {
         --cap-add=NET_ADMIN \
         -v "${DATA_DIR}":/var/lib/tailscale \
         -v ~/.ssh:/root/.ssh:ro \
-        -e TAILSCALE_HOSTNAME="${HOSTNAME}" \
+        ${DOCKER_ENV} \
         ${DOCKER_PORTS} \
         "${RUN_IMAGE_NAME}"
 
@@ -591,9 +607,9 @@ case "$COMMAND" in
     echo "                             Build the Docker image with UTF-8 locale support." >&2
     echo "                             Optional: specify custom image name." >&2
     echo "" >&2
-    echo "  run --name <name> [--data-dir <path>] [--image-name <name>] [--socks5-port <port>]" >&2
+    echo "  run --name <name> [--data-dir <path>] [--image-name <name>] [--socks5-port <port>] [--ephemeral]" >&2
     echo "                             Run a new container with a unique name." >&2
-    echo "                             Optional: specify custom data directory, image name, and SOCKS5 port mapping." >&2
+    echo "                             Optional: specify custom data directory, image name, SOCKS5 port mapping, and ephemeral mode." >&2
     echo "" >&2
     echo "  logs --name <name>         Follow the logs of a container to get auth URL." >&2
     echo "" >&2
@@ -619,6 +635,7 @@ case "$COMMAND" in
     echo "  $0 build --image-name my-tailscale-dev" >&2
     echo "  $0 run --name dev1" >&2
     echo "  $0 run --name dev1 --socks5-port 1080" >&2
+    echo "  $0 run --name dev1 --ephemeral" >&2
     echo "  $0 run --name dev2 --image-name my-tailscale-dev" >&2
     echo "  $0 logs --name dev1" >&2
     echo "  $0 shell --name dev1" >&2
