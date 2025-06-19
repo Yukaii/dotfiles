@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# --- Default values ---
+TARGET_REPO=""
+
+# --- Helper functions ---
+print_usage() {
+    echo "Usage: $0 [-R, --repo [HOST/]OWNER/REPO]"
+    echo
+    echo "Finds 'notable' PRs and issues (e.g., #1, #100, #222) in a GitHub repository."
+    echo
+    echo "Flags:"
+    echo "  -R, --repo    Select a repository using the [HOST/]OWNER/REPO format."
+    echo "                If omitted, the repository in the current directory is used."
+}
+
+# --- Argument Parsing ---
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -R|--repo)
+            if [[ -n "$2" ]]; then
+                TARGET_REPO="$2"
+                shift # past argument
+                shift # past value
+            else
+                echo "Error: --repo flag requires a [HOST/]OWNER/REPO argument." >&2
+                echo >&2
+                print_usage
+                exit 1
+            fi
+            ;;
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        *)
+            echo "Error: Unknown parameter passed: $1" >&2
+            echo >&2
+            print_usage
+            exit 1
+            ;;
+    esac
+done
+
+# --- Prerequisite Checks ---
+# 1. Check for GitHub CLI ('gh')
+if ! command -v gh &> /dev/null; then
+    echo "Error: The GitHub CLI ('gh') is not installed." >&2
+    echo "Please install it from https://cli.github.com/ and authenticate with 'gh auth login'." >&2
+    exit 1
+fi
+
+# 2. Check for 'jq'
+if ! command -v jq &> /dev/null; then
+    echo "Error: The JSON processor 'jq' is not installed." >&2
+    echo "Please install it. (e.g., 'sudo apt-get install jq', 'brew install jq')" >&2
+    exit 1
+fi
+
+
+# --- Repository Validation and Setup ---
+if [[ -n "$TARGET_REPO" ]]; then
+    GH_REPO_FLAG="-R $TARGET_REPO"
+    if ! gh repo view "$TARGET_REPO" > /dev/null 2>&1; then
+        echo "Error: Repository '$TARGET_REPO' not found or you lack permission to view it." >&2
+        exit 1
+    fi
+    repo_name=$(gh repo view "$TARGET_REPO" --json nameWithOwner | jq -r .nameWithOwner)
+else
+    GH_REPO_FLAG=""
+    if ! gh repo view > /dev/null 2>&1; then
+        echo "Error: Not a GitHub repository." >&2
+        echo "Please run this script from a repository directory or specify one with the -R, --repo flag." >&2
+        exit 1
+    fi
+    repo_name=$(gh repo view --json nameWithOwner | jq -r .nameWithOwner)
+fi
+echo "🔍 Finding notable issues and pull requests in: $repo_name"
+echo
+
+# --- Main Logic ---
+# Determine the highest number by finding the latest PR and issue.
+# This version pipes the JSON output to the 'jq' command for compatibility.
+latest_pr=$(gh pr list $GH_REPO_FLAG --limit 1 --json number | jq '.[0].number // 0')
+latest_issue=$(gh issue list $GH_REPO_FLAG --limit 1 --json number | jq '.[0].number // 0')
+max_number=$(( latest_pr > latest_issue ? latest_pr : latest_issue ))
+
+if [[ $max_number -eq 0 ]]; then
+    echo "Could not find any pull requests or issues in this repository."
+    exit 0
+fi
+
+# Generate the list of notable numbers
+notable_numbers=()
+i=1
+while (( i <= max_number )); do
+    notable_numbers+=($i)
+    ((i*=10))
+done
+
+for digit in {1..9}; do
+    num=$digit
+    while (( num <= max_number )); do
+        notable_numbers+=($num)
+        num=$((num * 10 + digit))
+    done
+done
+
+unique_sorted_numbers=($(printf "%s\n" "${notable_numbers[@]}" | sort -n | uniq))
+
+# Calculate optimal column widths based on terminal width
+TERM_WIDTH=$(tput cols 2>/dev/null || echo 120)
+TYPE_WIDTH=7
+NUMBER_WIDTH=8
+AUTHOR_WIDTH=20
+PADDING=12  # Account for table separators and padding
+
+# Calculate available width for title column
+TITLE_WIDTH=$((TERM_WIDTH - TYPE_WIDTH - NUMBER_WIDTH - AUTHOR_WIDTH - PADDING))
+
+# Ensure minimum and maximum title width
+if [[ $TITLE_WIDTH -lt 30 ]]; then
+    TITLE_WIDTH=30
+elif [[ $TITLE_WIDTH -gt 80 ]]; then
+    TITLE_WIDTH=80
+fi
+
+# Adjust author width if terminal is very narrow
+if [[ $TERM_WIDTH -lt 100 ]]; then
+    AUTHOR_WIDTH=15
+    TITLE_WIDTH=$((TERM_WIDTH - TYPE_WIDTH - NUMBER_WIDTH - AUTHOR_WIDTH - PADDING))
+    if [[ $TITLE_WIDTH -lt 25 ]]; then
+        TITLE_WIDTH=25
+    fi
+fi
+
+# Print table header
+printf "| %-${TYPE_WIDTH}s | %-${NUMBER_WIDTH}s | %-${TITLE_WIDTH}s | %-${AUTHOR_WIDTH}s |\n" "Type" "Number" "Title" "Author"
+
+# Create separator line
+type_sep=$(printf "%*s" $((TYPE_WIDTH + 1)) | tr ' ' '-')
+number_sep=$(printf "%*s" $((NUMBER_WIDTH + 1)) | tr ' ' '-')
+title_sep=$(printf "%*s" $((TITLE_WIDTH + 1)) | tr ' ' '-')
+author_sep=$(printf "%*s" $((AUTHOR_WIDTH + 1)) | tr ' ' '-')
+printf "|:%s|:%s|:%s|:%s|\n" "$type_sep" "$number_sep" "$title_sep" "$author_sep"
+
+for num in "${unique_sorted_numbers[@]}"; do
+    if (( num > max_number )); then
+        continue
+    fi
+
+    # Try to get as an issue first
+    issue_data=$(gh issue view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
+    
+    if [[ -n "$issue_data" ]]; then
+        title=$(echo "$issue_data" | jq -r .title)
+        author=$(echo "$issue_data" | jq -r .author.login)
+        type="Issue"
+
+        # Truncate title if needed
+        if ((${#title} > TITLE_WIDTH)); then
+            title="$(printf "%.${TITLE_WIDTH}s" "$title")"
+            title="${title%???}..."
+        fi
+
+        # Truncate author if needed
+        if ((${#author} > AUTHOR_WIDTH)); then
+            author="$(printf "%.${AUTHOR_WIDTH}s" "$author")"
+            author="${author%???}..."
+        fi
+
+        printf "| %-${TYPE_WIDTH}s | #%-${NUMBER_WIDTH}s | %-${TITLE_WIDTH}s | %-${AUTHOR_WIDTH}s |\n" "$type" "$num" "$title" "$author"
+    else
+        # Try to get as a pull request
+        pr_data=$(gh pr view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
+        
+        if [[ -n "$pr_data" ]]; then
+            title=$(echo "$pr_data" | jq -r .title)
+            author=$(echo "$pr_data" | jq -r .author.login)
+            type="PR"
+
+            # Truncate title if needed
+            if ((${#title} > TITLE_WIDTH)); then
+                title="$(printf "%.${TITLE_WIDTH}s" "$title")"
+                title="${title%???}..."
+            fi
+
+            # Truncate author if needed
+            if ((${#author} > AUTHOR_WIDTH)); then
+                author="$(printf "%.${AUTHOR_WIDTH}s" "$author")"
+                author="${author%???}..."
+            fi
+
+            printf "| %-${TYPE_WIDTH}s | #%-${NUMBER_WIDTH}s | %-${TITLE_WIDTH}s | %-${AUTHOR_WIDTH}s |\n" "$type" "$num" "$title" "$author"
+        fi
+    fi
+done
