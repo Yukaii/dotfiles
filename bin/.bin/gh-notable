@@ -14,6 +14,131 @@ print_usage() {
     echo "                If omitted, the repository in the current directory is used."
 }
 
+# Calculate display width of a string (accounting for CJK characters)
+get_display_width() {
+    local str="$1"
+    local width=0
+    local i=0
+    
+    # Convert string to array of characters
+    while IFS= read -r -n1 char; do
+        if [[ -n "$char" ]]; then
+            # Get Unicode code point
+            local code=$(printf "%d" "'$char" 2>/dev/null || echo 0)
+            
+            # Check if character is wide (CJK ranges and other wide characters)
+            if (( (code >= 0x1100 && code <= 0x115F) ||
+                  (code >= 0x2329 && code <= 0x232A) ||
+                  (code >= 0x2E80 && code <= 0x2EFF) ||
+                  (code >= 0x2F00 && code <= 0x2FDF) ||
+                  (code >= 0x2FF0 && code <= 0x2FFF) ||
+                  (code >= 0x3000 && code <= 0x303E) ||
+                  (code >= 0x3041 && code <= 0x3096) ||
+                  (code >= 0x30A1 && code <= 0x30FA) ||
+                  (code >= 0x3105 && code <= 0x312D) ||
+                  (code >= 0x3131 && code <= 0x318E) ||
+                  (code >= 0x3190 && code <= 0x31BA) ||
+                  (code >= 0x31C0 && code <= 0x31E3) ||
+                  (code >= 0x31F0 && code <= 0x31FF) ||
+                  (code >= 0x3200 && code <= 0x32FF) ||
+                  (code >= 0x3300 && code <= 0x33FF) ||
+                  (code >= 0x3400 && code <= 0x4DBF) ||
+                  (code >= 0x4E00 && code <= 0x9FFF) ||
+                  (code >= 0xA960 && code <= 0xA97F) ||
+                  (code >= 0xAC00 && code <= 0xD7A3) ||
+                  (code >= 0xD7B0 && code <= 0xD7FF) ||
+                  (code >= 0xF900 && code <= 0xFAFF) ||
+                  (code >= 0xFE10 && code <= 0xFE19) ||
+                  (code >= 0xFE30 && code <= 0xFE6F) ||
+                  (code >= 0xFF00 && code <= 0xFF60) ||
+                  (code >= 0xFFE0 && code <= 0xFFE6) )); then
+                ((width += 2))
+            else
+                ((width += 1))
+            fi
+        fi
+    done < <(printf "%s" "$str" | fold -w1)
+    
+    echo "$width"
+}
+
+# Truncate string to fit display width (respecting character boundaries)
+truncate_to_width() {
+    local str="$1"
+    local max_width="$2"
+    local current_width=0
+    local result=""
+    local i=0
+    
+    while IFS= read -r -n1 char; do
+        if [[ -n "$char" ]]; then
+            local code=$(printf "%d" "'$char" 2>/dev/null || echo 0)
+            local char_width=1
+            
+            # Check if character is wide
+            if (( (code >= 0x1100 && code <= 0x115F) ||
+                  (code >= 0x2329 && code <= 0x232A) ||
+                  (code >= 0x2E80 && code <= 0x2EFF) ||
+                  (code >= 0x2F00 && code <= 0x2FDF) ||
+                  (code >= 0x2FF0 && code <= 0x2FFF) ||
+                  (code >= 0x3000 && code <= 0x303E) ||
+                  (code >= 0x3041 && code <= 0x3096) ||
+                  (code >= 0x30A1 && code <= 0x30FA) ||
+                  (code >= 0x3105 && code <= 0x312D) ||
+                  (code >= 0x3131 && code <= 0x318E) ||
+                  (code >= 0x3190 && code <= 0x31BA) ||
+                  (code >= 0x31C0 && code <= 0x31E3) ||
+                  (code >= 0x31F0 && code <= 0x31FF) ||
+                  (code >= 0x3200 && code <= 0x32FF) ||
+                  (code >= 0x3300 && code <= 0x33FF) ||
+                  (code >= 0x3400 && code <= 0x4DBF) ||
+                  (code >= 0x4E00 && code <= 0x9FFF) ||
+                  (code >= 0xA960 && code <= 0xA97F) ||
+                  (code >= 0xAC00 && code <= 0xD7A3) ||
+                  (code >= 0xD7B0 && code <= 0xD7FF) ||
+                  (code >= 0xF900 && code <= 0xFAFF) ||
+                  (code >= 0xFE10 && code <= 0xFE19) ||
+                  (code >= 0xFE30 && code <= 0xFE6F) ||
+                  (code >= 0xFF00 && code <= 0xFF60) ||
+                  (code >= 0xFFE0 && code <= 0xFFE6) )); then
+                char_width=2
+            fi
+            
+            # Check if adding this character would exceed the width
+            if (( current_width + char_width > max_width )); then
+                # If we have room for "..." (3 chars), add it
+                if (( current_width + 3 <= max_width )); then
+                    result+="..."
+                elif (( current_width + 2 <= max_width )); then
+                    result+=".."
+                elif (( current_width + 1 <= max_width )); then
+                    result+="."
+                fi
+                break
+            fi
+            
+            result+="$char"
+            ((current_width += char_width))
+        fi
+    done < <(printf "%s" "$str" | fold -w1)
+    
+    echo "$result"
+}
+
+# Pad string to specified display width
+pad_to_width() {
+    local str="$1"
+    local target_width="$2"
+    local current_width=$(get_display_width "$str")
+    local padding_needed=$((target_width - current_width))
+    
+    if (( padding_needed > 0 )); then
+        printf "%s%*s" "$str" "$padding_needed" ""
+    else
+        printf "%s" "$str"
+    fi
+}
+
 # --- Argument Parsing ---
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -173,19 +298,24 @@ for num in "${unique_sorted_numbers[@]}"; do
         author=$(echo "$pr_data" | jq -r .author.login)
         type="PR"
 
-        # Truncate title if needed
-        if ((${#title} > TITLE_WIDTH)); then
-            title="$(printf "%.${TITLE_WIDTH}s" "$title")"
-            title="${title%???}..."
+        # Truncate title if needed (Unicode-aware)
+        title_display_width=$(get_display_width "$title")
+        if (( title_display_width > TITLE_WIDTH )); then
+            title=$(truncate_to_width "$title" "$TITLE_WIDTH")
         fi
 
-        # Truncate author if needed
-        if ((${#author} > AUTHOR_WIDTH)); then
-            author="$(printf "%.${AUTHOR_WIDTH}s" "$author")"
-            author="${author%???}..."
+        # Truncate author if needed (Unicode-aware)
+        author_display_width=$(get_display_width "$author")
+        if (( author_display_width > AUTHOR_WIDTH )); then
+            author=$(truncate_to_width "$author" "$AUTHOR_WIDTH")
         fi
 
-        printf "| %-${TYPE_WIDTH}s | #%-${NUMBER_WIDTH}s | %-${TITLE_WIDTH}s | %-${AUTHOR_WIDTH}s |\n" "$type" "$num" "$title" "$author"
+        # Format with proper Unicode-aware padding
+        padded_type=$(pad_to_width "$type" "$TYPE_WIDTH")
+        padded_title=$(pad_to_width "$title" "$TITLE_WIDTH")
+        padded_author=$(pad_to_width "$author" "$AUTHOR_WIDTH")
+
+        printf "| %s | #%-${NUMBER_WIDTH}s | %s | %s |\n" "$padded_type" "$num" "$padded_title" "$padded_author"
     else
         # If not a PR, try to get as an issue
         issue_data=$(gh issue view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
@@ -195,19 +325,24 @@ for num in "${unique_sorted_numbers[@]}"; do
             author=$(echo "$issue_data" | jq -r .author.login)
             type="Issue"
 
-            # Truncate title if needed
-            if ((${#title} > TITLE_WIDTH)); then
-                title="$(printf "%.${TITLE_WIDTH}s" "$title")"
-                title="${title%???}..."
+            # Truncate title if needed (Unicode-aware)
+            title_display_width=$(get_display_width "$title")
+            if (( title_display_width > TITLE_WIDTH )); then
+                title=$(truncate_to_width "$title" "$TITLE_WIDTH")
             fi
 
-            # Truncate author if needed
-            if ((${#author} > AUTHOR_WIDTH)); then
-                author="$(printf "%.${AUTHOR_WIDTH}s" "$author")"
-                author="${author%???}..."
+            # Truncate author if needed (Unicode-aware)
+            author_display_width=$(get_display_width "$author")
+            if (( author_display_width > AUTHOR_WIDTH )); then
+                author=$(truncate_to_width "$author" "$AUTHOR_WIDTH")
             fi
 
-            printf "| %-${TYPE_WIDTH}s | #%-${NUMBER_WIDTH}s | %-${TITLE_WIDTH}s | %-${AUTHOR_WIDTH}s |\n" "$type" "$num" "$title" "$author"
+            # Format with proper Unicode-aware padding
+            padded_type=$(pad_to_width "$type" "$TYPE_WIDTH")
+            padded_title=$(pad_to_width "$title" "$TITLE_WIDTH")
+            padded_author=$(pad_to_width "$author" "$AUTHOR_WIDTH")
+
+            printf "| %s | #%-${NUMBER_WIDTH}s | %s | %s |\n" "$padded_type" "$num" "$padded_title" "$padded_author"
         fi
     fi
 done
