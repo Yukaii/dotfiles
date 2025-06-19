@@ -92,14 +92,30 @@ fi
 
 # Generate the list of notable numbers
 notable_numbers=()
+
+# Add powers of 10: 1, 10, 100, 1000, 10000, etc.
 i=1
 while (( i <= max_number )); do
     notable_numbers+=($i)
     ((i*=10))
 done
 
+# Add multiples of powers of 10: 2000, 3000, 4000, etc.
+power=1000
+while (( power <= max_number )); do
+    for multiple in {2..9}; do
+        num=$((multiple * power))
+        if (( num <= max_number )); then
+            notable_numbers+=($num)
+        fi
+    done
+    ((power*=10))
+done
+
+# Add repeating digit patterns starting from 111: 111, 222, 333, etc. (skip 11-99)
 for digit in {1..9}; do
-    num=$digit
+    # Start from 3-digit repeating numbers (111, 222, etc.)
+    num=$((digit * 111))
     while (( num <= max_number )); do
         notable_numbers+=($num)
         num=$((num * 10 + digit))
@@ -149,13 +165,13 @@ for num in "${unique_sorted_numbers[@]}"; do
         continue
     fi
 
-    # Try to get as an issue first
-    issue_data=$(gh issue view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
+    # First check if it's a pull request
+    pr_data=$(gh pr view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
     
-    if [[ -n "$issue_data" ]]; then
-        title=$(echo "$issue_data" | jq -r .title)
-        author=$(echo "$issue_data" | jq -r .author.login)
-        type="Issue"
+    if [[ -n "$pr_data" ]]; then
+        title=$(echo "$pr_data" | jq -r .title)
+        author=$(echo "$pr_data" | jq -r .author.login)
+        type="PR"
 
         # Truncate title if needed
         if ((${#title} > TITLE_WIDTH)); then
@@ -171,13 +187,13 @@ for num in "${unique_sorted_numbers[@]}"; do
 
         printf "| %-${TYPE_WIDTH}s | #%-${NUMBER_WIDTH}s | %-${TITLE_WIDTH}s | %-${AUTHOR_WIDTH}s |\n" "$type" "$num" "$title" "$author"
     else
-        # Try to get as a pull request
-        pr_data=$(gh pr view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
+        # If not a PR, try to get as an issue
+        issue_data=$(gh issue view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
         
-        if [[ -n "$pr_data" ]]; then
-            title=$(echo "$pr_data" | jq -r .title)
-            author=$(echo "$pr_data" | jq -r .author.login)
-            type="PR"
+        if [[ -n "$issue_data" ]]; then
+            title=$(echo "$issue_data" | jq -r .title)
+            author=$(echo "$issue_data" | jq -r .author.login)
+            type="Issue"
 
             # Truncate title if needed
             if ((${#title} > TITLE_WIDTH)); then
