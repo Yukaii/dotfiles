@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+#
+# hackmd-edit ── fuzzy-pick / create & live-sync HackMD notes
+#
+# Dependencies: hackmd-cli, jq, fzf
+# Works on Linux (GNU stat) and macOS/BSD (BSD stat)
+#
+# Usage
+#   hackmd-edit            # pick an existing note or "🆕  Create new note"
+#   hackmd-edit -n "Title" # directly create a new note named "Title"
+#
+set -euo pipefail
+
+###############################################################################
+# Configuration                                                               #
+###############################################################################
+TMPDIR="${TMPDIR:-/tmp}"
+EDITOR="${EDITOR:-vi}"
+POLL_INTERVAL=1      # seconds between mtime checks
+
+###############################################################################
+# Cross-platform mtime helper                                                 #
+###############################################################################
+get_mtime() {
+  if stat -c %Y "$1" >/dev/null 2>&1; then
+    stat -c %Y "$1"      # GNU
+  else
+    stat -f %m "$1"      # BSD / macOS
+  fi
+}
+
+###############################################################################
+# Optional CLI argument: -n|--new "Title" to create immediately               #
+###############################################################################
+if [[ ${1:-} =~ ^-n|--new$ ]]; then
+  shift
+  NEW_TITLE=${1-}
+  if [[ -z $NEW_TITLE ]]; then
+    read -rp "New note title: " NEW_TITLE
+  fi
+  CREATE_DIRECT="yes"
+fi
+
+###############################################################################
+# 1) Pick or create note                                                      #
+###############################################################################
+if [[ ${CREATE_DIRECT:-no} == "yes" ]]; then
+  note_title=$NEW_TITLE
+  printf "✚ Creating note \"%s\" … " "$note_title"
+  note_id=$(hackmd-cli notes create --title "$note_title" --output json | jq -r '.[0].id')
+  echo "done (id = $note_id)."
+else
+  # Build list: existing notes + "create new"
+  selection_list=$(
+    printf "_new\t🆕  Create new note\n"
+    hackmd-cli notes --output json | jq -r '.[] | [.id, .title] | @tsv'
+  )
+
+  selected=$(echo "$selection_list" \
+    | fzf --prompt='Select / Create HackMD note > ' --with-nth=2) || {
+      echo "✖ No choice made – exiting."
+      exit 1
+    }
+
+  note_id="${selected%%$'\t'*}"
+  note_title="${selected#*$'\t'}"
+
+  if [[ $note_id == "_new" ]]; then
+    read -rp "New note title: " note_title
+    printf "✚ Creating note \"%s\" … " "$note_title"
+    note_id=$(hackmd-cli notes create --title "$note_title" --output json | jq -r '.[0].id')
+    echo "done (id = $note_id)."
+  fi
+fi
+
+###############################################################################
+# 2) Prepare tmp file & open editor                                           #
+###############################################################################
+tmp_file="$TMPDIR/hackmd-${note_id}.md"
+
+# If the note is new the content file is empty; for existing pull remote body
+if [[ -f $tmp_file ]]; then :; else touch "$tmp_file"; fi
+if [[ ${CREATE_DIRECT:-no} != "yes" && $note_id != _new ]]; then
+  hackmd-cli notes --noteId "$note_id" > "$tmp_file"
+fi
+
+echo "→ Editing: \"$note_title\"  (id = $note_id)"
+"$EDITOR" "$tmp_file"
+
+###############################################################################
+# 3) Poll for changes & push updates                                          #
+###############################################################################
+last_mtime=$(get_mtime "$tmp_file")
+
+echo "✓ Initial edit done. Polling every ${POLL_INTERVAL}s for changes …"
+echo "  (Ctrl-C to stop)"
+
+while :; do
+  sleep "$POLL_INTERVAL"
+  new_mtime=$(get_mtime "$tmp_file")
+  if [[ $new_mtime != "$last_mtime" ]]; then
+    last_mtime=$new_mtime
+    printf "↻ Saving to HackMD … "
+    if hackmd-cli notes update --noteId "$note_id" --file "$tmp_file" >/dev/null; then
+      echo "done @ $(date +'%H:%M:%S')."
+    else
+      echo "failed!"
+    fi
+  fi
+done
