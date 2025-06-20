@@ -2,16 +2,27 @@
 
 # --- Default values ---
 TARGET_REPO=""
+USE_FIBONACCI=false
+USE_PRIMES=false
+USE_POWERS_OF_2=false
 
 # --- Helper functions ---
 print_usage() {
-    echo "Usage: $0 [-R, --repo [HOST/]OWNER/REPO]"
+    echo "Usage: $0 [-R, --repo [HOST/]OWNER/REPO] [--fibonacci] [--primes] [--powers-of-2]"
     echo
     echo "Finds 'notable' PRs and issues (e.g., #1, #100, #222) in a GitHub repository."
     echo
     echo "Flags:"
-    echo "  -R, --repo    Select a repository using the [HOST/]OWNER/REPO format."
-    echo "                If omitted, the repository in the current directory is used."
+    echo "  -R, --repo       Select a repository using the [HOST/]OWNER/REPO format."
+    echo "                   If omitted, the repository in the current directory is used."
+    echo "  --fibonacci      Include Fibonacci sequence numbers (1, 1, 2, 3, 5, 8, 13, ...)"
+    echo "  --primes         Include prime numbers (2, 3, 5, 7, 11, 13, 17, 19, ...)"
+    echo "  --powers-of-2    Include powers of 2 (1, 2, 4, 8, 16, 32, 64, ...)"
+    echo
+    echo "Note: If no sequence flags are specified, the default notable patterns are used:"
+    echo "      - Powers of 10 (1, 10, 100, 1000, ...)"
+    echo "      - Multiples of powers of 10 (2000, 3000, 4000, ...)"
+    echo "      - Repeating digit patterns (111, 222, 333, ...)"
 }
 
 # Calculate display width of a string (accounting for CJK characters)
@@ -19,13 +30,13 @@ get_display_width() {
     local str="$1"
     local width=0
     local i=0
-    
+
     # Convert string to array of characters
     while IFS= read -r -n1 char; do
         if [[ -n "$char" ]]; then
             # Get Unicode code point
             local code=$(printf "%d" "'$char" 2>/dev/null || echo 0)
-            
+
             # Check if character is wide (CJK ranges and other wide characters)
             if (( (code >= 0x1100 && code <= 0x115F) ||
                   (code >= 0x2329 && code <= 0x232A) ||
@@ -58,7 +69,7 @@ get_display_width() {
             fi
         fi
     done < <(printf "%s" "$str" | fold -w1)
-    
+
     echo "$width"
 }
 
@@ -69,12 +80,12 @@ truncate_to_width() {
     local current_width=0
     local result=""
     local i=0
-    
+
     while IFS= read -r -n1 char; do
         if [[ -n "$char" ]]; then
             local code=$(printf "%d" "'$char" 2>/dev/null || echo 0)
             local char_width=1
-            
+
             # Check if character is wide
             if (( (code >= 0x1100 && code <= 0x115F) ||
                   (code >= 0x2329 && code <= 0x232A) ||
@@ -103,7 +114,7 @@ truncate_to_width() {
                   (code >= 0xFFE0 && code <= 0xFFE6) )); then
                 char_width=2
             fi
-            
+
             # Check if adding this character would exceed the width
             if (( current_width + char_width > max_width )); then
                 # If we have room for "..." (3 chars), add it
@@ -116,12 +127,12 @@ truncate_to_width() {
                 fi
                 break
             fi
-            
+
             result+="$char"
             ((current_width += char_width))
         fi
     done < <(printf "%s" "$str" | fold -w1)
-    
+
     echo "$result"
 }
 
@@ -131,12 +142,79 @@ pad_to_width() {
     local target_width="$2"
     local current_width=$(get_display_width "$str")
     local padding_needed=$((target_width - current_width))
-    
+
     if (( padding_needed > 0 )); then
         printf "%s%*s" "$str" "$padding_needed" ""
     else
         printf "%s" "$str"
     fi
+}
+
+# Generate Fibonacci sequence up to max_number
+generate_fibonacci() {
+    local max=$1
+    local fib_numbers=()
+    local a=1 b=1
+    
+    while (( a <= max )); do
+        fib_numbers+=($a)
+        local temp=$((a + b))
+        a=$b
+        b=$temp
+    done
+    
+    printf "%s\n" "${fib_numbers[@]}"
+}
+
+# Check if a number is prime
+is_prime() {
+    local n=$1
+    if (( n < 2 )); then
+        return 1
+    fi
+    if (( n == 2 )); then
+        return 0
+    fi
+    if (( n % 2 == 0 )); then
+        return 1
+    fi
+    
+    local i=3
+    while (( i * i <= n )); do
+        if (( n % i == 0 )); then
+            return 1
+        fi
+        ((i += 2))
+    done
+    return 0
+}
+
+# Generate prime numbers up to max_number
+generate_primes() {
+    local max=$1
+    local prime_numbers=()
+    
+    for (( i=2; i<=max; i++ )); do
+        if is_prime $i; then
+            prime_numbers+=($i)
+        fi
+    done
+    
+    printf "%s\n" "${prime_numbers[@]}"
+}
+
+# Generate powers of 2 up to max_number
+generate_powers_of_2() {
+    local max=$1
+    local powers=()
+    local power=1
+    
+    while (( power <= max )); do
+        powers+=($power)
+        ((power *= 2))
+    done
+    
+    printf "%s\n" "${powers[@]}"
 }
 
 # --- Argument Parsing ---
@@ -153,6 +231,18 @@ while [[ "$#" -gt 0 ]]; do
                 print_usage
                 exit 1
             fi
+            ;;
+        --fibonacci)
+            USE_FIBONACCI=true
+            shift
+            ;;
+        --primes)
+            USE_PRIMES=true
+            shift
+            ;;
+        --powers-of-2)
+            USE_POWERS_OF_2=true
+            shift
             ;;
         -h|--help)
             print_usage
@@ -218,34 +308,68 @@ fi
 # Generate the list of notable numbers
 notable_numbers=()
 
-# Add powers of 10: 1, 10, 100, 1000, 10000, etc.
-i=1
-while (( i <= max_number )); do
-    notable_numbers+=($i)
-    ((i*=10))
-done
+# Check if any sequence flags were specified
+sequence_flags_specified=false
+if [[ "$USE_FIBONACCI" == true || "$USE_PRIMES" == true || "$USE_POWERS_OF_2" == true ]]; then
+    sequence_flags_specified=true
+fi
 
-# Add multiples of powers of 10: 2000, 3000, 4000, etc.
-power=1000
-while (( power <= max_number )); do
-    for multiple in {2..9}; do
-        num=$((multiple * power))
-        if (( num <= max_number )); then
+# Add sequences based on flags
+if [[ "$USE_FIBONACCI" == true ]]; then
+    while IFS= read -r num; do
+        if [[ -n "$num" ]]; then
             notable_numbers+=($num)
         fi
-    done
-    ((power*=10))
-done
+    done < <(generate_fibonacci $max_number)
+fi
 
-# Add repeating digit patterns starting from 111: 111, 222, 333, etc. (skip 11-99)
-for digit in {1..9}; do
-    # Start from 3-digit repeating numbers (111, 222, etc.)
-    num=$((digit * 111))
-    while (( num <= max_number )); do
-        notable_numbers+=($num)
-        num=$((num * 10 + digit))
+if [[ "$USE_PRIMES" == true ]]; then
+    while IFS= read -r num; do
+        if [[ -n "$num" ]]; then
+            notable_numbers+=($num)
+        fi
+    done < <(generate_primes $max_number)
+fi
+
+if [[ "$USE_POWERS_OF_2" == true ]]; then
+    while IFS= read -r num; do
+        if [[ -n "$num" ]]; then
+            notable_numbers+=($num)
+        fi
+    done < <(generate_powers_of_2 $max_number)
+fi
+
+# If no sequence flags were specified, use default patterns
+if [[ "$sequence_flags_specified" == false ]]; then
+    # Add powers of 10: 1, 10, 100, 1000, 10000, etc.
+    i=1
+    while (( i <= max_number )); do
+        notable_numbers+=($i)
+        ((i*=10))
     done
-done
+
+    # Add multiples of powers of 10: 2000, 3000, 4000, etc.
+    power=1000
+    while (( power <= max_number )); do
+        for multiple in {2..9}; do
+            num=$((multiple * power))
+            if (( num <= max_number )); then
+                notable_numbers+=($num)
+            fi
+        done
+        ((power*=10))
+    done
+
+    # Add repeating digit patterns starting from 111: 111, 222, 333, etc. (skip 11-99)
+    for digit in {1..9}; do
+        # Start from 3-digit repeating numbers (111, 222, etc.)
+        num=$((digit * 111))
+        while (( num <= max_number )); do
+            notable_numbers+=($num)
+            num=$((num * 10 + digit))
+        done
+    done
+fi
 
 unique_sorted_numbers=($(printf "%s\n" "${notable_numbers[@]}" | sort -n | uniq))
 
@@ -292,7 +416,7 @@ for num in "${unique_sorted_numbers[@]}"; do
 
     # First check if it's a pull request
     pr_data=$(gh pr view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
-    
+
     if [[ -n "$pr_data" ]]; then
         title=$(echo "$pr_data" | jq -r .title)
         author=$(echo "$pr_data" | jq -r .author.login)
@@ -319,7 +443,7 @@ for num in "${unique_sorted_numbers[@]}"; do
     else
         # If not a PR, try to get as an issue
         issue_data=$(gh issue view "$num" $GH_REPO_FLAG --json title,author 2>/dev/null)
-        
+
         if [[ -n "$issue_data" ]]; then
             title=$(echo "$issue_data" | jq -r .title)
             author=$(echo "$issue_data" | jq -r .author.login)
