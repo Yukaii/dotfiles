@@ -205,11 +205,6 @@
       "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
     },
     {
-      "key" : "b",
-      "type" : "application",
-      "value" : "/Applications/Vivaldi.app"
-    },
-    {
       "key" : "c",
       "type" : "application",
       "value" : "/Applications/Cursor.app"
