@@ -131,6 +131,13 @@ declare-option -hidden str lsp_server_copilot_lsp %{
   root_globs = [".git", ".hg"]
 }
 
+declare-option -hidden str lsp_server_harper_lsp %{
+  [harper-ls]
+  settings_section = "_"
+  args = ["--stdio"]
+  root_globs = [".git", ".hg"]
+}
+
 # [ast-grep]
 # root_globs = ["sgconfig.yml"]
 # args = ["lsp"]
@@ -191,6 +198,8 @@ hook -group lsp-filetype-markdown global BufSetOption filetype=markdown %{
     %opt{lsp_server_simple_completion}
     # %opt{lsp_server_ai_lsp}
     %opt{lsp_server_copilot_lsp}
+
+    %opt{lsp_server_harper_lsp}
   }
 }
 
