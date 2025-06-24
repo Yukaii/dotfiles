@@ -71,6 +71,10 @@ command = "ctags-lsp"
 command = "copilot-language-server"
 args = ["--stdio"]
 
+[language-server.harper-ls]
+command = "harper-ls"
+args = ["--stdio"]
+
 # Languages config
 
 [[language]]
@@ -86,7 +90,7 @@ language-servers = ["typescript-language-server", "eslint", "scls"]
 
 [[language]]
 name = "markdown"
-language-servers = ["marksman", "scls", "copilot"]
+language-servers = ["marksman", "scls", "copilot", "harper-ls"]
 
 [[language]]
 name = "tsx"
