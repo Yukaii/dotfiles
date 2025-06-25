@@ -34,6 +34,8 @@ end
 fish_add_path /opt/homebrew/opt/gnu-getopt/bin
 fish_add_path /opt/homebrew/opt/make/libexec/gnubin
 
+fish_add_path "$HOME/Programs/kakoune/bin"
+
 # Environment Variables
 set -x PIPENV_SHELL_FANCY 1
 set -x PIPENV_IGNORE_VIRTUALENVS 1
