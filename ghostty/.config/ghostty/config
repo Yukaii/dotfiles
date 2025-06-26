@@ -43,6 +43,7 @@ macos-icon = xray
 # Shaders
 # custom-shader = shaders/bettercrt.glsl
 # custom-shader = shaders/underwater.glsl
+custom-shader = my_shaders/cursor-trail.glsl
 
 # Keybindings
 keybind = ctrl+shift+right=goto_split:right
