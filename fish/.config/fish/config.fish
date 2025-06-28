@@ -34,13 +34,15 @@ end
 fish_add_path /opt/homebrew/opt/gnu-getopt/bin
 fish_add_path /opt/homebrew/opt/make/libexec/gnubin
 
-fish_add_path "$HOME/Programs/kakoune/bin"
+fish_add_path "$HOME/Programs/kakoune/src"
 
 # Environment Variables
 set -x PIPENV_SHELL_FANCY 1
 set -x PIPENV_IGNORE_VIRTUALENVS 1
 set -x EDITOR 'k'
 set -x KI_EDITOR_THEME "Github Dark"
+# claude thing
+set -x ENABLE_BACKGROUND_TASKS 1
 
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
