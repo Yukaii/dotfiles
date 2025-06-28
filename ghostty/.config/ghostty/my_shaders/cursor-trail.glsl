@@ -1,3 +1,5 @@
+// Copy from https://github.com/KroneCorylus/shader-playground/blob/main/shaders/cursor_smear.glsl
+
 float getSdfRectangle(in vec2 p, in vec2 xy, in vec2 b)
 {
     vec2 d = abs(p - xy) - b;
