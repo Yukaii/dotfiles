@@ -89,7 +89,8 @@ enabled = false
 #   `command = ["top"]`
 # * Play the "Bad Apple" video in the background.
 #   `command = ["mpv", "--really-quiet", "--vo=tct", "--volume=0", "https://www.youtube.com/watch?v=UkgK8eUdpAo"]`
-command = ["echo", "Hello World"]
+# command = ["echo", "Hello World"]
+command = ["mpv", "--really-quiet", "--vo=tct", "--volume=0", "https://www.youtube.com/watch?v=UkgK8eUdpAo"]
 # Do you expect the command to exit or not?
 # Usually when a command exits Tattoy shows an error notification. But you may want to render a
 # command that outputs some static content, for example to print out some ASCII-based image:
