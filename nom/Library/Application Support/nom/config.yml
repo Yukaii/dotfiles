@@ -1,0 +1,6 @@
+feeds:
+  - url: https://yukai.dev/feed.xml
+  - url: https://hnrss.org/newest
+  - url: https://hnrss.org/show
+  - url: https://hnrss.org/bestcomments
+
