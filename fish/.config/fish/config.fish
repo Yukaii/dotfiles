@@ -2,6 +2,7 @@ set fish_greeting
 
 # Configuration and Secrets
 source $__fish_config_dir/secrets.fish
+source $__fish_config_dir/claude.fish
 source $__fish_config_dir/aliases.fish
 
 set LANG "en_US.UTF-8"

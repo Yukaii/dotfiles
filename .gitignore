@@ -16,6 +16,7 @@ fish/.config/configstore
 fish/.config/fisherman
 fish/.config/fish/fishd.*
 fish/.config/fish/secrets.fish
+fish/.config/fish/claude.fish
 
 # static generated completions
 fish/.config/fish/completions/volta.fish
