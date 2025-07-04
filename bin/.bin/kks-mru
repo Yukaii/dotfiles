@@ -23,7 +23,7 @@
 #   }
 # }
 
-preview_cmd="bat --color=always --line-range=:500"
+preview_cmd="bat --color=always --line-range=:500 --style plain"
 pwd=$(echo $PWD | sed 's|/|-|g')
 mru=~/.cache/kak-mru-"$pwd"
 

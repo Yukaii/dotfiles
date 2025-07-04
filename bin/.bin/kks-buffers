@@ -6,7 +6,7 @@
 # - fzf (https://github.com/junegunn/fzf)
 # - bat (https://github.com/sharkdp/bat)
 
-preview_cmd="bat --color=always --line-range=:500"
+preview_cmd="bat --color=always --line-range=:500 --style plain"
 history_file="$HOME/.cache/kks-buffers-history"
 
 [ -f "$history_file" ] || touch "$history_file"
