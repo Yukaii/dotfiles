@@ -272,8 +272,9 @@ stop_container() {
     exit 1
   fi
   CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
-  echo "Stopping container ${CONTAINER_NAME}..."
+  echo "Stopping and removing container ${CONTAINER_NAME}..."
   docker stop "${CONTAINER_NAME}"
+  docker rm "${CONTAINER_NAME}"
 }
 
 wipe_data() {
