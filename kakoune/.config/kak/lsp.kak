@@ -3,7 +3,7 @@
 # set global lsp_debug true
 
 # kak-lsp
-hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml|gleam|sh|yaml|dockerfile|vue|elixir|crystal) %{
+hook global WinSetOption filetype=(rust|python|go|javascript|typescript|css|scss|json|markdown|toml|gleam|sh|yaml|dockerfile|vue|elixir|crystal|zig) %{
   lsp-enable-window
 }
 
@@ -259,4 +259,11 @@ hook -group lsp-filetype-crystal global BufSetOption filetype=crystal %{
         args = ["--stdio"]
         root_globs = ["shard.yml"]
     }
+}
+
+hook -group lsp-filetype-zig global BufSetOption filetype=zig %{
+  set-option buffer lsp_servers %{
+      [zls]
+      root_globs = [".git", "build.zig"]
+  }
 }
