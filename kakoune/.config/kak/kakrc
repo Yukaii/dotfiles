@@ -202,6 +202,7 @@ map global find-actions -docstring 'edit file under buffer basefolder' 'p'  ':ba
 map global find-actions -docstring 'switch themes'                     'S'  ':colorscheme<space>'
 map global find-actions -docstring 'PR changed files'                  'c'  ':kks-connect terminal-popup kks-pr-diff-files<ret>'
 map global find-actions -docstring 'symbols'                           's'  ':kks-connect terminal-popup kks-symbols<ret>'
+map global find-actions -docstring 'edir in buffer directory'          <minus>  ':edir-buffer-dir<ret>'
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
 	evaluate-commands %sh{
@@ -214,6 +215,13 @@ define-command basefolder-edit -docstring 'base folder edit' %{
   evaluate-commands %sh{
     dir=$(dirname "$kak_bufname")
 		echo "execute-keys :e<space>$dir/"
+  }
+}
+
+define-command edir-buffer-dir -docstring 'open edir in buffer directory' %{
+  evaluate-commands %sh{
+    dir=$(dirname "$kak_bufname")
+    echo "terminal-popup edir \"$dir\""
   }
 }
 
