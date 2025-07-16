@@ -1,0 +1,9 @@
+aider-chat
+audiblez
+edir
+gql
+open-webui
+ospeak
+python-lsp-server
+trash-cli
+wxpython
