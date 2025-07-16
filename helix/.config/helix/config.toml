@@ -188,6 +188,7 @@ p = "file_picker_in_current_buffer_directory"
 j = "jumplist_picker"
 e = "@:e <C-r>%<C-w>"
 x = "@:sh rm <C-r>%"
+"-" = ":sh winmux popup \"edir $(dirname %{buffer_name})\""
 
 # Git related actions
 [keys.select.space.g]
@@ -282,6 +283,7 @@ p = "file_picker_in_current_buffer_directory"
 j = "jumplist_picker"
 e = "@:e <C-r>%<C-w>"
 x = "@:sh rm <C-r>%"
+"-" = ":sh winmux popup \"edir $(dirname %{buffer_name})\""
 
 # Git related actions
 [keys.normal.space.g]
