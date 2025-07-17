@@ -18,6 +18,3 @@ hook global WinSetOption filetype=edir %{
   add-highlighter window/edir ref edir
 }
 
-hook global WinSetOption filetype=(?!edir).* %{
-  remove-highlighter window/edir
-}
