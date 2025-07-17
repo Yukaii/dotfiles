@@ -101,6 +101,8 @@ keybind = ctrl+alt+apostrophe=text:\x11"
 keybind = ctrl+alt+slash=text:\x11|
 # toggle zoom
 keybind = ctrl+alt+z=text:\x11z
+# command palette
+keybind = cmd+p=text:\x11?
 
 # tmux panel jump
 keybind = cmd+physical:one=text:\x111
