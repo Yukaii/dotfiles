@@ -60,10 +60,14 @@ if set -q WEZTERM_PANE
   end
 end
 
-if command -q hub-tool
-  hub-tool completion fish > $completions_dir/hub-tool.fish
-end
+# if command -q hub-tool
+#   hub-tool completion fish > $completions_dir/hub-tool.fish
+# end
 
 if command -q atuin
   atuin gen-completions --shell fish > $completions_dir/atuin.fish
+end
+
+if command -q ov
+  ov --completion fish > $completions_dir/ov.fish
 end
