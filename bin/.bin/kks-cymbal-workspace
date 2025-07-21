@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#
+# search symbols in workspace using cymbal
+#
+# requires:
+# - cymbal (https://github.com/enricozb/cymbal)
+# - fzf (https://github.com/junegunn/fzf)
+# - bat (https://github.com/sharkdp/bat)
+
+history_file="$HOME/.cache/kks-cymbal-workspace-history"
+query=""
+
+[ -f "$history_file" ] || touch "$history_file"
+[ "$(kks get %val[selection_length])" -gt 1 ] && query="$(kks get %val[selection])"
+
+cymbal --delimiter $'\t' --separator $'\n' . |
+  awk -F$'\t' 'BEGIN{OFS="\t"} {$1=$1" "$2; $2=""; for(i=6;i<=NF;i++) $2=$2" "$i; print $3, $4, $5, $1, $2}' |
+  fzf --delimiter=$'\t' \
+    --query="$query" \
+    --height="100%" \
+    --prompt="symbols> " \
+    --history="$history_file" \
+    --highlight-line \
+    --ansi \
+    --with-nth=4,5 \
+    --preview='bat {1} --color always --style=numbers,snip,header --highlight-line {2} --line-range {2}:+50' \
+    --style=full \
+    --header="workspace symbols" |
+  awk -F$'\t' '{print $1 " " "+" $2 ":" $3 }' |
+  xargs -r kks edit

@@ -200,9 +200,10 @@ map global find-actions -docstring 'file types'                        'y'  ':kk
 map global find-actions -docstring 'file inside buffer basefolder'     'e'  ':basefolder-files<ret>'
 map global find-actions -docstring 'file inside project root'          'E'  ':kks-connect terminal-popup kks-files-navigation<ret>'
 map global find-actions -docstring 'edit file under buffer basefolder' 'p'  ':basefolder-edit<ret>'
-map global find-actions -docstring 'switch themes'                     'S'  ':colorscheme<space>'
+map global find-actions -docstring 'switch themes'                     'T'  ':colorscheme<space>'
 map global find-actions -docstring 'PR changed files'                  'c'  ':kks-connect terminal-popup kks-pr-diff-files<ret>'
-map global find-actions -docstring 'symbols'                           's'  ':kks-connect terminal-popup kks-symbols<ret>'
+map global find-actions -docstring 'file symbols'                    's'  ':kks-connect terminal-popup kks-cymbal-file<ret>'
+map global find-actions -docstring 'workspace symbols'               'S'  ':kks-connect terminal-popup kks-cymbal-workspace<ret>'
 map global find-actions -docstring 'edir in buffer directory'          <minus>  ':edir-buffer-dir<ret>'
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
