@@ -24,7 +24,8 @@ cymbal --delimiter $'\t' --separator $'\n' . |
     --ansi \
     --with-nth=4,5 \
     --preview='bat {1} --color always --style=numbers,snip,header --highlight-line {2} --line-range {2}:+50' \
+    --bind "ctrl-l:execute(cymbal --delimiter $'\t' --separator $'\n' . | awk -F$'\t' 'BEGIN{OFS=\":\"} {gsub(/\x1b\[[0-9;]*m/, \"\"); print \$3, \$4, \$5, \$7\" \"\$1\" \"\$2}' | kks-pipe-to-grep-buffer {q})+abort" \
     --style=full \
-    --header="workspace symbols" |
+    --header="[ctrl-l] send to grep buffer | workspace symbols" |
   awk -F$'\t' '{print $1 " " "+" $2 ":" $3 }' |
   xargs -r kks edit
