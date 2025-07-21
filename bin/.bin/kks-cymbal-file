@@ -33,5 +33,5 @@ cymbal --delimiter $'\t' --separator $'\n' "$current_file" |
     --preview='bat {1} --color always --style=numbers,snip,header --highlight-line {2} --line-range {2}:+50' \
     --style=full \
     --header="symbols in $(basename "$current_file")" |
-  awk -F$'\t' '{print $2}' |
-  xargs -r -I {} kks send "execute-keys '<esc>{}g'"
+  awk -F$'\t' '{print $2 "g" ($3-1) "l"}' |
+  xargs -r -I {} kks send "execute-keys '<esc>{}'"
