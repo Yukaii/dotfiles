@@ -2,6 +2,9 @@
 declare-option str-list bookmarks
 declare-option str bookmarks_state_file
 
+# Line specifications for gutter highlighting
+declare-option line-specs bookmark_highlights
+
 # Initialize state directory
 define-command bookmarks-init %{
   nop %sh{
@@ -9,22 +12,60 @@ define-command bookmarks-init %{
   }
 }
 
+# Update bookmark highlights for current buffer
+define-command -hidden highlight_bookmarks %{
+  evaluate-commands %sh{
+    specs_list=""
+
+    eval set -- "$kak_quoted_opt_bookmarks"
+    while [ $# -gt 0 ]; do
+      bookmark="$1"
+      file="${bookmark%%:*}"
+      rest="${bookmark#*:}"
+      line="${rest%%:*}"
+
+      # Clean quotes from parsed fields
+      file="${file#\'}"
+      file="${file%\'}"
+      line="${line#\'}"
+      line="${line%\'}"
+
+      # Only highlight bookmarks for current buffer
+      if [ "$file" = "$kak_buffile" ]; then
+        specs_list="$specs_list '${line}|{blue+b}📌'"
+      fi
+
+      shift
+    done
+
+    # Apply bookmark highlights
+    if [ -n "$specs_list" ]; then
+      echo "set-option window bookmark_highlights %val{timestamp}$specs_list"
+    else
+      echo "set-option window bookmark_highlights %val{timestamp}"
+    fi
+  }
+}
+
 # Add current position to bookmarks
 define-command bookmarks-add -params ..1 -docstring "bookmarks-add [description]: Add current position to bookmarks" %{
   evaluate-commands %sh{
     description="${1:-}"
+    new_bookmark="${kak_buffile}:${kak_cursor_line}:${kak_cursor_column}:${description}"
+
     # Check if position already exists
     eval set -- "$kak_quoted_opt_bookmarks"
     while [ $# -gt 0 ]; do
-      if [ "$1" = "${kak_buffile}:${kak_cursor_line}:${kak_cursor_column}:${description}" ]; then
+      if [ "$1" = "$new_bookmark" ]; then
         echo "fail %{Position already bookmarked}"
         exit
       fi
       shift
     done
     printf "%s\\n" "
-      set-option -add global bookmarks %{${kak_buffile}:${kak_cursor_line}:${kak_cursor_column}:${description}}
+      set-option -add global bookmarks %{$new_bookmark}
       echo -markup {green}✓ Added bookmark${description:+: ${description}}
+      highlight_bookmarks
     "
   }
 }
@@ -86,6 +127,7 @@ define-command -hidden bookmarks-update-from-list %{
       execute-keys -draft -save-regs '' '%<a-s><a-k>^\d+:\s*<ret><a-;>;wl<a-l>y'
       set-option global bookmarks %reg{dquote}
       bookmarks-show-list
+      highlight_bookmarks
     } catch %{
       set-option global bookmarks
     }
@@ -99,6 +141,7 @@ define-command -hidden bookmarks-load %{
     if [ -f "$kak_opt_bookmarks_state_file" ]; then
       printf "set-option global bookmarks "
       cat "$kak_opt_bookmarks_state_file"
+      printf "\nhighlight_bookmarks\n"
     fi
   }
 }
@@ -162,6 +205,12 @@ hook global BufCreate \*bookmarks\* %{
   add-highlighter buffer/bookmark-file regex ^\d+:\s*([^:]+) 1:green
   add-highlighter buffer/bookmark-pos regex :(\d+):(\d+) 1:yellow 2:yellow
   add-highlighter buffer/bookmark-desc regex :([^:]+)$ 1:blue
+}
+
+# Gutter highlighting hook
+hook global WinDisplay .* %{
+  highlight_bookmarks
+  add-highlighter -override window/bookmark_highlights flag-lines default bookmark_highlights
 }
 
 # Auto-save hooks
