@@ -205,6 +205,10 @@ map global find-actions -docstring 'PR changed files'                  'c'  ':kk
 map global find-actions -docstring 'file symbols'                    's'  ':kks-connect terminal-popup kks-cymbal-file<ret>'
 map global find-actions -docstring 'workspace symbols'               'S'  ':kks-connect terminal-popup kks-cymbal-workspace<ret>'
 map global find-actions -docstring 'edir in buffer directory'          <minus>  ':edir-buffer-dir<ret>'
+map global find-actions -docstring 'case insensitive search'          'i'  '/(?i)'
+map global find-actions -docstring 'case insensitive backward search' '<a-/>' '<a-/>(?i)'
+map global find-actions -docstring 'case insensitive extend search'   '?'  '?(?i)'
+map global find-actions -docstring 'case insensitive backward extend-search' '<a-?>' '<a-?>(?i)'
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
 	evaluate-commands %sh{
