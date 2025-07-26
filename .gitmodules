@@ -16,3 +16,6 @@
 [submodule "kakoune/.config/kak/bundle/kak-bundle"]
 	path = kakoune/.config/kak/bundle/kak-bundle
 	url = https://github.com/jdugan6240/kak-bundle
+[submodule "ghostty/.config/ghostty/cursor_shaders"]
+	path = ghostty/.config/ghostty/cursor_shaders
+	url = https://github.com/KroneCorylus/ghostty-shader-playground
