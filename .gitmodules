@@ -19,3 +19,6 @@
 [submodule "ghostty/.config/ghostty/cursor_shaders"]
 	path = ghostty/.config/ghostty/cursor_shaders
 	url = https://github.com/KroneCorylus/ghostty-shader-playground
+[submodule "tattoy/Library/Application Support/tattoy/cursor_shaders"]
+	path = tattoy/Library/Application Support/tattoy/cursor_shaders
+	url = https://github.com/KroneCorylus/ghostty-shader-playground
