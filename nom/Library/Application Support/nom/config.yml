@@ -3,4 +3,5 @@ feeds:
   - url: https://hnrss.org/newest
   - url: https://hnrss.org/show
   - url: https://hnrss.org/bestcomments
+  - url: https://wiwi.blog/blog/rss.xml
 
