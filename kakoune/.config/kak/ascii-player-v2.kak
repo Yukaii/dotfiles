@@ -15,8 +15,11 @@ define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
             exit 1
         fi
         
-        # Read and parse frames into a list
-        frames=""
+        # Create temporary directory for frames
+        frames_dir="/tmp/kak_ascii_frames_$$"
+        mkdir -p "$frames_dir"
+        
+        # Read and parse frames into separate files
         current_frame=""
         frame_count=0
         
@@ -26,9 +29,7 @@ define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
                     frame_count=$((frame_count + 1))
                     # Remove trailing empty lines and normalize
                     normalized_frame=$(printf '%s' "$current_frame" | sed '/^[[:space:]]*$/d')
-                    # Properly escape for Kakoune string-list
-                    escaped_frame=$(printf '%s' "$normalized_frame" | sed "s/'/'\\\\''/g")
-                    frames="$frames '$escaped_frame'"
+                    printf '%s' "$normalized_frame" > "$frames_dir/frame_$frame_count"
                     current_frame=""
                 fi
             else
@@ -45,16 +46,10 @@ define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
             frame_count=$((frame_count + 1))
             # Remove trailing empty lines and normalize
             normalized_frame=$(printf '%s' "$current_frame" | sed '/^[[:space:]]*$/d')
-            escaped_frame=$(printf '%s' "$normalized_frame" | sed "s/'/'\\''/g")
-            frames="$frames '$escaped_frame'"
+            printf '%s' "$normalized_frame" > "$frames_dir/frame_$frame_count"
         fi
         
-        # frame_count is already calculated during parsing
-        
-        echo "echo -markup '{Information}DEBUG: About to store $frame_count frames'"
-        echo "echo -markup '{Information}DEBUG: Frames string length: ${#frames}'"
-        echo "echo -markup '{Information}DEBUG: First 50 chars: ${frames:0:50}'"
-        echo "set-option global ascii_frames $frames"
+        echo "set-option global ascii_frames_dir $frames_dir"
         echo "set-option global ascii_frame_count $frame_count"
         echo "set-option global ascii_current_frame 0"
         echo "echo -markup '{Information}Loaded $frame_count frames from $file'"
@@ -79,8 +74,9 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
     evaluate-commands %sh{
         frame_count=$kak_opt_ascii_frame_count
         current=$kak_opt_ascii_current_frame
+        frames_dir=$kak_opt_ascii_frames_dir
         
-        if [ "$frame_count" -eq 0 ]; then
+        if [ "$frame_count" -eq 0 ] || [ ! -d "$frames_dir" ]; then
             echo "echo -markup '{Error}No frames loaded. Use ascii-load-sequence first.'"
             exit 1
         fi
@@ -98,25 +94,16 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
             fi
         fi
         
-        # Extract the frame content using a more robust method
-        # Each frame creates 2 records: empty + content, so frame N is at record (N*2)
-        frame_content=$(echo "$kak_opt_ascii_frames" | awk -v frame="$frame_index" '
-            BEGIN { RS = "'\''"; FS = "" }
-            NR == (frame * 2) && length($0) > 0 { gsub(/'\''\\\\'\''/, "'\''"); print }
-        ')
+        # Get frame file
+        frame_file="$frames_dir/frame_$frame_index"
         
-        # Insert frame content directly into buffer
-        if [ -n "$frame_content" ]; then
-            # Create a temporary file to hold the frame content
-            temp_file="/tmp/kak_ascii_frame_$$"
-            printf '%s' "$frame_content" > "$temp_file"
-            
+        if [ -f "$frame_file" ]; then
             echo "evaluate-commands %{
                 try %{
                     buffer *ascii*
                     set-option buffer readonly false
                     execute-keys '%d'
-                    execute-keys '!cat $temp_file<ret>'
+                    execute-keys '!cat $frame_file<ret>'
                     execute-keys ','
                     set-option buffer readonly true
                     set-option global ascii_current_frame $((current + 1))
@@ -126,10 +113,8 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
             }"
             
             echo "echo -markup '{Information}Frame $((current + 1))/$frame_count displayed'"
-            
-            echo "nop %sh{ rm -f '$temp_file' }"
         else
-            echo "echo -markup '{Error}Frame $((current + 1)) is empty'"
+            echo "echo -markup '{Error}Frame file not found: $frame_file'"
         fi
     }
 }
@@ -142,6 +127,12 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
 }
 
 define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
+    evaluate-commands %sh{
+        frames_dir=$kak_opt_ascii_frames_dir
+        if [ -d "$frames_dir" ]; then
+            echo "nop %sh{ rm -rf '$frames_dir' }"
+        fi
+    }
     set-option global ascii_player_state "stopped"
     set-option global ascii_current_frame 0
     try %{ delete-buffer *ascii* }
@@ -195,7 +186,7 @@ define-command ascii-schedule-next-frame -docstring "Schedule the next frame upd
             echo "nop %sh{
                 (sleep $speed_s
                  if [ \"\$kak_opt_ascii_player_state\" = \"playing\" ]; then
-                     printf 'evaluate-commands %%{ascii-schedule-next-frame}\n' | kak -p \$kak_session
+                     printf 'evaluate-commands %%{ascii-schedule-next-frame}\\n' | kak -p \$kak_session
                  fi) >/dev/null 2>&1 &
             }"
         fi
@@ -210,25 +201,3 @@ map global ascii-player r ':ascii-restart<ret>' -docstring 'restart sequence'
 map global ascii-player l ':ascii-load-sequence<ret>' -docstring 'load sequence file'
 
 map global user a ':enter-user-mode ascii-player<ret>' -docstring 'ASCII player mode'
-
-define-command ascii-debug-simple -docstring "Simple debug of frames" %{
-    ascii-load-sequence
-    evaluate-commands %sh{
-        echo "echo -markup '{Information}Frame count: $kak_opt_ascii_frame_count'"
-        echo "echo -markup '{Information}Frames length: ${#kak_opt_ascii_frames}'"
-        
-        # Save to temp file and show first few chars
-        temp_debug="/tmp/kak_debug_$$"
-        printf '%s' "$kak_opt_ascii_frames" > "$temp_debug"
-        echo "echo -markup '{Information}First 100 chars:'"
-        head -c 100 "$temp_debug" | while IFS= read -r line; do
-            echo "echo -markup '{Information}  $line'"
-        done
-        
-        # Try simple extraction - just get everything between first pair of quotes
-        first_frame=$(echo "$kak_opt_ascii_frames" | sed -n "s/.*'\([^']*\)'.*/\1/p" | head -1)
-        echo "echo -markup '{Information}First frame via sed: [${first_frame:0:50}...]'"
-        
-        rm -f "$temp_debug"
-    }
-}
