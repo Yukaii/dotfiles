@@ -127,13 +127,14 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
 }
 
 define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
+    set-option global ascii_player_state "stopped"
+    remove-hooks global ascii-timer
     evaluate-commands %sh{
         frames_dir=$kak_opt_ascii_frames_dir
         if [ -d "$frames_dir" ]; then
-            echo "nop %sh{ rm -rf '$frames_dir' }"
+            echo "nop %sh{ rm -rf '$frames_dir'; rm -f /tmp/kak_timer_* }"
         fi
     }
-    set-option global ascii_player_state "stopped"
     set-option global ascii_current_frame 0
     try %{ delete-buffer *ascii* }
     echo -markup "{Information}ASCII playback stopped"
@@ -177,18 +178,26 @@ define-command ascii-restart -docstring "Restart ASCII sequence from beginning" 
 }
 
 define-command ascii-schedule-next-frame -docstring "Schedule the next frame update" %{
+    ascii-update-frame
     evaluate-commands %sh{
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
-            speed_ms=$kak_opt_ascii_playback_speed
-            speed_s=$(awk "BEGIN {printf \"%.3f\", $speed_ms/1000}")
+            echo "echo -markup '{Information}Scheduling next frame...'"
             
-            echo "ascii-update-frame"
-            echo "nop %sh{
-                (sleep $speed_s
-                 if [ \"\$kak_opt_ascii_player_state\" = \"playing\" ]; then
-                     printf 'evaluate-commands %%{ascii-schedule-next-frame}\\n' | kak -p \$kak_session
-                 fi) >/dev/null 2>&1 &
+            # Calculate target timestamp  
+            current_time=$kak_timestamp
+            target_time=$((current_time + kak_opt_ascii_playback_speed))
+            
+            echo "hook -once global NormalIdle .* %{
+                evaluate-commands %sh{
+                    if [ \$kak_timestamp -ge $target_time ] && [ \"\$kak_opt_ascii_player_state\" = \"playing\" ]; then
+                        printf 'ascii-schedule-next-frame\n'
+                    else
+                        printf 'hook -once global NormalIdle .* %%{ascii-schedule-next-frame}\n'
+                    fi
+                }
             }"
+        else
+            echo "echo -markup '{Information}Player state is: $kak_opt_ascii_player_state (not playing)'"
         fi
     }
 }
@@ -201,3 +210,14 @@ map global ascii-player r ':ascii-restart<ret>' -docstring 'restart sequence'
 map global ascii-player l ':ascii-load-sequence<ret>' -docstring 'load sequence file'
 
 map global user a ':enter-user-mode ascii-player<ret>' -docstring 'ASCII player mode'
+
+define-command ascii-test-timer -docstring "Test timer mechanism" %{
+    evaluate-commands %sh{
+        echo "echo -markup '{Information}Testing timer in 3 seconds...'"
+        echo "nop %sh{
+            (sleep 3
+             printf 'echo -markup \"{Information}Timer worked!\"\n' | kak -p \$kak_session 2>/tmp/kak_test_timer_\$\$
+            ) &
+        }"
+    }
+}
