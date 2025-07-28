@@ -6,6 +6,7 @@ declare-option -hidden str ascii_player_state "stopped"
 declare-option -hidden int ascii_current_frame 0
 declare-option -hidden str ascii_frames_dir
 declare-option -hidden int ascii_frame_count
+declare-option -hidden int ascii_last_update_time 0
 
 define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
     evaluate-commands %sh{
@@ -77,6 +78,8 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
         current=$kak_opt_ascii_current_frame
         frames_dir=$kak_opt_ascii_frames_dir
 
+        echo "echo -debug \"Current frame: $current, Total frames: $frame_count\""
+
         if [ "$frame_count" -eq 0 ] || [ ! -d "$frames_dir" ]; then
             echo "echo -markup '{Error}No frames loaded. Use ascii-load-sequence first.'"
             exit 1
@@ -84,9 +87,12 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
 
         # Get current frame (1-indexed)
         frame_index=$((current + 1))
+        echo "echo -debug \"Displaying frame index: $frame_index\""
+
         if [ "$frame_index" -gt "$frame_count" ]; then
             if [ "$kak_opt_ascii_loop" = "true" ]; then
                 frame_index=1
+                echo "echo -debug \"Looping back to frame 1\""
                 echo "set-option global ascii_current_frame 0"
             else
                 echo "set-option global ascii_player_state stopped"
@@ -99,6 +105,7 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
         frame_file="$frames_dir/frame_$frame_index"
 
         if [ -f "$frame_file" ]; then
+            echo "echo -debug \"Loading frame file: $frame_file\""
             echo "try %{
                 buffer *ascii*
                 set-option buffer readonly false
@@ -112,6 +119,7 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 set-option global ascii_player_state stopped
                 echo -markup \\'{Error}ASCII buffer not found - stopping playback\'
             }"
+            echo "echo -debug \"Frame counter updated to: $((current + 1))\""
         else
             echo "echo -markup '{Error}Frame file not found: $frame_file'"
         fi
@@ -122,7 +130,19 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
     ascii-load-sequence
     ascii-create-buffer
     set-option global ascii_player_state "playing"
-    ascii-schedule-next-frame
+    evaluate-commands %sh{
+        echo "set-option global ascii_last_update_time $(date +%s)"
+    }
+    hook -group ascii-timer global FocusIn .* %{
+        ascii-check-timer
+    }
+    hook -group ascii-timer global InsertIdle .* %{
+        ascii-check-timer
+    }
+    hook -group ascii-timer global NormalIdle .* %{
+        ascii-check-timer
+    }
+    ascii-update-frame
 }
 
 define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
@@ -131,7 +151,7 @@ define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
     evaluate-commands %sh{
         frames_dir=$kak_opt_ascii_frames_dir
         if [ -d "$frames_dir" ]; then
-            echo "nop %sh{ rm -rf '$frames_dir'; rm -f /tmp/kak_timer_* }"
+            echo "nop %sh{ rm -rf '$frames_dir' }"
         fi
     }
     set-option global ascii_current_frame 0
@@ -176,17 +196,24 @@ define-command ascii-restart -docstring "Restart ASCII sequence from beginning" 
     }
 }
 
-define-command ascii-schedule-next-frame -docstring "Schedule the next frame update" %{
-    echo -debug "ascii-schedule-next-frame"
-    ascii-update-frame
-    ascii-start-timer
-}
-
-define-command ascii-start-timer -docstring "Start the async timer" %{
-    echo -debug "ascii-start-timer"
+define-command ascii-check-timer -docstring "Check if it's time for the next frame" %{
     evaluate-commands %sh{
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
-            ( sleep 2; echo "ascii-schedule-next-frame" | kak -p $kak_session ) &
+            current_time=$(date +%s)
+            last_update=$kak_opt_ascii_last_update_time
+            speed_s=$((kak_opt_ascii_playback_speed / 1000))
+
+            if [ "$speed_s" -lt 1 ]; then
+                speed_s=1
+            fi
+
+            elapsed=$((current_time - last_update))
+
+            if [ "$elapsed" -ge "$speed_s" ]; then
+                echo "echo -debug \"Timer check: ${elapsed}s elapsed, updating frame\""
+                echo "ascii-update-frame"
+                echo "set-option global ascii_last_update_time $current_time"
+            fi
         fi
     }
 }
