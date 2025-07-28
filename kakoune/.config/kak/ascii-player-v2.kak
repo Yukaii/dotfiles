@@ -147,12 +147,13 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
 }
 
 define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
+    echo -debug "ASCII Stop: Stopping playback"
     set-option global ascii_player_state "stopped"
     ascii-cleanup-timer-hooks
     evaluate-commands %sh{
         frames_dir=$kak_opt_ascii_frames_dir
         if [ -d "$frames_dir" ]; then
-            echo "nop %sh{ rm -rf '$frames_dir' }"
+            echo "nop %sh{ (rm -rf '$frames_dir') & }"
         fi
     }
     set-option global ascii_current_frame 0
@@ -206,15 +207,8 @@ define-command ascii-setup-timer-hooks -docstring "Setup native Kakoune timer fo
 }
 
 define-command ascii-cleanup-timer-hooks -docstring "Stop native timer and cleanup" %{
-    echo -debug "ASCII Timer: Cleaning up timer hooks"
-    evaluate-commands %sh{
-        if [ -n "$kak_opt_ascii_timer_fifo" ] && [ -p "$kak_opt_ascii_timer_fifo" ]; then
-            echo "echo -debug 'ASCII Timer: Sending stop command to fifo: $kak_opt_ascii_timer_fifo'"
-            echo "nop %sh{ echo stop > '$kak_opt_ascii_timer_fifo' 2>/dev/null || true }"
-        else
-            echo "echo -debug 'ASCII Timer: No active timer fifo to stop'"
-        fi
-    }
+    echo -debug "ASCII Timer: Cleaning up timer hooks - timer will stop on next tick"
+    # Don't try to send fifo commands, just let the timer die naturally when it sees state=stopped
     set-option global ascii_timer_fifo ""
 }
 
@@ -264,22 +258,17 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
         echo "echo -debug 'ASCII Timer: Entering main loop'" | kak -p "$kak_session"
         
         while true; do
-            # Check for stop command using simple approach
-            if [ -p "$timer_fifo" ] && [ -r "$timer_fifo" ]; then
-                # Use dd to do a non-blocking read
-                if cmd=$(dd if="$timer_fifo" bs=1 count=4 iflag=nonblock 2>/dev/null | head -c 4); then
-                    if [ "$cmd" = "stop" ]; then
-                        echo "echo -debug 'ASCII Timer: Received stop command after $tick_count ticks'" | kak -p "$kak_session"
-                        break
-                    fi
-                fi
-            fi
-
+            # Simple approach: just sleep and send tick
             sleep "$delay_s"
             tick_count=$((tick_count + 1))
 
             # Send timer tick to Kakoune with client context
             if echo "evaluate-commands -try-client '$kak_client' 'ascii-timer-tick'" | kak -p "$kak_session" 2>/dev/null; then
+                # Check if we should continue (simple approach)
+                if echo "echo \$kak_opt_ascii_player_state" | kak -p "$kak_session" 2>/dev/null | grep -q "stopped"; then
+                    echo "echo -debug 'ASCII Timer: Player stopped, exiting after $tick_count ticks'" | kak -p "$kak_session"
+                    break
+                fi
                 # Log every 5th tick to reduce spam
                 if [ $((tick_count % 5)) -eq 0 ]; then
                     echo "echo -debug 'ASCII Timer: Completed $tick_count ticks successfully'" | kak -p "$kak_session"
