@@ -8,6 +8,7 @@ declare-option -hidden str ascii_frames_dir
 declare-option -hidden int ascii_frame_count
 declare-option -hidden int ascii_last_update_time 0
 declare-option -hidden str ascii_timer_fifo
+declare-option -hidden str ascii_timer_pid
 
 define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
     evaluate-commands %sh{
@@ -136,6 +137,14 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
 }
 
 define-command ascii-play -docstring "Start ASCII sequence playback" %{
+    # Always cleanup any existing timers first
+    echo -debug "ASCII Play: Cleaning up any existing timers before starting"
+    set-option global ascii_player_state "stopped"
+    ascii-cleanup-timer-hooks
+    
+    # Brief pause to let any existing timer processes notice the stopped state and exit
+    nop %sh{ sleep 0.2 }
+    
     ascii-load-sequence
     ascii-create-buffer
     set-option global ascii_player_state "playing"
@@ -209,9 +218,19 @@ define-command ascii-setup-timer-hooks -docstring "Setup native Kakoune timer fo
 }
 
 define-command ascii-cleanup-timer-hooks -docstring "Stop native timer and cleanup" %{
-    echo -debug "ASCII Timer: Cleaning up timer hooks - timer will stop on next tick"
-    # Don't try to send fifo commands, just let the timer die naturally when it sees state=stopped
+    echo -debug "ASCII Timer: Cleaning up timer hooks"
+    evaluate-commands %sh{
+        if [ -n "$kak_opt_ascii_timer_pid" ]; then
+            echo "echo -debug 'ASCII Timer: Killing timer process: $kak_opt_ascii_timer_pid'"
+            echo "nop %sh{ kill '$kak_opt_ascii_timer_pid' 2>/dev/null || true }"
+        fi
+        if [ -n "$kak_opt_ascii_timer_fifo" ] && [ -p "$kak_opt_ascii_timer_fifo" ]; then
+            echo "echo -debug 'ASCII Timer: Removing fifo: $kak_opt_ascii_timer_fifo'"
+            echo "nop %sh{ rm -f '$kak_opt_ascii_timer_fifo' 2>/dev/null || true }"
+        fi
+    }
     set-option global ascii_timer_fifo ""
+    set-option global ascii_timer_pid ""
 }
 
 define-command ascii-start-native-timer -docstring "Start native timer using fifo pattern" %{
@@ -229,61 +248,63 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
         echo "echo -debug 'ASCII Timer: Created fifo: $timer_fifo'"
         echo "set-option global ascii_timer_fifo '$timer_fifo'"
     }
-    # Start the timer process using clean async pattern
-    nop %sh{ {
-        trap 'exit' INT TERM
-        timer_fifo="$kak_opt_ascii_timer_fifo"
-        delay_ms="$kak_opt_ascii_playback_speed"
-        
-        # Debug: Log timer startup
-        echo "echo -debug 'ASCII Timer: Starting timer process with delay ${delay_ms}ms'" | kak -p "$kak_session"
+    # Start the timer process using clean async pattern and capture PID
+    evaluate-commands %sh{
+        echo "nop %sh{ {
+            trap 'exit' INT TERM
+            timer_fifo='$kak_opt_ascii_timer_fifo'
+            delay_ms='$kak_opt_ascii_playback_speed'
+            
+            # Debug: Log timer startup
+            echo \"echo -debug 'ASCII Timer: Starting timer process with delay \${delay_ms}ms'\" | kak -p '$kak_session'
 
-        # Clamp delay to reasonable bounds
-        if [ "$delay_ms" -lt 100 ]; then
-            delay_ms=100
-        elif [ "$delay_ms" -gt 10000 ]; then
-            delay_ms=10000
-        fi
-        delay_s=$(awk "BEGIN {printf \"%.3f\", $delay_ms/1000}")
-        
-        echo "echo -debug 'ASCII Timer: Using delay ${delay_s}s, fifo: ${timer_fifo}'" | kak -p "$kak_session"
+            # Clamp delay to reasonable bounds
+            if [ \"\$delay_ms\" -lt 100 ]; then
+                delay_ms=100
+            elif [ \"\$delay_ms\" -gt 10000 ]; then
+                delay_ms=10000
+            fi
+            delay_s=\$(awk \"BEGIN {printf \\\"%.3f\\\", \$delay_ms/1000}\")
+            
+            echo \"echo -debug 'ASCII Timer: Using delay \${delay_s}s, fifo: \${timer_fifo}'\" | kak -p '$kak_session'
 
-        # Test if fifo exists and is accessible
-        if [ -p "$timer_fifo" ]; then
-            echo "echo -debug 'ASCII Timer: Fifo exists and is a pipe'" | kak -p "$kak_session"
-        else
-            echo "echo -debug 'ASCII Timer: ERROR - Fifo does not exist or is not a pipe'" | kak -p "$kak_session"
-            exit 1
-        fi
+            # Test if fifo exists and is accessible
+            if [ -p \"\$timer_fifo\" ]; then
+                echo \"echo -debug 'ASCII Timer: Fifo exists and is a pipe'\" | kak -p '$kak_session'
+            else
+                echo \"echo -debug 'ASCII Timer: ERROR - Fifo does not exist or is not a pipe'\" | kak -p '$kak_session'
+                exit 1
+            fi
 
-        tick_count=0
-        echo "echo -debug 'ASCII Timer: Entering main loop'" | kak -p "$kak_session"
-        
-        while true; do
-            # Simple approach: just sleep and send tick
-            sleep "$delay_s"
-            tick_count=$((tick_count + 1))
+            tick_count=0
+            echo \"echo -debug 'ASCII Timer: Entering main loop'\" | kak -p '$kak_session'
+            
+            while true; do
+                # Simple approach: just sleep and send tick
+                sleep \"\$delay_s\"
+                tick_count=\$((tick_count + 1))
 
-            # Send timer tick to Kakoune with client context
-            if echo "evaluate-commands -try-client '$kak_client' 'ascii-timer-tick'" | kak -p "$kak_session" 2>/dev/null; then
-                # Check if we should continue (simple approach)
-                if echo "echo \$kak_opt_ascii_player_state" | kak -p "$kak_session" 2>/dev/null | grep -q "stopped"; then
-                    echo "echo -debug 'ASCII Timer: Player stopped, exiting after $tick_count ticks'" | kak -p "$kak_session"
+                # Send timer tick to Kakoune with client context
+                if echo \"evaluate-commands -try-client '$kak_client' 'ascii-timer-tick'\" | kak -p '$kak_session' 2>/dev/null; then
+                    # Check if we should continue (simple approach)
+                    if echo \"echo \\\$kak_opt_ascii_player_state\" | kak -p '$kak_session' 2>/dev/null | grep -q \"stopped\"; then
+                        echo \"echo -debug 'ASCII Timer: Player stopped, exiting after \$tick_count ticks'\" | kak -p '$kak_session'
+                        break
+                    fi
+                    # Log every 5th tick to reduce spam
+                    if [ \$((tick_count % 5)) -eq 0 ]; then
+                        echo \"echo -debug 'ASCII Timer: Completed \$tick_count ticks successfully'\" | kak -p '$kak_session'
+                    fi
+                else
+                    echo \"echo -debug 'ASCII Timer: Failed to send tick #\$tick_count, exiting'\" | kak -p '$kak_session'
                     break
                 fi
-                # Log every 5th tick to reduce spam
-                if [ $((tick_count % 5)) -eq 0 ]; then
-                    echo "echo -debug 'ASCII Timer: Completed $tick_count ticks successfully'" | kak -p "$kak_session"
-                fi
-            else
-                echo "echo -debug 'ASCII Timer: Failed to send tick #$tick_count, exiting'" | kak -p "$kak_session"
-                break
-            fi
-        done
+            done
 
-        echo "echo -debug 'ASCII Timer: Cleaning up and exiting'" | kak -p "$kak_session"
-        rm -f "$timer_fifo"
-    } > /dev/null 2>&1 < /dev/null & }
+            echo \"echo -debug 'ASCII Timer: Cleaning up and exiting'\" | kak -p '$kak_session'
+            rm -f \"\$timer_fifo\"
+        } > /dev/null 2>&1 < /dev/null & timer_pid=\$!; echo \"set-option global ascii_timer_pid \$timer_pid\" | kak -p '$kak_session' }"
+    }
 }
 
 define-command ascii-timer-tick -docstring "Process one timer tick" %{
