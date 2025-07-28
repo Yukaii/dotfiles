@@ -60,12 +60,6 @@ add-highlighter global/todo-highlighter regex //\h*(TODO:)[^\n]* 0:cyan 1:yellow
 
 add-highlighter global/ regex \b(TODO|FIXME|NOTE)\b 0:default+rb
 
-# trailing whitespaces
-define-command -hidden show-trailing-whitespaces %{ try %{ add-highlighter global/trailing-whitespaces regex '\h+$' 0:default,red } }
-define-command -hidden hide-trailing-whitespaces %{ try %{ remove-highlighter global/trailing-whitespaces } }
-hook global WinDisplay .*              show-trailing-whitespaces
-hook global ModeChange 'insert:normal' show-trailing-whitespaces
-hook global ModeChange 'normal:insert' hide-trailing-whitespaces
 
 # User mode mappings
 map global user '<space>' ':kks-connect terminal-popup kks-mru<ret>'    -docstring 'recent files'
@@ -411,10 +405,37 @@ bundle git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
 bundle ui 'https://github.com/kkga/ui.kak' %{
   map global user u ': enter-user-mode ui<ret>' -docstring "ui mode"
 
+  # trailing whitespace state and commands
+  declare-option bool trailing_whitespaces_visible true
+
+  define-command -hidden show-trailing-whitespaces %{ try %{ add-highlighter global/trailing-whitespaces regex '\h+$' 0:default,red } }
+  define-command -hidden hide-trailing-whitespaces %{ try %{ remove-highlighter global/trailing-whitespaces } }
+
+  define-command ui-trailing-whitespaces-toggle %{
+    evaluate-commands %sh{
+      if [ "$kak_opt_trailing_whitespaces_visible" = "true" ]; then
+        echo "set-option global trailing_whitespaces_visible false"
+        echo "hide-trailing-whitespaces"
+        echo "echo -markup '{Information}Trailing whitespaces hidden'"
+      else
+        echo "set-option global trailing_whitespaces_visible true"
+        echo "show-trailing-whitespaces"
+        echo "echo -markup '{Information}Trailing whitespaces visible'"
+      fi
+    }
+  }
+
+  map global ui t ':ui-trailing-whitespaces-toggle<ret>' -docstring 'toggle trailing whitespaces'
+
   hook global WinCreate .* %{
     ui-matching-toggle
     ui-search-toggle
+    show-trailing-whitespaces
   }
+
+  hook global WinDisplay .*              show-trailing-whitespaces
+  hook global ModeChange 'insert:normal' show-trailing-whitespaces
+  hook global ModeChange 'normal:insert' hide-trailing-whitespaces
 }
 
 bundle harpoon 'https://github.com/raiguard/kak-harpoon' %{
