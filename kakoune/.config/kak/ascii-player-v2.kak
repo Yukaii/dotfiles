@@ -7,6 +7,7 @@ declare-option -hidden int ascii_current_frame 0
 declare-option -hidden str ascii_frames_dir
 declare-option -hidden int ascii_frame_count
 declare-option -hidden int ascii_last_update_time 0
+declare-option -hidden str ascii_timer_fifo
 
 define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
     evaluate-commands %sh{
@@ -96,6 +97,7 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 echo "set-option global ascii_current_frame 0"
             else
                 echo "set-option global ascii_player_state stopped"
+                echo "ascii-cleanup-timer-hooks"
                 echo "echo -markup '{Information}ASCII sequence finished'"
                 exit 0
             fi
@@ -117,6 +119,7 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 echo -markup \'{Information}Frame $((current + 1))/$frame_count displayed'
             } catch %{
                 set-option global ascii_player_state stopped
+                ascii-cleanup-timer-hooks
                 echo -markup \\'{Error}ASCII buffer not found - stopping playback\'
             }"
             echo "echo -debug \"Frame counter updated to: $((current + 1))\""
@@ -133,21 +136,13 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
     evaluate-commands %sh{
         echo "set-option global ascii_last_update_time $(date +%s)"
     }
-    hook -group ascii-timer global FocusIn .* %{
-        ascii-check-timer
-    }
-    hook -group ascii-timer global InsertIdle .* %{
-        ascii-check-timer
-    }
-    hook -group ascii-timer global NormalIdle .* %{
-        ascii-check-timer
-    }
+    ascii-setup-timer-hooks
     ascii-update-frame
 }
 
 define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
     set-option global ascii_player_state "stopped"
-    remove-hooks global ascii-timer
+    ascii-cleanup-timer-hooks
     evaluate-commands %sh{
         frames_dir=$kak_opt_ascii_frames_dir
         if [ -d "$frames_dir" ]; then
@@ -163,10 +158,12 @@ define-command ascii-pause -docstring "Pause ASCII sequence playback" %{
     evaluate-commands %sh{
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
             echo "set-option global ascii_player_state paused"
+            echo "ascii-cleanup-timer-hooks"
             echo "echo -markup '{Information}ASCII playback paused'"
         elif [ "$kak_opt_ascii_player_state" = "paused" ]; then
             echo "set-option global ascii_player_state playing"
-            echo "ascii-schedule-next-frame"
+            echo "evaluate-commands %sh{ echo \"set-option global ascii_last_update_time \$(date +%s)\" }"
+            echo "ascii-setup-timer-hooks"
             echo "echo -markup '{Information}ASCII playback resumed'"
         else
             echo "echo -markup '{Error}No active playback to pause/resume'"
@@ -196,7 +193,65 @@ define-command ascii-restart -docstring "Restart ASCII sequence from beginning" 
     }
 }
 
-define-command ascii-check-timer -docstring "Check if it's time for the next frame" %{
+define-command ascii-setup-timer-hooks -docstring "Setup native Kakoune timer for ASCII playback" %{
+    ascii-cleanup-timer-hooks
+    ascii-start-native-timer
+}
+
+define-command ascii-cleanup-timer-hooks -docstring "Stop native timer and cleanup" %{
+    evaluate-commands %sh{
+        if [ -n "$kak_opt_ascii_timer_fifo" ] && [ -p "$kak_opt_ascii_timer_fifo" ]; then
+            echo "nop %sh{ echo stop > '$kak_opt_ascii_timer_fifo' 2>/dev/null || true }"
+        fi
+    }
+    set-option global ascii_timer_fifo ""
+}
+
+define-command ascii-start-native-timer -docstring "Start native timer using fifo pattern" %{
+    evaluate-commands %sh{
+        if [ "$kak_opt_ascii_player_state" != "playing" ]; then
+            exit 0
+        fi
+
+        # Create timer fifo
+        timer_fifo="/tmp/kak_ascii_timer_$$"
+        mkfifo "$timer_fifo"
+
+        echo "set-option global ascii_timer_fifo '$timer_fifo'"
+    }
+    # Start the timer process using clean async pattern
+    nop %sh{ {
+        trap 'exit' INT TERM
+        timer_fifo="$kak_opt_ascii_timer_fifo"
+        delay_ms="$kak_opt_ascii_playback_speed"
+
+        # Clamp delay to reasonable bounds
+        if [ "$delay_ms" -lt 100 ]; then
+            delay_ms=100
+        elif [ "$delay_ms" -gt 10000 ]; then
+            delay_ms=10000
+        fi
+        delay_s=$(awk "BEGIN {printf \"%.3f\", $delay_ms/1000}")
+
+        while true; do
+            # Check for stop command
+            if read -t 0.1 cmd < "$timer_fifo" 2>/dev/null; then
+                if [ "$cmd" = "stop" ]; then
+                    break
+                fi
+            fi
+
+            sleep "$delay_s"
+
+            # Send timer tick to Kakoune
+            echo "ascii-timer-tick" | kak -p "$kak_session" 2>/dev/null || break
+        done
+
+        rm -f "$timer_fifo"
+    } > /dev/null 2>&1 < /dev/null & }
+}
+
+define-command ascii-timer-tick -docstring "Process one timer tick" %{
     evaluate-commands %sh{
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
             current_time=$(date +%s)
@@ -210,12 +265,19 @@ define-command ascii-check-timer -docstring "Check if it's time for the next fra
             elapsed=$((current_time - last_update))
 
             if [ "$elapsed" -ge "$speed_s" ]; then
-                echo "echo -debug \"Timer check: ${elapsed}s elapsed, updating frame\""
+                echo "echo -debug \"Timer tick: ${elapsed}s elapsed, updating frame\""
                 echo "ascii-update-frame"
                 echo "set-option global ascii_last_update_time $current_time"
             fi
+        else
+            # Stop timer if not playing
+            echo "ascii-cleanup-timer-hooks"
         fi
     }
+}
+
+define-command ascii-check-timer -docstring "Legacy timer check - now redirects to tick system" %{
+    ascii-timer-tick
 }
 
 declare-user-mode ascii-player
