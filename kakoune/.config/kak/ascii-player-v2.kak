@@ -1,5 +1,5 @@
-declare-option -docstring "Path to ASCII sequence file" str ascii_sequence_file "%val{config}/sequences/example.txt"
-declare-option -docstring "Playback speed in milliseconds between frames" int ascii_playback_speed 100
+declare-option -docstring "Path to ASCII sequence file or directory" str ascii_sequence_file "%val{config}/sequences/frames-ascii"
+declare-option -docstring "Playback speed in milliseconds between frames" int ascii_playback_speed 50
 declare-option -docstring "Whether to loop the sequence" bool ascii_loop true
 
 declare-option -hidden str ascii_player_state "stopped"
@@ -10,52 +10,73 @@ declare-option -hidden int ascii_last_update_time 0
 declare-option -hidden str ascii_timer_fifo
 declare-option -hidden str ascii_timer_pid
 
-define-command ascii-load-sequence -docstring "Load ASCII sequence from file" %{
+define-command ascii-load-sequence -docstring "Load ASCII sequence from file or directory" %{
     evaluate-commands %sh{
-        file="$kak_opt_ascii_sequence_file"
-        if [ ! -f "$file" ]; then
-            echo "echo -markup '{Error}ASCII sequence file not found: $file'"
+        path="$kak_opt_ascii_sequence_file"
+
+        if [ -d "$path" ]; then
+            # Directory mode: use individual frame files directly
+            echo "echo -debug 'ASCII Load: Directory mode detected: $path'"
+
+            # Count frame files
+            frame_count=$(find "$path" -name "*.txt" -type f | wc -l | tr -d ' ')
+
+            if [ "$frame_count" -eq 0 ]; then
+                echo "echo -markup '{Error}No .txt frame files found in directory: $path'"
+                exit 1
+            fi
+
+            echo "set-option global ascii_frames_dir '$path'"
+            echo "set-option global ascii_frame_count $frame_count"
+            echo "set-option global ascii_current_frame 0"
+            echo "echo -markup '{Information}Loaded $frame_count frames from directory: $path'"
+
+        elif [ -f "$path" ]; then
+            # File mode: parse joined format into temporary files
+            echo "echo -debug 'ASCII Load: File mode detected: $path'"
+
+            # Create temporary directory for frames
+            frames_dir="/tmp/kak_ascii_frames_$$"
+            mkdir -p "$frames_dir"
+
+            # Read and parse frames into separate files
+            current_frame=""
+            frame_count=0
+
+            while IFS= read -r line || [ -n "$line" ]; do
+                if [ "$line" = "---FRAME---" ]; then
+                    if [ -n "$current_frame" ]; then
+                        frame_count=$((frame_count + 1))
+                        # Remove trailing empty lines and normalize
+                        normalized_frame=$(printf '%s' "$current_frame" | sed '/^[[:space:]]*$/d')
+                        printf '%s' "$normalized_frame" > "$frames_dir/frame_$frame_count"
+                        current_frame=""
+                    fi
+                else
+                    if [ -n "$current_frame" ]; then
+                        current_frame="$current_frame"$'\n'"$line"
+                    else
+                        current_frame="$line"
+                    fi
+                fi
+            done < "$path"
+
+            # Add last frame if exists
+            if [ -n "$current_frame" ]; then
+                frame_count=$((frame_count + 1))
+                # Remove trailing empty lines and normalize
+                normalized_frame=$(printf '%s' "$current_frame" | sed '/^[[:space:]]*$/d')
+                printf '%s' "$normalized_frame" > "$frames_dir/frame_$frame_count"
+            fi
+
+            echo "set-option global ascii_frames_dir '$frames_dir'"
+            echo "set-option global ascii_frame_count $frame_count"
+            echo "set-option global ascii_current_frame 0"
+            echo "echo -markup '{Information}Loaded $frame_count frames from file: $path'"
+        else
+            echo "echo -markup '{Error}ASCII sequence path not found: $path'"
             exit 1
         fi
-
-        # Create temporary directory for frames
-        frames_dir="/tmp/kak_ascii_frames_$$"
-        mkdir -p "$frames_dir"
-
-        # Read and parse frames into separate files
-        current_frame=""
-        frame_count=0
-
-        while IFS= read -r line || [ -n "$line" ]; do
-            if [ "$line" = "---FRAME---" ]; then
-                if [ -n "$current_frame" ]; then
-                    frame_count=$((frame_count + 1))
-                    # Remove trailing empty lines and normalize
-                    normalized_frame=$(printf '%s' "$current_frame" | sed '/^[[:space:]]*$/d')
-                    printf '%s' "$normalized_frame" > "$frames_dir/frame_$frame_count"
-                    current_frame=""
-                fi
-            else
-                if [ -n "$current_frame" ]; then
-                    current_frame="$current_frame"$'\n'"$line"
-                else
-                    current_frame="$line"
-                fi
-            fi
-        done < "$file"
-
-        # Add last frame if exists
-        if [ -n "$current_frame" ]; then
-            frame_count=$((frame_count + 1))
-            # Remove trailing empty lines and normalize
-            normalized_frame=$(printf '%s' "$current_frame" | sed '/^[[:space:]]*$/d')
-            printf '%s' "$normalized_frame" > "$frames_dir/frame_$frame_count"
-        fi
-
-        echo "set-option global ascii_frames_dir $frames_dir"
-        echo "set-option global ascii_frame_count $frame_count"
-        echo "set-option global ascii_current_frame 0"
-        echo "echo -markup '{Information}Loaded $frame_count frames from $file'"
     }
 }
 
@@ -106,8 +127,14 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
             fi
         fi
 
-        # Get frame file
-        frame_file="$frames_dir/frame_$frame_index"
+        # Get frame file - handle both directory and temp file modes
+        if [ -f "$frames_dir/frame_1" ]; then
+            # Temp file mode (from joined format)
+            frame_file="$frames_dir/frame_$frame_index"
+        else
+            # Directory mode (individual files) - find the Nth file
+            frame_file=$(find "$frames_dir" -name "*.txt" -type f | sort -V | sed -n "${frame_index}p")
+        fi
 
         if [ -f "$frame_file" ]; then
             echo "echo -debug \"Loading frame file: $frame_file\""
@@ -141,10 +168,10 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
     echo -debug "ASCII Play: Cleaning up any existing timers before starting"
     set-option global ascii_player_state "stopped"
     ascii-cleanup-timer-hooks
-    
+
     # Brief pause to let any existing timer processes notice the stopped state and exit
     nop %sh{ sleep 0.2 }
-    
+
     ascii-load-sequence
     ascii-create-buffer
     set-option global ascii_player_state "playing"
@@ -163,7 +190,8 @@ define-command ascii-stop -docstring "Stop ASCII sequence playback" %{
     ascii-cleanup-timer-hooks
     evaluate-commands %sh{
         frames_dir=$kak_opt_ascii_frames_dir
-        if [ -d "$frames_dir" ]; then
+        # Only cleanup temp directories (those with "kak_ascii_frames" in the name)
+        if [ -d "$frames_dir" ] && echo "$frames_dir" | grep -q "kak_ascii_frames"; then
             echo "nop %sh{ (rm -rf '$frames_dir') & }"
         fi
     }
@@ -254,7 +282,7 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
             trap 'exit' INT TERM
             timer_fifo='$kak_opt_ascii_timer_fifo'
             delay_ms='$kak_opt_ascii_playback_speed'
-            
+
             # Debug: Log timer startup
             echo \"echo -debug 'ASCII Timer: Starting timer process with delay \${delay_ms}ms'\" | kak -p '$kak_session'
 
@@ -265,7 +293,7 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
                 delay_ms=10000
             fi
             delay_s=\$(awk \"BEGIN {printf \\\"%.3f\\\", \$delay_ms/1000}\")
-            
+
             echo \"echo -debug 'ASCII Timer: Using delay \${delay_s}s, fifo: \${timer_fifo}'\" | kak -p '$kak_session'
 
             # Test if fifo exists and is accessible
@@ -278,7 +306,7 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
 
             tick_count=0
             echo \"echo -debug 'ASCII Timer: Entering main loop'\" | kak -p '$kak_session'
-            
+
             while true; do
                 # Simple approach: just sleep and send tick
                 sleep \"\$delay_s\"
@@ -310,7 +338,7 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
 define-command ascii-timer-tick -docstring "Process one timer tick" %{
     evaluate-commands %sh{
         echo "echo -debug 'Timer tick received, state: $kak_opt_ascii_player_state'"
-        
+
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
             current_time=$(date +%s)
             last_update=$kak_opt_ascii_last_update_time
