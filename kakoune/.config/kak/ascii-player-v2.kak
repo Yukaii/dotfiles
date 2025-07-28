@@ -65,11 +65,12 @@ define-command ascii-create-buffer -docstring "Create or switch to ASCII playbac
         edit -scratch *ascii*
         set-option buffer readonly true
         set-option buffer filetype text
-        map buffer normal q ':ascii-stop<ret>' -docstring 'stop ASCII playback'
-        map buffer normal <space> ':ascii-toggle<ret>' -docstring 'toggle ASCII playback'
-        map buffer normal r ':ascii-restart<ret>' -docstring 'restart ASCII sequence'
-        echo -markup "{Information}ASCII buffer created. Press 'q' to stop, <space> to toggle, 'r' to restart"
     }
+    # Always set up the key mappings, even if buffer already exists
+    map buffer normal q ':ascii-stop<ret>' -docstring 'stop ASCII playback'
+    map buffer normal <space> ':ascii-toggle<ret>' -docstring 'toggle ASCII playback'
+    map buffer normal r ':ascii-restart<ret>' -docstring 'restart ASCII sequence'
+    echo -markup "{Information}ASCII buffer ready. Press 'q' to stop, <space> to toggle, 'r' to restart"
 }
 
 define-command ascii-update-frame -docstring "Update current frame in ASCII buffer" %{
@@ -94,7 +95,8 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
             if [ "$kak_opt_ascii_loop" = "true" ]; then
                 frame_index=1
                 echo "echo -debug \"Looping back to frame 1\""
-                echo "set-option global ascii_current_frame 0"
+                # Reset to frame 1 (frame_index=1, so current should be 0 after increment)
+                current=0
             else
                 echo "set-option global ascii_player_state stopped"
                 echo "ascii-cleanup-timer-hooks"
@@ -117,8 +119,8 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 execute-keys '!cat $frame_file<ret>'
                 execute-keys ','
                 set-option buffer readonly true
-                set-option global ascii_current_frame $((current + 1))
-                echo -markup \'{Information}Frame $((current + 1))/$frame_count displayed'
+                set-option global ascii_current_frame $frame_index
+                echo -markup \'{Information}Frame $frame_index/$frame_count displayed'
                 echo -debug \'Frame update completed successfully\'
             } catch %{
                 echo -debug \'ERROR: Failed to update frame - %val{error}\'
@@ -126,7 +128,7 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 ascii-cleanup-timer-hooks
                 echo -markup \\'{Error}ASCII buffer error: %val{error} - stopping playback\'
             }"
-            echo "echo -debug \"Frame counter updated to: $((current + 1))\""
+            echo "echo -debug \"Frame counter updated to: $frame_index\""
         else
             echo "echo -markup '{Error}Frame file not found: $frame_file'"
         fi
