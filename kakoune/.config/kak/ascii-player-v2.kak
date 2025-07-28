@@ -286,9 +286,9 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
             # Debug: Log timer startup
             echo \"echo -debug 'ASCII Timer: Starting timer process with delay \${delay_ms}ms'\" | kak -p '$kak_session'
 
-            # Clamp delay to reasonable bounds
-            if [ \"\$delay_ms\" -lt 100 ]; then
-                delay_ms=100
+            # Clamp delay to prevent crashes (minimum 50ms)
+            if [ \"\$delay_ms\" -lt 50 ]; then
+                delay_ms=50
             elif [ \"\$delay_ms\" -gt 10000 ]; then
                 delay_ms=10000
             fi
