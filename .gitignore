@@ -43,6 +43,7 @@ kakoune/Library/Application Support/kak-tree-sitter/*
 !kakoune/Library/Application Support/kak-tree-sitter/additional
 kakoune/.config/kak/bundle/*
 !kakoune/.config/kak/bundle/kak-bundle
+kakoune/.config/kak/sequences/frames-ascii/*
 
 bombdadillo/.config/*
 
@@ -56,3 +57,5 @@ codex/.codex/*
 !codex/.codex/config.json
 
 .storage
+
+!.gitkeep
