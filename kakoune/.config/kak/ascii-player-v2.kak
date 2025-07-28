@@ -109,7 +109,9 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
         if [ -f "$frame_file" ]; then
             echo "echo -debug \"Loading frame file: $frame_file\""
             echo "try %{
+                echo -debug \'Trying to switch to *ascii* buffer\'
                 buffer *ascii*
+                echo -debug \'Successfully switched to *ascii* buffer\'
                 set-option buffer readonly false
                 execute-keys '%d'
                 execute-keys '!cat $frame_file<ret>'
@@ -117,10 +119,12 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 set-option buffer readonly true
                 set-option global ascii_current_frame $((current + 1))
                 echo -markup \'{Information}Frame $((current + 1))/$frame_count displayed'
+                echo -debug \'Frame update completed successfully\'
             } catch %{
+                echo -debug \'ERROR: Failed to update frame - %val{error}\'
                 set-option global ascii_player_state stopped
                 ascii-cleanup-timer-hooks
-                echo -markup \\'{Error}ASCII buffer not found - stopping playback\'
+                echo -markup \\'{Error}ASCII buffer error: %val{error} - stopping playback\'
             }"
             echo "echo -debug \"Frame counter updated to: $((current + 1))\""
         else
@@ -194,22 +198,29 @@ define-command ascii-restart -docstring "Restart ASCII sequence from beginning" 
 }
 
 define-command ascii-setup-timer-hooks -docstring "Setup native Kakoune timer for ASCII playback" %{
+    echo -debug "ASCII Timer: Setting up timer hooks"
     ascii-cleanup-timer-hooks
     ascii-start-native-timer
 }
 
 define-command ascii-cleanup-timer-hooks -docstring "Stop native timer and cleanup" %{
+    echo -debug "ASCII Timer: Cleaning up timer hooks"
     evaluate-commands %sh{
         if [ -n "$kak_opt_ascii_timer_fifo" ] && [ -p "$kak_opt_ascii_timer_fifo" ]; then
+            echo "echo -debug 'ASCII Timer: Sending stop command to fifo: $kak_opt_ascii_timer_fifo'"
             echo "nop %sh{ echo stop > '$kak_opt_ascii_timer_fifo' 2>/dev/null || true }"
+        else
+            echo "echo -debug 'ASCII Timer: No active timer fifo to stop'"
         fi
     }
     set-option global ascii_timer_fifo ""
 }
 
 define-command ascii-start-native-timer -docstring "Start native timer using fifo pattern" %{
+    echo -debug "ASCII Timer: Starting native timer"
     evaluate-commands %sh{
         if [ "$kak_opt_ascii_player_state" != "playing" ]; then
+            echo "echo -debug 'ASCII Timer: Not starting - player state is: $kak_opt_ascii_player_state'"
             exit 0
         fi
 
@@ -217,6 +228,7 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
         timer_fifo="/tmp/kak_ascii_timer_$$"
         mkfifo "$timer_fifo"
 
+        echo "echo -debug 'ASCII Timer: Created fifo: $timer_fifo'"
         echo "set-option global ascii_timer_fifo '$timer_fifo'"
     }
     # Start the timer process using clean async pattern
@@ -224,6 +236,9 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
         trap 'exit' INT TERM
         timer_fifo="$kak_opt_ascii_timer_fifo"
         delay_ms="$kak_opt_ascii_playback_speed"
+        
+        # Debug: Log timer startup
+        echo "echo -debug 'ASCII Timer: Starting timer process with delay ${delay_ms}ms'" | kak -p "$kak_session"
 
         # Clamp delay to reasonable bounds
         if [ "$delay_ms" -lt 100 ]; then
@@ -232,27 +247,56 @@ define-command ascii-start-native-timer -docstring "Start native timer using fif
             delay_ms=10000
         fi
         delay_s=$(awk "BEGIN {printf \"%.3f\", $delay_ms/1000}")
+        
+        echo "echo -debug 'ASCII Timer: Using delay ${delay_s}s, fifo: ${timer_fifo}'" | kak -p "$kak_session"
 
+        # Test if fifo exists and is accessible
+        if [ -p "$timer_fifo" ]; then
+            echo "echo -debug 'ASCII Timer: Fifo exists and is a pipe'" | kak -p "$kak_session"
+        else
+            echo "echo -debug 'ASCII Timer: ERROR - Fifo does not exist or is not a pipe'" | kak -p "$kak_session"
+            exit 1
+        fi
+
+        tick_count=0
+        echo "echo -debug 'ASCII Timer: Entering main loop'" | kak -p "$kak_session"
+        
         while true; do
-            # Check for stop command
-            if read -t 0.1 cmd < "$timer_fifo" 2>/dev/null; then
-                if [ "$cmd" = "stop" ]; then
-                    break
+            # Check for stop command using simple approach
+            if [ -p "$timer_fifo" ] && [ -r "$timer_fifo" ]; then
+                # Use dd to do a non-blocking read
+                if cmd=$(dd if="$timer_fifo" bs=1 count=4 iflag=nonblock 2>/dev/null | head -c 4); then
+                    if [ "$cmd" = "stop" ]; then
+                        echo "echo -debug 'ASCII Timer: Received stop command after $tick_count ticks'" | kak -p "$kak_session"
+                        break
+                    fi
                 fi
             fi
 
             sleep "$delay_s"
+            tick_count=$((tick_count + 1))
 
-            # Send timer tick to Kakoune
-            echo "ascii-timer-tick" | kak -p "$kak_session" 2>/dev/null || break
+            # Send timer tick to Kakoune with client context
+            if echo "evaluate-commands -try-client '$kak_client' 'ascii-timer-tick'" | kak -p "$kak_session" 2>/dev/null; then
+                # Log every 5th tick to reduce spam
+                if [ $((tick_count % 5)) -eq 0 ]; then
+                    echo "echo -debug 'ASCII Timer: Completed $tick_count ticks successfully'" | kak -p "$kak_session"
+                fi
+            else
+                echo "echo -debug 'ASCII Timer: Failed to send tick #$tick_count, exiting'" | kak -p "$kak_session"
+                break
+            fi
         done
 
+        echo "echo -debug 'ASCII Timer: Cleaning up and exiting'" | kak -p "$kak_session"
         rm -f "$timer_fifo"
     } > /dev/null 2>&1 < /dev/null & }
 }
 
 define-command ascii-timer-tick -docstring "Process one timer tick" %{
     evaluate-commands %sh{
+        echo "echo -debug 'Timer tick received, state: $kak_opt_ascii_player_state'"
+        
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
             current_time=$(date +%s)
             last_update=$kak_opt_ascii_last_update_time
@@ -268,10 +312,11 @@ define-command ascii-timer-tick -docstring "Process one timer tick" %{
                 echo "echo -debug \"Timer tick: ${elapsed}s elapsed, updating frame\""
                 echo "ascii-update-frame"
                 echo "set-option global ascii_last_update_time $current_time"
+            else
+                echo "echo -debug \"Timer tick: Only ${elapsed}s elapsed, not updating (need ${speed_s}s)\""
             fi
         else
-            # Stop timer if not playing
-            echo "ascii-cleanup-timer-hooks"
+            echo "echo -debug 'Timer tick: Player not playing (state: $kak_opt_ascii_player_state), ignoring tick'"
         fi
     }
 }
