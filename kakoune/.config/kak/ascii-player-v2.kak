@@ -1,5 +1,5 @@
 declare-option -docstring "Path to ASCII sequence file" str ascii_sequence_file "%val{config}/sequences/example.txt"
-declare-option -docstring "Playback speed in milliseconds between frames" int ascii_playback_speed 2000
+declare-option -docstring "Playback speed in milliseconds between frames" int ascii_playback_speed 100
 declare-option -docstring "Whether to loop the sequence" bool ascii_loop true
 
 declare-option -hidden str ascii_player_state "stopped"
@@ -117,7 +117,7 @@ define-command ascii-update-frame -docstring "Update current frame in ASCII buff
                 set-option buffer readonly false
                 execute-keys '%d'
                 execute-keys '!cat $frame_file<ret>'
-                execute-keys ','
+                execute-keys ';'
                 set-option buffer readonly true
                 set-option global ascii_current_frame $frame_index
                 echo -markup \'{Information}Frame $frame_index/$frame_count displayed'
@@ -140,7 +140,9 @@ define-command ascii-play -docstring "Start ASCII sequence playback" %{
     ascii-create-buffer
     set-option global ascii_player_state "playing"
     evaluate-commands %sh{
-        echo "set-option global ascii_last_update_time $(date +%s)"
+        # Use seconds with decimal for compatibility
+        current_time=$(date +%s)
+        echo "set-option global ascii_last_update_time $current_time"
     }
     ascii-setup-timer-hooks
     ascii-update-frame
@@ -291,20 +293,17 @@ define-command ascii-timer-tick -docstring "Process one timer tick" %{
         if [ "$kak_opt_ascii_player_state" = "playing" ]; then
             current_time=$(date +%s)
             last_update=$kak_opt_ascii_last_update_time
-            speed_s=$((kak_opt_ascii_playback_speed / 1000))
-
-            if [ "$speed_s" -lt 1 ]; then
-                speed_s=1
-            fi
+            speed_s_decimal=$(awk "BEGIN {printf \"%.3f\", $kak_opt_ascii_playback_speed/1000}")
 
             elapsed=$((current_time - last_update))
 
-            if [ "$elapsed" -ge "$speed_s" ]; then
-                echo "echo -debug \"Timer tick: ${elapsed}s elapsed, updating frame\""
+            # For sub-second speeds, always update (timer controls the rate)
+            if [ "$kak_opt_ascii_playback_speed" -lt 1000 ] || [ "$elapsed" -ge 1 ]; then
+                echo "echo -debug \"Timer tick: ${elapsed}s elapsed, updating frame (speed: ${speed_s_decimal}s)\""
                 echo "ascii-update-frame"
                 echo "set-option global ascii_last_update_time $current_time"
             else
-                echo "echo -debug \"Timer tick: Only ${elapsed}s elapsed, not updating (need ${speed_s}s)\""
+                echo "echo -debug \"Timer tick: Only ${elapsed}s elapsed, not updating (need 1s minimum)\""
             fi
         else
             echo "echo -debug 'Timer tick: Player not playing (state: $kak_opt_ascii_player_state), ignoring tick'"
