@@ -41,6 +41,22 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGai
 })
 vim.cmd("set completeopt+=noselect")
 
+local zen_mode = false
+local function toggle_zen_mode()
+	zen_mode = not zen_mode
+	if zen_mode then
+		vim.o.number = false
+		vim.o.relativenumber = false
+		vim.o.signcolumn = "no"
+		vim.cmd("set columns=120")
+	else
+		vim.o.number = true
+		vim.o.relativenumber = true
+		vim.o.signcolumn = "yes:3"
+		vim.cmd("set columns&")
+	end
+end
+
 require "mini.pick".setup()
 require "nvim-treesitter.configs".setup({
 	ensure_installed = { "svelte", "typescript", "javascript" },
@@ -50,7 +66,7 @@ require "oil".setup()
 require 'mini.comment'.setup()
 require 'gitsigns'.setup()
 require 'blame'.setup()
-require('gitlinker').setup()
+pcall(function() require('gitlinker').setup() end)
 
 require("which-key").setup()
 require("which-key").add({
@@ -80,6 +96,10 @@ require("which-key").add({
 	{ "<leader>tj",  ":silent !tsm popup lazyjj<CR>",                                                         desc = "Lazyjj" },
 	{ "<leader>tr",  ":silent !tsm popup serpl<CR>",                                                          desc = "Serpl" },
 	{ "<leader>tb",  ":silent !winmux sp fish<CR>",                                                           desc = "Bottom terminal" },
+
+	{ "<leader>u",   group = "UI" },
+	{ "<leader>uw",  function() vim.o.wrap = not vim.o.wrap end,                                              desc = "Toggle wrap" },
+	{ "<leader>uz",  toggle_zen_mode,                                                                         desc = "Toggle zen mode" },
 
 	{ "<leader>g",   group = "Git" },
 	{ "<leader>gb",  group = "Git Blame" },
