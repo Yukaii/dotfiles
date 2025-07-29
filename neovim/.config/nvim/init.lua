@@ -1,6 +1,6 @@
 vim.o.number = true
 vim.o.relativenumber = true
-vim.o.signcolumn = "yes:3"
+-- vim.o.signcolumn = "yes:3"
 vim.o.termguicolors = true
 vim.o.wrap = false
 vim.o.tabstop = 4
@@ -13,7 +13,6 @@ vim.o.autoread = true
 vim.pack.add({
 	{ src = "https://github.com/rebelot/kanagawa.nvim" },
 	{ src = "https://github.com/stevearc/oil.nvim" },
-	{ src = "https://github.com/echasnovski/mini.pick" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/echasnovski/mini.nvim" },
@@ -63,10 +62,18 @@ require "nvim-treesitter.configs".setup({
 	highlight = { enable = true }
 })
 require "oil".setup()
-require 'mini.comment'.setup()
 require 'gitsigns'.setup()
 require 'blame'.setup()
 pcall(function() require('gitlinker').setup() end)
+require 'mini.comment'.setup()
+require('mini.starter').setup()
+require('mini.cursorword').setup()
+require('mini.statusline').setup()
+require('mini.tabline').setup()
+require('mini.icons').setup()
+require('mini.notify').setup()
+require('mini.git').setup()
+require('mini.diff').setup()
 
 require("which-key").setup()
 require("which-key").add({
