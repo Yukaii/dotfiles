@@ -74,6 +74,13 @@ require("which-key").add({
 	{ "<leader>l", group = "LSP" },
 	{ "<leader>lf", vim.lsp.buf.format, desc = "Format" },
 
+	{ "<leader>t", group = "Terminal" },
+	{ "<leader>tl", ":silent !tsm popup lazygit<CR>", desc = "Lazygit" },
+	{ "<leader>tf", ":silent !tsm popup<CR>", desc = "Terminal popup" },
+	{ "<leader>tj", ":silent !tsm popup lazyjj<CR>", desc = "Lazyjj" },
+	{ "<leader>tr", ":silent !tsm popup serpl<CR>", desc = "Serpl" },
+	{ "<leader>tb", ":silent !winmux sp fish<CR>", desc = "Bottom terminal" },
+
 	{ "<leader>g", group = "Git" },
 	{ "<leader>gb", group = "Git Blame" },
 	{ "<leader>gbl", function() require('gitsigns').blame_line() end, desc = "Blame line" },
