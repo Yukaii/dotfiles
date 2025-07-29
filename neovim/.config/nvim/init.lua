@@ -18,6 +18,7 @@ vim.pack.add({
 	{ src = "https://github.com/chomosuke/typst-preview.nvim" },
 	{ src = "https://github.com/echasnovski/mini.nvim" },
 	{ src = "https://github.com/folke/which-key.nvim" },
+	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -37,6 +38,7 @@ require "nvim-treesitter.configs".setup({
 })
 require "oil".setup()
 require 'mini.comment'.setup()
+require 'gitsigns'.setup()
 
 
 require("which-key").setup()
@@ -60,6 +62,15 @@ require("which-key").add({
 
 	{ "<leader>l", group = "LSP" },
 	{ "<leader>lf", vim.lsp.buf.format, desc = "Format" },
+
+	{ "<leader>g", group = "Git" },
+	{ "<leader>gb", function() require('gitsigns').blame_line() end, desc = "Blame line" },
+	{ "<leader>gp", function() require('gitsigns').preview_hunk() end, desc = "Preview hunk" },
+	{ "<leader>gs", function() require('gitsigns').stage_hunk() end, desc = "Stage hunk" },
+	{ "<leader>gu", function() require('gitsigns').undo_stage_hunk() end, desc = "Undo stage hunk" },
+	{ "<leader>gr", function() require('gitsigns').reset_hunk() end, desc = "Reset hunk" },
+	{ "]c", function() require('gitsigns').next_hunk() end, desc = "Next hunk" },
+	{ "[c", function() require('gitsigns').prev_hunk() end, desc = "Previous hunk" },
 })
 
 vim.lsp.enable({ "lua_ls", "biome", "tinymist", "emmetls" })
