@@ -17,6 +17,7 @@ vim.pack.add({
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/chomosuke/typst-preview.nvim" },
 	{ src = "https://github.com/echasnovski/mini.nvim" },
+	{ src = "https://github.com/folke/which-key.nvim" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -35,24 +36,31 @@ require "nvim-treesitter.configs".setup({
 	highlight = { enable = true }
 })
 require "oil".setup()
-require('Comment').setup()
 require 'mini.comment'.setup()
 
-vim.keymap.set('n', '<leader>o', ':update<CR> :source<CR>')
-vim.keymap.set('n', '<leader>w', ':write<CR>')
-vim.keymap.set('n', '<leader>q', ':quit<CR>')
-vim.keymap.set('n', '<leader>c', ':bd<CR>')
 
-vim.keymap.set({ 'n', 'v', 'x' }, '<leader>y', '"+y<CR>')
-vim.keymap.set({ 'n', 'v', 'x' }, '<leader>d', '"+d<CR>')
+require("which-key").setup()
 
-vim.keymap.set('n', '<leader>ff', ":Pick files<CR>")
-vim.keymap.set('n', '<leader>fw', ":Pick grep_live<CR>")
-vim.keymap.set('n', '<leader>fb', ":Pick buffers<CR>")
-vim.keymap.set('n', '<leader>fh', ":Pick help<CR>")
-vim.keymap.set('n', '<leader>fe', ":Oil<CR>")
+require("which-key").add({
+	{ "<leader>o", ":update<CR> :source<CR>", desc = "Update and source" },
+	{ "<leader>w", ":write<CR>", desc = "Write file" },
+	{ "<leader>q", ":quit<CR>", desc = "Quit" },
+	{ "<leader>c", ":bd<CR>", desc = "Close buffer" },
+	{ "<leader>S", ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>", desc = "Trim trailing whitespace" },
 
-vim.keymap.set('n', '<leader>lf', vim.lsp.buf.format)
+	{ "<leader>y", '"+y', desc = "Yank to clipboard", mode = { "n", "v", "x" } },
+	{ "<leader>d", '"+d', desc = "Delete to clipboard", mode = { "n", "v", "x" } },
+
+	{ "<leader>f", group = "Find" },
+	{ "<leader>ff", ":Pick files<CR>", desc = "Find files" },
+	{ "<leader>fw", ":Pick grep_live<CR>", desc = "Find word" },
+	{ "<leader>fb", ":Pick buffers<CR>", desc = "Find buffers" },
+	{ "<leader>fh", ":Pick help<CR>", desc = "Find help" },
+	{ "<leader>fe", ":Oil<CR>", desc = "File explorer" },
+
+	{ "<leader>l", group = "LSP" },
+	{ "<leader>lf", vim.lsp.buf.format, desc = "Format" },
+})
 
 vim.lsp.enable({ "lua_ls", "biome", "tinymist", "emmetls" })
 
