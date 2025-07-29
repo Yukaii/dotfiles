@@ -8,6 +8,7 @@ vim.o.swapfile = false
 vim.g.mapleader = " "
 vim.o.winborder = "rounded"
 vim.o.clipboard = "unnamedplus"
+vim.o.autoread = true
 
 vim.pack.add({
 	{ src = "https://github.com/rebelot/kanagawa.nvim" },
@@ -26,6 +27,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
 		local client = vim.lsp.get_client_by_id(ev.data.client_id)
 		if client:supports_method('textDocument/completion') then
 			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" }, {
+	callback = function()
+		if vim.fn.mode() ~= 'c' then
+			vim.cmd('checktime')
 		end
 	end,
 })
