@@ -15,10 +15,10 @@ vim.pack.add({
 	{ src = "https://github.com/echasnovski/mini.pick" },
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
-	{ src = "https://github.com/chomosuke/typst-preview.nvim" },
 	{ src = "https://github.com/echasnovski/mini.nvim" },
 	{ src = "https://github.com/folke/which-key.nvim" },
 	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
+	{ src = "https://github.com/FabijanZulj/blame.nvim" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -39,6 +39,7 @@ require "nvim-treesitter.configs".setup({
 require "oil".setup()
 require 'mini.comment'.setup()
 require 'gitsigns'.setup()
+require 'blame'.setup()
 
 
 require("which-key").setup()
@@ -49,6 +50,7 @@ require("which-key").add({
 	{ "<leader>q", ":quit<CR>", desc = "Quit" },
 	{ "<leader>c", ":bd<CR>", desc = "Close buffer" },
 	{ "<leader>S", ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>", desc = "Trim trailing whitespace" },
+	{ "<leader>,", ":e ~/.config/nvim/init.lua<CR>", desc = "Open config" },
 
 	{ "<leader>y", '"+y', desc = "Yank to clipboard", mode = { "n", "v", "x" } },
 	{ "<leader>d", '"+d', desc = "Delete to clipboard", mode = { "n", "v", "x" } },
@@ -64,7 +66,9 @@ require("which-key").add({
 	{ "<leader>lf", vim.lsp.buf.format, desc = "Format" },
 
 	{ "<leader>g", group = "Git" },
-	{ "<leader>gb", function() require('gitsigns').blame_line() end, desc = "Blame line" },
+	{ "<leader>gb", group = "Git Blame" },
+	{ "<leader>gbl", function() require('gitsigns').blame_line() end, desc = "Blame line" },
+	{ "<leader>gba", function() vim.cmd("BlameToggle") end, desc = "Toggle blame view" },
 	{ "<leader>gp", function() require('gitsigns').preview_hunk() end, desc = "Preview hunk" },
 	{ "<leader>gs", function() require('gitsigns').stage_hunk() end, desc = "Stage hunk" },
 	{ "<leader>gu", function() require('gitsigns').undo_stage_hunk() end, desc = "Undo stage hunk" },
@@ -73,7 +77,7 @@ require("which-key").add({
 	{ "[c", function() require('gitsigns').prev_hunk() end, desc = "Previous hunk" },
 })
 
-vim.lsp.enable({ "lua_ls", "biome", "tinymist", "emmetls" })
+vim.lsp.enable({ "lua_ls", "biome", "emmetls" })
 
 require "kanagawa".setup({ transparent = true })
 vim.cmd("colorscheme kanagawa")
