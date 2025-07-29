@@ -76,69 +76,97 @@ require('mini.icons').setup()
 require('mini.notify').setup()
 require('mini.git').setup()
 require('mini.diff').setup()
+require('mini.extra').setup()
 
 require("which-key").setup()
 require("which-key").add({
-	{ "<leader>C",   ":update<CR> :source<CR>",                                                               desc = "Update and source" },
-	{ "<leader>w",   ":write<CR>",                                                                            desc = "Write file" },
-	{ "<leader>q",   ":bd<CR>",                                                                               desc = "Quit" },
-	{ "<leader>c",   ":bd<CR>",                                                                               desc = "Close buffer" },
-	{ "<leader>S",   ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>",                                 desc = "Trim trailing whitespace" },
-	{ "<leader>,",   ":e ~/.config/nvim/init.lua<CR>",                                                        desc = "Open config" },
+	{ "<leader>C",       ":update<CR> :source<CR>",                                                               desc = "Update and source" },
+	{ "<leader>w",       ":write<CR>",                                                                            desc = "Write file" },
+	{ "<leader>q",       ":q<R>",                                                                                 desc = "Quit" },
+	{ "<leader>c",       ":bd<CR>",                                                                               desc = "Close buffer" },
+	{ "<leader>S",       ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>",                                 desc = "Trim trailing whitespace" },
+	{ "<leader>,",       ":e ~/.config/nvim/init.lua<CR>",                                                        desc = "Open config" },
+	{ "<leader><space>", ":Pick oldfiles<CR>",                                                                    desc = "Recent files" },
 
-	{ "<leader>/",   function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",          mode = "n" },
-	{ "<leader>/",   function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",          mode = { "v", "x" } },
+	{ "<leader>/",       function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",          mode = "n" },
+	{ "<leader>/",       function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",          mode = { "v", "x" } },
 
-	{ "<leader>f",   group = "Find" },
-	{ "<leader>ff",  ":Pick files<CR>",                                                                       desc = "Find files" },
-	{ "<leader>fw",  ":Pick grep_live<CR>",                                                                   desc = "Find word" },
-	{ "<leader>fb",  ":Pick buffers<CR>",                                                                     desc = "Find buffers" },
-	{ "<leader>fh",  ":Pick help<CR>",                                                                        desc = "Find help" },
-	{ "<leader>fe",  ":Oil<CR>",                                                                              desc = "File explorer" },
+	{ "<leader>f",       group = "Find" },
+	{
+		"<leader>ff",
+		function()
+			local show_with_icons = function(buf_id, items, query)
+				return require('mini.pick').default_show(buf_id, items, query, { show_icons = true })
+			end
+			local postprocess = function(lines)
+				return vim.tbl_map(function(l) return l:gsub('^%./', '') end, lines)
+			end
+			return require('mini.pick').builtin.cli(
+				{ command = { 'rg', '--files', '--hidden', '--no-ignore' }, postprocess = postprocess },
+				{ source = { show = show_with_icons } }
+			)
+		end,
+		desc = "Find all files (including hidden)"
+	},
+	{ "<leader>fg",  ":Pick files tool='git'<CR>",                                                     desc = "Find git tracked files" },
+	{ "<leader>fw",  ":Pick grep_live<CR>",                                                            desc = "Find word" },
+	{ "<leader>fb",  ":Pick buffers<CR>",                                                              desc = "Find buffers" },
+	{ "<leader>fh",  ":Pick help<CR>",                                                                 desc = "Find help" },
+	{ "<leader>fe",  function() require('mini.extra').pickers.explorer() end,                          desc = "File explorer" },
+	{ "<leader>f-",  ":Oil<CR>",                                                                       desc = "Oil file manager" },
 
 	{ "<leader>l",   group = "LSP" },
-	{ "<leader>lf",  vim.lsp.buf.format,                                                                      desc = "Format" },
+	{ "<leader>lf",  vim.lsp.buf.format,                                                               desc = "Format" },
+	{ "<leader>ld",  function() require('mini.extra').pickers.diagnostic() end,                        desc = "Diagnostics" },
+	{ "<leader>ls",  group = "LSP Symbols" },
+	{ "<leader>lsc", function() require('mini.extra').pickers.lsp({ scope = 'declaration' }) end,      desc = "Declaration" },
+	{ "<leader>lsd", function() require('mini.extra').pickers.lsp({ scope = 'definition' }) end,       desc = "Definition" },
+	{ "<leader>lsD", function() require('mini.extra').pickers.lsp({ scope = 'document_symbol' }) end,  desc = "Document symbol" },
+	{ "<leader>lsi", function() require('mini.extra').pickers.lsp({ scope = 'implementation' }) end,   desc = "Implementation" },
+	{ "<leader>lsr", function() require('mini.extra').pickers.lsp({ scope = 'references' }) end,       desc = "References" },
+	{ "<leader>lst", function() require('mini.extra').pickers.lsp({ scope = 'type_definition' }) end,  desc = "Type definition" },
+	{ "<leader>lsw", function() require('mini.extra').pickers.lsp({ scope = 'workspace_symbol' }) end, desc = "Workspace symbol" },
 
 	{ "<leader>t",   group = "Terminal" },
-	{ "<leader>tl",  ":silent !tsm popup lazygit<CR>",                                                        desc = "Lazygit" },
-	{ "<leader>tf",  ":silent !tsm popup<CR>",                                                                desc = "Terminal popup" },
-	{ "<leader>tj",  ":silent !tsm popup lazyjj<CR>",                                                         desc = "Lazyjj" },
-	{ "<leader>tr",  ":silent !tsm popup serpl<CR>",                                                          desc = "Serpl" },
-	{ "<leader>tb",  ":silent !winmux sp fish<CR>",                                                           desc = "Bottom terminal" },
+	{ "<leader>tl",  ":silent !tsm popup lazygit<CR>",                                                 desc = "Lazygit" },
+	{ "<leader>tf",  ":silent !tsm popup<CR>",                                                         desc = "Terminal popup" },
+	{ "<leader>tj",  ":silent !tsm popup lazyjj<CR>",                                                  desc = "Lazyjj" },
+	{ "<leader>tr",  ":silent !tsm popup serpl<CR>",                                                   desc = "Serpl" },
+	{ "<leader>tb",  ":silent !winmux sp fish<CR>",                                                    desc = "Bottom terminal" },
 
 	{ "<leader>u",   group = "UI" },
-	{ "<leader>uw",  function() vim.o.wrap = not vim.o.wrap end,                                              desc = "Toggle wrap" },
-	{ "<leader>uz",  toggle_zen_mode,                                                                         desc = "Toggle zen mode" },
+	{ "<leader>uw",  function() vim.o.wrap = not vim.o.wrap end,                                       desc = "Toggle wrap" },
+	{ "<leader>uz",  toggle_zen_mode,                                                                  desc = "Toggle zen mode" },
 
 	{ "<leader>g",   group = "Git" },
 	{ "<leader>gb",  group = "Git Blame" },
-	{ "<leader>gbl", function() require('gitsigns').blame_line() end,                                         desc = "Blame line" },
-	{ "<leader>gba", function() vim.cmd("BlameToggle") end,                                                   desc = "Toggle blame view" },
-	{ "<leader>gp",  function() require('gitsigns').preview_hunk() end,                                       desc = "Preview hunk" },
-	{ "<leader>gs",  function() require('gitsigns').stage_hunk() end,                                         desc = "Stage hunk" },
-	{ "<leader>gu",  function() require('gitsigns').undo_stage_hunk() end,                                    desc = "Undo stage hunk" },
-	{ "<leader>gr",  function() require('gitsigns').reset_hunk() end,                                         desc = "Reset hunk" },
-	{ "<leader>gy",  function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",      mode = { "n", "v", "x" } },
+	{ "<leader>gbl", function() require('gitsigns').blame_line() end,                                  desc = "Blame line" },
+	{ "<leader>gba", function() vim.cmd("BlameToggle") end,                                            desc = "Toggle blame view" },
+	{ "<leader>gp",  function() require('gitsigns').preview_hunk() end,                                desc = "Preview hunk" },
+	{ "<leader>gs",  function() require('gitsigns').stage_hunk() end,                                  desc = "Stage hunk" },
+	{ "<leader>gu",  function() require('gitsigns').undo_stage_hunk() end,                             desc = "Undo stage hunk" },
+	{ "<leader>gr",  function() require('gitsigns').reset_hunk() end,                                  desc = "Reset hunk" },
+	{ "<leader>gy",  function() vim.cmd("GitLink") end,                                                desc = "Copy Git Permalink",    mode = { "n", "v", "x" } },
 
 	{ "<leader>o",   group = "Harpoon" },
-	{ "<leader>oa",  function() require("harpoon.mark").add_file() end,                                       desc = "Add file" },
-	{ "<leader>ol",  function() require("harpoon.ui").toggle_quick_menu() end,                                desc = "List files" },
-	{ "<leader>on",  function() require("harpoon.ui").nav_next() end,                                         desc = "Next file" },
-	{ "<leader>op",  function() require("harpoon.ui").nav_prev() end,                                         desc = "Previous file" },
-	{ "<leader>o1",  function() require("harpoon.ui").nav_file(1) end,                                        desc = "File 1" },
-	{ "<leader>o2",  function() require("harpoon.ui").nav_file(2) end,                                        desc = "File 2" },
-	{ "<leader>o3",  function() require("harpoon.ui").nav_file(3) end,                                        desc = "File 3" },
-	{ "<leader>o4",  function() require("harpoon.ui").nav_file(4) end,                                        desc = "File 4" },
-	{ "<leader>o5",  function() require("harpoon.ui").nav_file(5) end,                                        desc = "File 5" },
-	{ "<leader>o6",  function() require("harpoon.ui").nav_file(6) end,                                        desc = "File 6" },
-	{ "<leader>o7",  function() require("harpoon.ui").nav_file(7) end,                                        desc = "File 7" },
-	{ "<leader>o8",  function() require("harpoon.ui").nav_file(8) end,                                        desc = "File 8" },
-	{ "<leader>o9",  function() require("harpoon.ui").nav_file(9) end,                                        desc = "File 9" },
-	{ "<leader>o0",  function() require("harpoon.ui").nav_file(10) end,                                       desc = "File 10" },
-	{ "]c",          function() require('gitsigns').next_hunk() end,                                          desc = "Next hunk" },
-	{ "[c",          function() require('gitsigns').prev_hunk() end,                                          desc = "Previous hunk" },
-	{ "]t",          ":tabnext<CR>",                                                                          desc = "Next tab" },
-	{ "[t",          ":tabprevious<CR>",                                                                      desc = "Previous tab" },
+	{ "<leader>oa",  function() require("harpoon.mark").add_file() end,                                desc = "Add file" },
+	{ "<leader>ol",  function() require("harpoon.ui").toggle_quick_menu() end,                         desc = "List files" },
+	{ "<leader>on",  function() require("harpoon.ui").nav_next() end,                                  desc = "Next file" },
+	{ "<leader>op",  function() require("harpoon.ui").nav_prev() end,                                  desc = "Previous file" },
+	{ "<leader>o1",  function() require("harpoon.ui").nav_file(1) end,                                 desc = "File 1" },
+	{ "<leader>o2",  function() require("harpoon.ui").nav_file(2) end,                                 desc = "File 2" },
+	{ "<leader>o3",  function() require("harpoon.ui").nav_file(3) end,                                 desc = "File 3" },
+	{ "<leader>o4",  function() require("harpoon.ui").nav_file(4) end,                                 desc = "File 4" },
+	{ "<leader>o5",  function() require("harpoon.ui").nav_file(5) end,                                 desc = "File 5" },
+	{ "<leader>o6",  function() require("harpoon.ui").nav_file(6) end,                                 desc = "File 6" },
+	{ "<leader>o7",  function() require("harpoon.ui").nav_file(7) end,                                 desc = "File 7" },
+	{ "<leader>o8",  function() require("harpoon.ui").nav_file(8) end,                                 desc = "File 8" },
+	{ "<leader>o9",  function() require("harpoon.ui").nav_file(9) end,                                 desc = "File 9" },
+	{ "<leader>o0",  function() require("harpoon.ui").nav_file(10) end,                                desc = "File 10" },
+	{ "]c",          function() require('gitsigns').next_hunk() end,                                   desc = "Next hunk" },
+	{ "[c",          function() require('gitsigns').prev_hunk() end,                                   desc = "Previous hunk" },
+	{ "]t",          ":tabnext<CR>",                                                                   desc = "Next tab" },
+	{ "[t",          ":tabprevious<CR>",                                                               desc = "Previous tab" },
 })
 
 vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint" })
