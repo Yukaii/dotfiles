@@ -20,6 +20,8 @@ vim.pack.add({
 	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
 	{ src = "https://github.com/FabijanZulj/blame.nvim" },
 	{ src = "https://github.com/linrongbin16/gitlinker.nvim" },
+	{ src = "https://github.com/nvim-lua/plenary.nvim" },
+	{ src = "https://github.com/ThePrimeagen/harpoon" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -77,7 +79,7 @@ require('mini.diff').setup()
 
 require("which-key").setup()
 require("which-key").add({
-	{ "<leader>o",   ":update<CR> :source<CR>",                                                               desc = "Update and source" },
+	{ "<leader>C",   ":update<CR> :source<CR>",                                                               desc = "Update and source" },
 	{ "<leader>w",   ":write<CR>",                                                                            desc = "Write file" },
 	{ "<leader>q",   ":bd<CR>",                                                                               desc = "Quit" },
 	{ "<leader>c",   ":bd<CR>",                                                                               desc = "Close buffer" },
@@ -117,6 +119,22 @@ require("which-key").add({
 	{ "<leader>gu",  function() require('gitsigns').undo_stage_hunk() end,                                    desc = "Undo stage hunk" },
 	{ "<leader>gr",  function() require('gitsigns').reset_hunk() end,                                         desc = "Reset hunk" },
 	{ "<leader>gy",  function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",      mode = { "n", "v", "x" } },
+
+	{ "<leader>o",   group = "Harpoon" },
+	{ "<leader>oa",  function() require("harpoon.mark").add_file() end,                                       desc = "Add file" },
+	{ "<leader>ol",  function() require("harpoon.ui").toggle_quick_menu() end,                                desc = "List files" },
+	{ "<leader>on",  function() require("harpoon.ui").nav_next() end,                                         desc = "Next file" },
+	{ "<leader>op",  function() require("harpoon.ui").nav_prev() end,                                         desc = "Previous file" },
+	{ "<leader>o1",  function() require("harpoon.ui").nav_file(1) end,                                        desc = "File 1" },
+	{ "<leader>o2",  function() require("harpoon.ui").nav_file(2) end,                                        desc = "File 2" },
+	{ "<leader>o3",  function() require("harpoon.ui").nav_file(3) end,                                        desc = "File 3" },
+	{ "<leader>o4",  function() require("harpoon.ui").nav_file(4) end,                                        desc = "File 4" },
+	{ "<leader>o5",  function() require("harpoon.ui").nav_file(5) end,                                        desc = "File 5" },
+	{ "<leader>o6",  function() require("harpoon.ui").nav_file(6) end,                                        desc = "File 6" },
+	{ "<leader>o7",  function() require("harpoon.ui").nav_file(7) end,                                        desc = "File 7" },
+	{ "<leader>o8",  function() require("harpoon.ui").nav_file(8) end,                                        desc = "File 8" },
+	{ "<leader>o9",  function() require("harpoon.ui").nav_file(9) end,                                        desc = "File 9" },
+	{ "<leader>o0",  function() require("harpoon.ui").nav_file(10) end,                                       desc = "File 10" },
 	{ "]c",          function() require('gitsigns').next_hunk() end,                                          desc = "Next hunk" },
 	{ "[c",          function() require('gitsigns').prev_hunk() end,                                          desc = "Previous hunk" },
 	{ "]t",          ":tabnext<CR>",                                                                          desc = "Next tab" },
