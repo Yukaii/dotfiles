@@ -1,6 +1,6 @@
 vim.o.number = true
 vim.o.relativenumber = true
-vim.o.signcolumn = "auto:3"
+vim.o.signcolumn = "yes:3"
 vim.o.termguicolors = true
 vim.o.wrap = false
 vim.o.tabstop = 4
@@ -56,13 +56,11 @@ require("which-key").setup()
 require("which-key").add({
 	{ "<leader>o", ":update<CR> :source<CR>", desc = "Update and source" },
 	{ "<leader>w", ":write<CR>", desc = "Write file" },
-	{ "<leader>q", ":quit<CR>", desc = "Quit" },
+	{ "<leader>q", ":bd<CR>", desc = "Quit" },
 	{ "<leader>c", ":bd<CR>", desc = "Close buffer" },
 	{ "<leader>S", ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>", desc = "Trim trailing whitespace" },
 	{ "<leader>,", ":e ~/.config/nvim/init.lua<CR>", desc = "Open config" },
 
-	{ "<leader>y", '"+y', desc = "Yank to clipboard", mode = { "n", "v", "x" } },
-	{ "<leader>d", '"+d', desc = "Delete to clipboard", mode = { "n", "v", "x" } },
 	{ "<leader>/", function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment", mode = "n" },
 	{ "<leader>/", function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment", mode = { "v", "x" } },
 
@@ -93,9 +91,11 @@ require("which-key").add({
 	{ "<leader>gr", function() require('gitsigns').reset_hunk() end, desc = "Reset hunk" },
 	{ "]c", function() require('gitsigns').next_hunk() end, desc = "Next hunk" },
 	{ "[c", function() require('gitsigns').prev_hunk() end, desc = "Previous hunk" },
+	{ "]t", ":tabnext<CR>", desc = "Next tab" },
+	{ "[t", ":tabprevious<CR>", desc = "Previous tab" },
 })
 
-vim.lsp.enable({ "lua_ls", "biome", "emmetls" })
+vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint" })
 
 require "kanagawa".setup({ transparent = true })
 vim.cmd("colorscheme kanagawa")
