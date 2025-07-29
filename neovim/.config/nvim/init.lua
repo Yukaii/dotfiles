@@ -1,6 +1,6 @@
 vim.o.number = true
 vim.o.relativenumber = true
-vim.o.signcolumn = "yes"
+vim.o.signcolumn = "auto:3"
 vim.o.termguicolors = true
 vim.o.wrap = false
 vim.o.tabstop = 4
@@ -63,6 +63,8 @@ require("which-key").add({
 
 	{ "<leader>y", '"+y', desc = "Yank to clipboard", mode = { "n", "v", "x" } },
 	{ "<leader>d", '"+d', desc = "Delete to clipboard", mode = { "n", "v", "x" } },
+	{ "<leader>/", function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment", mode = "n" },
+	{ "<leader>/", function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment", mode = { "v", "x" } },
 
 	{ "<leader>f", group = "Find" },
 	{ "<leader>ff", ":Pick files<CR>", desc = "Find files" },
