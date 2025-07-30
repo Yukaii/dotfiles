@@ -83,7 +83,7 @@ require("which-key").setup()
 require("which-key").add({
 	{ "<leader>C",       ":update<CR> :source<CR>",                                                               desc = "Update and source" },
 	{ "<leader>w",       ":write<CR>",                                                                            desc = "Write file" },
-	{ "<leader>q",       ":q<CR>",                                                                                 desc = "Quit" },
+	{ "<leader>q",       ":q<CR>",                                                                                desc = "Quit" },
 	{ "<leader>c",       ":bd<CR>",                                                                               desc = "Close buffer" },
 	{ "<leader>S",       ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>",                                 desc = "Trim trailing whitespace" },
 	{ "<leader>,",       ":e ~/.config/nvim/init.lua<CR>",                                                        desc = "Open config" },
