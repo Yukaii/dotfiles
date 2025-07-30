@@ -10,6 +10,8 @@ vim.g.mapleader = " "
 vim.o.winborder = "rounded"
 vim.o.clipboard = "unnamedplus"
 vim.o.autoread = true
+vim.o.ignorecase = true
+vim.o.smartcase = true
 
 vim.pack.add({
 	{ src = "https://github.com/rebelot/kanagawa.nvim" },
