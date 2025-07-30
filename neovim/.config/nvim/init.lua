@@ -63,7 +63,7 @@ end
 
 require "mini.pick".setup()
 require "nvim-treesitter.configs".setup({
-	ensure_installed = { "svelte", "typescript", "javascript" },
+	ensure_installed = { "svelte", "typescript", "javascript", "bash", "python", "rust" },
 	highlight = { enable = true }
 })
 require "oil".setup()
@@ -75,6 +75,7 @@ require('mini.starter').setup()
 require('mini.cursorword').setup()
 require('mini.statusline').setup()
 require('mini.tabline').setup()
+require('mini.hues').setup()
 require('mini.icons').setup()
 require('mini.notify').setup()
 require('mini.git').setup()
@@ -85,7 +86,11 @@ require('mini.extra').setup()
 local harpoon = require("harpoon")
 harpoon:setup()
 
-require("which-key").setup()
+require("which-key").setup({
+	preset = "helix",
+	show_help = false,
+	show_keys = false,
+})
 require("which-key").add({
 	{ "<leader>C",       ":update<CR> :source<CR>",                                                               desc = "Update and source" },
 	{ "<leader>w",       ":write<CR>",                                                                            desc = "Write file" },
