@@ -1,5 +1,6 @@
 vim.o.number = true
 vim.o.relativenumber = true
+vim.o.statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum}  "
 -- vim.o.signcolumn = "yes:3"
 vim.o.termguicolors = true
 vim.o.wrap = false
@@ -195,3 +196,8 @@ local gutter_groups = {
 for _, group in ipairs(gutter_groups) do
 	make_bg_transparent(group)
 end
+
+-- Customize mini.cursorword to use light background from theme colors
+local colors = require("kanagawa.colors").setup()
+vim.api.nvim_set_hl(0, "MiniCursorword", { bg = colors.theme.ui.bg_p1 })
+vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { bg = colors.theme.ui.bg_p2 })
