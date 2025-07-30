@@ -162,6 +162,7 @@ require("which-key").add({
 	{ "[c",              function() require('gitsigns').prev_hunk() end,                                          desc = "Previous hunk" },
 	{ "]t",              ":tabnext<CR>",                                                                          desc = "Next tab" },
 	{ "[t",              ":tabprevious<CR>",                                                                      desc = "Previous tab" },
+	{ "ga",              "<C-^>",                                                                                 desc = "Jump to alternate buffer" },
 })
 
 vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint" })
