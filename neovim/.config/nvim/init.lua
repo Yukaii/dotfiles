@@ -131,6 +131,7 @@ require("which-key").add({
 	{ "<leader>u",       group = "UI" },
 	{ "<leader>uw",      function() vim.o.wrap = not vim.o.wrap end,                                              desc = "Toggle wrap" },
 	{ "<leader>uz",      toggle_zen_mode,                                                                         desc = "Toggle zen mode" },
+	{ "<leader>uh",      ":noh<CR>",                                                                              desc = "No highlighting" },
 
 	{ "<leader>g",       group = "Git" },
 	{ "<leader>gb",      group = "Git Blame" },
