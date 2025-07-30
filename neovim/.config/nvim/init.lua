@@ -25,6 +25,7 @@ vim.pack.add({
 	{ src = "https://github.com/linrongbin16/gitlinker.nvim" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim" },
 	{ src = "https://github.com/ThePrimeagen/harpoon",           version = "harpoon2" },
+	{ src = "https://github.com/norcalli/nvim-colorizer.lua" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -75,12 +76,12 @@ require('mini.starter').setup()
 require('mini.cursorword').setup()
 require('mini.statusline').setup()
 require('mini.tabline').setup()
-require('mini.hues').setup()
 require('mini.icons').setup()
 require('mini.notify').setup()
 require('mini.git').setup()
 require('mini.diff').setup()
 require('mini.extra').setup()
+require('colorizer').setup()
 
 -- Harpoon 2 setup (required)
 local harpoon = require("harpoon")
@@ -170,7 +171,7 @@ require("which-key").add({
 	{ "ga",              "<C-^>",                                                                                 desc = "Jump to alternate buffer" },
 })
 
-vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint" })
+vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint", "tailwindcss" })
 
 require "kanagawa".setup({ transparent = true })
 vim.cmd("colorscheme kanagawa")
