@@ -117,7 +117,46 @@ require("which-key").add({
 		desc = "Find all files (including hidden)"
 	},
 	{ "<leader>fg",  ":Pick files tool='git'<CR>",                                                     desc = "Find git tracked files" },
-	{ "<leader>fw",  ":Pick grep_live<CR>",                                                            desc = "Find word" },
+	{ "<leader>fw",  function() return require('mini.pick').builtin.grep_live({ tool = 'rg' }) end,    desc = "Find word" },
+	{
+		"<leader>fW",
+		function()
+			local show_with_icons = function(buf_id, items, query)
+				return require('mini.pick').default_show(buf_id, items, query, { show_icons = true })
+			end
+
+			local process
+			local cwd = vim.fn.getcwd()
+			local set_items_opts = { do_match = false }
+			local spawn_opts = { cwd = cwd }
+
+			local match = function(_, _, query)
+				pcall(vim.loop.process_kill, process)
+				if #query == 0 then return require('mini.pick').set_picker_items({}, set_items_opts) end
+
+				local pattern = table.concat(query)
+				local command = {
+					'rg', '--column', '--line-number', '--no-heading', '--color=never',
+					'--hidden', '--no-ignore', '--', pattern
+				}
+				process = require('mini.pick').set_picker_items_from_cli(command, {
+					set_items_opts = set_items_opts,
+					spawn_opts = spawn_opts
+				})
+			end
+
+			return require('mini.pick').start({
+				source = {
+					name = 'Grep live (rg)',
+					items = {},
+					match = match,
+					show = show_with_icons,
+					cwd = cwd
+				}
+			})
+		end,
+		desc = "Find word (including hidden)"
+	},
 	{ "<leader>fb",  ":Pick buffers<CR>",                                                              desc = "Find buffers" },
 	{ "<leader>fh",  ":Pick help<CR>",                                                                 desc = "Find help" },
 	{ "<leader>fe",  function() require('mini.extra').pickers.explorer() end,                          desc = "File explorer" },
