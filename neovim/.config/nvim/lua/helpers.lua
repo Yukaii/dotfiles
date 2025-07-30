@@ -19,16 +19,16 @@ function M.grep_live_all()
 	local show_with_icons = function(buf_id, items, query)
 		return require('mini.pick').default_show(buf_id, items, query, { show_icons = true })
 	end
-	
+
 	local process
 	local cwd = vim.fn.getcwd()
 	local set_items_opts = { do_match = false }
 	local spawn_opts = { cwd = cwd }
-	
+
 	local match = function(_, _, query)
 		pcall(vim.loop.process_kill, process)
 		if #query == 0 then return require('mini.pick').set_picker_items({}, set_items_opts) end
-		
+
 		local pattern = table.concat(query)
 		local command = {
 			'rg', '--column', '--line-number', '--no-heading', '--color=never',
@@ -39,7 +39,7 @@ function M.grep_live_all()
 			spawn_opts = spawn_opts
 		})
 	end
-	
+
 	return require('mini.pick').start({
 		source = {
 			name = 'Grep live (rg)',
@@ -52,3 +52,4 @@ function M.grep_live_all()
 end
 
 return M
+
