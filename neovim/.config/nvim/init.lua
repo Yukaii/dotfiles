@@ -197,7 +197,23 @@ for _, group in ipairs(gutter_groups) do
 	make_bg_transparent(group)
 end
 
--- Customize mini.cursorword to use light background from theme colors
-local colors = require("kanagawa.colors").setup()
-vim.api.nvim_set_hl(0, "MiniCursorword", { bg = colors.theme.ui.bg_p1 })
-vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { bg = colors.theme.ui.bg_p2 })
+-- Customize mini.cursorword to use light background from current theme
+local function set_cursorword_colors()
+	-- Get colors from current theme's Visual selection or similar subtle highlight
+	local visual_hl = vim.api.nvim_get_hl(0, { name = "Visual" })
+	local search_hl = vim.api.nvim_get_hl(0, { name = "Search" })
+
+	-- Use Visual background but make it more subtle, or fallback to a dim version
+	local bg_color = visual_hl.bg or search_hl.bg
+	if bg_color then
+		-- Make the color more subtle by reducing opacity/brightness
+		vim.api.nvim_set_hl(0, "MiniCursorword", { bg = bg_color, blend = 70 })
+		vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { bg = bg_color, blend = 50 })
+	else
+		-- Fallback to using existing highlight groups
+		vim.api.nvim_set_hl(0, "MiniCursorword", { link = "CursorLine" })
+		vim.api.nvim_set_hl(0, "MiniCursorwordCurrent", { link = "CursorLine" })
+	end
+end
+
+set_cursorword_colors()
