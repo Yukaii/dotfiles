@@ -82,7 +82,7 @@ require("which-key").setup()
 require("which-key").add({
 	{ "<leader>C",       ":update<CR> :source<CR>",                                                               desc = "Update and source" },
 	{ "<leader>w",       ":write<CR>",                                                                            desc = "Write file" },
-	{ "<leader>q",       ":q<R>",                                                                                 desc = "Quit" },
+	{ "<leader>q",       ":q<CR>",                                                                                 desc = "Quit" },
 	{ "<leader>c",       ":bd<CR>",                                                                               desc = "Close buffer" },
 	{ "<leader>S",       ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>",                                 desc = "Trim trailing whitespace" },
 	{ "<leader>,",       ":e ~/.config/nvim/init.lua<CR>",                                                        desc = "Open config" },
@@ -173,3 +173,25 @@ vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint" })
 
 require "kanagawa".setup({ transparent = true })
 vim.cmd("colorscheme kanagawa")
+
+-- Make gutter background transparent while preserving foreground colors
+local function make_bg_transparent(group_name)
+	local hl = vim.api.nvim_get_hl(0, { name = group_name })
+	if hl then
+		hl.bg = nil
+		vim.api.nvim_set_hl(0, group_name, hl)
+	end
+end
+
+-- Apply transparent background to gutter-related highlight groups
+local gutter_groups = {
+	"SignColumn", "LineNr", "CursorLineNr",
+	"DiagnosticSignError", "DiagnosticSignWarn", "DiagnosticSignInfo", "DiagnosticSignHint",
+	"GitSignsAdd", "GitSignsChange", "GitSignsDelete", "GitSignsTopdelete", "GitSignsChangedelete",
+	"MiniGitSignAdd", "MiniGitSignChange", "MiniGitSignDelete",
+	"MiniDiffSignAdd", "MiniDiffSignChange", "MiniDiffSignDelete"
+}
+
+for _, group in ipairs(gutter_groups) do
+	make_bg_transparent(group)
+end
