@@ -12,6 +12,7 @@ vim.o.clipboard = "unnamedplus"
 vim.o.autoread = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
+vim.o.showmode = false
 
 vim.pack.add({
 	{ src = "https://github.com/rebelot/kanagawa.nvim" },
@@ -67,9 +68,9 @@ require "nvim-treesitter.configs".setup({
 	ensure_installed = { "svelte", "typescript", "javascript", "bash", "python", "rust" },
 	highlight = { enable = true }
 })
-require "oil".setup()
-require 'gitsigns'.setup()
-require 'blame'.setup()
+require("oil").setup()
+require("gitsigns").setup()
+require("blame").setup()
 pcall(function() require('gitlinker').setup() end)
 require 'mini.comment'.setup()
 require('mini.starter').setup()
