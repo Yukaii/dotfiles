@@ -27,6 +27,8 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-lua/plenary.nvim" },
 	{ src = "https://github.com/ThePrimeagen/harpoon",           version = "harpoon2" },
 	{ src = "https://github.com/norcalli/nvim-colorizer.lua" },
+	{ src = "https://github.com/CopilotC-Nvim/CopilotChat.nvim" },
+	{ src = "https://codeberg.org/mirge/kak.nvim" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -83,6 +85,10 @@ require('mini.git').setup()
 require('mini.diff').setup()
 require('mini.extra').setup()
 require('colorizer').setup()
+require("CopilotChat").setup()
+
+-- replace picker
+vim.ui.select = require('mini.pick').ui_select
 
 -- Harpoon 2 setup (required)
 local harpoon = require("harpoon")
@@ -94,7 +100,7 @@ require("which-key").setup({
 	show_keys = false,
 })
 require("which-key").add({
-	{ "<leader>C",       ":update<CR> :source<CR>",                                                               desc = "Update and source" },
+	{ "<leader>C",       ":update ~/.config/nvim/init.lua<CR>:source ~/.config/nvim/init.lua<CR>",                desc = "Update and source config" },
 	{ "<leader>w",       ":write<CR>",                                                                            desc = "Write file" },
 	{ "<leader>q",       ":q<CR>",                                                                                desc = "Quit" },
 	{ "<leader>c",       ":bd<CR>",                                                                               desc = "Close buffer" },
@@ -116,6 +122,7 @@ require("which-key").add({
 	{ "<leader>fe",      function() require('mini.extra').pickers.explorer({ cwd = vim.fn.expand('%:p:h') }) end, desc = "File explorer (buffer dir)" },
 	{ "<leader>fE",      function() require('mini.extra').pickers.explorer() end,                                 desc = "File explorer (current dir)" },
 	{ "<leader>f-",      ":Oil<CR>",                                                                              desc = "Oil file manager" },
+	{ "<leader>f/",      ":Pick commands<CR>",                                                                    desc = "Commands" },
 
 	{ "<leader>l",       group = "LSP" },
 	{ "<leader>lf",      vim.lsp.buf.format,                                                                      desc = "Format" },
@@ -171,8 +178,10 @@ require("which-key").add({
 	{ "[t",              ":tabprevious<CR>",                                                                      desc = "Previous tab" },
 	{ "ga",              "<C-^>",                                                                                 desc = "Jump to alternate buffer" },
 })
+require("kak").setup({
+})
 
-vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint", "tailwindcss" })
+vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint", "tailwindcss", "marksman" })
 
 require "kanagawa".setup({ transparent = true })
 vim.cmd("colorscheme kanagawa")
