@@ -49,27 +49,13 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "CursorHoldI", "FocusGai
 })
 vim.cmd("set completeopt+=noselect")
 
-local zen_mode = false
-local function toggle_zen_mode()
-	zen_mode = not zen_mode
-	if zen_mode then
-		vim.o.number = false
-		vim.o.relativenumber = false
-		vim.o.signcolumn = "no"
-		vim.cmd("set columns=120")
-	else
-		vim.o.number = true
-		vim.o.relativenumber = true
-		vim.o.signcolumn = "yes:3"
-		vim.cmd("set columns&")
-	end
-end
-
 require("snacks").setup({
 	picker = {
 		ui_select = true,
 	},
 	explorer = {},
+	zen = {},
+	statuscolumn = { enabled = true },
 })
 require "nvim-treesitter.configs".setup({
 	ensure_installed = { "svelte", "typescript", "javascript", "bash", "python", "rust" },
@@ -108,16 +94,15 @@ require("which-key").add({
 	{ "<leader>q",       ":q<CR>",                                                                                desc = "Quit" },
 	{ "<leader>c",       ":bd<CR>",                                                                               desc = "Close buffer" },
 	{ "<leader>S",       ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>",                                 desc = "Trim trailing whitespace" },
-	{ "<leader>,",       function() require('snacks').picker.buffers() end,                                       desc = "Buffers" },
-	{ "<leader>/",       function() require('snacks').picker.grep() end,                                          desc = "Grep" },
+	{ "<leader>,",       ":e ~/.config/nvim/init.lua<CR>",                                                        desc = "Open config" },
 	{ "<leader>:",       function() require('snacks').picker.command_history() end,                               desc = "Command History" },
 	{ "<leader>n",       function() require('snacks').picker.notifications() end,                                 desc = "Notification History" },
 	{ "<leader>e",       function() require('snacks').explorer() end,                                             desc = "File Explorer" },
 	{ "<leader>Pu",      function() vim.pack.update() end,                                                        desc = "Update packages" },
 	{ "<leader><space>", function() require('snacks').picker.smart() end,                                         desc = "Smart Find Files" },
 
-	{ "<leader>\\c",     function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = "n" },
-	{ "<leader>\\c",     function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = { "v", "x" } },
+	{ "<leader>/",     function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = "n" },
+	{ "<leader>/",     function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = { "v", "x" } },
 
 	{ "<leader>f",       group = "Find" },
 	{ "<leader>ff",      function() require('snacks').picker.files() end,                                         desc = "Find Files" },
@@ -127,7 +112,6 @@ require("which-key").add({
 	{ "<leader>fb",      function() require('snacks').picker.buffers() end,                                       desc = "Buffers" },
 	{ "<leader>fh",      function() require('snacks').picker.help() end,                                          desc = "Help Pages" },
 	{ "<leader>fe",      function() require('snacks').explorer() end,                                             desc = "File Explorer" },
-	{ "<leader>fE",      function() require('snacks').explorer() end,                                             desc = "File Explorer (current dir)" },
 	{ "<leader>f-",      ":Oil<CR>",                                                                              desc = "Oil file manager" },
 	{ "<leader>f/",      function() require('snacks').picker.commands() end,                                      desc = "Commands" },
 	{ "<leader>fc",      function() require('snacks').picker.files({ cwd = vim.fn.stdpath("config") }) end,       desc = "Find Config File" },
@@ -143,7 +127,6 @@ require("which-key").add({
 	{ '<leader>s/',      function() require('snacks').picker.search_history() end,                                desc = "Search History" },
 	{ "<leader>sa",      function() require('snacks').picker.autocmds() end,                                      desc = "Autocmds" },
 	{ "<leader>sc",      function() require('snacks').picker.command_history() end,                               desc = "Command History" },
-	{ "<leader>sC",      function() require('snacks').picker.commands() end,                                      desc = "Commands" },
 	{ "<leader>sd",      function() require('snacks').picker.diagnostics() end,                                   desc = "Diagnostics" },
 	{ "<leader>sD",      function() require('snacks').picker.diagnostics_buffer() end,                            desc = "Buffer Diagnostics" },
 	{ "<leader>sh",      function() require('snacks').picker.help() end,                                          desc = "Help Pages" },
@@ -181,7 +164,7 @@ require("which-key").add({
 
 	{ "<leader>u",       group = "UI" },
 	{ "<leader>uw",      function() vim.o.wrap = not vim.o.wrap end,                                              desc = "Toggle wrap" },
-	{ "<leader>uz",      toggle_zen_mode,                                                                         desc = "Toggle zen mode" },
+	{ "<leader>uz",      function() require('snacks').zen() end,                                                  desc = "Toggle zen mode" },
 	{ "<leader>uh",      ":noh<CR>",                                                                              desc = "No highlighting" },
 	{ "<leader>uC",      function() require('snacks').picker.colorschemes() end,                                  desc = "Colorschemes" },
 
