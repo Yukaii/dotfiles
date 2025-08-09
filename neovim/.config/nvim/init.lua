@@ -101,8 +101,8 @@ require("which-key").add({
 	{ "<leader>Pu",      function() vim.pack.update() end,                                                        desc = "Update packages" },
 	{ "<leader><space>", function() require('snacks').picker.smart() end,                                         desc = "Smart Find Files" },
 
-	{ "<leader>/",     function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = "n" },
-	{ "<leader>/",     function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = { "v", "x" } },
+	{ "<leader>/",       function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",          mode = "n" },
+	{ "<leader>/",       function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",          mode = { "v", "x" } },
 
 	{ "<leader>f",       group = "Find" },
 	{ "<leader>ff",      function() require('snacks').picker.files() end,                                         desc = "Find Files" },
@@ -176,7 +176,7 @@ require("which-key").add({
 	{ "<leader>gs",      function() require('gitsigns').stage_hunk() end,                                         desc = "Stage hunk" },
 	{ "<leader>gu",      function() require('gitsigns').undo_stage_hunk() end,                                    desc = "Undo stage hunk" },
 	{ "<leader>gr",      function() require('gitsigns').reset_hunk() end,                                         desc = "Reset hunk" },
-	{ "<leader>gy",      function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",         mode = { "n", "v", "x" } },
+	{ "<leader>gy",      function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",      mode = { "n", "v", "x" } },
 	{ "<leader>gB",      function() require('snacks').picker.git_branches() end,                                  desc = "Git Branches" },
 	{ "<leader>gl",      function() require('snacks').picker.git_log() end,                                       desc = "Git Log" },
 	{ "<leader>gL",      function() require('snacks').picker.git_log_line() end,                                  desc = "Git Log Line" },
