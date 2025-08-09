@@ -28,7 +28,6 @@ vim.pack.add({
 	{ src = "https://github.com/ThePrimeagen/harpoon",           version = "harpoon2" },
 	{ src = "https://github.com/norcalli/nvim-colorizer.lua" },
 	{ src = "https://github.com/CopilotC-Nvim/CopilotChat.nvim" },
-	{ src = "https://codeberg.org/mirge/kak.nvim" },
 })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -177,8 +176,6 @@ require("which-key").add({
 	{ "]t",              ":tabnext<CR>",                                                                          desc = "Next tab" },
 	{ "[t",              ":tabprevious<CR>",                                                                      desc = "Previous tab" },
 	{ "ga",              "<C-^>",                                                                                 desc = "Jump to alternate buffer" },
-})
-require("kak").setup({
 })
 
 vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint", "tailwindcss", "marksman" })
