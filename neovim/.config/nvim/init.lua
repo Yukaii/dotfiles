@@ -20,6 +20,7 @@ vim.pack.add({
 	{ src = "https://github.com/nvim-treesitter/nvim-treesitter" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/echasnovski/mini.nvim" },
+	{ src = "https://github.com/folke/snacks.nvim" },
 	{ src = "https://github.com/folke/which-key.nvim" },
 	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
 	{ src = "https://github.com/FabijanZulj/blame.nvim" },
@@ -64,7 +65,12 @@ local function toggle_zen_mode()
 	end
 end
 
-require "mini.pick".setup()
+require("snacks").setup({
+	picker = {
+		ui_select = true,
+	},
+	explorer = {},
+})
 require "nvim-treesitter.configs".setup({
 	ensure_installed = { "svelte", "typescript", "javascript", "bash", "python", "rust" },
 	highlight = { enable = true }
@@ -86,8 +92,6 @@ require('mini.extra').setup()
 require('colorizer').setup()
 require("CopilotChat").setup()
 
--- replace picker
-vim.ui.select = require('mini.pick').ui_select
 
 -- Harpoon 2 setup (required)
 local harpoon = require("harpoon")
@@ -104,35 +108,69 @@ require("which-key").add({
 	{ "<leader>q",       ":q<CR>",                                                                                desc = "Quit" },
 	{ "<leader>c",       ":bd<CR>",                                                                               desc = "Close buffer" },
 	{ "<leader>S",       ":let _s=@/<Bar>:%s/\\s\\+$//e<Bar>:let @/=_s<Bar><CR>",                                 desc = "Trim trailing whitespace" },
-	{ "<leader>,",       ":e ~/.config/nvim/init.lua<CR>",                                                        desc = "Open config" },
+	{ "<leader>,",       function() require('snacks').picker.buffers() end,                                       desc = "Buffers" },
+	{ "<leader>/",       function() require('snacks').picker.grep() end,                                          desc = "Grep" },
+	{ "<leader>:",       function() require('snacks').picker.command_history() end,                               desc = "Command History" },
+	{ "<leader>n",       function() require('snacks').picker.notifications() end,                                 desc = "Notification History" },
+	{ "<leader>e",       function() require('snacks').explorer() end,                                             desc = "File Explorer" },
 	{ "<leader>Pu",      function() vim.pack.update() end,                                                        desc = "Update packages" },
-	{ "<leader><space>", ":Pick oldfiles<CR>",                                                                    desc = "Recent files" },
+	{ "<leader><space>", function() require('snacks').picker.smart() end,                                         desc = "Smart Find Files" },
 
-	{ "<leader>/",       function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",                   mode = "n" },
-	{ "<leader>/",       function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",                   mode = { "v", "x" } },
+	{ "<leader>\\c",     function() require('mini.comment').toggle_lines(vim.fn.line('.'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = "n" },
+	{ "<leader>\\c",     function() require('mini.comment').toggle_lines(vim.fn.line('v'), vim.fn.line('.')) end, desc = "Toggle comment",             mode = { "v", "x" } },
 
 	{ "<leader>f",       group = "Find" },
-	{ "<leader>ff",      function() return require('helpers').files_all() end,                                    desc = "Find all files (including hidden)" },
-	{ "<leader>fg",      ":Pick files tool='git'<CR>",                                                            desc = "Find git tracked files" },
-	{ "<leader>fw",      function() return require('mini.pick').builtin.grep_live({ tool = 'rg' }) end,           desc = "Find word" },
-	{ "<leader>fW",      function() return require('helpers').grep_live_all() end,                                desc = "Find word (including hidden)" },
-	{ "<leader>fb",      ":Pick buffers<CR>",                                                                     desc = "Find buffers" },
-	{ "<leader>fh",      ":Pick help<CR>",                                                                        desc = "Find help" },
-	{ "<leader>fe",      function() require('mini.extra').pickers.explorer({ cwd = vim.fn.expand('%:p:h') }) end, desc = "File explorer (buffer dir)" },
-	{ "<leader>fE",      function() require('mini.extra').pickers.explorer() end,                                 desc = "File explorer (current dir)" },
+	{ "<leader>ff",      function() require('snacks').picker.files() end,                                         desc = "Find Files" },
+	{ "<leader>fg",      function() require('snacks').picker.git_files() end,                                     desc = "Find Git Files" },
+	{ "<leader>fw",      function() require('snacks').picker.grep() end,                                          desc = "Grep" },
+	{ "<leader>fW",      function() require('snacks').picker.grep_word() end,                                     desc = "Grep Word" },
+	{ "<leader>fb",      function() require('snacks').picker.buffers() end,                                       desc = "Buffers" },
+	{ "<leader>fh",      function() require('snacks').picker.help() end,                                          desc = "Help Pages" },
+	{ "<leader>fe",      function() require('snacks').explorer() end,                                             desc = "File Explorer" },
+	{ "<leader>fE",      function() require('snacks').explorer() end,                                             desc = "File Explorer (current dir)" },
 	{ "<leader>f-",      ":Oil<CR>",                                                                              desc = "Oil file manager" },
-	{ "<leader>f/",      ":Pick commands<CR>",                                                                    desc = "Commands" },
+	{ "<leader>f/",      function() require('snacks').picker.commands() end,                                      desc = "Commands" },
+	{ "<leader>fc",      function() require('snacks').picker.files({ cwd = vim.fn.stdpath("config") }) end,       desc = "Find Config File" },
+	{ "<leader>fp",      function() require('snacks').picker.projects() end,                                      desc = "Projects" },
+	{ "<leader>fr",      function() require('snacks').picker.recent() end,                                        desc = "Recent" },
+
+	{ "<leader>s",       group = "Search" },
+	{ "<leader>sb",      function() require('snacks').picker.lines() end,                                         desc = "Buffer Lines" },
+	{ "<leader>sB",      function() require('snacks').picker.grep_buffers() end,                                  desc = "Grep Open Buffers" },
+	{ "<leader>sg",      function() require('snacks').picker.grep() end,                                          desc = "Grep" },
+	{ "<leader>sw",      function() require('snacks').picker.grep_word() end,                                     desc = "Grep Word" },
+	{ '<leader>s"',      function() require('snacks').picker.registers() end,                                     desc = "Registers" },
+	{ '<leader>s/',      function() require('snacks').picker.search_history() end,                                desc = "Search History" },
+	{ "<leader>sa",      function() require('snacks').picker.autocmds() end,                                      desc = "Autocmds" },
+	{ "<leader>sc",      function() require('snacks').picker.command_history() end,                               desc = "Command History" },
+	{ "<leader>sC",      function() require('snacks').picker.commands() end,                                      desc = "Commands" },
+	{ "<leader>sd",      function() require('snacks').picker.diagnostics() end,                                   desc = "Diagnostics" },
+	{ "<leader>sD",      function() require('snacks').picker.diagnostics_buffer() end,                            desc = "Buffer Diagnostics" },
+	{ "<leader>sh",      function() require('snacks').picker.help() end,                                          desc = "Help Pages" },
+	{ "<leader>sH",      function() require('snacks').picker.highlights() end,                                    desc = "Highlights" },
+	{ "<leader>si",      function() require('snacks').picker.icons() end,                                         desc = "Icons" },
+	{ "<leader>sj",      function() require('snacks').picker.jumps() end,                                         desc = "Jumps" },
+	{ "<leader>sk",      function() require('snacks').picker.keymaps() end,                                       desc = "Keymaps" },
+	{ "<leader>sl",      function() require('snacks').picker.loclist() end,                                       desc = "Location List" },
+	{ "<leader>sm",      function() require('snacks').picker.marks() end,                                         desc = "Marks" },
+	{ "<leader>sM",      function() require('snacks').picker.man() end,                                           desc = "Man Pages" },
+	{ "<leader>sp",      function() require('snacks').picker.lazy() end,                                          desc = "Search for Plugin Spec" },
+	{ "<leader>sq",      function() require('snacks').picker.qflist() end,                                        desc = "Quickfix List" },
+	{ "<leader>sR",      function() require('snacks').picker.resume() end,                                        desc = "Resume" },
+	{ "<leader>su",      function() require('snacks').picker.undo() end,                                          desc = "Undo History" },
+	{ "<leader>ss",      function() require('snacks').picker.lsp_symbols() end,                                   desc = "LSP Symbols" },
+	{ "<leader>sS",      function() require('snacks').picker.lsp_workspace_symbols() end,                         desc = "LSP Workspace Symbols" },
 
 	{ "<leader>l",       group = "LSP" },
 	{ "<leader>lf",      vim.lsp.buf.format,                                                                      desc = "Format" },
-	{ "<leader>ld",      function() require('mini.extra').pickers.diagnostic() end,                               desc = "Diagnostics" },
-	{ "<leader>lc",      function() require('mini.extra').pickers.lsp({ scope = 'declaration' }) end,             desc = "Declaration" },
-	{ "<leader>lg",      function() require('mini.extra').pickers.lsp({ scope = 'definition' }) end,              desc = "Go to definition" },
-	{ "<leader>ls",      function() require('mini.extra').pickers.lsp({ scope = 'document_symbol' }) end,         desc = "Document symbols" },
-	{ "<leader>li",      function() require('mini.extra').pickers.lsp({ scope = 'implementation' }) end,          desc = "Implementation" },
-	{ "<leader>lr",      function() require('mini.extra').pickers.lsp({ scope = 'references' }) end,              desc = "References" },
-	{ "<leader>lt",      function() require('mini.extra').pickers.lsp({ scope = 'type_definition' }) end,         desc = "Type definition" },
-	{ "<leader>lw",      function() require('mini.extra').pickers.lsp({ scope = 'workspace_symbol' }) end,        desc = "Workspace symbols" },
+	{ "<leader>ld",      function() require('snacks').picker.diagnostics() end,                                   desc = "Diagnostics" },
+	{ "<leader>lc",      function() require('snacks').picker.lsp_declarations() end,                              desc = "Declaration" },
+	{ "<leader>lg",      function() require('snacks').picker.lsp_definitions() end,                               desc = "Go to definition" },
+	{ "<leader>ls",      function() require('snacks').picker.lsp_symbols() end,                                   desc = "Document symbols" },
+	{ "<leader>li",      function() require('snacks').picker.lsp_implementations() end,                           desc = "Implementation" },
+	{ "<leader>lr",      function() require('snacks').picker.lsp_references() end,                                desc = "References" },
+	{ "<leader>lt",      function() require('snacks').picker.lsp_type_definitions() end,                          desc = "Type definition" },
+	{ "<leader>lw",      function() require('snacks').picker.lsp_workspace_symbols() end,                         desc = "Workspace symbols" },
 
 	{ "<leader>t",       group = "Terminal" },
 	{ "<leader>tl",      ":silent !tsm popup lazygit<CR>",                                                        desc = "Lazygit" },
@@ -145,6 +183,7 @@ require("which-key").add({
 	{ "<leader>uw",      function() vim.o.wrap = not vim.o.wrap end,                                              desc = "Toggle wrap" },
 	{ "<leader>uz",      toggle_zen_mode,                                                                         desc = "Toggle zen mode" },
 	{ "<leader>uh",      ":noh<CR>",                                                                              desc = "No highlighting" },
+	{ "<leader>uC",      function() require('snacks').picker.colorschemes() end,                                  desc = "Colorschemes" },
 
 	{ "<leader>g",       group = "Git" },
 	{ "<leader>gb",      group = "Git Blame" },
@@ -154,7 +193,13 @@ require("which-key").add({
 	{ "<leader>gs",      function() require('gitsigns').stage_hunk() end,                                         desc = "Stage hunk" },
 	{ "<leader>gu",      function() require('gitsigns').undo_stage_hunk() end,                                    desc = "Undo stage hunk" },
 	{ "<leader>gr",      function() require('gitsigns').reset_hunk() end,                                         desc = "Reset hunk" },
-	{ "<leader>gy",      function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",               mode = { "n", "v", "x" } },
+	{ "<leader>gy",      function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",         mode = { "n", "v", "x" } },
+	{ "<leader>gB",      function() require('snacks').picker.git_branches() end,                                  desc = "Git Branches" },
+	{ "<leader>gl",      function() require('snacks').picker.git_log() end,                                       desc = "Git Log" },
+	{ "<leader>gL",      function() require('snacks').picker.git_log_line() end,                                  desc = "Git Log Line" },
+	{ "<leader>gS",      function() require('snacks').picker.git_status() end,                                    desc = "Git Status" },
+	{ "<leader>gd",      function() require('snacks').picker.git_diff() end,                                      desc = "Git Diff (Hunks)" },
+	{ "<leader>gf",      function() require('snacks').picker.git_log_file() end,                                  desc = "Git Log File" },
 
 	{ "<leader>o",       group = "Harpoon" },
 	{ "<leader>oa",      function() harpoon:list():add() end,                                                     desc = "Add file" },
@@ -176,6 +221,11 @@ require("which-key").add({
 	{ "]t",              ":tabnext<CR>",                                                                          desc = "Next tab" },
 	{ "[t",              ":tabprevious<CR>",                                                                      desc = "Previous tab" },
 	{ "ga",              "<C-^>",                                                                                 desc = "Jump to alternate buffer" },
+	{ "gd",              function() require('snacks').picker.lsp_definitions() end,                               desc = "Goto Definition" },
+	{ "gD",              function() require('snacks').picker.lsp_declarations() end,                              desc = "Goto Declaration" },
+	{ "gr",              function() require('snacks').picker.lsp_references() end,                                desc = "References" },
+	{ "gI",              function() require('snacks').picker.lsp_implementations() end,                           desc = "Goto Implementation" },
+	{ "gt",              function() require('snacks').picker.lsp_type_definitions() end,                          desc = "Goto T[y]pe Definition" },
 })
 
 vim.lsp.enable({ "lua_ls", "biome", "emmetls", "ts_ls", "eslint", "tailwindcss", "marksman" })
