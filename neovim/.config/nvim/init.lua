@@ -1,7 +1,5 @@
 vim.o.number = true
 vim.o.relativenumber = true
-vim.o.statuscolumn = "%s%=%{v:relnum?v:relnum:v:lnum}  "
--- vim.o.signcolumn = "yes:3"
 vim.o.termguicolors = true
 vim.o.wrap = false
 vim.o.tabstop = 4
@@ -56,6 +54,10 @@ require("snacks").setup({
 	explorer = {},
 	zen = {},
 	statuscolumn = { enabled = true },
+	input = { enabled = true },
+	indent = { enabled = true },
+	bigfile = { enabled = true },
+	image = { enabled = true },
 })
 require "nvim-treesitter.configs".setup({
 	ensure_installed = { "svelte", "typescript", "javascript", "bash", "python", "rust" },
