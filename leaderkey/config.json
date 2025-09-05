@@ -150,6 +150,11 @@
           "key" : "f",
           "type" : "application",
           "value" : "/Applications/Figma.app"
+        },
+        {
+          "key" : "w",
+          "type" : "application",
+          "value" : "/Applications/WezTerm.app"
         }
       ],
       "key" : "o",
@@ -283,6 +288,11 @@
       "key" : "e",
       "type" : "application",
       "value" : "/Applications/Microsoft Edge Dev.app"
+    },
+    {
+      "key" : "z",
+      "type" : "application",
+      "value" : "/Applications/Zen Browser.app"
     }
   ],
   "type" : "group"
