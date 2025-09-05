@@ -11,10 +11,8 @@ cursor-style-blink         = false
 shell-integration-features = no-cursor
 
 macos-option-as-alt        = true
-macos-window-buttons       = hidden
 macos-window-shadow        = false
 title                      = " "
-# macos-titlebar-style       = tabs
 
 window-padding-x           = 10
 window-padding-y           = 5
