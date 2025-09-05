@@ -223,6 +223,37 @@ define-command basefolder-edit -docstring 'base folder edit' %{
 declare-user-mode display-actions
 map global user D ':enter-user-mode display-actions<ret>' -docstring 'Enter display mode'
 
+# Show human-readable file size for current buffer's file
+define-command file-size -docstring 'Show human-readable file size of current buffer' %{
+  evaluate-commands %sh{
+    file="$kak_buffile"
+
+    if [ -z "$file" ] || [ ! -e "$file" ]; then
+      printf "info 'No on-disk file for this buffer'\n"
+      exit 0
+    fi
+
+    # Get raw bytes size (portable)
+    bytes=$(wc -c < "$file" | tr -d '[:space:]')
+
+    # Convert to human-readable string using awk (no GNU coreutils dependency)
+    hr=$(awk -v b="$bytes" 'BEGIN{
+      split("B KB MB GB TB PB", u)
+      x=b+0; i=1
+      while (x>=1024 && i<6) { x/=1024; i++ }
+      if (i==1) printf "%d %s", x, u[i]; else printf "%.1f %s", x, u[i]
+    }')
+
+    # Escape single quotes in filename for single-quoted Kakoune string
+    safe_file=$(printf "%s" "$file" | sed "s/'/''/g")
+
+    printf "info 'Size: %s (%s bytes) — %s'\n" "$hr" "$bytes" "$safe_file"
+  }
+}
+
+# Display-actions mapping
+map global display-actions 's' ':file-size<ret>' -docstring 'show file size'
+
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
 map global window-actions 'j' ':focus-down<ret>'  -docstring 'focus down pane'
@@ -598,4 +629,3 @@ bundle hump 'https://github.com/delapouite/kakoune-hump' %{
   # enter modes
   map global user J ': enter-user-mode hump-jump -lock<ret>'   -docstring 'enter hump mode'
 }
-
