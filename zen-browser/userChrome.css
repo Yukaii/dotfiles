@@ -1,6 +1,7 @@
 /* @import "natsumi/natsumi.css"; */
 /* @import "./tab-group.css"; */
 
+/*
 #zen-tabbox-wrapper {
   border-radius: 6px !important;
   overflow: hidden;
@@ -13,7 +14,6 @@
 :root {
   --zen-element-separation: 10px !important;
 }
-
 .tabbrowser-tab {
   & .tab-background {
     &::before {
@@ -22,3 +22,4 @@
   }
 }
 
+*/
