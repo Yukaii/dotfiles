@@ -1,0 +1,1 @@
+../zen-open-workspace.sh
