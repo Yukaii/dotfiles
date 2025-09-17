@@ -4,9 +4,10 @@
     "bash": {
       "git status": "allow",
       "git diff": "allow",
-      "npm run build": "allow",
+      "npm run build": "ask",
       "ls": "allow",
-      "pwd": "allow"
+      "pwd": "allow",
+      "*": "ask"
     },
     "edit": "ask"
   }
