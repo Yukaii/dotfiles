@@ -106,27 +106,27 @@ keybind = ctrl+alt+z=text:\x11z
 keybind = cmd+p=text:\x11?
 
 # tmux panel jump
-keybind = cmd+physical:one=text:\x111
-keybind = cmd+physical:two=text:\x112
-keybind = cmd+physical:three=text:\x113
-keybind = cmd+physical:four=text:\x114
-keybind = cmd+physical:five=text:\x115
-keybind = cmd+physical:six=text:\x116
-keybind = cmd+physical:seven=text:\x117
-keybind = cmd+physical:eight=text:\x118
-keybind = cmd+physical:nine=text:\x1b[F
+keybind = cmd+Digit1=text:\x111
+keybind = cmd+Digit2=text:\x112
+keybind = cmd+Digit3=text:\x113
+keybind = cmd+Digit4=text:\x114
+keybind = cmd+Digit5=text:\x115
+keybind = cmd+Digit6=text:\x116
+keybind = cmd+Digit7=text:\x117
+keybind = cmd+Digit8=text:\x118
+keybind = cmd+Digit9=text:\x1b[F
 
 # regular tmux panel jump (combine with remote session with default prefix)
-keybind = ctrl+alt+physical:zero=text:\x020
-keybind = ctrl+alt+physical:one=text:\x021
-keybind = ctrl+alt+physical:two=text:\x022
-keybind = ctrl+alt+physical:three=text:\x023
-keybind = ctrl+alt+physical:four=text:\x024
-keybind = ctrl+alt+physical:five=text:\x025
-keybind = ctrl+alt+physical:six=text:\x026
-keybind = ctrl+alt+physical:seven=text:\x027
-keybind = ctrl+alt+physical:eight=text:\x028
-keybind = ctrl+alt+physical:nine=text:\x029
+keybind = ctrl+alt+Digit0=text:\x020
+keybind = ctrl+alt+Digit1=text:\x021
+keybind = ctrl+alt+Digit2=text:\x022
+keybind = ctrl+alt+Digit3=text:\x023
+keybind = ctrl+alt+Digit4=text:\x024
+keybind = ctrl+alt+Digit5=text:\x025
+keybind = ctrl+alt+Digit6=text:\x026
+keybind = ctrl+alt+Digit7=text:\x027
+keybind = ctrl+alt+Digit8=text:\x028
+keybind = ctrl+alt+Digit9=text:\x029
 
 keybind = ctrl+alt+left=text:\x02p
 keybind = ctrl+alt+right=text:\x02n
