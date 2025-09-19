@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+# start_with_event_stream.sh
+# Run any command, mirror STDOUT to stdout.log (and screen), mirror STDERR to errors.log (and screen),
+# and open a second terminal that tails stdout.log and greps for "event".
+
+set -euo pipefail
+
+# Show help
+show_help() {
+    cat << EOF
+logmon - Run commands with log monitoring
+
+USAGE:
+    $0 [OPTIONS] [--] COMMAND...
+
+DESCRIPTION:
+    Runs a command while mirroring STDOUT to stdout.log and STDERR to errors.log.
+    Opens a second terminal that tails stdout.log and optionally greps for patterns.
+
+OPTIONS:
+    -h, --help          Show this help message
+    --grep PATTERN      Pattern to grep for in event stream (default: show all)
+    --                  End of options (use before commands starting with -)
+
+ENVIRONMENT VARIABLES:
+    STDOUT_LOG          Output log file (default: stdout.log)
+    ERRORS_LOG          Error log file (default: errors.log)
+    TERMINAL_HOLD       Hold terminal open after exit (default: 1)
+
+EXAMPLES:
+    $0 npm run dev                     # Run npm run dev with full log monitoring
+    $0 --grep "error" python app.py   # Monitor only lines containing "error"
+    $0 -- npm run -v build             # Use -- before commands starting with -
+
+EOF
+}
+
+# -------- Config --------
+STDOUT_LOG="${STDOUT_LOG:-stdout.log}"
+ERRORS_LOG="${ERRORS_LOG:-errors.log}"
+GREP_PATTERN="${GREP_PATTERN:-}"          # empty by default, show all output
+TERMINAL_HOLD="${TERMINAL_HOLD:-1}"       # some terminals close on exit; set 1 to hold where supported
+# ------------------------
+
+# Parse arguments
+CMD=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        --grep)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --grep requires a pattern argument"
+                exit 1
+            fi
+            GREP_PATTERN="$2"
+            shift 2
+            ;;
+        --)
+            shift
+            CMD+=("$@")
+            break
+            ;;
+        *)
+            CMD+=("$1")
+            shift
+            ;;
+    esac
+done
+
+if [[ ${#CMD[@]} -eq 0 ]]; then
+    echo "Error: No command specified"
+    show_help
+    exit 1
+fi
+
+FIFO="/tmp/hm_stdout_fifo_$$"
+if [[ -n "$GREP_PATTERN" ]]; then
+    EVENT_CMD="tail -F \"$STDOUT_LOG\" | grep --line-buffered --color=never -E \"$GREP_PATTERN\""
+else
+    EVENT_CMD="tail -F \"$STDOUT_LOG\""
+fi
+
+cleanup() {
+    rm -f "$FIFO"
+}
+trap cleanup EXIT INT TERM
+
+# Create FIFO
+mkfifo "$FIFO"
+
+# Background reader: read FIFO, tee to file and to stdout
+cat "$FIFO" | tee -a "$STDOUT_LOG" &
+CAT_PID=$!
+
+open_event_terminal() {
+    local uname_s
+    uname_s="$(uname -s 2>/dev/null || echo unknown)"
+
+    # macOS: Terminal.app
+    if [[ "$uname_s" == "Darwin" ]] && command -v osascript >/dev/null 2>&1; then
+        osascript <<EOF >/dev/null 2>&1 &
+tell application "Terminal"
+    activate
+    do script "$EVENT_CMD"
+end tell
+EOF
+        return 0
+    fi
+
+    # macOS: iTerm2
+    if [[ "$uname_s" == "Darwin" ]] && command -v osascript >/dev/null 2>&1; then
+        osascript <<EOF >/dev/null 2>&1 &
+tell application "iTerm"
+    create window with default profile
+    tell current session of current window to write text "$EVENT_CMD"
+end tell
+EOF
+        return 0
+    fi
+
+    # Linux: try common terminals
+    if command -v gnome-terminal >/dev/null 2>&1; then
+        gnome-terminal -- bash -lc "$EVENT_CMD" &
+        return 0
+    fi
+    if command -v x-terminal-emulator >/dev/null 2>&1; then
+        x-terminal-emulator -e bash -lc "$EVENT_CMD" &
+        return 0
+    fi
+    if command -v konsole >/dev/null 2>&1; then
+        if [[ "$TERMINAL_HOLD" == "1" ]]; then
+            konsole --noclose -e bash -lc "$EVENT_CMD" &
+        else
+            konsole -e bash -lc "$EVENT_CMD" &
+        fi
+        return 0
+    fi
+    if command -v xfce4-terminal >/dev/null 2>&1; then
+        xfce4-terminal --hold="$TERMINAL_HOLD" -e "bash -lc \"$EVENT_CMD\"" &
+        return 0
+    fi
+    if command -v alacritty >/dev/null 2>&1; then
+        alacritty -e bash -lc "$EVENT_CMD" &
+        return 0
+    fi
+    if command -v urxvt >/dev/null 2>&1; then
+        if [[ "$TERMINAL_HOLD" == "1" ]]; then
+            urxvt -hold -e bash -lc "$EVENT_CMD" &
+        else
+            urxvt -e bash -lc "$EVENT_CMD" &
+        fi
+        return 0
+    fi
+    if command -v xterm >/dev/null 2>&1; then
+        if [[ "$TERMINAL_HOLD" == "1" ]]; then
+            xterm -hold -e "$EVENT_CMD" &
+        else
+            xterm -e "$EVENT_CMD" &
+        fi
+        return 0
+    fi
+
+    # WSL: try Windows Terminal
+    if grep -qEi "(Microsoft|WSL)" /proc/version 2>/dev/null || [[ -n "${WSL_DISTRO_NAME-}" ]]; then
+        if command -v wt.exe >/dev/null 2>&1; then
+            wt.exe new-tab bash -lc "$EVENT_CMD" &
+            return 0
+        fi
+        if command -v powershell.exe >/devnull 2>&1; then
+            powershell.exe -NoProfile -Command "Start-Process wt -ArgumentList 'new-tab','bash -lc \"$EVENT_CMD\"'" >/dev/null 2>&1 &
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
+if open_event_terminal; then
+    echo "Opened event stream in a new terminal (following $STDOUT_LOG)."
+else
+    echo "Could not auto-open a terminal for the event stream."
+    echo "Run this in another terminal to see only lines matching pattern:"
+    echo "    $EVENT_CMD"
+fi
+
+# Run the command:
+#   - STDOUT -> FIFO (so it goes through tee to stdout.log and your screen)
+#   - STDERR -> tee appending to errors.log and back to real stderr
+(
+    exec 1> "$FIFO"
+    exec 2> >(tee -a "$ERRORS_LOG" >&2)
+    "${CMD[@]}"
+)
+
+# Let background cat flush and exit when FIFO closes
+sleep 0.2
+if kill -0 "$CAT_PID" 2>/dev/null; then
+    kill "$CAT_PID" 2>/dev/null || true
+fi
+
+echo "Command exited. Logs: $STDOUT_LOG, $ERRORS_LOG"
+
