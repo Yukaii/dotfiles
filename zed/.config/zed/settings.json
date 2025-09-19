@@ -7,40 +7,47 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "language_models": {
+    "copilot_chat": {
+      "api_url": "https://api.githubcopilot.com/chat/completions",
+      "auth_url": "https://api.github.com/copilot_internal/v2/token",
+      "models_url": "https://api.githubcopilot.com/models"
+    }
+  },
   "edit_predictions": {
     "mode": "eager",
     "copilot": {
       "proxy": null,
       "proxy_no_verify": null
     },
-    "enabled_in_assistant": false
+    "enabled_in_text_threads": false
   },
   "icon_theme": "JetBrains New UI Icons (Dark)",
   "features": {
     "edit_prediction_provider": "zed"
   },
-  "assistant": {
-    "default_profile": "write",
+  "agent": {
+    "default_profile": "minimal",
     "profiles": {
       "write": {
         "name": "Write",
         "tools": {
           "open": false,
-          "bash": true,
+          "terminal": true,
           "batch_tool": true,
           "code_symbols": true,
           "copy_path": true,
           "create_file": true,
           "delete_path": false,
           "diagnostics": true,
-          "find_replace_file": true,
+          "edit_file": true,
           "fetch": true,
           "list_directory": true,
           "move_path": true,
           "now": true,
-          "path_search": true,
+          "find_path": true,
           "read_file": true,
-          "regex_search": true,
+          "grep": true,
           "symbol_info": true,
           "thinking": true,
           "create_directory": true
@@ -50,16 +57,16 @@
       }
     },
     "default_model": {
-      "provider": "openai",
-      "model": "gpt-4.1"
-    },
-    "version": "2"
+      "provider": "vercel",
+      "model": "v0-1.5-md"
+    }
   },
   "ui_font_family": "JetBrainsMono Nerd Font",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
   "theme": "JetBrains New Dark",
   "vim_mode": true,
+  "helix_mode": true,
   "auto_update": true,
   "terminal": {
     "shell": {
@@ -72,7 +79,6 @@
   },
   "confirm_quit": true,
   "cursor_blink": false,
-  "show_copilot_suggestions": true,
   "relative_line_numbers": true,
   "inlay_hints": {
     "enabled": false

@@ -4,7 +4,7 @@
     "bindings": {
       "ctrl-w z": "workspace::ToggleZoom",
       "g ]": "editor::GoToDiagnostic",
-      "g [": "editor::GoToPrevDiagnostic",
+      "g [": "editor::GoToPreviousDiagnostic",
       "g r": "editor::FindAllReferences",
       "shift-k": "editor::Hover",
       "space l a": "editor::ToggleCodeActions",
@@ -57,7 +57,7 @@
     "context": "Terminal",
     "bindings": {
       "cmd-shift-k": "pane::ActivateNextItem",
-      "cmd-shift-j": "pane::ActivatePrevItem",
+      "cmd-shift-j": "pane::ActivatePreviousItem",
       "ctrl-`": "workspace::ToggleZoom",
       "ctrl-shift-k": "pane::CloseActiveItem",
       "cmd-t": "workspace::NewTerminal"
