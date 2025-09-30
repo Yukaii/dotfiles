@@ -431,6 +431,7 @@ bundle git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
   # declare-git-mode
 
   map global git-yank 'y' ':gitlinker<ret>'           -docstring 'Copy Permalink'
+  map global git-yank 'o' ':gitlinker-open<ret>'       -docstring 'Open Permalink'
 }
 
 bundle ui 'https://github.com/kkga/ui.kak' %{

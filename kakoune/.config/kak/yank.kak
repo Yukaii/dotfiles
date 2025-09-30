@@ -15,6 +15,12 @@ define-command yank-buffer-path -docstring "yank full buffer path" %{
     echo -markup "{Information}Yanked buffer path: %reg{dquote}"
 }
 
+# Yank absolute buffer path
+define-command yank-absolute-buffer-path -docstring "yank absolute buffer path" %{
+    set-register dquote %val{buffile}
+    echo -markup "{Information}Yanked absolute buffer path: %reg{dquote}"
+}
+
 # Yank directory of current buffer
 define-command yank-buffer-directory -docstring "yank buffer directory" %{
     set-register dquote %sh{ dirname "$kak_bufname" }
@@ -43,10 +49,11 @@ define-command yank-as-markdown -docstring "yank selection as markdown code bloc
 }
 
 # Map commands to yank mode
-map global yank b ':yank-buffer-name<ret>'       -docstring 'buffer name'
-map global yank f ':yank-buffer-path<ret>'       -docstring 'full buffer path'
-map global yank d ':yank-buffer-directory<ret>'  -docstring 'buffer directory'
-map global yank w ':yank-working-directory<ret>' -docstring 'working directory'
-map global yank l ':yank-line-number<ret>'       -docstring 'line number'
-map global yank m ':yank-as-markdown<ret>'       -docstring 'as markdown'
-map global yank p ':gitlinker<ret>'              -docstring 'git permalink (gitlinker)'
+map global yank b ':yank-buffer-name<ret>'           -docstring 'buffer name'
+map global yank f ':yank-buffer-path<ret>'           -docstring 'full buffer path'
+map global yank a ':yank-absolute-buffer-path<ret>'  -docstring 'absolute buffer path'
+map global yank d ':yank-buffer-directory<ret>'      -docstring 'buffer directory'
+map global yank w ':yank-working-directory<ret>'     -docstring 'working directory'
+map global yank l ':yank-line-number<ret>'           -docstring 'line number'
+map global yank m ':yank-as-markdown<ret>'           -docstring 'as markdown'
+map global yank p ':gitlinker<ret>'                  -docstring 'git permalink (gitlinker)'
