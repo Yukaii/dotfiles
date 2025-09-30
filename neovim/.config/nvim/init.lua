@@ -22,7 +22,6 @@ vim.pack.add({
 	{ src = "https://github.com/folke/which-key.nvim" },
 	{ src = "https://github.com/lewis6991/gitsigns.nvim" },
 	{ src = "https://github.com/FabijanZulj/blame.nvim" },
-	{ src = "https://github.com/linrongbin16/gitlinker.nvim" },
 	{ src = "https://github.com/nvim-lua/plenary.nvim" },
 	{ src = "https://github.com/ThePrimeagen/harpoon",           version = "harpoon2" },
 	{ src = "https://github.com/norcalli/nvim-colorizer.lua" },
@@ -66,7 +65,13 @@ require "nvim-treesitter.configs".setup({
 require("oil").setup()
 require("gitsigns").setup()
 require("blame").setup()
-pcall(function() require('gitlinker').setup() end)
+
+-- Setup gitlinker.cr integration
+_G.gitlinker = loadstring(vim.fn.system("gitlinker init neovim"))()
+if _G.gitlinker then
+	_G.gitlinker.setup()
+end
+
 require 'mini.comment'.setup()
 require('mini.starter').setup()
 require('mini.cursorword').setup()
@@ -178,7 +183,8 @@ require("which-key").add({
 	{ "<leader>gs",      function() require('gitsigns').stage_hunk() end,                                         desc = "Stage hunk" },
 	{ "<leader>gu",      function() require('gitsigns').undo_stage_hunk() end,                                    desc = "Undo stage hunk" },
 	{ "<leader>gr",      function() require('gitsigns').reset_hunk() end,                                         desc = "Reset hunk" },
-	{ "<leader>gy",      function() vim.cmd("GitLink") end,                                                       desc = "Copy Git Permalink",      mode = { "n", "v", "x" } },
+	{ "<leader>gy",      function() _G.gitlinker.copy() end,                                                      desc = "Copy Git Permalink",      mode = { "n", "v", "x" } },
+	{ "<leader>go",      function() _G.gitlinker.open() end,                                                      desc = "Open Git Permalink",      mode = { "n", "v", "x" } },
 	{ "<leader>gB",      function() require('snacks').picker.git_branches() end,                                  desc = "Git Branches" },
 	{ "<leader>gl",      function() require('snacks').picker.git_log() end,                                       desc = "Git Log" },
 	{ "<leader>gL",      function() require('snacks').picker.git_log_line() end,                                  desc = "Git Log Line" },
