@@ -26,6 +26,8 @@ ENVIRONMENT VARIABLES:
     STDOUT_LOG          Output log file (default: stdout.log)
     ERRORS_LOG          Error log file (default: errors.log)
     TERMINAL_HOLD       Hold terminal open after exit (default: 1)
+    STDOUT_LOG_MAX_SIZE Rotate STDOUT_LOG when exceeding this size (bytes, supports K/M/G; default: disabled)
+    STDOUT_LOG_ROTATE_KEEP Number of rotated STDOUT logs to keep (default: 5)
 
 EXAMPLES:
     $0 npm run dev                     # Run npm run dev with full log monitoring
@@ -38,9 +40,47 @@ EOF
 # -------- Config --------
 STDOUT_LOG="${STDOUT_LOG:-stdout.log}"
 ERRORS_LOG="${ERRORS_LOG:-errors.log}"
-GREP_PATTERN="${GREP_PATTERN:-}"          # empty by default, show all output
-TERMINAL_HOLD="${TERMINAL_HOLD:-1}"       # some terminals close on exit; set 1 to hold where supported
+GREP_PATTERN="${GREP_PATTERN:-}"              # empty by default, show all output
+TERMINAL_HOLD="${TERMINAL_HOLD:-1}"           # some terminals close on exit; set 1 to hold where supported
+STDOUT_LOG_MAX_SIZE="${STDOUT_LOG_MAX_SIZE:-0}"    # support numeric or K/M/G suffix values
+STDOUT_LOG_ROTATE_KEEP="${STDOUT_LOG_ROTATE_KEEP:-5}"
 # ------------------------
+
+parse_size_bytes() {
+    local value="$1"
+
+    if [[ -z "$value" ]]; then
+        printf '0'
+        return 0
+    fi
+
+    if [[ "$value" =~ ^[0-9]+$ ]]; then
+        printf '%s' "$value"
+        return 0
+    fi
+
+    if [[ "$value" =~ ^([0-9]+)([KkMmGg])$ ]]; then
+        local number="${BASH_REMATCH[1]}"
+        local unit="${BASH_REMATCH[2]}"
+        case "$unit" in
+            K|k)
+                printf '%d' $((number * 1024))
+                return 0
+                ;;
+            M|m)
+                printf '%d' $((number * 1024 * 1024))
+                return 0
+                ;;
+            G|g)
+                printf '%d' $((number * 1024 * 1024 * 1024))
+                return 0
+                ;;
+        esac
+    fi
+
+    echo "Error: invalid size value '$value'" >&2
+    return 1
+}
 
 # Parse arguments
 CMD=()
@@ -76,6 +116,20 @@ if [[ ${#CMD[@]} -eq 0 ]]; then
     exit 1
 fi
 
+if ! STDOUT_LOG_MAX_BYTES="$(parse_size_bytes "$STDOUT_LOG_MAX_SIZE")"; then
+    exit 1
+fi
+
+if [[ ! "$STDOUT_LOG_ROTATE_KEEP" =~ ^[0-9]+$ ]]; then
+    echo "Error: STDOUT_LOG_ROTATE_KEEP must be a non-negative integer" >&2
+    exit 1
+fi
+
+if (( STDOUT_LOG_MAX_BYTES > 0 )) && ! command -v python3 >/dev/null 2>&1; then
+    echo "Error: python3 is required when STDOUT_LOG_MAX_SIZE is set" >&2
+    exit 1
+fi
+
 FIFO="/tmp/hm_stdout_fifo_$$"
 if [[ -n "$GREP_PATTERN" ]]; then
     EVENT_CMD="tail -F \"$STDOUT_LOG\" | grep --line-buffered --color=never -E \"$GREP_PATTERN\""
@@ -91,8 +145,93 @@ trap cleanup EXIT INT TERM
 # Create FIFO
 mkfifo "$FIFO"
 
-# Background reader: read FIFO, tee to file and to stdout
-cat "$FIFO" | tee -a "$STDOUT_LOG" &
+start_stdout_writer() {
+    local fifo_path="$1"
+    local log_path="$2"
+    local max_bytes="$3"
+    local keep_count="$4"
+
+    if (( max_bytes > 0 )); then
+        python3 - "$fifo_path" "$log_path" "$max_bytes" "$keep_count" <<'PYTHON'
+import os
+import sys
+
+fifo, logfile, max_bytes, keep_count = sys.argv[1:]
+max_bytes = int(max_bytes)
+keep_count = int(keep_count)
+
+log = None
+current_size = 0
+
+
+def reopen_log():
+    global log, current_size
+    log = open(logfile, 'ab', buffering=0)
+    try:
+        current_size = os.path.getsize(logfile)
+    except OSError:
+        current_size = 0
+
+
+def rotate_logs():
+    global log, current_size
+    log.close()
+    if keep_count > 0:
+        for index in range(keep_count, 0, -1):
+            src = f"{logfile}.{index}"
+            dst = f"{logfile}.{index + 1}"
+            try:
+                if index == keep_count:
+                    os.remove(src)
+                else:
+                    os.replace(src, dst)
+            except FileNotFoundError:
+                pass
+            except OSError as exc:
+                print(f"logmon: warning: rotate failure {src} -> {dst}: {exc}", file=sys.stderr)
+        try:
+            os.replace(logfile, f"{logfile}.1")
+        except FileNotFoundError:
+            pass
+        except OSError as exc:
+            print(f"logmon: warning: rotate failure {logfile} -> {logfile}.1: {exc}", file=sys.stderr)
+    else:
+        try:
+            os.remove(logfile)
+        except FileNotFoundError:
+            pass
+        except OSError as exc:
+            print(f"logmon: warning: failed to remove {logfile}: {exc}", file=sys.stderr)
+    reopen_log()
+
+
+reopen_log()
+
+try:
+    with open(fifo, 'rb', buffering=0) as source:
+        while True:
+            chunk = source.read(8192)
+            if not chunk:
+                break
+            sys.stdout.buffer.write(chunk)
+            sys.stdout.buffer.flush()
+            if max_bytes > 0 and current_size >= max_bytes:
+                rotate_logs()
+            log.write(chunk)
+            current_size += len(chunk)
+            if max_bytes > 0 and current_size >= max_bytes:
+                rotate_logs()
+finally:
+    if log is not None:
+        log.close()
+PYTHON
+    else
+        tee -a "$log_path" <"$fifo_path"
+    fi
+}
+
+# Background reader: read FIFO, tee (with optional rotation) to file and to stdout
+start_stdout_writer "$FIFO" "$STDOUT_LOG" "$STDOUT_LOG_MAX_BYTES" "$STDOUT_LOG_ROTATE_KEEP" &
 CAT_PID=$!
 
 open_event_terminal() {
@@ -202,4 +341,3 @@ if kill -0 "$CAT_PID" 2>/dev/null; then
 fi
 
 echo "Command exited. Logs: $STDOUT_LOG, $ERRORS_LOG"
-
