@@ -1,6 +1,91 @@
 {
   "actions" : [
     {
+      "key" : "m",
+      "label" : "Menu Items",
+      "type" : "url",
+      "value" : "raycast://extensions/raycast/navigation/search-menu-items"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "o",
+          "label" : "Zen Open",
+          "type" : "application",
+          "value" : "/Applications/Zen Browser.app"
+        },
+        {
+          "key" : "1",
+          "label" : "Zen Workspace 1",
+          "type" : "command",
+          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 1"
+        },
+        {
+          "key" : "2",
+          "label" : "Zen Workspace 2",
+          "type" : "command",
+          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 2"
+        },
+        {
+          "key" : "3",
+          "label" : "Zen Workspace 3",
+          "type" : "command",
+          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 3"
+        },
+        {
+          "key" : "4",
+          "label" : "Zen Workspace 4",
+          "type" : "command",
+          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 4"
+        }
+      ],
+      "key" : "z",
+      "label" : "Zen Browser",
+      "type" : "group"
+    },
+    {
+      "key" : "1",
+      "label" : "EN (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"
+    },
+    {
+      "key" : "ㄅ",
+      "label" : "EN (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"
+    },
+    {
+      "key" : "2",
+      "label" : "威 ZH (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select org.atelierInmu.inputmethod.vChewing.IMECHT"
+    },
+    {
+      "key" : "3",
+      "label" : "JA (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
+    },
+    {
+      "key" : "ˇ",
+      "label" : "JA (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
+    },
+    {
+      "key" : "4",
+      "label" : "ZH (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
+    },
+    {
+      "key" : "ˋ",
+      "label" : "ZH (IME)",
+      "type" : "command",
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
+    },
+    {
       "actions" : [
         {
           "key" : "m",
@@ -85,10 +170,65 @@
       "type" : "group"
     },
     {
-      "key" : "m",
-      "label" : "Menu Items",
-      "type" : "url",
-      "value" : "raycast://extensions/raycast/navigation/search-menu-items"
+      "actions" : [
+        {
+          "key" : "s",
+          "type" : "application",
+          "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
+        },
+        {
+          "key" : "c",
+          "type" : "application",
+          "value" : "/Applications/Google Chrome.app"
+        },
+        {
+          "key" : "e",
+          "type" : "application",
+          "value" : "/Applications/Microsoft Edge Dev.app"
+        }
+      ],
+      "key" : "b",
+      "label" : "Browsers",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "c",
+          "type" : "application",
+          "value" : "/Applications/Cursor.app"
+        },
+        {
+          "key" : "v",
+          "type" : "application",
+          "value" : "/Applications/Visual Studio Code - Insiders.app"
+        }
+      ],
+      "key" : "e",
+      "label" : "Editors",
+      "type" : "group"
+    },
+    {
+      "actions" : [
+        {
+          "key" : "g",
+          "type" : "application",
+          "value" : "/Applications/Ghostty.app"
+        },
+        {
+          "key" : "a",
+          "type" : "application",
+          "value" : "/Applications/Alacritty.app"
+        },
+        {
+          "key" : "w",
+          "type" : "application",
+          "value" : "/Applications/WezTerm.app"
+        }
+      ],
+      "key" : "t",
+      "label" : "Terminals",
+      "type" : "group"
     },
     {
       "actions" : [
@@ -103,19 +243,44 @@
           "label" : "Raycast AI Chat",
           "type" : "url",
           "value" : "raycast://extensions/raycast/raycast-ai/ai-chat"
+        },
+        {
+          "key" : "g",
+          "label" : "Fix grammar",
+          "type" : "url",
+          "value" : "raycast://ai-commands/fix-spelling-and-grammar-gpt-nano"
+        },
+        {
+          "key" : "j",
+          "label" : "Japanese Helper",
+          "type" : "url",
+          "value" : "raycast://ai-commands/japanese-helper"
+        },
+        {
+          "key" : "J",
+          "label" : "Translate to Japanese",
+          "type" : "url",
+          "value" : "raycast://ai-commands/translate-to-japanese"
+        },
+        {
+          "key" : "r",
+          "label" : "Translate to Traditional Chinses",
+          "type" : "url",
+          "value" : "raycast://ai-commands/translate-to-traditional-chinese"
+        },
+        {
+          "key" : "y",
+          "label" : "Summarize YouTube",
+          "type" : "url",
+          "value" : "raycast://ai-commands/summarize-youtube-video"
         }
       ],
       "key" : "a",
-      "label" : "AI Things",
+      "label" : "AI & Translation",
       "type" : "group"
     },
     {
       "actions" : [
-        {
-          "key" : "a",
-          "type" : "application",
-          "value" : "/Applications/Alacritty.app"
-        },
         {
           "key" : "m",
           "type" : "application",
@@ -150,15 +315,10 @@
           "key" : "f",
           "type" : "application",
           "value" : "/Applications/Figma.app"
-        },
-        {
-          "key" : "w",
-          "type" : "application",
-          "value" : "/Applications/WezTerm.app"
         }
       ],
       "key" : "o",
-      "label" : "Open",
+      "label" : "Apps",
       "type" : "group"
     },
     {
@@ -189,141 +349,7 @@
         }
       ],
       "key" : "T",
-      "label" : "TailScale commands",
-      "type" : "group"
-    },
-    {
-      "key" : "j",
-      "label" : "Japanese Helper",
-      "type" : "url",
-      "value" : "raycast://ai-commands/japanese-helper"
-    },
-    {
-      "key" : "J",
-      "label" : "Translate to Japanese",
-      "type" : "url",
-      "value" : "raycast://ai-commands/translate-to-japanese"
-    },
-    {
-      "key" : "s",
-      "type" : "application",
-      "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
-    },
-    {
-      "key" : "c",
-      "type" : "application",
-      "value" : "/Applications/Cursor.app"
-    },
-    {
-      "key" : "t",
-      "type" : "application",
-      "value" : "/Applications/Ghostty.app"
-    },
-    {
-      "key" : "1",
-      "label" : "EN (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"
-    },
-    {
-      "key" : "ㄅ",
-      "label" : "EN (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.keylayout.ABC"
-    },
-    {
-      "key" : "2",
-      "label" : "威 ZH (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select org.atelierInmu.inputmethod.vChewing.IMECHT"
-    },
-    {
-      "key" : "3",
-      "label" : "JA (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
-    },
-    {
-      "key" : "ˇ",
-      "label" : "JA (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
-    },
-    {
-      "key" : "4",
-      "label" : "ZH (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
-    },
-    {
-      "key" : "ˋ",
-      "label" : "ZH (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
-    },
-    {
-      "key" : "v",
-      "type" : "application",
-      "value" : "/Applications/Visual Studio Code - Insiders.app"
-    },
-    {
-      "key" : "g",
-      "label" : "Fix grammar",
-      "type" : "url",
-      "value" : "raycast://ai-commands/fix-spelling-and-grammar-gpt-nano"
-    },
-    {
-      "key" : "r",
-      "label" : "Translate to Traditional Chinses",
-      "type" : "url",
-      "value" : "raycast://ai-commands/translate-to-traditional-chinese"
-    },
-    {
-      "key" : "y",
-      "label" : "Summarize YouTube",
-      "type" : "url",
-      "value" : "raycast://ai-commands/summarize-youtube-video"
-    },
-    {
-      "key" : "e",
-      "type" : "application",
-      "value" : "/Applications/Microsoft Edge Dev.app"
-    },
-    {
-      "actions" : [
-        {
-          "key" : "o",
-          "label" : "Zen Open",
-          "type" : "application",
-          "value" : "/Applications/Zen Browser.app"
-        },
-        {
-          "key" : "1",
-          "label" : "Zen Workspace 1",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 1"
-        },
-        {
-          "key" : "2",
-          "label" : "Zen Workspace 2",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 2"
-        },
-        {
-          "key" : "3",
-          "label" : "Zen Workspace 3",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 3"
-        },
-        {
-          "key" : "4",
-          "label" : "Zen Workspace 4",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 4"
-        }
-      ],
-      "key" : "z",
-      "label" : "Zen Browser",
+      "label" : "TailScale",
       "type" : "group"
     }
   ],
