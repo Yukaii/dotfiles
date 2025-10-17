@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "open raycast://extensions/raycast/raycast/confetti"
+          }
+        ]
+      }
+    ]
+  }
+}
