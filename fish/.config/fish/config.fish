@@ -122,7 +122,9 @@ if command -q starship
 end
 
 if command -q atuin
-  atuin init fish | source
+  # Temporary workaround for deprecated -k flag warning
+  # Remove sed once https://github.com/atuinsh/atuin/pull/2902 is released
+  atuin init fish | sed "s/-k up/up/g" | source
 end
 
 zoxide init fish | source
