@@ -1,0 +1,181 @@
+# Kanagawa Alabaster
+# Kanagawa color palette with Alabaster highlighting philosophy
+# Based on: https://tonsky.me/blog/syntax-highlighting/
+# Minimal highlighting focused on: strings, constants, comments, and top-level definitions
+
+# Alabaster highlighting principles:
+# Only 4 highlighting categories:
+# 1. Green - Strings
+# 2. Purple - Statically known constants (numbers, booleans, symbols)
+# 3. Yellow + Bold - Comments (highlighted, not hidden)
+# 4. Blue - Global definitions (functions, classes, constructors)
+#
+# What's NOT highlighted (white/default):
+# - Control keywords (if, else, for, while, function, class, return)
+# - Variables, types, attributes
+# - Function calls (including builtins)
+# - Operators (grayed out for punctuation)
+
+## User interface (keep original Kanagawa UI)
+"ui.selection" = { bg = "waveBlue2" }
+"ui.selection.primary" = { bg = "waveBlue2" }
+"ui.background" = { fg = "fujiWhite", bg = "sumiInk3" }
+
+"ui.linenr" = { fg = "sumiInk6" }
+"ui.linenr.selected" = { fg = "roninYellow", modifiers = ["bold"] }
+"ui.gutter" = { fg = "sumiInk6", bg = "sumiInk4" }
+
+"ui.virtual" = "sumiInk6"
+"ui.virtual.ruler" = { bg = "sumiInk4" }
+"ui.virtual.inlay-hint" = "sumiInk6"
+"ui.virtual.jump-label" = { fg = "peachRed", modifiers = ["bold"] }
+
+"ui.statusline" = { fg = "oldWhite", bg = "sumiInk0" }
+"ui.statusline.inactive" = { fg = "fujiGray", bg = "sumiInk0" }
+"ui.statusline.normal" = { fg = "sumiInk0", bg = "crystalBlue", modifiers = ["bold"] }
+"ui.statusline.insert" = { fg = "sumiInk0", bg = "autumnGreen", modifiers = ["bold"] }
+"ui.statusline.select" = { fg = "sumiInk0", bg = "oniViolet", modifiers = ["bold"] }
+
+"ui.bufferline" = { fg = "fujiGray", bg = "sumiInk0" }
+"ui.bufferline.active" = { fg = "oldWhite", bg = "sumiInk0" }
+"ui.bufferline.background" = { bg = "sumiInk0" }
+
+"ui.popup" = { fg = "fujiWhite", bg = "sumiInk0" }
+"ui.window" = { fg = "sumiInk0" }
+"ui.help" = { fg = "fujiWhite", bg = "sumiInk0" }
+"ui.text" = "fujiWhite"
+"ui.text.focus" = { fg = "fujiWhite", bg = "waveBlue2", modifiers = ["bold"] }
+
+"ui.cursor" = { fg = "waveBlue1", bg = "waveAqua2" }
+"ui.cursor.primary" = { fg = "waveBlue1", bg = "fujiWhite" }
+"ui.cursor.match" = { fg = "waveRed", modifiers = ["bold"] }
+"ui.highlight" = { fg = "fujiWhite", bg = "waveBlue2" }
+"ui.menu" = { fg = "fujiWhite", bg = "waveBlue1" }
+"ui.menu.selected" = { fg = "fujiWhite", bg = "waveBlue2", modifiers = ["bold"] }
+"ui.menu.scroll" = { fg = "oldWhite", bg = "waveBlue1" }
+
+"ui.cursorline.primary" = { bg = "sumiInk5" }
+"ui.cursorcolumn.primary" = { bg = "sumiInk5" }
+
+"ui.debug.breakpoint" = "springBlue"
+"ui.debug.active" = "winterRed"
+
+"diagnostic.error" = { underline = { color = "samuraiRed", style = "curl" } }
+"diagnostic.warning" = { underline = { color = "roninYellow", style = "curl" } }
+"diagnostic.info" = { underline = { color = "dragonBlue", style = "curl" } }
+"diagnostic.hint" = { underline = { color = "waveAqua1", style = "curl" } }
+"diagnostic.unnecessary" = { modifiers = ["dim"] }
+"diagnostic.deprecated" = { modifiers = ["crossed_out"] }
+
+error = "samuraiRed"
+warning = "roninYellow"
+info = "dragonBlue"
+hint = "waveAqua1"
+
+## Diff
+"diff.plus" = "autumnGreen"
+"diff.minus" = "autumnRed"
+"diff.delta" = "autumnYellow"
+
+## Syntax highlighting - Alabaster-inspired minimal highlighting
+# Green - Strings
+"string" = "springGreen"
+"string.regexp" = "springGreen"
+"string.special.url" = "springGreen"
+"string.special.symbol" = "oniViolet"
+
+# Purple - Constants (numbers, booleans, symbols)
+"constant" = "oniViolet"
+"constant.numeric" = "oniViolet"
+"constant.character.escape" = "oniViolet"
+
+# Yellow + Bold - Comments
+"comment" = { fg = "carpYellow", modifiers = ["bold"] }
+
+# Blue - Definitions (functions, classes, constructors)
+"function" = "crystalBlue"
+"constructor" = "crystalBlue"
+
+# White/Default - Everything else (not highlighted)
+"attribute" = "fujiWhite"
+"type" = "fujiWhite"
+"type.builtin" = "fujiWhite"
+"variable" = "fujiWhite"
+"variable.builtin" = "fujiWhite"
+"variable.parameter" = "fujiWhite"
+"variable.other.member" = "fujiWhite"
+"label" = "fujiWhite"
+"keyword" = "fujiWhite"
+"keyword.control.return" = "fujiWhite"
+"keyword.control.exception" = "fujiWhite"
+"keyword.directive" = "fujiWhite"
+"function.builtin" = "fujiWhite"
+"function.macro" = "fujiWhite"
+"tag" = "fujiWhite"
+"namespace" = "fujiWhite"
+"special" = "fujiWhite"
+
+# Gray - Punctuation and operators
+"punctuation" = "fujiGray"
+"operator" = "fujiGray"
+
+## Markup modifiers
+"markup.heading" = { fg = "crystalBlue", modifiers = ["bold"] }
+"markup.heading.marker" = "fujiGray"
+"markup.heading.1" = { fg = "crystalBlue", modifiers = ["bold"] }
+"markup.heading.2" = { fg = "crystalBlue", modifiers = ["bold"] }
+"markup.heading.3" = { fg = "crystalBlue", modifiers = ["bold"] }
+"markup.list" = "fujiGray"
+"markup.bold" = { modifiers = ["bold"] }
+"markup.italic" = { modifiers = ["italic"] }
+"markup.strikethrough" = { modifiers = ["crossed_out"] }
+"markup.link.text" = "crystalBlue"
+"markup.link.url" = "springGreen"
+"markup.link.label" = "crystalBlue"
+"markup.quote" = { fg = "carpYellow", modifiers = ["italic"] }
+"markup.raw" = "springGreen"
+
+[palette]
+oldWhite = "#C8C093"
+fujiWhite = "#DCD7BA"
+fujiGray = "#727169"
+sumiInk0 = "#16161D"
+sumiInk1 = "#181820"
+sumiInk2 = "#1A1A22"
+sumiInk3 = "#1F1F28"
+sumiInk4 = "#2A2A37"
+sumiInk5 = "#363646"
+sumiInk6 = "#54546D"
+waveBlue1 = "#223249"
+waveBlue2 = "#2D4F67"
+winterGreen = "#2B3328"
+winterYellow = "#49443C"
+winterRed = "#43242B"
+winterBlue = "#252535"
+autumnGreen = "#76946A"
+autumnRed = "#C34043"
+autumnYellow = "#DCA561"
+samuraiRed = "#E82424"
+roninYellow = "#FF9E3B"
+waveAqua1 = "#6A9589"
+dragonBlue = "#658594"
+oniViolet = "#957FB8"
+oniViolet2 = "#B8B4D0"
+crystalBlue = "#7E9CD8"
+springViolet1 = "#938AA9"
+springViolet2 = "#9CABCA"
+springBlue = "#7FB4CA"
+lightBlue = "#A3D4D5"
+waveAqua2 = "#7AA89F"
+waveAqua3 = "#68AD99"
+waveAqua4 = "#7AA880"
+waveAqua5 = "#6CAF95"
+springGreen = "#98BB6C"
+boatYellow1 = "#938056"
+boatYellow2 = "#C0A36E"
+carpYellow = "#E6C384"
+sakuraPink = "#D27E99"
+waveRed = "#E46876"
+peachRed = "#FF5D62"
+surimiOrange = "#FFA066"
+katanaGray = "#717C7C"

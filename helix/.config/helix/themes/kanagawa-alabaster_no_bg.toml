@@ -1,0 +1,7 @@
+inherits = "kanagawa-alabaster"
+"ui.background" = {}
+"ui.gutter" = {}
+"ui.statusline" = {}
+"ui.bufferline.background" = {}
+"ui.bufferline.active" = {}
+"ui.popup" = {}

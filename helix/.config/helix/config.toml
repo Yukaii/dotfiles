@@ -1,4 +1,5 @@
-theme = "kanagawa_no_bg"
+# theme = "kanagawa_no_bg"
+theme = "kanagawa-alabaster_no_bg"
 # theme = "darkvoid"
 
 [editor]
