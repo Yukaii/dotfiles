@@ -31,7 +31,9 @@ source "%val{config}/ascii-player.kak"
 # source "%val{config}/jump-stack.kak"
 # source "%val{config}/amber.kak"
 
-colorscheme kanagawa
+colorscheme kanagawa-alabaster
+# colorscheme alabaster
+# colorscheme kanagawa
 # colorscheme ayu-mirage
 # colorscheme catppuccin_macchiato
 
