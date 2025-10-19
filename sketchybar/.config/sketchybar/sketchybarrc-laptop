@@ -1,0 +1,97 @@
+#!/usr/bin/env zsh
+
+source "$HOME/.config/sketchybar/colors.sh"
+
+FONT_FACE="JetBrainsMono Nerd Font"
+PLUGIN_DIR="$HOME/.config/sketchybar/plugins"
+
+# Bar Configuration for Laptop (with notch support)
+sketchybar --bar \
+    height=32 \
+    color=0x2f655091 \
+    margin=0 \
+    sticky=on \
+    padding_left=5 \
+    padding_right=5 \
+    notch_width=188 \
+    display=main
+
+# Default item configuration
+sketchybar --default \
+    background.color=0x66494d64 \
+    background.corner_radius=5 \
+    background.padding_right=5 \
+    background.height=26 \
+    icon.font="$FONT_FACE:Medium:15.0" \
+    icon.padding_left=5 \
+    icon.padding_right=5 \
+    label.font="$FONT_FACE:Medium:13.0" \
+    label.color=0xffcad3f5 \
+    label.y_offset=0 \
+    label.padding_left=0 \
+    label.padding_right=5
+
+# Current space indicator
+sketchybar --add item current_space left \
+    --set current_space \
+    background.color=0xfff5a97f \
+    icon.color=0xff24273a \
+    icon.drawing=on \
+    label.drawing=off \
+    shadow=on \
+    script="$PLUGIN_DIR/current_space.sh" \
+    --subscribe current_space space_change mouse.clicked
+
+# Front app with sophisticated bracket system
+sketchybar --add item front_app left \
+    --set front_app \
+    background.color=0xffa6da95 \
+    background.padding_left=0 \
+    background.padding_right=0 \
+    icon.y_offset=1 \
+    icon.color=0xff24273a \
+    icon.font="sketchybar-app-font:Regular:15.0" \
+    icon.padding_right=4 \
+    label.drawing=no \
+    script="$PLUGIN_DIR/front_app.sh" \
+    \
+    --add item front_app.separator left \
+    --set front_app.separator \
+    background.color=0x00000000 \
+    background.padding_left=-15 \
+    \
+    --add item front_app.name left \
+    icon.padding_left=0 \
+    icon.padding_right=0 \
+    icon.y_offset=1 \
+    label.drawing=no \
+    --set front_app.name \
+    background.color=0x00000000 \
+    background.padding_right=0 \
+    icon.drawing=off \
+    label.font="$FONT_FACE:Bold:13.0" \
+    label.drawing=yes
+
+# Create bracket for front app
+sketchybar --add bracket front_app_bracket \
+    front_app \
+    front_app.separator \
+    front_app.name \
+    --subscribe front_app front_app_switched
+
+# Right side items
+sketchybar --add item clock right \
+    --set clock \
+    icon="󰃰" \
+    icon.color=0xffed8796 \
+    update_freq=10 \
+    script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --add item battery right \
+    --set battery \
+    update_freq=20 \
+    script="$PLUGIN_DIR/battery.sh"
+
+##### Finalizing Setup #####
+sketchybar --update
+sketchybar --trigger space_change
