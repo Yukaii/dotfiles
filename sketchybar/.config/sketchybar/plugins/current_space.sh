@@ -6,47 +6,33 @@ update_space() {
     case $SPACE_ID in
     1)
         ICON=󰊠
-        ICON_PADDING_LEFT=10
-        ICON_PADDING_RIGHT=9
         ;;
     2)
-        ICON=" "
-        ICON_PADDING_LEFT=10
-        ICON_PADDING_RIGHT=9
+        ICON=󰈹
         ;;
     3)
-        ICON=" "
-        ICON_PADDING_LEFT=10
-        ICON_PADDING_RIGHT=8
+        ICON=󰆍
         ;;
     4)
-        ICON=" "
-        ICON_PADDING_LEFT=10
-        ICON_PADDING_RIGHT=8
+        ICON=󰎄
         ;;
     5)
-        ICON=" "
-        ICON_PADDING_LEFT=10
-        ICON_PADDING_RIGHT=8
+        ICON=󰊻
         ;;
     *)
-        ICON=$SPACE_ID
-        ICON_PADDING_LEFT=9
-        ICON_PADDING_RIGHT=10
+        ICON=󰊠
         ;;
     esac
 
-    sketchybar --set $NAME \
-        icon=$ICON \
-        icon.padding_left=$ICON_PADDING_LEFT \
-        icon.padding_right=$ICON_PADDING_RIGHT
+    sketchybar --set $NAME icon=$ICON \
+               --set space_number label="$SPACE_ID"
 }
 
 case "$SENDER" in
 "mouse.clicked")
     # Reload sketchybar
     sketchybar --remove '/.*/'
-    source $HOME/.config/sketchybar/sketchybarrc-main
+    source $HOME/.config/sketchybar/sketchybarrc
     ;;
 *)
     update_space

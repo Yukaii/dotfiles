@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/bin/bash
 
 source "$HOME/.config/sketchybar/colors.sh"
 
@@ -31,16 +31,25 @@ sketchybar --default \
     label.padding_left=0 \
     label.padding_right=5
 
-# Current space indicator
-sketchybar --add item current_space left \
-    --set current_space \
-    background.color=0xfff5a97f \
-    icon.color=0xff24273a \
-    icon.drawing=on \
-    label.drawing=off \
-    shadow=on \
-    script="$PLUGIN_DIR/current_space.sh" \
-    --subscribe current_space space_change mouse.clicked
+# Mission Control Spaces
+for sid in {1..10}
+do
+  sketchybar --add space space.$sid left \
+             --set space.$sid \
+             space=$sid \
+             icon=$sid \
+             icon.padding_left=8 \
+             icon.padding_right=8 \
+             icon.color=0xffcad3f5 \
+             background.color=0x00000000 \
+             background.border_color=0xff8aadf4 \
+             background.border_width=1 \
+             background.corner_radius=6 \
+             background.height=24 \
+             label.drawing=off \
+             script="$PLUGIN_DIR/space.sh" \
+             click_script="yabai -m space --focus $sid"
+done
 
 # Front app with sophisticated bracket system
 sketchybar --add item front_app left \
@@ -70,7 +79,8 @@ sketchybar --add item front_app left \
     background.padding_right=0 \
     icon.drawing=off \
     label.font="$FONT_FACE:Bold:13.0" \
-    label.drawing=yes
+    label.drawing=yes \
+    \
 
 # Create bracket for front app
 sketchybar --add bracket front_app_bracket \
