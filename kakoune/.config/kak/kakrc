@@ -632,3 +632,39 @@ bundle hump 'https://github.com/delapouite/kakoune-hump' %{
   # enter modes
   map global user J ': enter-user-mode hump-jump -lock<ret>'   -docstring 'enter hump mode'
 }
+
+bundle nanoline 'https://github.com/ftonneau/nanoline.kak' %{
+  nanoline dark
+  nanoline-format
+
+  # Override nanoline-refresh to include git branch
+  define-command -hidden -override nanoline-refresh %{
+    try %{
+        nanoline-window-equals %opt(readonly) true
+        set-option window nanoline_head "{%opt(nanoline_rw_face)} RO "
+    } \
+    catch %{
+        set-option window nanoline_head "{%opt(nanoline_rw_face)} RW "
+    }
+    try %{ nanoline-window-equals %val(selection_count) 1 } \
+    catch %{ set-option -add window nanoline_head "%val(selection_count) " }
+    set-option -add window nanoline_head '{default}'
+
+    set-option -add window nanoline_head "{default,+b}   %val(bufname) {default}"
+    try %{ nanoline-window-equals %opt(filetype) '' } \
+    catch %{ set-option -add window nanoline_head "(%opt(filetype))" }
+
+    # Add git branch if available
+    evaluate-commands %sh{
+      if [ -n "$kak_opt_modeline_git_branch" ]; then
+        # Properly escape the branch name for Kakoune
+        branch=$(printf '%s' "$kak_opt_modeline_git_branch" | sed "s/'/''/g")
+        printf "set-option -add window nanoline_head ' {cyan}  %s{default}'\n" "$branch"
+      fi
+    }
+
+    set-option -add window nanoline_head %opt(nanoline_macro_cue)
+
+    echo -markup %opt(nanoline_head)
+  }
+}
