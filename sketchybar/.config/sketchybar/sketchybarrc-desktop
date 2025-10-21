@@ -2,105 +2,80 @@
 
 source "$HOME/.config/sketchybar/colors.sh"
 
-FONT_FACE="JetBrainsMono Nerd Font"
+FONT_FACE="SF Pro Rounded"
 PLUGIN_DIR="$HOME/.config/sketchybar/plugins"
 
-# Bar Configuration for Desktop (no notch)
+# Bar Configuration for Desktop (minimal style)
 sketchybar --bar \
-    height=32 \
-    color=0x66494d64 \
+    height=54 \
+    color=$BAR_COLOR \
+    blur_radius=24 \
     margin=0 \
     sticky=on \
-    padding_left=0 \
-    padding_right=0 \
-    notch_width=188 \
+    padding_left=5 \
+    padding_right=10 \
     display=main
 
-# Default item configuration
+# Default item configuration (minimal style)
 sketchybar --default \
-    background.height=32 \
-    icon.color=0xff24273a \
-    icon.font="$FONT_FACE:Medium:20.0" \
-    icon.padding_left=5 \
-    icon.padding_right=5 \
-    label.color=0xff24273a \
-    label.font="$FONT_FACE:Bold:14.0" \
-    label.y_offset=1 \
-    label.padding_left=0 \
-    label.padding_right=5
+    background.color=$ITEM_BG_COLOR \
+    background.corner_radius=10 \
+    background.padding_left=10 \
+    background.padding_right=10 \
+    icon.font="$FONT_FACE:Black:15.0" \
+    icon.color=$TEXT_PRIMARY \
+    icon.padding_left=10 \
+    icon.padding_right=10 \
+    label.font="$FONT_FACE:Black:13.0" \
+    label.color=$TEXT_PRIMARY \
+    label.padding_left=10 \
+    label.padding_right=10 \
+    label.align=center
 
-# Mission Control Spaces
-for sid in {1..10}
+# Mission Control Spaces (minimal style)
+for sid in {1..5}
 do
   sketchybar --add space space.$sid left \
              --set space.$sid \
              space=$sid \
              icon=$sid \
-             icon.padding_left=8 \
-             icon.padding_right=8 \
-             icon.color=0xffcad3f5 \
-             background.color=0x00000000 \
-             background.border_color=0xff8aadf4 \
-             background.border_width=1 \
-             background.corner_radius=6 \
-             background.height=24 \
+             icon.font="$FONT_FACE:Black:15.0" \
+             icon.color=$TEXT_PRIMARY \
+             background.color=$TRANSPARENT \
+             background.corner_radius=10 \
              label.drawing=off \
              script="$PLUGIN_DIR/space.sh" \
-             click_script="yabai -m space --focus $sid"
+             click_script="$PLUGIN_DIR/switch_space.sh $sid"
 done
 
-# Front app with sophisticated bracket system
+# Add spacer after spaces
+sketchybar --add item spacer_1 left \
+           --set spacer_1 \
+           icon= \
+           icon.color=$GREY_MEDIUM \
+           background.drawing=off
+
+# Front app (minimal style)
 sketchybar --add item front_app left \
-    --set front_app \
-    background.color=0xffa6da95 \
-    background.padding_left=0 \
-    background.padding_right=0 \
-    icon.y_offset=1 \
-    label.drawing=no \
-    script="$PLUGIN_DIR/front_app.sh" \
-    --add item front_app.separator left \
-    --set front_app.separator \
-    background.color=0x00000000 \
-    icon= \
-    icon.color=0xffa6da95 \
-    icon.font="$FONT_FACE:Bold:23.0" \
-    icon.padding_left=0 \
-    icon.padding_right=0 \
-    icon.y_offset=1 \
-    label.drawing=no \
-    --add item front_app.name left \
-    --set front_app.name \
-    background.color=0x00000000 \
-    icon.drawing=off \
-    label.font="$FONT_FACE:Bold:16.0" \
-    label.color=0xffcad3f5 \
-    label.padding_left=5 \
-    \
+           --set front_app \
+           background.color=$ITEM_BG_COLOR \
+           background.corner_radius=10 \
+           icon.drawing=off \
+           label.font="$FONT_FACE:Black:13.0" \
+           label.color=$TEXT_PRIMARY \
+           script="$PLUGIN_DIR/front_app.sh" \
+           --subscribe front_app front_app_switched
 
-# Create bracket for front app
-sketchybar --add bracket front_app_bracket \
-    front_app \
-    front_app.separator \
-    front_app.name \
-    --subscribe front_app front_app_switched
-
-# Right side items
+# Right side items (minimal style)
 sketchybar --add item clock right \
-    --set clock \
-    icon=󰃰 \
-    background.color=0xffed8796 \
-    update_freq=10 \
-    script="$PLUGIN_DIR/clock.sh"
-
-sketchybar --add event spotify_change "com.spotify.client.PlaybackStateChanged" \
-    --add item spotify right \
-    --set spotify \
-    icon= \
-    icon.y_offset=1 \
-    label.drawing=off \
-    label.padding_left=3 \
-    script="$PLUGIN_DIR/spotify.sh" \
-    --subscribe spotify spotify_change mouse.clicked
+           --set clock \
+           background.color=$ITEM_BG_COLOR \
+           background.corner_radius=10 \
+           icon.drawing=off \
+           label.font="$FONT_FACE:Black:13.0" \
+           label.color=$TEXT_PRIMARY \
+           update_freq=10 \
+           script="$PLUGIN_DIR/clock.sh"
 
 ##### Finalizing Setup #####
 sketchybar --update
