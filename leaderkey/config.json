@@ -86,6 +86,11 @@
       "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
     },
     {
+      "key" : "t",
+      "type" : "application",
+      "value" : "/Applications/Ghostty.app"
+    },
+    {
       "actions" : [
         {
           "key" : "m",
@@ -211,11 +216,6 @@
     {
       "actions" : [
         {
-          "key" : "g",
-          "type" : "application",
-          "value" : "/Applications/Ghostty.app"
-        },
-        {
           "key" : "a",
           "type" : "application",
           "value" : "/Applications/Alacritty.app"
@@ -226,7 +226,7 @@
           "value" : "/Applications/WezTerm.app"
         }
       ],
-      "key" : "t",
+      "key" : "T",
       "label" : "Terminals",
       "type" : "group"
     },
@@ -273,6 +273,12 @@
           "label" : "Summarize YouTube",
           "type" : "url",
           "value" : "raycast://ai-commands/summarize-youtube-video"
+        },
+        {
+          "key" : "e",
+          "label" : "Translate to English",
+          "type" : "url",
+          "value" : "raycast://ai-commands/translate-to-english"
         }
       ],
       "key" : "a",
@@ -348,7 +354,7 @@
           "value" : "raycast://extensions/tailscale/tailscale/connect"
         }
       ],
-      "key" : "T",
+      "key" : "S",
       "label" : "TailScale",
       "type" : "group"
     }
