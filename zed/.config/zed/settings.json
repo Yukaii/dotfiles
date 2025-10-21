@@ -27,7 +27,7 @@
     "edit_prediction_provider": "zed"
   },
   "agent": {
-    "default_profile": "minimal",
+    "default_profile": "write",
     "profiles": {
       "write": {
         "name": "Write",
@@ -57,14 +57,14 @@
       }
     },
     "default_model": {
-      "provider": "vercel",
-      "model": "v0-1.5-md"
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5-latest"
     }
   },
   "ui_font_family": "JetBrainsMono Nerd Font",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
-  "theme": "JetBrains New Dark",
+  "theme": "Github Dark",
   "vim_mode": true,
   "helix_mode": true,
   "auto_update": true,
