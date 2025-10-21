@@ -637,7 +637,7 @@ bundle nanoline 'https://github.com/ftonneau/nanoline.kak' %{
   nanoline dark
   nanoline-format
 
-  # Override nanoline-refresh to include git branch
+  # Override nanoline-refresh with filename/branch truncation
   define-command -hidden -override nanoline-refresh %{
     try %{
         nanoline-window-equals %opt(readonly) true
@@ -650,16 +650,50 @@ bundle nanoline 'https://github.com/ftonneau/nanoline.kak' %{
     catch %{ set-option -add window nanoline_head "%val(selection_count) " }
     set-option -add window nanoline_head '{default}'
 
-    set-option -add window nanoline_head "{default,+b}   %val(bufname) {default}"
+    # Add filename with truncation
+    evaluate-commands %sh{
+      bufname="$kak_bufname"
+      max_len=40
+
+      # Calculate length
+      len=${#bufname}
+
+      if [ "$len" -gt "$max_len" ]; then
+        # Truncate and add ellipsis - keep the end part (filename) visible
+        keep=$((max_len - 3))
+        start=$((len - keep))
+        truncated="…${bufname:$start}"
+      else
+        truncated="$bufname"
+      fi
+
+      # Escape for Kakoune
+      truncated=$(printf '%s' "$truncated" | sed "s/'/''/g")
+      printf "set-option -add window nanoline_head '{default,+b}   %s {default}'\n" "$truncated"
+    }
+
     try %{ nanoline-window-equals %opt(filetype) '' } \
     catch %{ set-option -add window nanoline_head "(%opt(filetype))" }
 
-    # Add git branch if available
+    # Add git branch with truncation and icon if available
     evaluate-commands %sh{
       if [ -n "$kak_opt_modeline_git_branch" ]; then
-        # Properly escape the branch name for Kakoune
-        branch=$(printf '%s' "$kak_opt_modeline_git_branch" | sed "s/'/''/g")
-        printf "set-option -add window nanoline_head ' {cyan}  %s{default}'\n" "$branch"
+        branch="$kak_opt_modeline_git_branch"
+        max_branch_len=25
+        len=${#branch}
+
+        if [ "$len" -gt "$max_branch_len" ]; then
+          # Truncate branch name
+          keep=$((max_branch_len - 1))
+          truncated="${branch:0:$keep}…"
+        else
+          truncated="$branch"
+        fi
+
+        # Escape for Kakoune
+        truncated=$(printf '%s' "$truncated" | sed "s/'/''/g")
+        # Using  (git branch icon from nerd fonts)
+        printf "set-option -add window nanoline_head ' {cyan}  %s{default}'\n" "$truncated"
       fi
     }
 
