@@ -56,6 +56,8 @@ broot/.config/broot/launcher/
 codex/.codex/*
 !codex/.codex/config.json
 
+!claude/.claude/settings.json
+
 .storage
 
 !.gitkeep
