@@ -43,6 +43,7 @@ macos-icon = xray
 
 # Shaders
 # custom-shader = shaders/bettercrt.glsl
+# custom-shader = shaders/matrix-hallway.glsl
 # custom-shader = shaders/underwater.glsl
 custom-shader = my_shaders/cursor-trail.glsl
 # custom-shader = cursor_shaders/shaders/cursor_blaze_no_trail.glsl
