@@ -1,0 +1,33 @@
+{
+  "plugins": {
+    "CopilotChat.nvim": {
+      "rev": "f68deee"
+    },
+    "blame.nvim": [],
+    "gitsigns.nvim": {
+      "rev": "1ee5c1f"
+    },
+    "harpoon": {
+      "version": "'harpoon2'"
+    },
+    "kanagawa.nvim": {
+      "rev": "27f1e11"
+    },
+    "mini.nvim": {
+      "rev": "fbb6ad0"
+    },
+    "nvim-colorizer.lua": [],
+    "nvim-lspconfig": {
+      "rev": "e688b48"
+    },
+    "nvim-treesitter": [],
+    "oil.nvim": [],
+    "plenary.nvim": [],
+    "snacks.nvim": {
+      "rev": "dae80fb"
+    },
+    "which-key.nvim": {
+      "rev": "b4177e3"
+    }
+  }
+}
