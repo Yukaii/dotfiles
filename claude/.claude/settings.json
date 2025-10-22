@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "open raycast://extensions/raycast/raycast/confetti"
+            "command": "open raycast://extensions/raycast/raycast/confetti?emojis=🤖🤖🔥🔥"
           }
         ]
       }
