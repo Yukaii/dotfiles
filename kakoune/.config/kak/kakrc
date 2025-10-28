@@ -702,3 +702,6 @@ bundle nanoline 'https://github.com/ftonneau/nanoline.kak' %{
     echo -markup %opt(nanoline_head)
   }
 }
+
+bundle texture 'https://github.com/ftonneau/texture.kak' %{
+}
