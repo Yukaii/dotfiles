@@ -338,12 +338,47 @@ test_workday_only_mode() {
     fi
 }
 
-# Test 11: Custom start date
-test_custom_start_date() {
-    log_test "Test 11: Custom start date"
+# Test 11: Custom work hours
+test_custom_work_hours() {
+    log_test "Test 11: Custom work hours (9am-5pm)"
 
-    create_test_repo "test11" "2024-10-21 10:00:00"
+    create_test_repo "test11" "2024-10-21 08:00:00"
     cd "$TEST_DIR/test11"
+
+    # Set custom work hours to 9-17 (9am-5pm), default is 8-18
+    echo "y" | "$SCRIPT_PATH" --workday-only --work-start 9 --work-end 17 >/dev/null 2>&1
+
+    local all_in_custom_hours=true
+    while read -r commit_date; do
+        local hour=$(date -j -f "%Y-%m-%d %H:%M:%S %z" "$commit_date" "+%H" 2>/dev/null)
+        hour=$((10#$hour))
+        local day_of_week=$(date -j -f "%Y-%m-%d %H:%M:%S %z" "$commit_date" "+%w" 2>/dev/null)
+
+        # Should be weekday and within custom work hours (9-16, since end is exclusive)
+        if [ "$day_of_week" -ge 1 ] && [ "$day_of_week" -le 5 ]; then
+            if [ $hour -lt 9 ] || [ $hour -ge 17 ]; then
+                all_in_custom_hours=false
+                break
+            fi
+        else
+            all_in_custom_hours=false
+            break
+        fi
+    done < <(git log --pretty=format:"%ai")
+
+    if [ "$all_in_custom_hours" = true ]; then
+        log_pass "All commits in custom work hours (9am-5pm)"
+    else
+        log_fail "Some commits not in custom work hours"
+    fi
+}
+
+# Test 12: Custom start date
+test_custom_start_date() {
+    log_test "Test 12: Custom start date"
+
+    create_test_repo "test12" "2024-10-21 10:00:00"
+    cd "$TEST_DIR/test12"
 
     echo "y" | "$SCRIPT_PATH" -s "2024-11-01 20:00:00" >/dev/null 2>&1
 
@@ -377,6 +412,7 @@ main() {
     test_evening_only_mode
     test_night_only_mode
     test_workday_only_mode
+    test_custom_work_hours
     test_custom_start_date
 
     echo

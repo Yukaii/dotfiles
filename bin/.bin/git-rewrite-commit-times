@@ -15,8 +15,8 @@ NC='\033[0m' # No Color
 # Configuration
 MIN_COMMIT_TIME=300      # 5 minutes minimum between commits
 BASE_LINES_PER_HOUR=100  # Base assumption: 100 lines = 1 hour of work
-WORK_START_HOUR=8        # Work starts at 08:00
-WORK_END_HOUR=18         # Work ends at 18:00
+DEFAULT_WORK_START_HOUR=8        # Work starts at 08:00 by default
+DEFAULT_WORK_END_HOUR=18         # Work ends at 18:00 by default
 
 usage() {
     cat << EOF
@@ -31,10 +31,12 @@ OPTIONS:
     -d, --dry-run          Show what would be done without making changes
     -s, --start <date>     Start date for new timeline (default: first commit date)
                             Format: YYYY-MM-DD or "YYYY-MM-DD HH:MM:SS"
+    --work-start <hour>    Work day start hour (default: 8)
+    --work-end <hour>      Work day end hour (default: 18)
     --weekend-only         Only place commits on weekends
-    --workday-only         Only place commits on weekday work hours (08:00-18:00)
-    --evening-only         Only place commits on weekday evenings (18:00-23:59)
-    --night-only           Only place commits on weekday nights (00:00-08:00)
+    --workday-only         Only place commits on weekday work hours
+    --evening-only         Only place commits on weekday evenings
+    --night-only           Only place commits on weekday nights
 
 EXAMPLES:
     # Rewrite all commits in current branch
@@ -51,6 +53,12 @@ EXAMPLES:
 
     # Only use workday hours (make it look like you work 9-5)
     $(basename "$0") --workday-only
+
+    # Custom work hours (9am-5pm instead of default 8am-6pm)
+    $(basename "$0") --workday-only --work-start 9 --work-end 17
+
+    # Flexible schedule (10am-4pm) on non-work hours
+    $(basename "$0") --work-start 10 --work-end 16
 
     # Start timeline from a specific date
     $(basename "$0") -s "2024-01-01 20:00:00"
@@ -307,6 +315,8 @@ adjust_to_non_work_time() {
 REVISION_RANGE="--all"
 DRY_RUN=false
 START_DATE=""
+WORK_START_HOUR=$DEFAULT_WORK_START_HOUR
+WORK_END_HOUR=$DEFAULT_WORK_END_HOUR
 WEEKEND_ONLY=false
 WORKDAY_ONLY=false
 EVENING_ONLY=false
@@ -327,6 +337,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         -s|--start)
             START_DATE="$2"
+            shift 2
+            ;;
+        --work-start)
+            WORK_START_HOUR="$2"
+            shift 2
+            ;;
+        --work-end)
+            WORK_END_HOUR="$2"
             shift 2
             ;;
         --weekend-only)
@@ -351,6 +369,22 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Validate work hours
+if ! [[ "$WORK_START_HOUR" =~ ^[0-9]+$ ]] || [ "$WORK_START_HOUR" -lt 0 ] || [ "$WORK_START_HOUR" -gt 23 ]; then
+    log_error "Invalid work start hour: $WORK_START_HOUR (must be 0-23)"
+    exit 1
+fi
+
+if ! [[ "$WORK_END_HOUR" =~ ^[0-9]+$ ]] || [ "$WORK_END_HOUR" -lt 1 ] || [ "$WORK_END_HOUR" -gt 24 ]; then
+    log_error "Invalid work end hour: $WORK_END_HOUR (must be 1-24)"
+    exit 1
+fi
+
+if [ "$WORK_START_HOUR" -ge "$WORK_END_HOUR" ]; then
+    log_error "Work start hour ($WORK_START_HOUR) must be less than work end hour ($WORK_END_HOUR)"
+    exit 1
+fi
 
 # Main execution
 main() {
