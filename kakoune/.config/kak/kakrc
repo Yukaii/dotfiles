@@ -55,7 +55,7 @@ set-option global autoreload yes
 set-option global grepcmd 'rg -Hn --no-heading --sort path --vimgrep'
 
 add-highlighter global/number-lines number-lines -hlcursor -relative -separator '  '
-add-highlighter global/show-whitespaces show-whitespaces -indent '▏' -lf ' ' -spc ' ' -nbsp ' ' -tab ' ' -tabpad ' '
+# add-highlighter global/show-whitespaces show-whitespaces -indent '▏' -lf ' ' -spc ' ' -nbsp ' ' -tab ' ' -tabpad ' '
 add-highlighter global/ show-matching
 add-highlighter global/ wrap -word
 add-highlighter global/todo-highlighter regex //\h*(TODO:)[^\n]* 0:cyan 1:yellow,red
