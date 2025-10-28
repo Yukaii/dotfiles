@@ -1,0 +1,482 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# git-rewrite-commit-times
+# Rewrites Git commit times to non-work hours (weekends or weekdays 18:00-08:00)
+# with realistic randomization based on changeset size
+
+# Color output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Configuration
+MIN_COMMIT_TIME=300      # 5 minutes minimum between commits
+BASE_LINES_PER_HOUR=100  # Base assumption: 100 lines = 1 hour of work
+WORK_START_HOUR=8        # Work starts at 08:00
+WORK_END_HOUR=18         # Work ends at 18:00
+
+usage() {
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+Rewrites Git commit times to non-work hours with realistic randomization.
+
+OPTIONS:
+    -h, --help              Show this help message
+    -r, --range <range>     Git revision range (default: --all)
+                            Examples: HEAD~10..HEAD, main..feature-branch
+    -d, --dry-run          Show what would be done without making changes
+    -s, --start <date>     Start date for new timeline (default: first commit date)
+                            Format: YYYY-MM-DD or "YYYY-MM-DD HH:MM:SS"
+    --weekend-only         Only place commits on weekends
+    --workday-only         Only place commits on weekday work hours (08:00-18:00)
+    --evening-only         Only place commits on weekday evenings (18:00-23:59)
+    --night-only           Only place commits on weekday nights (00:00-08:00)
+
+EXAMPLES:
+    # Rewrite all commits in current branch
+    $(basename "$0")
+
+    # Rewrite last 10 commits
+    $(basename "$0") -r HEAD~10..HEAD
+
+    # Dry run to see what would happen
+    $(basename "$0") --dry-run
+
+    # Only use weekend times
+    $(basename "$0") --weekend-only
+
+    # Only use workday hours (make it look like you work 9-5)
+    $(basename "$0") --workday-only
+
+    # Start timeline from a specific date
+    $(basename "$0") -s "2024-01-01 20:00:00"
+
+WARNING: This rewrites Git history. Only use on branches you haven't pushed
+         or coordinate with your team before force-pushing.
+
+EOF
+    exit 0
+}
+
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $*"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $*"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $*"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $*"
+}
+
+# Check if we're in a git repository
+check_git_repo() {
+    if ! git rev-parse --git-dir > /dev/null 2>&1; then
+        log_error "Not in a git repository"
+        exit 1
+    fi
+}
+
+# Check for uncommitted changes
+check_clean_working_tree() {
+    if ! git diff-index --quiet HEAD -- 2>/dev/null; then
+        log_error "You have uncommitted changes. Please commit or stash them first."
+        exit 1
+    fi
+}
+
+# Generate a random time offset in seconds based on changeset size
+generate_time_offset() {
+    local lines_changed=$1
+    local base_time=$((lines_changed * 3600 / BASE_LINES_PER_HOUR))
+
+    # Add minimum time
+    local min_time=$MIN_COMMIT_TIME
+
+    # Calculate total time with some randomization (±30%)
+    local variance=$((base_time * 30 / 100))
+    if [ $variance -eq 0 ]; then
+        variance=1800  # 30 minutes default variance
+    fi
+    local random_offset=$((RANDOM % (variance * 2) - variance))
+    local total_time=$((base_time + random_offset + min_time))
+
+    # Ensure minimum time
+    if [ $total_time -lt $MIN_COMMIT_TIME ]; then
+        total_time=$MIN_COMMIT_TIME
+    fi
+
+    echo $total_time
+}
+
+# Check if a given hour is work time
+is_work_time() {
+    local hour=$1
+    [ $hour -ge $WORK_START_HOUR ] && [ $hour -lt $WORK_END_HOUR ]
+}
+
+# Check if a date is weekend (0 = Sunday, 6 = Saturday)
+is_weekend() {
+    local timestamp=$1
+    local day_of_week=$(date -r "$timestamp" "+%w" 2>/dev/null || date -d "@$timestamp" "+%w")
+    [ "$day_of_week" -eq 0 ] || [ "$day_of_week" -eq 6 ]
+}
+
+# Get hour from timestamp (compatible with both BSD and GNU date)
+get_hour() {
+    local timestamp=$1
+    date -r "$timestamp" "+%-H" 2>/dev/null || date -d "@$timestamp" "+%-H" 2>/dev/null || date -r "$timestamp" "+%H"
+}
+
+# Adjust timestamp to next non-work period (or work period for workday-only mode)
+adjust_to_non_work_time() {
+    local timestamp=$1
+    local weekend_only=$2
+    local workday_only=$3
+    local evening_only=$4
+    local night_only=$5
+
+    local max_iterations=100
+    local iteration=0
+
+    while [ $iteration -lt $max_iterations ]; do
+        iteration=$((iteration + 1))
+
+        local hour=$(get_hour "$timestamp")
+        # Remove leading zero if present
+        hour=$((10#$hour))
+
+        local is_weekend_day=$(is_weekend "$timestamp" && echo "true" || echo "false")
+
+        # Weekend only mode
+        if [ "$weekend_only" = "true" ]; then
+            if [ "$is_weekend_day" = "true" ]; then
+                # Add random time within the day (00:00 to 23:59)
+                local random_seconds=$((RANDOM % 86400))
+                timestamp=$((timestamp - (hour * 3600) + random_seconds))
+                echo "$timestamp"
+                return
+            else
+                # Move to next Saturday
+                local day_of_week=$(date -r "$timestamp" "+%w" 2>/dev/null || date -d "@$timestamp" "+%w")
+                local days_until_saturday=$(( (6 - day_of_week + 7) % 7 ))
+                if [ $days_until_saturday -eq 0 ]; then
+                    days_until_saturday=7
+                fi
+                timestamp=$((timestamp + (days_until_saturday * 86400)))
+                continue
+            fi
+        fi
+
+        # Workday only mode (08:00-18:00 on weekdays)
+        if [ "$workday_only" = "true" ]; then
+            if [ "$is_weekend_day" = "false" ]; then
+                # It's a weekday, check if in work hours
+                if [ $hour -ge $WORK_START_HOUR ] && [ $hour -lt $WORK_END_HOUR ]; then
+                    # Already in work hours, add small random offset
+                    local random_seconds=$((RANDOM % 3600))
+                    echo $((timestamp + random_seconds))
+                    return
+                else
+                    # Move to work hours (08:00-18:00)
+                    if [ $hour -lt $WORK_START_HOUR ]; then
+                        # Before work, move to 08:00 same day
+                        timestamp=$((timestamp + ((WORK_START_HOUR - hour) * 3600)))
+                        # Add random offset within work hours (0-10 hours)
+                        local random_work_seconds=$((RANDOM % 36000))
+                        timestamp=$((timestamp + random_work_seconds))
+                    else
+                        # After work, move to next weekday 08:00
+                        timestamp=$((timestamp + ((24 - hour + WORK_START_HOUR) * 3600)))
+                        # Add random offset within work hours
+                        local random_work_seconds=$((RANDOM % 36000))
+                        timestamp=$((timestamp + random_work_seconds))
+                    fi
+                    continue
+                fi
+            else
+                # It's weekend, move to Monday 08:00
+                local day_of_week=$(date -r "$timestamp" "+%w" 2>/dev/null || date -d "@$timestamp" "+%w")
+                local days_until_monday=$(( (8 - day_of_week) % 7 ))
+                if [ $days_until_monday -eq 0 ]; then
+                    days_until_monday=1
+                fi
+                timestamp=$((timestamp + (days_until_monday * 86400)))
+                timestamp=$((timestamp - (hour * 3600) + (WORK_START_HOUR * 3600)))
+                # Add random offset within work hours
+                local random_work_seconds=$((RANDOM % 36000))
+                timestamp=$((timestamp + random_work_seconds))
+                continue
+            fi
+        fi
+
+        # Evening only mode (18:00-23:59)
+        if [ "$evening_only" = "true" ]; then
+            if [ "$is_weekend_day" = "false" ]; then
+                if [ $hour -ge $WORK_END_HOUR ] && [ $hour -lt 24 ]; then
+                    # Already in evening time, add small random offset
+                    local random_seconds=$((RANDOM % 3600))
+                    echo $((timestamp + random_seconds))
+                    return
+                else
+                    # Move to 18:00 same day if before, or next weekday if after
+                    if [ $hour -lt $WORK_END_HOUR ]; then
+                        timestamp=$((timestamp + ((WORK_END_HOUR - hour) * 3600)))
+                    else
+                        # Move to next weekday 18:00
+                        timestamp=$((timestamp + 86400))
+                        local new_hour=$(get_hour "$timestamp")
+                        new_hour=$((10#$new_hour))
+                        timestamp=$((timestamp - (new_hour * 3600) + (WORK_END_HOUR * 3600)))
+                    fi
+                    continue
+                fi
+            else
+                # Skip weekend, move to Monday 18:00
+                local day_of_week=$(date -r "$timestamp" "+%w" 2>/dev/null || date -d "@$timestamp" "+%w")
+                local days_until_monday=$(( (8 - day_of_week) % 7 ))
+                if [ $days_until_monday -eq 0 ]; then
+                    days_until_monday=1
+                fi
+                timestamp=$((timestamp + (days_until_monday * 86400)))
+                timestamp=$((timestamp - (hour * 3600) + (WORK_END_HOUR * 3600)))
+                continue
+            fi
+        fi
+
+        # Night only mode (00:00-08:00)
+        if [ "$night_only" = "true" ]; then
+            if [ "$is_weekend_day" = "false" ]; then
+                if [ $hour -lt $WORK_START_HOUR ]; then
+                    # Already in night time, add small random offset
+                    local random_seconds=$((RANDOM % 1800))
+                    echo $((timestamp + random_seconds))
+                    return
+                else
+                    # Move to next day 00:00
+                    timestamp=$((timestamp + ((24 - hour) * 3600)))
+                    continue
+                fi
+            else
+                # Skip weekend, move to Monday 00:00
+                local day_of_week=$(date -r "$timestamp" "+%w" 2>/dev/null || date -d "@$timestamp" "+%w")
+                local days_until_monday=$(( (8 - day_of_week) % 7 ))
+                if [ $days_until_monday -eq 0 ]; then
+                    days_until_monday=1
+                fi
+                timestamp=$((timestamp + (days_until_monday * 86400)))
+                timestamp=$((timestamp - (hour * 3600)))
+                continue
+            fi
+        fi
+
+        # Default mode: weekends OR non-work hours (18:00-08:00)
+        if [ "$is_weekend_day" = "true" ]; then
+            # It's weekend, pick a random time in the day
+            local random_seconds=$((RANDOM % 86400))
+            timestamp=$((timestamp - (hour * 3600) + random_seconds))
+            echo "$timestamp"
+            return
+        elif ! is_work_time "$hour"; then
+            # It's a weekday but non-work time, add small random offset
+            local random_seconds=$((RANDOM % 1800))
+            echo $((timestamp + random_seconds))
+            return
+        else
+            # It's work time, move to evening (18:00) with some randomness
+            local hours_to_evening=$((WORK_END_HOUR - hour))
+            local random_evening_offset=$((RANDOM % 3600))
+            timestamp=$((timestamp + (hours_to_evening * 3600) + random_evening_offset))
+        fi
+    done
+
+    # Fallback: return timestamp with random offset
+    echo $((timestamp + RANDOM % 86400))
+}
+
+# Parse command line arguments
+REVISION_RANGE="--all"
+DRY_RUN=false
+START_DATE=""
+WEEKEND_ONLY=false
+WORKDAY_ONLY=false
+EVENING_ONLY=false
+NIGHT_ONLY=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            usage
+            ;;
+        -r|--range)
+            REVISION_RANGE="$2"
+            shift 2
+            ;;
+        -d|--dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        -s|--start)
+            START_DATE="$2"
+            shift 2
+            ;;
+        --weekend-only)
+            WEEKEND_ONLY=true
+            shift
+            ;;
+        --workday-only)
+            WORKDAY_ONLY=true
+            shift
+            ;;
+        --evening-only)
+            EVENING_ONLY=true
+            shift
+            ;;
+        --night-only)
+            NIGHT_ONLY=true
+            shift
+            ;;
+        *)
+            log_error "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+# Main execution
+main() {
+    check_git_repo
+
+    if [ "$DRY_RUN" = false ]; then
+        check_clean_working_tree
+    fi
+
+    log_info "Analyzing commit history..."
+
+    # Create temporary files for storing commit data
+    local commits_file=$(mktemp)
+    local lines_file=$(mktemp)
+
+    trap "rm -f $commits_file $lines_file" EXIT
+
+    # Get list of commits
+    # Note: Using tformat instead of format to ensure trailing newline for proper line counting
+    git log $REVISION_RANGE --pretty=tformat:"%H|%at|%s" --reverse > "$commits_file"
+
+    # Calculate lines changed for each commit
+    while IFS='|' read -r commit_hash timestamp subject; do
+        local lines=$(git show --numstat --format= "$commit_hash" | awk '{added+=$1; removed+=$2} END {print added+removed}')
+        if [ -z "$lines" ] || [ "$lines" = "0" ]; then
+            lines=10  # Default for commits with no changes (like merges)
+        fi
+        echo "$commit_hash|$timestamp|$lines|$subject" >> "$lines_file"
+    done < "$commits_file"
+
+    # Determine start timestamp
+    local current_time
+    if [ -n "$START_DATE" ]; then
+        current_time=$(date -j -f "%Y-%m-%d %H:%M:%S" "$START_DATE" "+%s" 2>/dev/null || date -j -f "%Y-%m-%d" "$START_DATE 00:00:00" "+%s" 2>/dev/null)
+        if [ -z "$current_time" ]; then
+            log_error "Invalid date format: $START_DATE"
+            exit 1
+        fi
+    else
+        # Use the timestamp of the first commit
+        current_time=$(head -1 "$lines_file" | cut -d'|' -f2)
+    fi
+
+    local commit_count=$(wc -l < "$lines_file" | tr -d ' ')
+    log_info "Processing $commit_count commits..."
+    echo
+
+    # Create temporary file for new timestamps
+    local timestamps_file=$(mktemp)
+    trap "rm -f $commits_file $lines_file $timestamps_file" EXIT
+
+    # Generate new timestamps for each commit
+    while IFS='|' read -r commit_hash old_timestamp lines subject; do
+        local short_hash=$(echo "$commit_hash" | cut -c1-7)
+
+        # Ensure minimum lines for realistic timing
+        if [ "$lines" -lt 5 ]; then
+            lines=5
+        fi
+
+        # Generate time offset based on changeset size
+        local time_offset=$(generate_time_offset "$lines")
+        current_time=$((current_time + time_offset))
+
+        # Adjust to non-work time (or work time for workday-only mode)
+        current_time=$(adjust_to_non_work_time "$current_time" "$WEEKEND_ONLY" "$WORKDAY_ONLY" "$EVENING_ONLY" "$NIGHT_ONLY")
+
+        # Store the mapping
+        echo "$commit_hash|$current_time" >> "$timestamps_file"
+
+        local readable_date=$(date -r "$current_time" "+%Y-%m-%d %H:%M:%S %a" 2>/dev/null || date -d "@$current_time" "+%Y-%m-%d %H:%M:%S %a")
+
+        if [ "$DRY_RUN" = true ]; then
+            echo -e "${BLUE}$short_hash${NC} | ${GREEN}$readable_date${NC} | ${YELLOW}${lines} lines${NC} | $subject"
+        else
+            echo -e "${BLUE}$short_hash${NC} → ${GREEN}$readable_date${NC} (${YELLOW}${lines} lines${NC})"
+        fi
+    done < "$lines_file"
+
+    echo
+
+    if [ "$DRY_RUN" = true ]; then
+        log_info "Dry run completed. No changes made."
+        log_info "Run without --dry-run to apply these changes."
+        return
+    fi
+
+    # Confirm before proceeding
+    log_warning "This will rewrite Git history!"
+    read -p "Continue? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        log_info "Aborted."
+        return
+    fi
+
+    # Backup current branch
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    local backup_branch="backup-$(date +%Y%m%d-%H%M%S)-$current_branch"
+    git branch "$backup_branch"
+    log_info "Created backup branch: $backup_branch"
+
+    # Rewrite history using filter-branch
+    log_info "Rewriting commit history..."
+
+    # Build the case statement for filter-branch
+    local case_statement=""
+    while IFS='|' read -r commit_hash new_timestamp; do
+        case_statement="${case_statement}                $commit_hash) export GIT_AUTHOR_DATE='$new_timestamp'; export GIT_COMMITTER_DATE='$new_timestamp';;\n"
+    done < "$timestamps_file"
+
+    # Clean up any previous filter-branch backups
+    rm -rf .git/refs/original
+
+    # Execute filter-branch with dynamic case statement
+    # Note: -- --all syntax is needed for proper revision range handling
+    FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --env-filter "
+        case \$GIT_COMMIT in
+$(echo -e "$case_statement")        esac
+    " -- $REVISION_RANGE 2>/dev/null
+
+    log_success "Commit history rewritten successfully!"
+    echo
+    log_info "Backup branch created: $backup_branch"
+    log_info "To restore original history: git reset --hard $backup_branch"
+    log_warning "To push changes: git push --force-with-lease"
+}
+
+main "$@"
