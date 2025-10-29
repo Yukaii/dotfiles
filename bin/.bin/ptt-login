@@ -83,8 +83,11 @@ if {$username == "" || $password == ""} {
     exit 1
 }
 
-# Connect to PTT
-spawn ssh bbsu@ptt.cc
+# Connect to PTT with fixed terminal size
+set env(COLUMNS) 80
+set env(LINES) 24
+spawn ssh -o SendEnv=COLUMNS,LINES bbsu@ptt.cc
+
 
 # Wait for the login prompt
 expect "請輸入代號"
