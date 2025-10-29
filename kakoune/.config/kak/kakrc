@@ -306,6 +306,40 @@ define-command glow -params .. -file-completion -docstring %{
   }
 }
 
+define-command mdt -params .. -file-completion -docstring %{
+  mdt [<arguments>]: md-tui utility wrapper
+  All optional arguments are forwarded to the md-tui utility
+  If no arguments is passed. The current buffer will be previewed
+} %{
+  evaluate-commands %sh{
+    if [ $# -eq 0 ]; then
+      if [ -e "$kak_buffile" ]; then
+        echo "terminal-horizontal mdt %val{buffile}"
+      else
+        dir="$(dirname "$kak_buffile")"
+        if [ -d "$dir" ]; then
+          echo "terminal-horizontal mdt $dir"
+        fi
+      fi
+    else
+      echo "terminal-horizontal mdt %arg{@}"
+    fi
+  }
+}
+
+# Markdown user mode
+declare-user-mode markdown
+map global markdown g ':glow<ret>' -docstring 'preview with glow'
+map global markdown m ':mdt<ret>'  -docstring 'preview with md-tui'
+
+hook global WinSetOption filetype=markdown %{
+  map window user v ':enter-user-mode markdown<ret>' -docstring 'markdown preview'
+}
+
+hook global WinSetOption filetype=(?!markdown).* %{
+  unmap window user v ':enter-user-mode markdown<ret>'
+}
+
 define-command format-indent -params 0..2 -docstring '
   indentfmt [indent-type] [size]: Format current buffer indentation
   indent-type: space or tab (default: space)
