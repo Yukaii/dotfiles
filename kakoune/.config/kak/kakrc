@@ -64,28 +64,37 @@ add-highlighter global/ regex \b(TODO|FIXME|NOTE)\b 0:default+rb
 
 
 # User mode mappings
+# Core actions (frequently used)
 map global user '<space>' ':kks-connect terminal-popup kks-mru<ret>'    -docstring 'recent files'
 map global user n         ':e -scratch<ret>'                            -docstring 'create buffer'
 map global user c         ':db<ret>'                                    -docstring 'delete buffer'
 map global user q         ':q<ret>'                                     -docstring 'quit'
-map global user y         ':enter-user-mode yank<ret>'                  -docstring 'yank operations'
-map global user P         '!pbpaste<ret>'                               -docstring 'paste from clipboard'
-map global user p         '<a-!>pbpaste<ret>'                           -docstring 'paste before from clipboard'
-map global user R         '|pbpaste<ret>'                               -docstring 'replace selection with clipaboard'
-map global user /         ':comment-line<ret>'                          -docstring 'comment line'
-map global user ?         ':comment-block<ret>'                         -docstring 'block comment selection'
-map global user e         ':open-broot<ret>'                            -docstring 'explorer'
+map global user w         ':w<ret>'                                     -docstring 'write'
 map global user ,         ':edit-config<ret>'                           -docstring 'edit config'
-map global user d         ':buffer *debug*<ret>'                        -docstring 'debug buffer'
-map global user h         ':lsp-hover<ret>'                             -docstring 'lsp hover'
-map global user H         ':lsp-hover-buffer<ret>'                      -docstring 'lsp hover buffer'
-map global user S         ':trim-trailing-whitespaces<ret>'             -docstring 'trim trailing whitesapce'
-map global user w         ':w<ret>'                                     -docstring 'write file'
-map global user t         ':enter-user-mode terminal-actions<ret>'      -docstring 'terminal actions'
-map global user f         ':enter-user-mode find-actions<ret>'          -docstring 'find actions'
-map global user b         ':enter-user-mode buffer-actions<ret>'        -docstring 'buffer actions'
-map global user B         ':enter-user-mode buffer-actions -lock<ret>'  -docstring 'buffer actions (Locked)'
-map global user l         ':enter-user-mode lsp<ret>'                   -docstring 'lsp mode'
+map global user y         ':enter-user-mode yank<ret>'                  -docstring 'yank operations'
+map global user E         ':open-broot<ret>'                            -docstring 'file explorer'
+map global user W         ':grep-write<ret>'                            -docstring 'grep write'
+
+# Domain modes
+map global user f         ':enter-user-mode find-actions<ret>'          -docstring 'files & navigation'
+map global user g         ':enter-user-mode git<ret>'                   -docstring 'git'
+map global user l         ':enter-user-mode lsp<ret>'                   -docstring 'LSP'
+map global user b         ':enter-user-mode buffer-actions<ret>'        -docstring 'buffers'
+map global user B         ':enter-user-mode buffer-actions -lock<ret>'  -docstring 'buffers (locked)'
+map global user t         ':enter-user-mode terminal-actions<ret>'      -docstring 'terminal'
+map global user v         ':enter-user-mode view-actions<ret>'          -docstring 'view & display'
+map global user e         ':enter-user-mode edit-actions<ret>'          -docstring 'edit & format'
+
+# Plugin modes
+map global user o         ':enter-user-mode harpoon<ret>'               -docstring 'harpoon'
+map global user m         ':enter-user-mode mark<ret>'                  -docstring 'marks'
+map global user k         ':enter-user-mode konflict<ret>'              -docstring 'git konflict'
+map global user s         ':enter-user-mode spell<ret>'                 -docstring 'spelling'
+
+# Advanced modes
+map global user D         ':enter-user-mode dev-debug<ret>'             -docstring 'dev & debug'
+map global user j         ':enter-user-mode jump-actions<ret>'          -docstring 'jump mode'
+map global user J         ':enter-user-mode hump-jump -lock<ret>'       -docstring 'hump jump'
 
 define-command trim-trailing-whitespaces -docstring 'trim trailing whitespaces' %{
   try %{
@@ -184,28 +193,33 @@ define-command -override run -shell-completion -params .. -docstring 'run comman
 
 
 declare-user-mode find-actions
-map global find-actions -docstring 'pick buffer'                       'B'  ':open_buffer_picker<ret>'
-map global find-actions -docstring 'terminal'                          't'  ':kks-connect terminal-vertical fish<ret>'
-map global find-actions -docstring 'files'                             'f'  ':kks-connect terminal-popup kks-files<ret>'
+# File navigation
+map global find-actions -docstring 'files (all)'                       'f'  ':kks-connect terminal-popup kks-files<ret>'
 map global find-actions -docstring 'git files'                         'g'  ':kks-connect terminal-popup kks-git-files<ret>'
 map global find-actions -docstring 'git changed files'                 'd'  ':kks-connect terminal-popup kks-git-changed-files<ret>'
-map global find-actions -docstring 'buffers'                           'b'  ':kks-connect terminal-popup kks-buffers<ret>'
-map global find-actions -docstring 'live grep(fzf)'                    'w'  ':kks-connect terminal-popup kks-grep<ret>'
-map global find-actions -docstring 'live grep all files(fzf)'          'W'  ':kks-connect terminal-popup kks-grep --hidden<ret>'
-map global find-actions -docstring 'browse file on github'             'B'  ':browse_github<ret>'
-map global find-actions -docstring 'file types'                        'y'  ':kks-connect terminal-popup kks-filetypes<ret>'
-map global find-actions -docstring 'file inside buffer basefolder'     'e'  ':basefolder-files<ret>'
-map global find-actions -docstring 'file inside project root'          'E'  ':kks-connect terminal-popup kks-files-navigation<ret>'
-map global find-actions -docstring 'edit file under buffer basefolder' 'p'  ':basefolder-edit<ret>'
-map global find-actions -docstring 'switch themes'                     'T'  ':colorscheme<space>'
 map global find-actions -docstring 'PR changed files'                  'c'  ':kks-connect terminal-popup kks-pr-diff-files<ret>'
-map global find-actions -docstring 'file symbols'                    's'  ':kks-connect terminal-popup kks-cymbal-file<ret>'
-map global find-actions -docstring 'workspace symbols'               'S'  ':kks-connect terminal-popup kks-cymbal-workspace<ret>'
-map global find-actions -docstring 'edir in buffer directory'          <minus>  ':edir-buffer-dir<ret>'
-map global find-actions -docstring 'case insensitive search'          'i'  '/(?i)'
-map global find-actions -docstring 'case insensitive backward search' '<a-/>' '<a-/>(?i)'
-map global find-actions -docstring 'case insensitive extend search'   '?'  '?(?i)'
-map global find-actions -docstring 'case insensitive backward extend-search' '<a-?>' '<a-?>(?i)'
+map global find-actions -docstring 'file in buffer directory'          'e'  ':basefolder-files<ret>'
+map global find-actions -docstring 'file in project root'              'E'  ':kks-connect terminal-popup kks-files-navigation<ret>'
+
+# Buffer & Symbol navigation
+map global find-actions -docstring 'buffers'                           'b'  ':kks-connect terminal-popup kks-buffers<ret>'
+map global find-actions -docstring 'file symbols'                      's'  ':kks-connect terminal-popup kks-cymbal-file<ret>'
+map global find-actions -docstring 'workspace symbols'                 'S'  ':kks-connect terminal-popup kks-cymbal-workspace<ret>'
+
+# Search
+map global find-actions -docstring 'live grep'                         'w'  ':kks-connect terminal-popup kks-grep<ret>'
+map global find-actions -docstring 'live grep (all files)'             'W'  ':kks-connect terminal-popup kks-grep --hidden<ret>'
+map global find-actions -docstring 'live grep (plugin)'                '/'  ':live-grep<ret>'
+map global find-actions -docstring 'case insensitive /'                'i'  '/(?i)'
+map global find-actions -docstring 'case insensitive ?'                '?'  '?(?i)'
+
+# Misc
+map global find-actions -docstring 'terminal'                          't'  ':kks-connect terminal-vertical fish<ret>'
+map global find-actions -docstring 'file types'                        'y'  ':kks-connect terminal-popup kks-filetypes<ret>'
+map global find-actions -docstring 'edit path prompt'                  'p'  ':basefolder-edit<ret>'
+map global find-actions -docstring 'switch theme'                      'T'  ':colorscheme<space>'
+map global find-actions -docstring 'edir (buffer dir)'                 <minus>  ':edir-buffer-dir<ret>'
+map global find-actions -docstring 'browse on github'                  'h'  ':browse_github<ret>'
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
 	evaluate-commands %sh{
@@ -222,8 +236,30 @@ define-command basefolder-edit -docstring 'base folder edit' %{
 }
 
 
-declare-user-mode display-actions
-map global user D ':enter-user-mode display-actions<ret>' -docstring 'Enter display mode'
+# View & Display mode - consolidates display, markdown preview, UI toggles
+declare-user-mode view-actions
+map global view-actions s ':file-size<ret>'                          -docstring 'show file size'
+map global view-actions m ':enter-user-mode markdown<ret>'           -docstring 'markdown preview'
+map global view-actions t ':ui-trailing-whitespaces-toggle<ret>'     -docstring 'toggle trailing whitespace'
+map global view-actions u ':enter-user-mode ui<ret>'                 -docstring 'ui toggles'
+
+# Edit & Format mode - consolidates comments, formatting, text operations
+declare-user-mode edit-actions
+map global edit-actions / ':comment-line<ret>'                       -docstring 'comment line'
+map global edit-actions ? ':comment-block<ret>'                      -docstring 'comment block'
+map global edit-actions f ':enter-user-mode format<ret>'             -docstring 'format (prettier/eslint)'
+map global edit-actions i ':format-indent<ret>'                      -docstring 'format indentation'
+map global edit-actions s ':trim-trailing-whitespaces<ret>'          -docstring 'trim trailing whitespace'
+map global edit-actions r ':enter-user-mode replace<ret>'            -docstring 'replace mode'
+map global edit-actions c ':enter-user-mode case<ret>'               -docstring 'case transformations'
+map global edit-actions P '!pbpaste<ret>'                            -docstring 'paste from clipboard'
+map global edit-actions p '<a-!>pbpaste<ret>'                        -docstring 'paste before from clipboard'
+map global edit-actions R '|pbpaste<ret>'                            -docstring 'replace with clipboard'
+
+# Dev & Debug mode - consolidates debug buffer and ANSI rendering
+declare-user-mode dev-debug
+map global dev-debug d ':buffer *debug*<ret>'                        -docstring 'debug buffer'
+map global dev-debug a ':enter-user-mode ansi-mode<ret>'             -docstring 'ANSI rendering'
 
 # Show human-readable file size for current buffer's file
 define-command file-size -docstring 'Show human-readable file size of current buffer' %{
@@ -253,9 +289,6 @@ define-command file-size -docstring 'Show human-readable file size of current bu
   }
 }
 
-# Display-actions mapping
-map global display-actions 's' ':file-size<ret>' -docstring 'show file size'
-
 declare-user-mode window-actions
 map global window-actions 'h' ':focus-left<ret>'  -docstring 'focus left pane'
 map global window-actions 'j' ':focus-down<ret>'  -docstring 'focus down pane'
@@ -277,8 +310,9 @@ map -docstring 'enter jump mode (select mode: extend)' global jump-actions F ':e
 map -docstring 'enter jump mode (select mode: append)' global jump-actions <a-f> ':enter_jump_mode_with_append_select_mode<ret>'
 map globa user 'j' -docstring 'Enter jump mode' ':enter-user-mode jump-actions<ret>'
 
-map global user g ': enter-user-mode git<ret>' -docstring "git mode"
-map global user T ': enter-user-mode tree-sitter<ret>' -docstring "Tree sitter mode"
+# Note: git (g) mode is added by git_mode plugin
+# Tree-sitter mode (provided by kak-tree-sitter via kks init)
+map global user T ': enter-user-mode tree-sitter<ret>' -docstring "tree-sitter"
 
 # More objecct mapping from https://discuss.kakoune.com/t/useful-objects/58
 map -docstring "xml tag objet" global object t %{c<lt>([\w.]+)\b[^>]*?(?<lt>!/)>,<lt>/([\w.]+)\b[^>]*?(?<lt>!/)><ret>}
@@ -332,12 +366,14 @@ declare-user-mode markdown
 map global markdown g ':glow<ret>' -docstring 'preview with glow'
 map global markdown m ':mdt<ret>'  -docstring 'preview with md-tui'
 
+# Note: markdown mode is accessible via view-actions (<space>vm) for all files
+# or directly mapped to <space>M for markdown files only
 hook global WinSetOption filetype=markdown %{
-  map window user v ':enter-user-mode markdown<ret>' -docstring 'markdown preview'
+  map window user M ':enter-user-mode markdown<ret>' -docstring 'markdown preview'
 }
 
 hook global WinSetOption filetype=(?!markdown).* %{
-  unmap window user v ':enter-user-mode markdown<ret>'
+  try %{ unmap window user M ':enter-user-mode markdown<ret>' }
 }
 
 define-command format-indent -params 0..2 -docstring '
@@ -465,6 +501,7 @@ bundle git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
 
   # Declare git mode with default set of mappings
   # declare-git-mode
+  map global user g ': enter-user-mode git<ret>' -docstring "git"
 
   map global git-yank 'y' ':gitlinker<ret>'           -docstring 'Copy Permalink'
   map global git-yank 'o' ':gitlinker-open<ret>'       -docstring 'Open Permalink'
@@ -525,15 +562,15 @@ bundle harpoon 'https://github.com/raiguard/kak-harpoon' %{
 }
 
 bundle live_grep 'https://github.com/raiguard/kak-live-grep' %{
-  map global find-actions -docstring 'live grep'   '/' ':live-grep<ret>'
+  # Mapped in find-actions mode (accessible via <space>f/)
 }
 
 bundle grep-write 'https://github.com/jtrv/grep-write.kak' %{
-  map global user -docstring 'grep write' W ':grep-write<ret>'
+  # Accessible at top-level via <space>W
 }
 
 bundle replace-mode https://github.com/tomKPZ/replace-mode.kak %{
-  map global user r ':enter-user-mode replace<ret>' -docstring 'replace mode'
+  # Moved to edit-actions mode (accessible via <space>er)
 }
 
 bundle filetree https://github.com/occivink/kakoune-filetree
@@ -542,13 +579,14 @@ bundle sshconfig https://github.com/Yukaii/ssh-config.kak
 
 bundle case 'https://gitlab.com/FlyingWombat/case.kak.git/' %{
   map global normal ` ': enter-user-mode case<ret>'
+  # Also accessible via <space>ec
 }
 
 # cork vue https://github.com/ABuffSeagull/kakoune-vue
 
 bundle kak-jsts https://github.com/schemar/kak-jsts %{
   declare-user-mode format
-  map global user F ':enter-user-mode format<ret>' -docstring 'Enter format mode'
+  # Accessible via <space>ef
   map global format p ':format-prettier<ret>'      -docstring 'Format with prettier'
   map global format e ':format-eslint<ret>'        -docstring 'Format with eslint'
 }
@@ -596,7 +634,7 @@ bundle Encapsul8 https://github.com/ElectricR/Encapsul8 %{
 
 bundle bookmarks https://github.com/Yukaii/bookmarks.kak %{
   declare-user-mode mark
-  map global user m ': enter-user-mode mark<ret>' -docstring "Enter mark mode"
+  map global user m ': enter-user-mode mark<ret>' -docstring "marks/bookmarks"
 
   map global mark l ':bookmarks-show-list<ret>'            -docstring "List bookmarks"
   map global mark a ':bookmarks-add-prompt<ret>'           -docstring "Add bookmark"
@@ -652,7 +690,7 @@ bundle-install-hook kak-ansi %{
 
 bundle autospell https://git.sr.ht/~ficd/kak-autospell %{
   require-module autospell
-  map -docstring 'spelling' global user s ': enter-user-mode spell<ret>'
+  map global user s ': enter-user-mode spell<ret>' -docstring 'spelling'
 }
 
 bundle hump 'https://github.com/delapouite/kakoune-hump' %{
@@ -664,7 +702,7 @@ bundle hump 'https://github.com/delapouite/kakoune-hump' %{
   map global hump-jump W      ': extend-next-hump<ret>'     -docstring 'extend →'
 
   # enter modes
-  map global user J ': enter-user-mode hump-jump -lock<ret>'   -docstring 'enter hump mode'
+  map global user J ': enter-user-mode hump-jump -lock<ret>'   -docstring 'hump jump'
 }
 
 bundle nanoline 'https://github.com/ftonneau/nanoline.kak' %{
