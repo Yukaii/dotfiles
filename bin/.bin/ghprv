@@ -1,3 +1,12 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-gh pr view --web
+ghprv() {
+  if command -v ghprcp >/dev/null 2>&1; then
+    ghprcp >/dev/null || echo "Warning: failed to copy pull request URL to clipboard." >&2
+  fi
+
+  gh pr view --web
+}
+
+ghprv "$@"

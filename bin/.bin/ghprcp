@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ghprcp() {
+  if ! command -v copy_to_clipboard >/dev/null 2>&1; then
+    echo "copy_to_clipboard script not found in PATH." >&2
+    return 1
+  fi
+
+  local url
+  if ! url=$(gh pr view --json url --jq .url 2>/dev/null); then
+    echo "No pull request associated with the current branch." >&2
+    return 1
+  fi
+
+  if [ -z "$url" ]; then
+    echo "Unable to determine pull request URL." >&2
+    return 1
+  fi
+
+  printf '%s' "$url" | copy_to_clipboard
+  echo "Copied pull request URL to clipboard."
+}
+
+ghprcp "$@"
