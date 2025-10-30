@@ -145,6 +145,143 @@ get_hour() {
     date -r "$timestamp" "+%-H" 2>/dev/null || date -d "@$timestamp" "+%-H" 2>/dev/null || date -r "$timestamp" "+%H"
 }
 
+# Determine if a timestamp satisfies the current scheduling mode
+is_valid_time_for_mode() {
+    local timestamp=$1
+    local weekend_only=$2
+    local workday_only=$3
+    local evening_only=$4
+    local night_only=$5
+
+    local hour=$(get_hour "$timestamp")
+    hour=$((10#$hour))
+    local is_weekend_day=false
+    if is_weekend "$timestamp"; then
+        is_weekend_day=true
+    fi
+
+    if [ "$weekend_only" = "true" ]; then
+        [ "$is_weekend_day" = true ] && return 0 || return 1
+    fi
+
+    if [ "$workday_only" = "true" ]; then
+        if [ "$is_weekend_day" = false ] && [ $hour -ge $WORK_START_HOUR ] && [ $hour -lt $WORK_END_HOUR ]; then
+            return 0
+        fi
+        return 1
+    fi
+
+    if [ "$evening_only" = "true" ]; then
+        if [ "$is_weekend_day" = false ] && [ $hour -ge $WORK_END_HOUR ] && [ $hour -lt 24 ]; then
+            return 0
+        fi
+        return 1
+    fi
+
+    if [ "$night_only" = "true" ]; then
+        if [ "$is_weekend_day" = false ] && [ $hour -lt $WORK_START_HOUR ]; then
+            return 0
+        fi
+        return 1
+    fi
+
+    # Default: weekends or non-work hours
+    if [ "$is_weekend_day" = true ]; then
+        return 0
+    fi
+
+    if ! is_work_time "$hour"; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Search backwards for the latest valid timestamp within bounds
+find_previous_valid_time() {
+    local timestamp=$1
+    local min_timestamp=$2
+    local weekend_only=$3
+    local workday_only=$4
+    local evening_only=$5
+    local night_only=$6
+    local step=300  # 5 minutes
+    local max_iterations=50000
+    local iteration=0
+
+    while [ "$timestamp" -ge "$min_timestamp" ] && [ $iteration -lt $max_iterations ]; do
+        if is_valid_time_for_mode "$timestamp" "$weekend_only" "$workday_only" "$evening_only" "$night_only"; then
+            echo "$timestamp"
+            return 0
+        fi
+        timestamp=$((timestamp - step))
+        iteration=$((iteration + 1))
+    done
+
+    return 1
+}
+
+# Search forward for the earliest valid timestamp within bounds
+find_next_valid_time() {
+    local timestamp=$1
+    local max_timestamp=$2
+    local weekend_only=$3
+    local workday_only=$4
+    local evening_only=$5
+    local night_only=$6
+    local step=300  # 5 minutes
+    local max_iterations=50000
+    local iteration=0
+
+    while [ "$timestamp" -le "$max_timestamp" ] && [ $iteration -lt $max_iterations ]; do
+        if is_valid_time_for_mode "$timestamp" "$weekend_only" "$workday_only" "$evening_only" "$night_only"; then
+            echo "$timestamp"
+            return 0
+        fi
+        timestamp=$((timestamp + step))
+        iteration=$((iteration + 1))
+    done
+
+    return 1
+}
+
+# Clamp and adjust timestamp to stay within bounds without future dates
+ensure_time_within_bounds() {
+    local candidate=$1
+    local min_timestamp=$2
+    local max_timestamp=$3
+    local weekend_only=$4
+    local workday_only=$5
+    local evening_only=$6
+    local night_only=$7
+
+    if [ "$candidate" -lt "$min_timestamp" ]; then
+        candidate=$min_timestamp
+    fi
+
+    if [ "$candidate" -gt "$max_timestamp" ]; then
+        candidate=$max_timestamp
+    fi
+
+    if is_valid_time_for_mode "$candidate" "$weekend_only" "$workday_only" "$evening_only" "$night_only"; then
+        echo "$candidate"
+        return 0
+    fi
+
+    local adjusted
+    if adjusted=$(find_previous_valid_time "$candidate" "$min_timestamp" "$weekend_only" "$workday_only" "$evening_only" "$night_only"); then
+        echo "$adjusted"
+        return 0
+    fi
+
+    if adjusted=$(find_next_valid_time "$candidate" "$max_timestamp" "$weekend_only" "$workday_only" "$evening_only" "$night_only"); then
+        echo "$adjusted"
+        return 0
+    fi
+
+    return 1
+}
+
 # Adjust timestamp to next non-work period (or work period for workday-only mode)
 adjust_to_non_work_time() {
     local timestamp=$1
@@ -436,21 +573,59 @@ main() {
     local timestamps_file=$(mktemp)
     trap "rm -f $commits_file $lines_file $timestamps_file" EXIT
 
+    local now_timestamp=$(date +%s)
+    local processed_count=0
+    local last_assigned_time=""
+
     # Generate new timestamps for each commit
     while IFS='|' read -r commit_hash old_timestamp lines subject; do
+        processed_count=$((processed_count + 1))
         local short_hash=$(echo "$commit_hash" | cut -c1-7)
+        local remaining_after_current=$((commit_count - processed_count))
 
         # Ensure minimum lines for realistic timing
         if [ "$lines" -lt 5 ]; then
             lines=5
         fi
 
+        # Determine bounds for the current commit
+        local min_allowed_time
+        if [ -z "$last_assigned_time" ]; then
+            min_allowed_time=$current_time
+        else
+            min_allowed_time=$((last_assigned_time + MIN_COMMIT_TIME))
+        fi
+
+        local max_allowed_time=$((now_timestamp - remaining_after_current * MIN_COMMIT_TIME))
+
+        if [ "$max_allowed_time" -lt "$min_allowed_time" ]; then
+            log_error "Unable to schedule commit $short_hash without using future timestamps. Consider specifying an earlier --start date."
+            exit 1
+        fi
+
         # Generate time offset based on changeset size
         local time_offset=$(generate_time_offset "$lines")
         current_time=$((current_time + time_offset))
 
+        if [ "$current_time" -lt "$min_allowed_time" ]; then
+            current_time=$min_allowed_time
+        fi
+
+        if [ "$current_time" -gt "$max_allowed_time" ]; then
+            current_time=$max_allowed_time
+        fi
+
         # Adjust to non-work time (or work time for workday-only mode)
-        current_time=$(adjust_to_non_work_time "$current_time" "$WEEKEND_ONLY" "$WORKDAY_ONLY" "$EVENING_ONLY" "$NIGHT_ONLY")
+        local adjusted_time
+        adjusted_time=$(adjust_to_non_work_time "$current_time" "$WEEKEND_ONLY" "$WORKDAY_ONLY" "$EVENING_ONLY" "$NIGHT_ONLY")
+
+        if ! adjusted_time=$(ensure_time_within_bounds "$adjusted_time" "$min_allowed_time" "$max_allowed_time" "$WEEKEND_ONLY" "$WORKDAY_ONLY" "$EVENING_ONLY" "$NIGHT_ONLY"); then
+            log_error "Unable to find a valid timestamp for commit $short_hash within the allowed window."
+            exit 1
+        fi
+
+        current_time=$adjusted_time
+        last_assigned_time=$current_time
 
         # Store the mapping
         echo "$commit_hash|$current_time" >> "$timestamps_file"

@@ -380,7 +380,20 @@ test_custom_start_date() {
     create_test_repo "test12" "2024-10-21 10:00:00"
     cd "$TEST_DIR/test12"
 
-    echo "y" | "$SCRIPT_PATH" -s "2024-11-01 20:00:00" >/dev/null 2>&1
+    local start_date="2024-11-01 20:00:00"
+    local start_ts=$(date -j -f "%Y-%m-%d %H:%M:%S" "$start_date" "+%s" 2>/dev/null || date -d "$start_date" "+%s" 2>/dev/null || echo "")
+    local now_ts=$(date +%s)
+
+    if [ -n "$start_ts" ] && [ "$start_ts" -gt "$now_ts" ]; then
+        if echo "y" | "$SCRIPT_PATH" -s "$start_date" >/dev/null 2>&1; then
+            log_fail "Script accepted future start date $start_date"
+        else
+            log_pass "Script rejected future start date $start_date as expected"
+        fi
+        return
+    fi
+
+    echo "y" | "$SCRIPT_PATH" -s "$start_date" >/dev/null 2>&1
 
     local commit_date=$(git log --pretty=format:"%ai" -n 1 | cut -d' ' -f1)
 
@@ -389,6 +402,39 @@ test_custom_start_date() {
         log_pass "Custom start date respected (commit on $commit_date)"
     else
         log_fail "Custom start date not respected (commit on $commit_date)"
+    fi
+}
+
+# Test 13: Ensure no rewritten commit lands in the future
+test_no_future_commit_times() {
+    log_test "Test 13: No future commit times"
+
+    create_test_repo "test13" \
+        "2024-10-21 10:00:00" \
+        "2024-10-21 11:00:00" \
+        "2024-10-21 12:00:00"
+
+    cd "$TEST_DIR/test13"
+
+    if ! echo "y" | "$SCRIPT_PATH" >/dev/null 2>&1; then
+        log_fail "Script execution failed unexpectedly"
+        return
+    fi
+
+    local now_ts=$(date +%s)
+    local has_future=false
+
+    while read -r commit_epoch; do
+        if [ "$commit_epoch" -gt "$now_ts" ]; then
+            has_future=true
+            break
+        fi
+    done < <(git log --pretty=format:"%at")
+
+    if [ "$has_future" = false ]; then
+        log_pass "All rewritten commits are at or before current time"
+    else
+        log_fail "Detected commit rewritten into the future"
     fi
 }
 
@@ -414,6 +460,7 @@ main() {
     test_workday_only_mode
     test_custom_work_hours
     test_custom_start_date
+    test_no_future_commit_times
 
     echo
     echo "=========================================="
