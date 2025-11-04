@@ -178,20 +178,53 @@ Example output:
 
                 if [[ "$response" =~ ^[Yy]$ ]]; then
                     echo "" >&2
-                    log_info "Fetching release notes for all packages..." >&2
+                    log_info "Fetching release notes for all packages (in parallel)..." >&2
 
+                    # Create temp directory for parallel results
+                    TEMP_DIR=$(mktemp -d)
+                    trap "rm -rf $TEMP_DIR" EXIT
+
+                    # Launch all fetches in parallel
+                    PKG_COUNT=0
                     while IFS='|' read -r pkg old new; do
-                        echo "" >&2
-                        log_info "Fetching: $pkg ($old → $new)" >&2
-                        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                        ((PKG_COUNT++))
+                        (
+                            # Fetch in subshell
+                            OUTPUT=$("$0" --summarize "$pkg" "v$old..v$new" 2>&1)
+                            EXIT_CODE=$?
 
-                        # Recursively call this script for each package
-                        "$0" --summarize "$pkg" "v$old..v$new" 2>&1
+                            # Save to temp file with index for ordering
+                            cat > "$TEMP_DIR/$PKG_COUNT.txt" <<EOF
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 $pkg: v$old → v$new
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-                        echo ""
-                        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-                        echo ""
+$OUTPUT
+
+EOF
+                        ) &
                     done <<< "$PACKAGES"
+
+                    # Wait for all background jobs with progress indicator
+                    TOTAL_JOBS=$PKG_COUNT
+                    log_info "Waiting for $TOTAL_JOBS package(s) to complete..." >&2
+
+                    while [[ $(jobs -r | wc -l) -gt 0 ]]; do
+                        REMAINING=$(jobs -r | wc -l | tr -d ' ')
+                        COMPLETED=$((TOTAL_JOBS - REMAINING))
+                        printf "\r${BLUE}ℹ${NC} Progress: $COMPLETED/$TOTAL_JOBS completed..." >&2
+                        sleep 0.5
+                    done
+                    printf "\r${GREEN}✓${NC} All $TOTAL_JOBS package(s) completed!    \n" >&2
+
+                    # Output results in order
+                    echo "" >&2
+                    for i in $(seq 1 $PKG_COUNT); do
+                        if [[ -f "$TEMP_DIR/$i.txt" ]]; then
+                            cat "$TEMP_DIR/$i.txt"
+                            echo ""
+                        fi
+                    done
 
                     log_success "All release notes fetched!" >&2
                 else
@@ -364,44 +397,80 @@ trap "rm -f $FEATURES_FILE $FIXES_FILE $BREAKING_FILE $DEPENDENCIES_FILE" EXIT
 TOTAL_RELEASES=0
 TOTAL_BREAKING=0
 
-# Process each version
+# Create temp directory for parallel fetching
+RELEASE_TEMP_DIR=$(mktemp -d)
+trap "rm -rf $RELEASE_TEMP_DIR $FEATURES_FILE $FIXES_FILE $BREAKING_FILE $DEPENDENCIES_FILE" EXIT
+
+# Fetch all releases in parallel
+log_info "Fetching release data in parallel..."
+VERSION_INDEX=0
 while IFS= read -r version; do
     [[ -z "$version" ]] && continue
+    ((VERSION_INDEX++))
 
-    log_info "Processing $version..."
+    (
+        # Try to get release notes
+        RELEASE_NOTES=$(gh release view "$version" --repo "$OWNER_REPO" --json body,publishedAt,name --jq '{body: .body, date: .publishedAt, name: .name}' 2>/dev/null || echo "")
 
-    # Try to get release notes
-    RELEASE_NOTES=$(gh release view "$version" --repo "$OWNER_REPO" --json body,publishedAt,name --jq '{body: .body, date: .publishedAt, name: .name}' 2>/dev/null || echo "")
+        BODY=""
+        DATE=""
 
-    BODY=""
-    DATE=""
+        if [[ -z "$RELEASE_NOTES" ]] || [[ "$RELEASE_NOTES" == "null" ]]; then
+            DATE=$(gh api "repos/$OWNER_REPO/git/refs/tags/$version" --jq '.object.url' 2>/dev/null | xargs -I {} gh api {} --jq '.author.date' 2>/dev/null | cut -d'T' -f1 || echo "")
+        else
+            BODY=$(echo "$RELEASE_NOTES" | jq -r '.body // ""')
+            DATE=$(echo "$RELEASE_NOTES" | jq -r '.date // ""' | cut -d'T' -f1)
+        fi
 
-    if [[ -z "$RELEASE_NOTES" ]] || [[ "$RELEASE_NOTES" == "null" ]]; then
-        log_warning "No release notes found for $version, fetching commits..."
-        DATE=$(gh api "repos/$OWNER_REPO/git/refs/tags/$version" --jq '.object.url' 2>/dev/null | xargs -I {} gh api {} --jq '.author.date' 2>/dev/null | cut -d'T' -f1 || echo "")
-    else
-        BODY=$(echo "$RELEASE_NOTES" | jq -r '.body // ""')
-        DATE=$(echo "$RELEASE_NOTES" | jq -r '.date // ""' | cut -d'T' -f1)
-    fi
+        # If body is empty or just the version string, get commits
+        if [[ -z "$BODY" ]] || [[ "$BODY" == "Version $version" ]] || [[ "$BODY" == "null" ]]; then
+            # Find previous version for comparison
+            PREV_VERSION=$(echo "$FILTERED_VERSIONS" | grep -B1 "^${version}$" | head -1)
 
-    # If body is empty or just the version string, get commits
-    if [[ -z "$BODY" ]] || [[ "$BODY" == "Version $version" ]] || [[ "$BODY" == "null" ]]; then
-        # Find previous version for comparison
-        PREV_VERSION=$(echo "$FILTERED_VERSIONS" | grep -B1 "^${version}$" | head -1)
+            if [[ -n "$PREV_VERSION" ]] && [[ "$PREV_VERSION" != "$version" ]]; then
+                COMMITS=$(gh api "repos/$OWNER_REPO/compare/$PREV_VERSION...$version" --jq '.commits[] | .commit.message' 2>/dev/null || echo "")
 
-        if [[ -n "$PREV_VERSION" ]] && [[ "$PREV_VERSION" != "$version" ]]; then
-            log_info "Fetching commits between $PREV_VERSION and $version"
-            COMMITS=$(gh api "repos/$OWNER_REPO/compare/$PREV_VERSION...$version" --jq '.commits[] | .commit.message' 2>/dev/null || echo "")
-
-            if [[ -n "$COMMITS" ]]; then
-                BODY="$COMMITS"
+                if [[ -n "$COMMITS" ]]; then
+                    BODY="$COMMITS"
+                else
+                    BODY="No release notes or commits available."
+                fi
             else
                 BODY="No release notes or commits available."
             fi
-        else
-            BODY="No release notes or commits available."
         fi
+
+        # Save to temp file
+        cat > "$RELEASE_TEMP_DIR/$VERSION_INDEX.json" <<EOF
+{
+  "version": "$version",
+  "date": "$DATE",
+  "body": $(echo "$BODY" | jq -Rs .)
+}
+EOF
+    ) &
+done <<< "$FILTERED_VERSIONS"
+
+# Wait for all releases to be fetched with progress
+TOTAL_JOBS=$VERSION_INDEX
+wait
+printf "${GREEN}✓${NC} All $TOTAL_JOBS releases fetched!           \n" >&2
+
+# Process each version from saved data
+log_info "Processing release notes..."
+VERSION_INDEX=0
+while IFS= read -r version; do
+    [[ -z "$version" ]] && continue
+    ((VERSION_INDEX++))
+
+    if [[ ! -f "$RELEASE_TEMP_DIR/$VERSION_INDEX.json" ]]; then
+        continue
     fi
+
+    # Read from temp file
+    RELEASE_DATA=$(cat "$RELEASE_TEMP_DIR/$VERSION_INDEX.json")
+    BODY=$(echo "$RELEASE_DATA" | jq -r '.body')
+    DATE=$(echo "$RELEASE_DATA" | jq -r '.date')
 
     # Parse release notes
     BREAKING_IN_VERSION=""
