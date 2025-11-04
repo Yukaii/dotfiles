@@ -1,0 +1,471 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Arguments
+PACKAGE_NAME=""
+VERSION_RANGE=""
+SUMMARIZE=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --summarize|-S)
+            SUMMARIZE=true
+            shift
+            ;;
+        *)
+            if [[ -z "$PACKAGE_NAME" ]]; then
+                PACKAGE_NAME="$1"
+            elif [[ -z "$VERSION_RANGE" ]]; then
+                VERSION_RANGE="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# No output file needed - stdout only
+
+# Usage
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [OPTIONS] <npm-package-name> <version-range>
+
+Options:
+  -S, --summarize    Use aichat to generate an AI summary of the release notes
+
+Examples:
+  $(basename "$0") react v18.0.0..v18.2.0
+  $(basename "$0") typescript v4.9.0..latest
+  $(basename "$0") vue v3.3.0
+  $(basename "$0") --summarize ejs v2.5.7..v3.1.10
+
+Version range formats:
+  - Single version: v3.0.0 or 3.0.0
+  - Range: v3.0.0..v3.2.0
+  - To latest: v3.0.0..latest
+EOF
+    exit 1
+}
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}ℹ${NC} $*" >&2
+}
+
+log_success() {
+    echo -e "${GREEN}✓${NC} $*" >&2
+}
+
+log_warning() {
+    echo -e "${YELLOW}⚠${NC} $*" >&2
+}
+
+log_error() {
+    echo -e "${RED}✗${NC} $*" >&2
+}
+
+# Check prerequisites
+check_prerequisites() {
+    if ! command -v curl >/dev/null 2>&1; then
+        log_error "curl is not installed"
+        exit 1
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        log_error "jq is not installed. Install with: brew install jq"
+        exit 1
+    fi
+
+    if ! command -v gh >/dev/null 2>&1; then
+        log_error "gh (GitHub CLI) is not installed. Install with: brew install gh"
+        exit 1
+    fi
+
+    # Check gh authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        log_error "gh is not authenticated. Please run: gh auth login"
+        exit 1
+    fi
+}
+
+# Validate arguments
+if [[ -z "$PACKAGE_NAME" ]]; then
+    log_error "Package name is required"
+    usage
+fi
+
+if [[ -z "$VERSION_RANGE" ]]; then
+    log_error "Version range is required"
+    usage
+fi
+
+check_prerequisites
+
+log_info "Fetching package info for: $PACKAGE_NAME"
+
+# Fetch NPM registry data
+NPM_DATA=$(curl -s "https://registry.npmjs.org/$PACKAGE_NAME")
+
+if [[ -z "$NPM_DATA" ]] || echo "$NPM_DATA" | jq -e '.error' >/dev/null 2>&1; then
+    log_error "Package not found: $PACKAGE_NAME"
+    exit 1
+fi
+
+log_success "Package found"
+
+# Resolve GitHub repository
+log_info "Resolving GitHub repository..."
+
+REPO=""
+
+# Try primary: repository.url
+REPO=$(echo "$NPM_DATA" | jq -r '.repository.url // empty')
+
+# Fallback: repository as string
+if [[ -z "$REPO" ]]; then
+    REPO=$(echo "$NPM_DATA" | jq -r 'if (.repository|type)=="string" then .repository else empty end')
+fi
+
+# Fallback: latest version's repository.url
+if [[ -z "$REPO" ]]; then
+    REPO=$(echo "$NPM_DATA" | jq -r '."dist-tags".latest as $v | .versions[$v].repository.url // empty')
+fi
+
+# Fallback: homepage (GitHub only)
+if [[ -z "$REPO" ]]; then
+    REPO=$(echo "$NPM_DATA" | jq -r '.homepage // empty | select(test("github.com"))')
+fi
+
+if [[ -z "$REPO" ]]; then
+    log_error "Could not resolve GitHub repository for package: $PACKAGE_NAME"
+    exit 1
+fi
+
+# Normalize to owner/repo format
+NORM=$(printf "%s" "$REPO" | sed -E 's#^git\+##; s#\.git$##; s#^git://#https://#; s#^ssh://git@github.com/#https://github.com/#; s#^git@github.com:#https://github.com/#')
+OWNER_REPO=$(printf "%s" "$NORM" | sed -nE 's#.*github.com/([^/]+)/([^/]+).*#\1/\2#p')
+
+if [[ -z "$OWNER_REPO" ]]; then
+    log_error "Could not parse GitHub owner/repo from: $REPO"
+    exit 1
+fi
+
+log_success "Repository resolved: $OWNER_REPO"
+
+# Fetch releases and tags
+log_info "Fetching releases and tags..."
+
+RELEASES=$(gh release list --repo "$OWNER_REPO" --limit 100 2>/dev/null || echo "")
+TAGS=$(gh api "repos/$OWNER_REPO/tags" --paginate --jq '.[] | .name' 2>/dev/null || echo "")
+
+ALL_VERSIONS=$(echo -e "$RELEASES\n$TAGS" | awk '{print $1}' | sort -uV)
+
+if [[ -z "$ALL_VERSIONS" ]]; then
+    log_error "No releases or tags found for repository: $OWNER_REPO"
+    exit 1
+fi
+
+log_success "Found $(echo "$ALL_VERSIONS" | wc -l | tr -d ' ') versions"
+
+# Parse version range
+FROM_VERSION=""
+TO_VERSION=""
+
+if [[ "$VERSION_RANGE" =~ \.\. ]]; then
+    FROM_VERSION=$(echo "$VERSION_RANGE" | cut -d'.' -f1-3)
+    TO_VERSION=$(echo "$VERSION_RANGE" | cut -d'.' -f5-)
+else
+    FROM_VERSION="$VERSION_RANGE"
+    TO_VERSION="latest"
+fi
+
+# Normalize version format (try with/without 'v' prefix)
+normalize_version() {
+    local ver="$1"
+    if [[ "$ver" == "latest" ]]; then
+        echo "$ALL_VERSIONS" | tail -1
+    else
+        # Try exact match first
+        if echo "$ALL_VERSIONS" | grep -Fxq "$ver"; then
+            echo "$ver"
+        # Try with 'v' prefix
+        elif echo "$ALL_VERSIONS" | grep -Fxq "v$ver"; then
+            echo "v$ver"
+        # Try without 'v' prefix
+        elif echo "$ALL_VERSIONS" | grep -Fxq "${ver#v}"; then
+            echo "${ver#v}"
+        else
+            # Find closest match
+            echo "$ALL_VERSIONS" | grep -i "$ver" | head -1 || echo "$ver"
+        fi
+    fi
+}
+
+FROM_VERSION=$(normalize_version "$FROM_VERSION")
+TO_VERSION=$(normalize_version "$TO_VERSION")
+
+log_info "Version range: $FROM_VERSION → $TO_VERSION"
+
+# Filter versions in range
+FILTERED_VERSIONS=$(echo "$ALL_VERSIONS" | awk -v from="$FROM_VERSION" -v to="$TO_VERSION" '
+    BEGIN { in_range=0 }
+    $0 == from { in_range=1 }
+    in_range { print }
+    $0 == to { exit }
+')
+
+VERSION_COUNT=$(echo "$FILTERED_VERSIONS" | wc -l | tr -d ' ')
+
+if [[ "$VERSION_COUNT" -gt 20 ]]; then
+    log_warning "More than 20 versions ($VERSION_COUNT) in range. Consider narrowing the range."
+fi
+
+log_info "Processing $VERSION_COUNT versions..."
+
+# Initialize markdown output
+MD_OUTPUT="# Release Notes: $PACKAGE_NAME
+
+**Version Range:** \`$FROM_VERSION\` → \`$TO_VERSION\`
+**Repository:** [$OWNER_REPO](https://github.com/$OWNER_REPO)
+**Compare:** [View Changes](https://github.com/$OWNER_REPO/compare/$FROM_VERSION...$TO_VERSION)
+
+---
+
+"
+
+# Temporary files for deduplication
+FEATURES_FILE=$(mktemp)
+FIXES_FILE=$(mktemp)
+BREAKING_FILE=$(mktemp)
+DEPENDENCIES_FILE=$(mktemp)
+
+# Cleanup on exit
+trap "rm -f $FEATURES_FILE $FIXES_FILE $BREAKING_FILE $DEPENDENCIES_FILE" EXIT
+
+TOTAL_RELEASES=0
+TOTAL_BREAKING=0
+
+# Process each version
+while IFS= read -r version; do
+    [[ -z "$version" ]] && continue
+
+    log_info "Processing $version..."
+
+    # Try to get release notes
+    RELEASE_NOTES=$(gh release view "$version" --repo "$OWNER_REPO" --json body,publishedAt,name --jq '{body: .body, date: .publishedAt, name: .name}' 2>/dev/null || echo "")
+
+    BODY=""
+    DATE=""
+
+    if [[ -z "$RELEASE_NOTES" ]] || [[ "$RELEASE_NOTES" == "null" ]]; then
+        log_warning "No release notes found for $version, fetching commits..."
+        DATE=$(gh api "repos/$OWNER_REPO/git/refs/tags/$version" --jq '.object.url' 2>/dev/null | xargs -I {} gh api {} --jq '.author.date' 2>/dev/null | cut -d'T' -f1 || echo "")
+    else
+        BODY=$(echo "$RELEASE_NOTES" | jq -r '.body // ""')
+        DATE=$(echo "$RELEASE_NOTES" | jq -r '.date // ""' | cut -d'T' -f1)
+    fi
+
+    # If body is empty or just the version string, get commits
+    if [[ -z "$BODY" ]] || [[ "$BODY" == "Version $version" ]] || [[ "$BODY" == "null" ]]; then
+        # Find previous version for comparison
+        PREV_VERSION=$(echo "$FILTERED_VERSIONS" | grep -B1 "^${version}$" | head -1)
+
+        if [[ -n "$PREV_VERSION" ]] && [[ "$PREV_VERSION" != "$version" ]]; then
+            log_info "Fetching commits between $PREV_VERSION and $version"
+            COMMITS=$(gh api "repos/$OWNER_REPO/compare/$PREV_VERSION...$version" --jq '.commits[] | .commit.message' 2>/dev/null || echo "")
+
+            if [[ -n "$COMMITS" ]]; then
+                BODY="$COMMITS"
+            else
+                BODY="No release notes or commits available."
+            fi
+        else
+            BODY="No release notes or commits available."
+        fi
+    fi
+
+    # Parse release notes
+    BREAKING_IN_VERSION=""
+
+    # Add to markdown output
+    MD_OUTPUT+="## $version"
+    [[ -n "$DATE" ]] && MD_OUTPUT+=" ($DATE)"
+    MD_OUTPUT+="
+
+"
+
+    # Detect breaking changes
+    if echo "$BODY" | grep -iE '(breaking|BREAKING CHANGE|!)' >/dev/null 2>&1; then
+        BREAKING_LIST=$(echo "$BODY" | grep -iE '(breaking|BREAKING CHANGE|\* feat.*!:|\* fix.*!:)' || echo "")
+
+        if [[ -n "$BREAKING_LIST" ]]; then
+            MD_OUTPUT+="### ⚠️ Notable Breaking Changes
+
+"
+            while IFS= read -r line; do
+                [[ -z "$line" ]] && continue
+                # Clean up the line
+                clean_line=$(echo "$line" | sed -E 's/^[*-] //; s/^#+\s*//')
+                MD_OUTPUT+="- $clean_line
+"
+                echo "$clean_line" >> "$BREAKING_FILE"
+                ((TOTAL_BREAKING++))
+            done <<< "$BREAKING_LIST"
+            MD_OUTPUT+="
+"
+        fi
+    fi
+
+    # Parse features (more flexible patterns)
+    FEAT_LIST=$(echo "$BODY" | grep -iE '(^|\*|-).*\s*(feat|feature|add|new|added|adding|implement)' || echo "")
+    if [[ -n "$FEAT_LIST" ]]; then
+        MD_OUTPUT+="### Features
+
+"
+        while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            # Take only first line of multi-line commits
+            first_line=$(echo "$line" | head -1)
+            clean_line=$(echo "$first_line" | sed -E 's/^[*-] //; s/^#+\s*//; s/^(feat|feature|add|added|adding|new|implement)[:\(]?\s*//i')
+            MD_OUTPUT+="- $clean_line
+"
+            echo "$clean_line" >> "$FEATURES_FILE"
+        done <<< "$FEAT_LIST"
+        MD_OUTPUT+="
+"
+    fi
+
+    # Parse fixes (more flexible patterns)
+    FIX_LIST=$(echo "$BODY" | grep -iE '(^|\*|-).*\s*(fix|fixed|bug|resolve|patch|close)' || echo "")
+    if [[ -n "$FIX_LIST" ]]; then
+        MD_OUTPUT+="### Bug Fixes
+
+"
+        while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            first_line=$(echo "$line" | head -1)
+            clean_line=$(echo "$first_line" | sed -E 's/^[*-] //; s/^#+\s*//; s/^(fix|fixed|bug|resolve|patch|close)[:\(]?\s*//i')
+            MD_OUTPUT+="- $clean_line
+"
+            echo "$clean_line" >> "$FIXES_FILE"
+        done <<< "$FIX_LIST"
+        MD_OUTPUT+="
+"
+    fi
+
+    # Parse dependencies (more flexible patterns)
+    DEP_LIST=$(echo "$BODY" | grep -iE '(^|\*|-).*\s*(bump|update|updated|upgrade|depend)' || echo "")
+    if [[ -n "$DEP_LIST" ]]; then
+        MD_OUTPUT+="### Dependencies
+
+"
+        while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            first_line=$(echo "$line" | head -1)
+            clean_line=$(echo "$first_line" | sed -E 's/^[*-] //; s/^#+\s*//; s/^(bump|update|updated|upgrade|depend)[:\(]?\s*//i')
+            MD_OUTPUT+="- $clean_line
+"
+            echo "$clean_line" >> "$DEPENDENCIES_FILE"
+        done <<< "$DEP_LIST"
+        MD_OUTPUT+="
+"
+    fi
+
+    # Show all other commits if no categorization matched
+    if [[ -z "$FEAT_LIST" ]] && [[ -z "$FIX_LIST" ]] && [[ -z "$DEP_LIST" ]] && [[ "$BODY" != "No release notes or commits available." ]]; then
+        MD_OUTPUT+="### Changes
+
+"
+        while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            first_line=$(echo "$line" | head -1)
+            # Skip merge commits
+            if echo "$first_line" | grep -qi "^Merge"; then
+                continue
+            fi
+            clean_line=$(echo "$first_line" | sed -E 's/^[*-] //; s/^#+\s*//')
+            MD_OUTPUT+="- $clean_line
+"
+        done <<< "$BODY"
+        MD_OUTPUT+="
+"
+    fi
+
+    MD_OUTPUT+="---
+
+"
+
+    ((TOTAL_RELEASES++))
+done <<< "$FILTERED_VERSIONS"
+
+# Count unique items
+UNIQUE_FEATURES=$(sort -u "$FEATURES_FILE" 2>/dev/null | wc -l | tr -d ' ')
+UNIQUE_FIXES=$(sort -u "$FIXES_FILE" 2>/dev/null | wc -l | tr -d ' ')
+UNIQUE_DEPENDENCIES=$(sort -u "$DEPENDENCIES_FILE" 2>/dev/null | wc -l | tr -d ' ')
+
+# Add summary
+MD_OUTPUT+="
+## Summary
+
+- **Total Releases:** $TOTAL_RELEASES
+- **Total Breaking Changes:** $TOTAL_BREAKING
+- **Total Features:** $UNIQUE_FEATURES
+- **Total Bug Fixes:** $UNIQUE_FIXES
+- **Total Dependency Updates:** $UNIQUE_DEPENDENCIES
+
+---
+
+*Generated on $(date '+%Y-%m-%d %H:%M:%S')*
+"
+
+# Output to stdout or summarize with aichat
+if [[ "$SUMMARIZE" == true ]]; then
+    if ! command -v aichat >/dev/null 2>&1; then
+        log_error "aichat is not installed. Install with: cargo install aichat"
+        log_info "Falling back to regular output..."
+        echo "$MD_OUTPUT"
+    else
+        log_info "Generating AI summary with aichat..."
+        SUMMARY=$(echo "$MD_OUTPUT" | aichat --no-stream "Analyze these release notes and provide a concise summary with the following sections:
+
+1. **Overview**: One paragraph summary of the version range and overall changes
+2. **Breaking Changes**: List any breaking changes with migration guidance (if none found, state 'No breaking changes detected')
+3. **Major Features**: Bullet list of 3-7 most significant new features
+4. **Notable Bug Fixes**: Bullet list of important bug fixes
+5. **Upgrade Recommendation**: Brief guidance on upgrading (complexity, risks, benefits)
+
+Keep it concise and actionable for developers." 2>/dev/null)
+
+        if [[ $? -eq 0 ]] && [[ -n "$SUMMARY" ]]; then
+            cat <<EOF
+# AI Summary: $PACKAGE_NAME ($FROM_VERSION → $TO_VERSION)
+
+$SUMMARY
+
+---
+
+**Stats**: $TOTAL_RELEASES releases, $TOTAL_BREAKING breaking changes, $UNIQUE_FEATURES features, $UNIQUE_FIXES fixes
+
+---
+
+*Generated on $(date '+%Y-%m-%d %H:%M:%S') with aichat*
+EOF
+        else
+            log_warning "aichat failed, falling back to regular output..."
+            echo "$MD_OUTPUT"
+        fi
+    fi
+else
+    echo "$MD_OUTPUT"
+fi
+
+log_success "Summary: $TOTAL_RELEASES releases, $TOTAL_BREAKING breaking changes"
