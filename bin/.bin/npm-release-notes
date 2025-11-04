@@ -163,17 +163,22 @@ Example output:
 
             if [[ -n "$PACKAGES" ]]; then
                 echo -e "${YELLOW}?${NC} Fetch release notes for these packages? (y/N): " >&2
+                response=""
+
+                # Try to read from terminal
                 if [[ -t 0 ]]; then
                     # stdin is a terminal, read directly
                     read -r response
+                elif [[ -t 2 ]]; then
+                    # stderr is a terminal, try reading from it
+                    read -r response <&2 2>/dev/null || response=""
+                elif { true < /dev/tty; } 2>/dev/null; then
+                    # Try /dev/tty as last resort (only if accessible)
+                    read -r response < /dev/tty 2>/dev/null || response=""
                 else
-                    # stdin is piped, try to read from tty
-                    response=""
-                    ( exec < /dev/tty && read -r response && echo "$response" ) 2>/dev/null | read -r response || response="n"
-                    if [[ -z "$response" ]] || [[ "$response" == "" ]]; then
-                        response="n"
-                        log_info "No tty available, skipping..." >&2
-                    fi
+                    # No interactive terminal available, default to no
+                    response="n"
+                    echo "n (auto-default)" >&2
                 fi
 
                 if [[ "$response" =~ ^[Yy]$ ]]; then
@@ -205,17 +210,11 @@ EOF
                         ) &
                     done <<< "$PACKAGES"
 
-                    # Wait for all background jobs with progress indicator
+                    # Wait for all background jobs
                     TOTAL_JOBS=$PKG_COUNT
                     log_info "Waiting for $TOTAL_JOBS package(s) to complete..." >&2
-
-                    while [[ $(jobs -r | wc -l) -gt 0 ]]; do
-                        REMAINING=$(jobs -r | wc -l | tr -d ' ')
-                        COMPLETED=$((TOTAL_JOBS - REMAINING))
-                        printf "\r${BLUE}ℹ${NC} Progress: $COMPLETED/$TOTAL_JOBS completed..." >&2
-                        sleep 0.5
-                    done
-                    printf "\r${GREEN}✓${NC} All $TOTAL_JOBS package(s) completed!    \n" >&2
+                    wait
+                    log_success "All $TOTAL_JOBS package(s) completed!" >&2
 
                     # Output results in order
                     echo "" >&2
