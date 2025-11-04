@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Navigate between files in a git diff buffer
+#
+# Requirements:
+# - fzf (https://github.com/junegunn/fzf)
+# - kks (kakoune-shell)
+#
+# Usage: Run this script when viewing a git diff output in Kakoune
+# It will extract all file headers and let you jump to them
+
+history_file="$HOME/.cache/kks-git-diff-files-history"
+
+[ -f "$history_file" ] || touch "$history_file"
+
+# Get the buffer content and extract file positions with their names
+# Git diff format: "diff --git a/file b/file" followed by line numbers
+kks cat | \
+    grep -n "^diff --git" | \
+    sed 's/:diff --git a\/.* b\//: /' | \
+    fzf --height 100% --prompt 'diff files> ' \
+        --history="$history_file" \
+        --delimiter ':' \
+        --preview 'kks cat | tail -n +{1} | head -n 50' \
+        --preview-window=right:60%:wrap \
+        --bind "ctrl-d:preview-page-down,ctrl-u:preview-page-up" | \
+    cut -d: -f1 | \
+    xargs -r -I {} kks send "execute-keys '<esc>{}gx'"
