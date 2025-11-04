@@ -13,12 +13,17 @@ NC='\033[0m' # No Color
 PACKAGE_NAME=""
 VERSION_RANGE=""
 SUMMARIZE=false
+FORMAT_MODE=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --summarize|-S)
             SUMMARIZE=true
+            shift
+            ;;
+        --format|-f)
+            FORMAT_MODE=true
             shift
             ;;
         *)
@@ -38,15 +43,23 @@ done
 usage() {
     cat <<EOF
 Usage: $(basename "$0") [OPTIONS] <npm-package-name> <version-range>
+       $(basename "$0") --format
 
 Options:
-  -S, --summarize    Use aichat to generate an AI summary of the release notes
+  -S, --summarize      Use aichat to generate an AI summary of the release notes
+  -f, --format         Format mode: parse stdin (diff, package.json) and show version changes
+                       Prompts to fetch full release notes for each package
 
 Examples:
+  # Generate release notes
   $(basename "$0") react v18.0.0..v18.2.0
   $(basename "$0") typescript v4.9.0..latest
   $(basename "$0") vue v3.3.0
   $(basename "$0") --summarize ejs v2.5.7..v3.1.10
+
+  # Format diff from clipboard/stdin (will prompt for release notes)
+  pbpaste | $(basename "$0") --format
+  git diff package.json | $(basename "$0") --format
 
 Version range formats:
   - Single version: v3.0.0 or 3.0.0
@@ -96,6 +109,103 @@ check_prerequisites() {
         exit 1
     fi
 }
+
+# Format mode - parse stdin for version changes
+if [[ "$FORMAT_MODE" == true ]]; then
+    if ! command -v aichat >/dev/null 2>&1; then
+        log_error "aichat is not installed. Install with: cargo install aichat"
+        exit 1
+    fi
+
+    log_info "Reading input from stdin..."
+    INPUT=$(cat)
+
+    if [[ -z "$INPUT" ]]; then
+        log_error "No input provided. Pipe diff or paste package.json changes."
+        usage
+    fi
+
+    log_info "Parsing version changes with aichat (fast model)..."
+
+    RESULT=$(echo "$INPUT" | aichat -m openai:gpt-4o-mini --no-stream "Parse this git diff or package.json snippet and extract package version changes. Output ONLY a clean markdown table with columns: Package | Old Version | New Version | Change Type (major/minor/patch).
+
+Rules:
+- Only include lines with version changes (- and + lines)
+- Detect semantic versioning changes (major.minor.patch)
+- Skip lines without version numbers
+- Output clean markdown table format
+- If no valid changes found, output 'No package version changes detected'
+
+Example output:
+| Package | Old Version | New Version | Change Type |
+|---------|-------------|-------------|-------------|
+| nodemailer | 4.6.5 | 6.10.1 | major |
+| lodash | 4.17.20 | 4.17.21 | patch |")
+
+    if [[ $? -eq 0 ]] && [[ -n "$RESULT" ]]; then
+        echo "$RESULT"
+
+        # Extract all packages and prompt to fetch release notes
+        if echo "$RESULT" | grep -q "|"; then
+            echo ""
+            echo "---"
+            echo ""
+
+            # Parse all packages from the table
+            PACKAGES=$(echo "$RESULT" | grep "|" | grep -v "Package" | grep -v "^|--" | while IFS='|' read -r _ pkg old new changetype _; do
+                pkg=$(echo "$pkg" | tr -d ' ')
+                old=$(echo "$old" | tr -d ' ')
+                new=$(echo "$new" | tr -d ' ')
+                if [[ -n "$pkg" ]] && [[ -n "$old" ]] && [[ -n "$new" ]]; then
+                    echo "$pkg|$old|$new"
+                fi
+            done)
+
+            if [[ -n "$PACKAGES" ]]; then
+                echo -e "${YELLOW}?${NC} Fetch release notes for these packages? (y/N): " >&2
+                if [[ -t 0 ]]; then
+                    # stdin is a terminal, read directly
+                    read -r response
+                else
+                    # stdin is piped, try to read from tty
+                    response=""
+                    ( exec < /dev/tty && read -r response && echo "$response" ) 2>/dev/null | read -r response || response="n"
+                    if [[ -z "$response" ]] || [[ "$response" == "" ]]; then
+                        response="n"
+                        log_info "No tty available, skipping..." >&2
+                    fi
+                fi
+
+                if [[ "$response" =~ ^[Yy]$ ]]; then
+                    echo "" >&2
+                    log_info "Fetching release notes for all packages..." >&2
+
+                    while IFS='|' read -r pkg old new; do
+                        echo "" >&2
+                        log_info "Fetching: $pkg ($old → $new)" >&2
+                        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+                        # Recursively call this script for each package
+                        "$0" --summarize "$pkg" "v$old..v$new" 2>&1
+
+                        echo ""
+                        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+                        echo ""
+                    done <<< "$PACKAGES"
+
+                    log_success "All release notes fetched!" >&2
+                else
+                    log_info "Skipped fetching release notes" >&2
+                fi
+            fi
+        fi
+    else
+        log_error "Failed to parse input"
+        exit 1
+    fi
+
+    exit 0
+fi
 
 # Validate arguments
 if [[ -z "$PACKAGE_NAME" ]]; then
