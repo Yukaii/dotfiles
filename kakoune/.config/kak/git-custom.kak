@@ -1,14 +1,40 @@
 declare-user-mode custom-git-actions
 map global git g ':enter-user-mode custom-git-actions<ret>' -docstring "custom git actions"
 
+declare-option -hidden bool git_diff_fifo_ready true
+
+hook global BufCreate '\*git\*' %{
+  set-option buffer git_diff_fifo_ready true
+  hook -always buffer BufOpenFifo '.*' %{
+    set-option buffer git_diff_fifo_ready false
+  }
+  hook -always buffer BufCloseFifo '.*' %{
+    # Simply mark as ready - no buffer conversion needed
+    # The fifo content is already complete when this hook fires
+    set-option buffer git_diff_fifo_ready true
+  }
+}
+
 define-command -params ..1 git-pr-diff -docstring %{
   Show pull request diff against the default branch or a specified base branch.
+  Uses a static buffer to avoid content changes during navigation.
 } %{
   evaluate-commands %sh{
     default_branch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
     compare_branch=${1:-$default_branch}
     diffBase=$(git merge-base HEAD $compare_branch)
-    echo "git diff $diffBase HEAD"
+
+    # Create a temp file with the complete diff
+    tmpfile=$(mktemp "${TMPDIR:-/tmp}/kak-pr-diff.XXXXXX")
+    git diff $diffBase HEAD > "$tmpfile" 2>&1
+
+    # Edit it directly instead of using fifo
+    printf "edit! -scratch *git*\n"
+    printf "execute-keys '%%d'\n"  # Clear buffer
+    printf "execute-keys '!cat %s<ret>'\n" "$tmpfile"
+    printf "set-option buffer filetype git-diff\n"
+    printf "execute-keys 'gg'\n"  # Go to top
+    printf "nop %%sh{ rm -f %s }\n" "$tmpfile"
   }
 }
 

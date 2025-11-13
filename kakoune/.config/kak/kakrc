@@ -426,12 +426,19 @@ hook global WinCreate .* %{
 hook global WinDisplay .* %{ arrange-buffers %val{hook_param} }
 
 # trigger update diff if inside git dir
+# Skip scratch/debug buffers to avoid overwriting static diffs
 hook global BufOpenFile .* %{
   evaluate-commands -draft %sh{
-    cd $(dirname "$kak_buffile")
+    # Skip buffers that start with * (scratch buffers) or don't have a file
+    case "$kak_buffile" in
+      \**|"") exit 0 ;;
+    esac
+
+    cd $(dirname "$kak_buffile") 2>/dev/null || exit 0
     if [ $(git rev-parse --git-dir 2>/dev/null) ]; then
       for hook in WinCreate BufReload BufWritePost NormalIdle; do
-        printf "hook buffer -group git-update-diff %s .* 'git update-diff'\n" "$hook"
+        # Wrap git update-diff to skip scratch buffers at runtime
+        printf "hook buffer -group git-update-diff %s .* 'evaluate-commands %%sh{ case \"\\$kak_bufname\" in \\*\\*) ;; *) printf \"git update-diff\" ;; esac }'\n" "$hook"
       done
     fi
   }
