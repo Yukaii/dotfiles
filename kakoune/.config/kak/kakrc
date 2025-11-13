@@ -194,11 +194,19 @@ define-command -override run -shell-completion -params .. -docstring 'run comman
 
 declare-user-mode find-actions
 # File navigation
+define-command -override git-diff-files-sidebar -docstring 'persistent git diff file navigation' %{
+  try %{
+    tmux-open-git-diff-files
+  } catch %{
+    kks-connect terminal-horizontal kks-git-diff-files --persistent
+  }
+}
+
 map global find-actions -docstring 'files (all)'                       'f'  ':kks-connect terminal-popup kks-files<ret>'
 map global find-actions -docstring 'git files'                         'g'  ':kks-connect terminal-popup kks-git-files<ret>'
 map global find-actions -docstring 'git changed files'                 'd'  ':kks-connect terminal-popup kks-git-changed-files<ret>'
 map global find-actions -docstring 'git diff file navigation'          'D'  ':kks-connect terminal-popup kks-git-diff-files<ret>'
-map global find-actions -docstring 'PR changed files'                  'c'  ':kks-connect terminal-popup kks-pr-diff-files<ret>'
+map global find-actions -docstring 'git diff sidebar'                  '|'  ':git-diff-files-sidebar<ret>'
 map global find-actions -docstring 'file in buffer directory'          'e'  ':basefolder-files<ret>'
 map global find-actions -docstring 'file in project root'              'E'  ':kks-connect terminal-popup kks-files-navigation<ret>'
 

@@ -67,6 +67,28 @@ The program passed as argument will be executed in the new terminal' \
 }
 complete-command tmux-popup shell
 
+define-command tmux-terminal-sidebar -params 1.. -docstring '
+tmux-terminal-sidebar <program> [<arguments>]: create a new terminal as a narrow horizontal pane (23%)
+Useful for persistent sidebars like file pickers or git diff lists.' \
+%{
+  tmux-terminal-impl 'split-window -hb -l 23%%' %arg{@}
+}
+complete-command tmux-terminal-sidebar shell
+
+define-command tmux-open-git-diff-files -docstring 'open persistent git diff file picker in sidebar' %{
+  evaluate-commands nop %sh{
+    tmux=${kak_client_env_TMUX:-$TMUX}
+    if [ -z "$tmux" ]; then
+      echo "fail 'tmux-open-git-diff-files: tmux session not detected'"
+      exit
+    fi
+
+    env_line="env EDITOR=\"kks edit\" KKS_SESSION=$kak_session KKS_CLIENT=$kak_client"
+    TMUX="$tmux" tmux split-window -hb -l 23% "$env_line kks-git-diff-files --persistent"
+  }
+}
+complete-command tmux-open-git-diff-files shell
+
 define-command tmux-open-broot -docstring 'open broot' %{
   evaluate-commands nop %sh{
     env_line="env EDITOR=\"kks edit\" KKS_SESSION=$kak_session KKS_CLIENT=$kak_client"
