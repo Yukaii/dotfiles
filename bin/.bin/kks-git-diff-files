@@ -27,6 +27,7 @@ if [ "$1" = "--jump" ]; then
     target_line="$1"
     if [ -n "$target_line" ]; then
         "$KKS_BIN" send "execute-keys '<esc>${target_line}gx'"
+        "$KKS_BIN" send "focus"
     fi
     exit 0
 fi
