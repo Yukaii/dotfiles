@@ -10,54 +10,26 @@
 # Usage: Run this script when viewing a git diff output in Kakoune
 # It will extract all file headers and let you jump to them
 
-history_file="$HOME/.cache/kks-git-diff-files-history"
+# Prefer user-provided KKS_BIN, otherwise fallback to whichever kks binary is in PATH
+if [ -z "$KKS_BIN" ]; then
+    KKS_BIN=$(command -v kks 2>/dev/null)
+fi
 
-[ -f "$history_file" ] || touch "$history_file"
-
-# Use the modified kks binary
-KKS_BIN="$HOME/dotfiles/bin/.bin/kks"
-
-wait_for_git_fifo() {
-    attempts=0
-    limit=30
-    debug_log="/tmp/kks-git-diff-debug.log"
-
-    echo "=== wait_for_git_fifo started at $(date '+%Y-%m-%d %H:%M:%S.%3N') ===" >> "$debug_log"
-
-    while [ "$attempts" -lt "$limit" ]; do
-        ready=$("$KKS_BIN" get "%opt{git_diff_fifo_ready}" 2>/dev/null | tr -d "'")
-        echo "  Attempt $attempts: ready='$ready'" >> "$debug_log"
-
-        if [ "$ready" = "true" ] || [ "$ready" = "1" ] || [ -z "$ready" ]; then
-            echo "  Breaking at attempt $attempts" >> "$debug_log"
-            break
-        fi
-
-        attempts=$((attempts + 1))
-        sleep 0.1
-    done
-
-    echo "=== wait_for_git_fifo finished after $attempts attempts ===" >> "$debug_log"
-}
+if [ -z "$KKS_BIN" ]; then
+    echo "kks binary not found. Set KKS_BIN or ensure kks is in PATH." >&2
+    exit 1
+fi
 
 # Get current cursor line to pre-select closest entry
 # Note: kks may show "unable to restore file permissions" errors from Kakoune
 # These are harmless timing issues with temp file cleanup and can be ignored
 current_line=$("$KKS_BIN" get "%val{cursor_line}" 2>/dev/null)
 
-# Get buffer info for debugging
 bufname=$("$KKS_BIN" get "%val{bufname}" 2>/dev/null)
-
-debug_log="/tmp/kks-git-diff-debug.log"
-echo "" >> "$debug_log"
-echo "=== kks-git-diff-files run started at $(date '+%Y-%m-%d %H:%M:%S.%3N') ===" >> "$debug_log"
-echo "  Buffer: $bufname" >> "$debug_log"
-echo "  Current line: $current_line" >> "$debug_log"
 
 # For the *git* buffer, give Kakoune a tiny moment to finish the write command
 # The polling in kks will handle waiting for the actual content
 if [ "$bufname" = "*git*" ] || [ "$bufname" = "*gh-pr-"* ]; then
-    echo "  Waiting briefly for write command to start..." >> "$debug_log"
     sleep 0.05  # Just 50ms to let Kakoune start writing
 fi
 
@@ -67,21 +39,11 @@ fi
 diff_file=$(mktemp)
 trap "rm -f '$diff_file'" EXIT
 
-read_start=$(date +%s%N)
 "$KKS_BIN" cat > "$diff_file"
-read_duration=$(( ($(date +%s%N) - read_start) / 1000000 ))
-
-# Get stats from file (much faster than from variable)
-lines=$(wc -l < "$diff_file" | tr -d ' ')
-files=$(grep -c "^diff --git" "$diff_file" || echo "0")
-md5=$(md5 -q "$diff_file")
-
-echo "  Read completed in ${read_duration}ms: $lines lines, $files files (MD5: ${md5:0:8}...)" >> "$debug_log"
 
 # Extract file list with line numbers directly from file
 file_list=$(grep -n "^diff --git" "$diff_file" | sed 's/:diff --git a\/.* b\//: /')
 file_count=$(echo "$file_list" | wc -l | tr -d ' ')
-echo "  Extracted $file_count files from diff" >> "$debug_log"
 
 # Find the closest file entry to current cursor position (the one before or at cursor)
 # Default to 1 if current_line is empty or invalid
@@ -114,10 +76,6 @@ if [ "$closest_index" -lt 1 ] || [ -z "$file_count" ] || [ "$file_count" -eq 0 ]
     closest_index=1
 fi
 
-echo "  Initial position: index $closest_index of $file_count files" >> "$debug_log"
-fzf_start=$(date +%s%N)
-echo "  Launching fzf at $(date '+%H:%M:%S.%3N')..." >> "$debug_log"
-
 # Run fzf with bat preview and initial position
 # Use pos() action as per fzf documentation (added in Dec 2022)
 # Example from commit: seq 100 | fzf --sync --bind 'start:pos(10)'
@@ -130,9 +88,6 @@ selected=$(echo "$file_list" | \
         --preview-window=right:60%:wrap \
         --bind "ctrl-d:preview-page-down,ctrl-u:preview-page-up" \
         --bind "start:pos($closest_index)")
-
-fzf_duration=$(( ($(date +%s%N) - fzf_start) / 1000000 ))
-echo "  fzf completed in ${fzf_duration}ms" >> "$debug_log"
 
 if [ -n "$selected" ]; then
     line_num=$(echo "$selected" | cut -d: -f1)
