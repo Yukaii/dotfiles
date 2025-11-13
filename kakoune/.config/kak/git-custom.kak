@@ -14,6 +14,70 @@ define-command -params ..1 git-pr-diff -docstring %{
 
 map global git P ':git-pr-diff<ret>' -docstring "PR diff against base branch"
 
+define-command -params 1 gh-pr-diff -docstring %{
+  Show the diff of a remote pull request using gh pr diff.
+  Usage: gh-pr-diff <pr-number>
+} %{
+  evaluate-commands %sh{
+    pr_number=$1
+
+    # Create a temp file with the PR diff
+    tmpfile=$(mktemp "${TMPDIR:-/tmp}/kak-gh-pr-diff.XXXXXX")
+
+    if gh pr diff "$pr_number" > "$tmpfile" 2>&1; then
+      # Edit it in a scratch buffer
+      printf "edit! -scratch *gh-pr-%s*\n" "$pr_number"
+      printf "execute-keys '%%d'\n"  # Clear buffer
+      printf "execute-keys '!cat %s<ret>'\n" "$tmpfile"
+      printf "set-option buffer filetype git-diff\n"
+      printf "execute-keys 'gg'\n"  # Go to top
+      printf "nop %%sh{ rm -f %s }\n" "$tmpfile"
+    else
+      # Show error message
+      error_msg=$(cat "$tmpfile")
+      printf "echo -markup '{Error}gh pr diff failed: %s'\n" "$error_msg"
+      printf "nop %%sh{ rm -f %s }\n" "$tmpfile"
+    fi
+  }
+}
+
+define-command -hidden test-kks-cat-stability -docstring "Test if kks cat returns stable content" %{
+  evaluate-commands %sh{
+    (
+      export KKS_SESSION="$kak_session"
+      export KKS_CLIENT="$kak_client"
+
+      bufname="$kak_bufname"
+
+      echo "Testing kks cat stability in buffer: $bufname" > /tmp/kks-stability-test.log
+      echo "Session: $kak_session, Client: $kak_client" >> /tmp/kks-stability-test.log
+      echo "Starting test at $(date)..." >> /tmp/kks-stability-test.log
+      echo "" >> /tmp/kks-stability-test.log
+
+      for i in 1 2 3 4 5; do
+        echo "Starting run $i..." >> /tmp/kks-stability-test.log
+        # Use timeout to prevent hanging (5 second timeout)
+        output=$(timeout 5 kks cat 2>&1 || echo "TIMEOUT")
+
+        if [ "$output" = "TIMEOUT" ]; then
+          echo "Run $i: TIMEOUT - kks cat hung!" >> /tmp/kks-stability-test.log
+        else
+          lines=$(echo "$output" | wc -l | tr -d ' ')
+          files=$(echo "$output" | grep -c "^diff --git")
+          md5=$(echo "$output" | md5)
+          echo "Run $i: $lines lines, $files files, MD5: $md5" >> /tmp/kks-stability-test.log
+        fi
+        sleep 0.2
+      done
+
+      echo "" >> /tmp/kks-stability-test.log
+      echo "Test finished at $(date)" >> /tmp/kks-stability-test.log
+    ) &
+
+    echo "echo -markup '{Information}Test running in background, check /tmp/kks-stability-test.log in a few seconds'"
+  }
+}
+
 define-command git-file-logs -docstring %{
   Show git commits of current buffer
 } %{
@@ -107,5 +171,6 @@ define-command -override git-jump-at-commit -docstring %{
 }}
 
 map global custom-git-actions p ':git-pr-diff<ret>' -docstring "PR diff against base branch"
+map global custom-git-actions r ':gh-pr-diff ' -docstring "Remote PR diff (gh pr diff)"
 map global custom-git-actions l ':git-file-logs<ret>' -docstring "Git logs against buffer file"
 map global custom-git-actions j ':git-jump-at-commit<ret>' -docstring "Jump to file at commit time"
