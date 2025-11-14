@@ -4,8 +4,9 @@ ${custom.kakcursor} \
 ${custom.kakposition} \
 ${custom.kakmode}\
 ${custom.kakcontext} \
+${custom.kaklsp_modeline}\
 ${custom.kakfile}\
-${custom.kakfiletype}\
+${custom.kakfiletype} \
 $git_branch\
 $git_status\
 ${custom.kaklsp_err}\
@@ -130,5 +131,14 @@ description = "Show activity of kak-lsp if any"
 format = "[]($style)"
 style = "dimmed white"
 when = '[ -n "$kak_opt_lsp_modeline_progress" ]'
+shell = ['sh']
+disabled = false
+
+[custom.kaklsp_modeline]
+description = "Show LSP modeline information"
+format = "[$output]($style) "
+style = "cyan"
+command = 'printf "%s" "$kak_opt_lsp_modeline"'
+when = '[ -n "$kak_opt_lsp_modeline" ]'
 shell = ['sh']
 disabled = false
