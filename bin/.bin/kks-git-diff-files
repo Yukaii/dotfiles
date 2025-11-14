@@ -102,6 +102,13 @@ trap "rm -f '$diff_file'" EXIT
 
 # Extract file list with line numbers directly from file
 file_list=$(grep -n "^diff --git" "$diff_file" | sed 's/:diff --git a\/.* b\//: /')
+
+# Diff didn't match what we expect (no git headers to parse), so bail early.
+if [ -z "$file_list" ]; then
+    echo "Unable to parse diff output. Are you sure this is 'git diff' format?" >&2
+    exit 1
+fi
+
 file_count=$(echo "$file_list" | wc -l | tr -d ' ')
 
 # Find the closest file entry to current cursor position (the one before or at cursor)
