@@ -1,7 +1,7 @@
 add_newline = false
 format = """\
-${custom.kakcursor} \
-${custom.kakposition} \
+${custom.kakcursor}  \
+${custom.kakposition}  \
 ${custom.kakmode}\
 ${custom.kakcontext} \
 ${custom.kaklsp_modeline}\
@@ -23,7 +23,7 @@ use_12hr = true
 disabled = false
 
 [git_branch]
-format = '[ ](bold white) [ $branch]($style)'
+format = "[ ](bold white) [ $branch]($style)"
 style = '#BFA8BF'
 truncation_length = 20
 truncation_symbol = '…'
@@ -49,9 +49,39 @@ disabled = false
 
 [custom.kakfile]
 description = 'The current Kakoune buffername'
-format = '[ ](bold white)[$output]($style)'
+format = '[ ](bold white) [$output]($style)'
 style = '#BFA8BF bold'
-command = 'printf "%s" ${kak_buffile##*/}'
+command = '''
+filename="${kak_buffile##*/}"
+extension="${filename##*.}"
+case "$extension" in
+    js|mjs|cjs) icon="" ;;
+    ts|tsx) icon="" ;;
+    py) icon="" ;;
+    rs) icon="" ;;
+    go) icon="󰟓" ;;
+    rb) icon="" ;;
+    php) icon="" ;;
+    java) icon="" ;;
+    c|h) icon="" ;;
+    cpp|cc|cxx|hpp) icon="" ;;
+    md) icon="" ;;
+    json) icon="" ;;
+    yml|yaml) icon="" ;;
+    toml) icon="" ;;
+    xml) icon="󰗀" ;;
+    html) icon="" ;;
+    css) icon="" ;;
+    sh|bash|zsh) icon="" ;;
+    vim) icon="" ;;
+    lua) icon="" ;;
+    sql) icon="" ;;
+    docker*|Dockerfile) icon="" ;;
+    git*) icon="" ;;
+    *) icon="󰦨" ;;
+esac
+printf "%s %s" "$icon" "$filename"
+'''
 when = 'true'
 shell = ['sh']
 disabled = false
@@ -66,14 +96,14 @@ disabled = false
 
 [custom.kakmode]
 description = 'The current Kakoune mode'
-format = ' {{mode_info}}'
+format = '{{mode_info}}'
 when = ''
 shell = ['true']
 disabled = false
 
 [custom.kakcontext]
 description = 'The current Kakoune context'
-format = ' {{context_info}}'
+format = '{{context_info}}'
 when = ''
 shell = ['true']
 disabled = false
@@ -87,9 +117,36 @@ disabled = true
 
 [custom.kakposition]
 description = 'Relative position of the cursor inside the buffer'
-format = '[$output%]($style)'
+format = '[$output]($style)'
 style = 'dimmed white'
-command = 'printf "%s" $(($kak_cursor_line * 100 / $kak_buf_line_count))'
+command = '''
+percent=$(($kak_cursor_line * 100 / $kak_buf_line_count))
+if [ "$percent" -eq 0 ]; then
+    printf "󰝦 "
+elif [ "$percent" -lt 10 ]; then
+    printf "󰪞 %s%%" "$percent"
+elif [ "$percent" -lt 20 ]; then
+    printf "󰪟 %s%%" "$percent"
+elif [ "$percent" -lt 30 ]; then
+    printf "󰪠 %s%%" "$percent"
+elif [ "$percent" -lt 40 ]; then
+    printf "󰪡 %s%%" "$percent"
+elif [ "$percent" -lt 50 ]; then
+    printf "󰪢 %s%%" "$percent"
+elif [ "$percent" -lt 60 ]; then
+    printf "󰪣 %s%%" "$percent"
+elif [ "$percent" -lt 70 ]; then
+    printf "󰪤 %s%%" "$percent"
+elif [ "$percent" -lt 80 ]; then
+    printf "󰪥 %s%%" "$percent"
+elif [ "$percent" -lt 90 ]; then
+    printf "󰪦 %s%%" "$percent"
+elif [ "$percent" -lt 100 ]; then
+    printf "󰪧 %s%%" "$percent"
+else
+    printf "󰝨 "
+fi
+'''
 when = '[ -n "$kak_cursor_line" ]'
 shell = ['sh']
 disabled = false
@@ -136,7 +193,7 @@ disabled = false
 
 [custom.kaklsp_modeline]
 description = "Show LSP modeline information"
-format = "[$output]($style) "
+format = "[$output]($style)"
 style = "cyan"
 command = 'printf "%s" "$kak_opt_lsp_modeline"'
 when = '[ -n "$kak_opt_lsp_modeline" ]'

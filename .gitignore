@@ -61,3 +61,5 @@ codex/.codex/*
 .storage
 
 !.gitkeep
+
+tmp
