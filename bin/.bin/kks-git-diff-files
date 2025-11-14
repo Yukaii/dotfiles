@@ -150,6 +150,7 @@ run_fzf() {
         "${FZF_CMD[@]}" \
             --height 100% \
             --sync \
+            --reverse \
             --prompt 'diff files> ' \
             --delimiter ':' \
             --with-nth='2..' \
@@ -162,6 +163,7 @@ run_fzf() {
         "${FZF_CMD[@]}" \
             --height 100% \
             --sync \
+            --reverse \
             --prompt 'diff files> ' \
             --delimiter ':' \
             --with-nth='2..' \
