@@ -74,6 +74,7 @@ map global user ,         ':edit-config<ret>'                           -docstri
 map global user y         ':enter-user-mode yank<ret>'                  -docstring 'yank operations'
 map global user E         ':open-broot<ret>'                            -docstring 'file explorer'
 map global user W         ':grep-write<ret>'                            -docstring 'grep write'
+map global user G         ':create-gist<ret>'                           -docstring 'create gist'
 
 # Domain modes
 map global user f         ':enter-user-mode find-actions<ret>'          -docstring 'files & navigation'
@@ -180,6 +181,7 @@ define-command -hidden browse_github %{
   evaluate-commands %sh{
     gh browse "$kak_bufname:$kak_cursor_line"
  }}
+
 
 # https://github.com/hadronized/config/blob/a1142ef783da4a1fd09b5d14f6f1234243304a18/kak/kakrc#L462C1-L469C2
 # experiment around ! and buffer-based interactive shells

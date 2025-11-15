@@ -2,6 +2,111 @@ declare-user-mode custom-git-actions
 map global git g ':enter-user-mode custom-git-actions<ret>' -docstring "custom git actions"
 
 declare-option -hidden bool git_diff_fifo_ready true
+declare-option str gist_last_url ''
+
+define-command gist-handle-action -params ..1 -docstring 'Handle gist follow-up actions' %{
+  evaluate-commands %sh{
+    url="$kak_opt_gist_last_url"
+    action="${1:-}"
+
+    if [ -z "$url" ]; then
+      echo "echo -markup '{Error}No gist URL available'"
+      exit 0
+    fi
+
+    case "$action" in
+      open|o|Open|OPEN)
+        if command -v open >/dev/null 2>&1; then
+          (open "$url" >/dev/null 2>&1 &)
+          echo "echo -markup '{Information}Opened gist in browser'"
+        elif command -v xdg-open >/dev/null 2>&1; then
+          (xdg-open "$url" >/dev/null 2>&1 &)
+          echo "echo -markup '{Information}Opened gist in browser'"
+        else
+          echo "echo -markup '{Error}Unable to find 'open' or 'xdg-open' to launch browser'"
+        fi
+        ;;
+      copy|c|Copy|COPY)
+        if command -v copy_to_clipboard >/dev/null 2>&1; then
+          printf '%s' "$url" | copy_to_clipboard
+          echo "echo -markup '{Information}Copied gist URL to clipboard'"
+        else
+          echo "echo -markup '{Error}copy_to_clipboard command not found'"
+        fi
+        ;;
+      *)
+        echo "echo -markup '{Information}Skipped gist action'"
+        ;;
+    esac
+  }
+}
+
+define-command create-gist -params ..1 -docstring 'Create gist of current buffer (pass public to share)' %{
+  evaluate-commands -draft %{
+    execute-keys '%'
+    evaluate-commands %sh{
+      if ! command -v gh >/dev/null 2>&1; then
+        echo "echo -markup '{Error}GitHub CLI (gh) not found'"
+        exit 0
+      fi
+
+      tmpfile=$(mktemp "${TMPDIR:-/tmp}/kak-gist.XXXXXX")
+      trap 'rm -f "$tmpfile"' EXIT
+
+      printf '%s' "$kak_selection" > "$tmpfile"
+
+      case "$kak_bufname" in
+        ""|\**)
+          filename=""
+          ;;
+        *)
+          filename=$(basename "$kak_bufname")
+          ;;
+      esac
+      filename=${filename:-kak-buffer.txt}
+
+      visibility_flag=""
+      if [ -n "%arg{1}" ]; then
+        case "%arg{1}" in
+          public|--public|Public|PUBLIC)
+            visibility_flag="--public"
+            ;;
+        esac
+      fi
+
+      gist_output=$(gh gist create $visibility_flag -f "$filename" - < "$tmpfile" 2>&1)
+      status=$?
+      if [ $status -ne 0 ]; then
+        escaped_error=$(printf "%s" "$gist_output" | tail -n 1 | sed "s/'/''/g")
+        printf "echo -markup '{Error}Gist creation failed: %s'\n" "$escaped_error"
+        exit 0
+      fi
+
+      escaped_output=$(printf "%s" "$gist_output" | sed "s/'/''/g")
+      printf "echo -debug 'gh gist output: %s'\n" "$escaped_output"
+
+      gist_url=$(printf "%s" "$gist_output" | tail -n 1 | tr -d '\r')
+      if [ -z "$gist_url" ]; then
+        printf "echo -markup '{Error}Unable to determine gist URL from gh output'\n"
+        exit 0
+      fi
+      escaped_url=$(printf "%s" "$gist_url" | sed "s/'/''/g")
+
+      printf "set-option global gist_last_url '%s'\n" "$escaped_url"
+      printf "echo -markup '{Information}Created gist: %s'\n" "$escaped_url"
+      printf "gist-handle-action copy\n"
+
+      client_escaped=$(printf "%s" "$kak_client" | sed "s/'/''/g")
+      cat <<EOF
+evaluate-commands -client '$client_escaped' %{
+  prompt "Gist action (open/copy/skip): " %{
+    gist-handle-action %val{text}
+  }
+}
+EOF
+    }
+  }
+}
 
 hook global BufCreate '\*git\*' %{
   set-option buffer git_diff_fifo_ready true
@@ -200,3 +305,5 @@ map global custom-git-actions p ':git-pr-diff<ret>' -docstring "PR diff against 
 map global custom-git-actions r ':gh-pr-diff ' -docstring "Remote PR diff (gh pr diff)"
 map global custom-git-actions l ':git-file-logs<ret>' -docstring "Git logs against buffer file"
 map global custom-git-actions j ':git-jump-at-commit<ret>' -docstring "Jump to file at commit time"
+map global custom-git-actions g ':create-gist<ret>' -docstring "Create secret gist"
+map global custom-git-actions G ':create-gist public<ret>' -docstring "Create public gist"
