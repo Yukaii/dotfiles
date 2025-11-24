@@ -1,0 +1,16 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Dotbar-style right status: time/date block.
+format = "${custom.right}"
+
+[custom.right]
+shell = "bash"
+format = "$output"
+when = "true"
+command = '''
+bg_r=11;  bg_g=14;  bg_b=20      # #0B0E14
+fg_r=71;  fg_g=82;  fg_b=102     # #475266
+
+now="$(date '+%a %H:%M')"
+printf '\033[48;2;%d;%d;%dm\033[38;2;%d;%d;%dm %s \033[0m' "$bg_r" "$bg_g" "$bg_b" "$fg_r" "$fg_g" "$fg_b" "$now"
+'''
