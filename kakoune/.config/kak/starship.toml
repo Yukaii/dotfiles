@@ -1,13 +1,12 @@
 add_newline = false
-format = """\
+format = """${custom.kaklsp_modeline}\
+${custom.kakfile}\
+${custom.kakfiletype} \
 ${custom.kakcursor}  \
 ${custom.kakposition}  \
 ${custom.kakmode}\
 ${custom.kakcontext} \
-${custom.kaklsp_modeline}\
-${custom.kakfile}\
-${custom.kakfiletype} \
-$git_branch\
+$git_branch \
 $git_status\
 ${custom.kaklsp_err}\
 ${custom.kaklsp_warn}\

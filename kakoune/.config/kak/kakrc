@@ -525,7 +525,7 @@ bundle git_mode 'https://github.com/jordan-yee/kakoune-git-mode' %{
   map global git-yank 'o' ':gitlinker-open<ret>'       -docstring 'Open Permalink'
 }
 
-bundle ui 'https://github.com/kkga/ui.kak' %{
+bundle kak-ui 'https://github.com/kkga/ui.kak' %{
   map global user u ': enter-user-mode ui<ret>' -docstring "ui mode"
 
   # trailing whitespace state and commands
@@ -591,9 +591,9 @@ bundle replace-mode https://github.com/tomKPZ/replace-mode.kak %{
   # Moved to edit-actions mode (accessible via <space>er)
 }
 
-bundle filetree https://github.com/occivink/kakoune-filetree
+bundle filetree 'https://github.com/occivink/kakoune-filetree' %{}
 
-bundle sshconfig https://github.com/Yukaii/ssh-config.kak
+bundle sshconfig 'https://github.com/Yukaii/ssh-config.kak' %{}
 
 bundle case 'https://gitlab.com/FlyingWombat/case.kak.git/' %{
   map global normal ` ': enter-user-mode case<ret>'
@@ -602,25 +602,25 @@ bundle case 'https://gitlab.com/FlyingWombat/case.kak.git/' %{
 
 # cork vue https://github.com/ABuffSeagull/kakoune-vue
 
-bundle kak-jsts https://github.com/schemar/kak-jsts %{
+bundle kak-jsts 'https://github.com/schemar/kak-jsts' %{
   declare-user-mode format
   # Accessible via <space>ef
   map global format p ':format-prettier<ret>'      -docstring 'Format with prettier'
   map global format e ':format-eslint<ret>'        -docstring 'Format with eslint'
 }
 
-bundle increment https://gitlab.com/Screwtapello/kakoune-inc-dec.git %{
+bundle increment 'https://gitlab.com/Screwtapello/kakoune-inc-dec.git' %{
   map global normal <c-a> ': inc-dec-modify-numbers + %val{count}<ret>' -docstring 'increment'
   map global normal <c-x> ': inc-dec-modify-numbers - %val{count}<ret>' -docstring 'decrement'
 }
 
-bundle edit-on-dir https://gitlab.com/fsub/kakoune-edit-or-dir.git/ %{
+bundle edit-on-dir 'https://gitlab.com/fsub/kakoune-edit-or-dir.git/' %{
   unalias global e edit
   alias global e edit-or-dir
   set-option global edit_or_dir_hidden '-A'
 }
 
-bundle save-state https://gitlab.com/Screwtapello/kakoune-state-save.git %{
+bundle save-state 'https://gitlab.com/Screwtapello/kakoune-state-save.git' %{
   hook global KakBegin .* %{
     state-save-reg-load colon
     state-save-reg-load pipe
@@ -637,7 +637,7 @@ bundle save-state https://gitlab.com/Screwtapello/kakoune-state-save.git %{
   hook global FocusIn  .* %{ state-save-reg-load dquote }
 }
 
-bundle crosshair https://github.com/insipx/kak-crosshairs %{
+bundle crosshair 'https://github.com/insipx/kak-crosshairs' %{
   set-option global highlight_current_line true
   set-face   global crosshairs_line   default,rgb:383838
   set-face   global crosshairs_column default,rgb:383838
@@ -646,11 +646,11 @@ bundle crosshair https://github.com/insipx/kak-crosshairs %{
   crosshairs-update
 }
 
-bundle Encapsul8 https://github.com/ElectricR/Encapsul8 %{
+bundle Encapsul8 'https://github.com/ElectricR/Encapsul8' %{
   require-module encapsul8-load-defaults
 }
 
-bundle bookmarks https://github.com/Yukaii/bookmarks.kak %{
+bundle bookmarks 'https://github.com/Yukaii/bookmarks.kak' %{
   declare-user-mode mark
   map global user m ': enter-user-mode mark<ret>' -docstring "marks/bookmarks"
 
@@ -679,7 +679,7 @@ bundle bookmarks https://github.com/Yukaii/bookmarks.kak %{
   map global mark p ':bookmarks-nav 20<ret>'               -docstring "Go to bookmark"
 }
 
-bundle wrap-calculator https://github.com/Yukaii/wrap-calculator.kak %{
+bundle wrap-calculator 'https://github.com/Yukaii/wrap-calculator.kak' %{
   map global goto J '<esc>:unset-j<ret>' -docstring 'Line move down'
   map global goto K '<esc>:unset-k<ret>' -docstring 'Line move up'
 }
@@ -692,7 +692,7 @@ bundle wrap-calculator https://github.com/Yukaii/wrap-calculator.kak %{
 # 	cargo install --force --path . --root ~/.local
 # }
 
-bundle kak-ansi https://github.com/eraserhd/kak-ansi %{
+bundle kak-ansi 'https://github.com/eraserhd/kak-ansi' %{
   declare-user-mode ansi-mode
   map global ansi-mode r ':ansi-render<ret>'           -docstring 'ansi-render'
   map global ansi-mode R ':ansi-render-selection<ret>' -docstring 'ansi-render-selection'
@@ -706,7 +706,7 @@ bundle-install-hook kak-ansi %{
   mv kak-ansi-filter ~/.local/bin/
 }
 
-bundle autospell https://git.sr.ht/~ficd/kak-autospell %{
+bundle autospell 'https://git.sr.ht/~ficd/kak-autospell' %{
   require-module autospell
   map global user s ': enter-user-mode spell<ret>' -docstring 'spelling'
 }
@@ -723,7 +723,7 @@ bundle hump 'https://github.com/delapouite/kakoune-hump' %{
   map global user J ': enter-user-mode hump-jump -lock<ret>'   -docstring 'hump jump'
 }
 
-bundle kakship 'https://github.com/eburghar/kakship' %{
+bundle kakship 'https://github.com/Yukaii/kakship' %{
   kakship-enable
 }
 

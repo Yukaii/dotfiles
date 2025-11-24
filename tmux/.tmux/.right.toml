@@ -1,12 +1,49 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Dotbar-style right status: time/date block.
-format = "$time"
+# Right status: battery + git status + time/date
+format = "$battery$git_status$custom"
 right_format = ""
 add_newline = false
 
-[time]
+[battery]
+full_symbol = "🔋"
+charging_symbol = "⚡"
+discharging_symbol = "🪫"
+unknown_symbol = "❓"
+empty_symbol = "🔴"
+format = "[$symbol$percentage]($style) "
 disabled = false
-time_format = "%a %H:%M"
-format = "[ $time ]($style)"
-style = "bg:#0B0E14 fg:#475266"
+
+[[battery.display]]
+threshold = 10
+style = "fg:red bold"
+
+[[battery.display]]
+threshold = 30
+style = "fg:yellow"
+
+[[battery.display]]
+threshold = 100
+style = "fg:green"
+
+[git_status]
+format = "[$all_status$ahead_behind]($style) "
+style = "fg:bright-red"
+conflicted = "="
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+up_to_date = ""
+untracked = "?${count}"
+stashed = "$${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✘${count}"
+
+[custom.time]
+shell = "bash"
+command = 'date "+%a %-l:%M %p"'
+format = "[$output]($style)"
+style = "fg:#475266"
+when = true

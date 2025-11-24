@@ -10,18 +10,18 @@ shell = "bash"
 when = 'test "${TMUX_WINDOW_ACTIVE:-0}" = "1"'
 command = '''printf "#%s %s " "${TMUX_WINDOW_INDEX:-?}" "${TMUX_WINDOW_NAME:-?}"'''
 format = "[$output]($style)"
-style = "bg:#0B0E14 fg:#BFBDB6 bold"
+style = "fg:#BFBDB6 bold"
 
 [custom.window_inactive]
 shell = "bash"
 when = 'test "${TMUX_WINDOW_ACTIVE:-0}" != "1"'
 command = '''printf "#%s %s " "${TMUX_WINDOW_INDEX:-?}" "${TMUX_WINDOW_NAME:-?}"'''
 format = "[$output]($style)"
-style = "bg:#0B0E14 fg:#475266"
+style = "fg:#475266"
 
 [custom.window_zoom]
 shell = "bash"
 when = 'test "${TMUX_WINDOW_ZOOMED_FLAG:-0}" = "1"'
 command = '''printf "󰊓 "'''
 format = "[$output]($style)"
-style = "bg:#0B0E14 fg:#39BAE6"
+style = "fg:#39BAE6"
