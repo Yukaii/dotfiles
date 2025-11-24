@@ -1,36 +1,27 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 # Dotbar-style window status entry (used by window-status-format/current-format).
-format = "${custom.window}"
+format = "$custom"
+right_format = ""
+add_newline = false
 
-[custom.window]
+[custom.window_active]
 shell = "bash"
-format = "$output"
-when = "true"
-command = '''
-idx="${TMUX_WINDOW_INDEX:-?}"
-name="${TMUX_WINDOW_NAME:-?}"
-active="${TMUX_WINDOW_ACTIVE:-0}"
-zoomed="${TMUX_WINDOW_ZOOMED_FLAG:-0}"
+when = 'test "${TMUX_WINDOW_ACTIVE:-0}" = "1"'
+command = '''printf "#%s %s " "${TMUX_WINDOW_INDEX:-?}" "${TMUX_WINDOW_NAME:-?}"'''
+format = "[$output]($style)"
+style = "bg:#0B0E14 fg:#BFBDB6 bold"
 
-bg_r=11;  bg_g=14;  bg_b=20      # #0B0E14
-fg_r=71;  fg_g=82;  fg_b=102     # #475266 (inactive)
-fgc_r=191; fgc_g=189; fgc_b=182  # #BFBDB6 (current)
-zoom_r=57; zoom_g=186; zoom_b=230 # #39BAE6
+[custom.window_inactive]
+shell = "bash"
+when = 'test "${TMUX_WINDOW_ACTIVE:-0}" != "1"'
+command = '''printf "#%s %s " "${TMUX_WINDOW_INDEX:-?}" "${TMUX_WINDOW_NAME:-?}"'''
+format = "[$output]($style)"
+style = "bg:#0B0E14 fg:#475266"
 
-if [ "$active" = "1" ]; then
-  fg="$fgc_r;$fgc_g;$fgc_b"
-  bold=$'\033[1m'
-else
-  fg="$fg_r;$fg_g;$fg_b"
-  bold=''
-fi
-
-printf '\033[48;2;%d;%d;%dm\033[38;2;%sm%s #%s %s ' "$bg_r" "$bg_g" "$bg_b" "$fg" "$bold" "$idx" "$name"
-
-if [ "$zoomed" = "1" ]; then
-  printf '\033[38;2;%d;%d;%dm󰊓 ' "$zoom_r" "$zoom_g" "$zoom_b"
-fi
-
-printf '\033[0m'
-'''
+[custom.window_zoom]
+shell = "bash"
+when = 'test "${TMUX_WINDOW_ZOOMED_FLAG:-0}" = "1"'
+command = '''printf "󰊓 "'''
+format = "[$output]($style)"
+style = "bg:#0B0E14 fg:#39BAE6"

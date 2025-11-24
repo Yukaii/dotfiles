@@ -1,26 +1,17 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Dotbar-style left status: session name, with prefix highlight when active.
-format = "${custom.session}"
+# Dotbar-style left status: session name; highlights when prefix is active.
+format = "$env_var"
+right_format = ""
+add_newline = false
 
-[custom.session]
-shell = "bash"
-format = "$output"
-when = "true"
-command = '''
-session="${TMUX_SESSION_NAME:-?}"
-prefix="${TMUX_CLIENT_PREFIX:-0}"
+[env_var.prefix]
+variable = "TMUX_PREFIX_LABEL"
+default = ""
+format = "[$env_value]($style)"
+style = "bg:#95E6CB fg:#0B0E14 bold"
 
-bg_r=11;  bg_g=14;  bg_b=20      # #0B0E14
-fg_r=86;  fg_g=91;  fg_b=102     # #565B66
-px_r=149; px_g=230; px_b=203     # #95E6CB
-
-if [ "$prefix" = "1" ]; then
-  # Highlighted block when prefix is pressed.
-  printf '\033[48;2;%d;%d;%dm\033[38;2;%d;%d;%dm\033[1m %s ' "$px_r" "$px_g" "$px_b" "$bg_r" "$bg_g" "$bg_b" "$session"
-else
-  # Normal session label.
-  printf '\033[48;2;%d;%d;%dm\033[38;2;%d;%d;%dm %s ' "$bg_r" "$bg_g" "$bg_b" "$fg_r" "$fg_g" "$fg_b" "$session"
-fi
-printf '\033[0m'
-'''
+[env_var.session]
+variable = "TMUX_SESSION_NAME"
+format = "[$env_value]($style)"
+style = "bg:#0B0E14 fg:#565B66"
