@@ -1,17 +1,20 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 # Dotbar-style left status: session name; highlights when prefix is active.
-format = "$env_var"
+format = "$custom"
 right_format = ""
 add_newline = false
 
-[env_var.prefix]
-variable = "TMUX_PREFIX_LABEL"
-default = ""
-format = "[$env_value]($style)"
+[custom.prefix_active]
+shell = "bash"
+when = 'test "${TMUX_CLIENT_PREFIX:-0}" = "1"'
+command = 'printf "%s" "${TMUX_SESSION_NAME:-?}"'
+format = "[$output]($style)"
 style = "bg:#95E6CB fg:#0B0E14 bold"
 
-[env_var.session]
-variable = "TMUX_SESSION_NAME"
-format = "[$env_value]($style)"
+[custom.session_normal]
+shell = "bash"
+when = 'test "${TMUX_CLIENT_PREFIX:-0}" != "1"'
+command = 'printf "%s" "${TMUX_SESSION_NAME:-?}"'
+format = "[$output]($style)"
 style = "bg:#0B0E14 fg:#565B66"
