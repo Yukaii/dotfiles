@@ -1,45 +1,9 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Right status: battery + git status + time/date
-format = "$battery$git_status$custom"
+# Right status: time + battery (conditional color) + git status
+format = "$custom"
 right_format = ""
 add_newline = false
-
-[battery]
-full_symbol = "🔋"
-charging_symbol = "⚡"
-discharging_symbol = "🪫"
-unknown_symbol = "❓"
-empty_symbol = "🔴"
-format = "[$symbol$percentage]($style) "
-disabled = false
-
-[[battery.display]]
-threshold = 10
-style = "fg:red bold"
-
-[[battery.display]]
-threshold = 30
-style = "fg:yellow"
-
-[[battery.display]]
-threshold = 100
-style = "fg:green"
-
-[git_status]
-format = "[$all_status$ahead_behind]($style) "
-style = "fg:bright-red"
-conflicted = "="
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-up_to_date = ""
-untracked = "?${count}"
-stashed = "$${count}"
-modified = "!${count}"
-staged = "+${count}"
-renamed = "»${count}"
-deleted = "✘${count}"
 
 [custom.time]
 shell = "bash"
@@ -47,3 +11,86 @@ command = 'date "+%a %-l:%M %p"'
 format = "[$output]($style)"
 style = "fg:#475266"
 when = true
+
+[custom.battery_low]
+shell = "bash"
+command = '''
+if command -v pmset &> /dev/null; then
+  battery_info=$(pmset -g batt)
+  percentage=$(echo "$battery_info" | grep -Eo "[0-9]+%" | cut -d% -f1)
+
+  if [ "$percentage" -le 10 ]; then
+    charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
+    if [ "$charging" = "1" ]; then
+      echo " 󰢟 $percentage%"
+    else
+      echo " 󰂎 $percentage%"
+    fi
+  fi
+fi
+'''
+format = "[$output]($style) "
+style = "fg:red bold"
+when = true
+
+[custom.battery_medium]
+shell = "bash"
+command = '''
+if command -v pmset &> /dev/null; then
+  battery_info=$(pmset -g batt)
+  percentage=$(echo "$battery_info" | grep -Eo "[0-9]+%" | cut -d% -f1)
+
+  if [ "$percentage" -gt 10 ] && [ "$percentage" -le 30 ]; then
+    charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
+
+    # Icon index 2-3
+    if [ "$percentage" -le 20 ]; then idx=2; else idx=3; fi
+
+    if [ "$charging" = "1" ]; then
+      icons=("" "󰢜" "󰂆")
+    else
+      icons=("" "󰁺" "󰁻")
+    fi
+
+    echo " ${icons[$idx]} $percentage%"
+  fi
+fi
+'''
+format = "[$output]($style)"
+style = "fg:yellow"
+when = true
+
+[custom.battery_high]
+shell = "bash"
+command = '''
+if command -v pmset &> /dev/null; then
+  battery_info=$(pmset -g batt)
+  percentage=$(echo "$battery_info" | grep -Eo "[0-9]+%" | cut -d% -f1)
+
+  if [ "$percentage" -gt 30 ]; then
+    charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
+
+    # Determine icon index (4-10)
+    if [ "$percentage" -le 40 ]; then idx=4
+    elif [ "$percentage" -le 50 ]; then idx=5
+    elif [ "$percentage" -le 60 ]; then idx=6
+    elif [ "$percentage" -le 70 ]; then idx=7
+    elif [ "$percentage" -le 80 ]; then idx=8
+    elif [ "$percentage" -le 90 ]; then idx=9
+    else idx=10
+    fi
+
+    if [ "$charging" = "1" ]; then
+      icons=("" "" "" "" "󰂇" "󰂈" "󰢝" "󰂉" "󰢞" "󰂊" "󰂅")
+    else
+      icons=("" "" "" "" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂")
+    fi
+
+    echo " ${icons[$idx]} $percentage%"
+  fi
+fi
+'''
+format = "[$output]($style)"
+style = "fg:green"
+when = true
+
