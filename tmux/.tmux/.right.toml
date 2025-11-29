@@ -1,6 +1,5 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Right status: time + battery (conditional color) + git status
 format = "$custom "
 right_format = ""
 add_newline = false
@@ -12,85 +11,61 @@ format = "[$output]($style)"
 style = "fg:#475266"
 when = true
 
-[custom.battery_low]
+[custom.battery]
 shell = "bash"
 command = '''
 if command -v pmset &> /dev/null; then
   battery_info=$(pmset -g batt)
   percentage=$(echo "$battery_info" | grep -Eo "[0-9]+%" | cut -d% -f1)
+  charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
 
-  if [ "$percentage" -le 10 ]; then
-    charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
-    if [ "$charging" = "1" ]; then
-      echo " 󰢟 $percentage%"
+  if [ -n "$percentage" ]; then
+    if [ "$percentage" -le 10 ]; then
+      idx=1
+    elif [ "$percentage" -le 20 ]; then
+      idx=2
+    elif [ "$percentage" -le 30 ]; then
+      idx=3
+    elif [ "$percentage" -le 40 ]; then
+      idx=4
+    elif [ "$percentage" -le 50 ]; then
+      idx=5
+    elif [ "$percentage" -le 60 ]; then
+      idx=6
+    elif [ "$percentage" -le 70 ]; then
+      idx=7
+    elif [ "$percentage" -le 80 ]; then
+      idx=8
+    elif [ "$percentage" -le 90 ]; then
+      idx=9
     else
-      echo " 󰂎 $percentage%"
-    fi
-  fi
-fi
-'''
-format = "[$output]($style) "
-style = "fg:red bold"
-when = true
-
-[custom.battery_medium]
-shell = "bash"
-command = '''
-if command -v pmset &> /dev/null; then
-  battery_info=$(pmset -g batt)
-  percentage=$(echo "$battery_info" | grep -Eo "[0-9]+%" | cut -d% -f1)
-
-  if [ "$percentage" -gt 10 ] && [ "$percentage" -le 30 ]; then
-    charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
-
-    # Icon index 2-3
-    if [ "$percentage" -le 20 ]; then idx=2; else idx=3; fi
-
-    if [ "$charging" = "1" ]; then
-      icons=("" "󰢜" "󰂆")
-    else
-      icons=("" "󰁺" "󰁻")
+      idx=10
     fi
 
-    echo " ${icons[$idx]} $percentage%"
-  fi
-fi
-'''
-format = "[$output]($style)"
-style = "fg:yellow"
-when = true
+    icons_charging=("" "󰢟" "󰢜" "󰂆" "󰂇" "󰂈" "󰢝" "󰂉" "󰢞" "󰂊" "󰂅")
+    icons_discharging=("" "󰂎" "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂")
 
-[custom.battery_high]
-shell = "bash"
-command = '''
-if command -v pmset &> /dev/null; then
-  battery_info=$(pmset -g batt)
-  percentage=$(echo "$battery_info" | grep -Eo "[0-9]+%" | cut -d% -f1)
-
-  if [ "$percentage" -gt 30 ]; then
-    charging=$(echo "$battery_info" | grep -q "AC Power" && echo "1" || echo "0")
-
-    # Determine icon index (4-10)
-    if [ "$percentage" -le 40 ]; then idx=4
-    elif [ "$percentage" -le 50 ]; then idx=5
-    elif [ "$percentage" -le 60 ]; then idx=6
-    elif [ "$percentage" -le 70 ]; then idx=7
-    elif [ "$percentage" -le 80 ]; then idx=8
-    elif [ "$percentage" -le 90 ]; then idx=9
-    else idx=10
+    if [ "$percentage" -le 10 ]; then
+      color="\e[31m"
+    elif [ "$percentage" -le 30 ]; then
+      color="\e[33m"
+    else
+      if [ "$charging" = "1" ]; then
+        color="\e[32m"
+      else
+        color="\e[37m"
+      fi
     fi
 
     if [ "$charging" = "1" ]; then
-      icons=("" "" "" "" "󰂇" "󰂈" "󰢝" "󰂉" "󰢞" "󰂊" "󰂅")
+      icon=${icons_charging[$idx]}
     else
-      icons=("" "" "" "" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂")
+      icon=${icons_discharging[$idx]}
     fi
 
-    echo " ${icons[$idx]} $percentage%"
+    printf "%b %s%%\e[0m" "$color" "${icon} $percentage"
   fi
 fi
 '''
-format = "[$output]($style)"
-style = "fg:green"
+format = "$output"
 when = true
-
