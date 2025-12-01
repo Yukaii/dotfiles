@@ -75,8 +75,8 @@ keybind = global:alt+shift+q=toggle_quick_terminal
 keybind = ctrl+apostrophe=text:\x11'
 
 # tmux navigation
-keybind = ctrl+alt+p=text:\x11p
-keybind = ctrl+alt+n=text:\x11n
+# keybind = ctrl+alt+p=text:\x11p
+# keybind = ctrl+alt+n=text:\x11n
 keybind = ctrl+shift+tab=text:\x11p
 keybind = ctrl+tab=text:\x11n
 keybind = cmd+shift+left_bracket=text:\x11p
@@ -93,6 +93,8 @@ keybind = ctrl+shift+left=text:\x11h
 keybind = ctrl+shift+right=text:\x11l
 keybind = ctrl+shift+up=text:\x11k
 keybind = ctrl+shift+down=text:\x11j
+# Start pane selector
+keybind = ctrl+alt+p=text:\x11q
 
 # other tmux goods
 
