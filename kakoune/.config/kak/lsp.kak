@@ -145,11 +145,12 @@ declare-option -hidden str lsp_server_harper_lsp %{
 
 hook -group lsp-filetype-javascript global BufSetOption filetype=(?:javascript|typescript) %{
   set-option buffer lsp_servers %exp{
-    [typescript-language-server]
+    [tsgo]
+    command = "%val{home}/.bun/install/global/node_modules/@typescript/native-preview-darwin-arm64/lib/tsgo"
+    args = ["lsp"]
     root_globs = ["package.json", "tsconfig.json", "jsconfig.json", ".git", ".hg"]
-    args = ["--stdio"]
     settings_section = "_"
-    [typescript-language-server.settings._]
+    [tsgo.settings._]
     # quotePreference = "double"
     # typescript.format.semicolons = "insert"
 
