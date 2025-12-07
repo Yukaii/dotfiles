@@ -11,6 +11,7 @@
       "grep": "allow",
       "find": "allow",
       "ripgrep": "allow",
+      "rg": "allow",
       "head": "allow",
       "*": "ask"
     },
@@ -240,7 +241,17 @@
     }
   },
   "plugin": [
-    "opencode-openai-codex-auth@4.0.0",
+    "opencode-openai-codex-auth@4.0.2",
     "opencode-gemini-auth"
-  ]
+  ],
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "chrome-devtools-mcp@latest"],
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    },
+  }
 }
