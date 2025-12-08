@@ -13,6 +13,7 @@
       "ripgrep": "allow",
       "rg": "allow",
       "head": "allow",
+      "wc": "allow",
       "*": "ask"
     },
     "edit": "ask"
