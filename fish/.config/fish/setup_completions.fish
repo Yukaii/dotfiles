@@ -5,10 +5,6 @@ set completions_dir "$HOME/.config/fish/completions"
 # Ensure the directory exists
 mkdir -p $completions_dir
 
-if command -q volta
-    volta completions fish > $completions_dir/volta.fish
-end
-
 # Shell Integrations and Completions
 if command -q oh-my-posh
   # oh-my-posh init fish --config (mbrew --prefix oh-my-posh)"/themes/uew.omp.json" > $completions_dir/oh-my-posh.fish
