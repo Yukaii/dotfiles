@@ -1,6 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "theme": "kanagawa_no_bg",
   "permission": {
+    "external_directory": "allow",
     "bash": {
       "git status": "allow",
       "git diff": "allow",
@@ -14,6 +16,13 @@
       "rg": "allow",
       "head": "allow",
       "wc": "allow",
+      "sudo *": "deny",
+      "rm -rf /": "deny",
+      "rm -rf /*": "deny",
+      "rm -rf ~": "deny",
+      "rm -rf ~/*": "deny",
+      ":(){:|:&};:": "deny",  // fork bomb, just in case
+      "mkdir": "allow",
       "*": "ask"
     },
     "edit": "ask"
@@ -30,11 +39,15 @@
         "store": false
       },
       "models": {
-        "gpt-5.1-codex-low": {
-          "name": "GPT 5.1 Codex Low (OAuth)",
+        "gpt-5.2-low": {
+          "name": "GPT 5.2 Low (OAuth)",
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "low",
@@ -46,11 +59,15 @@
             "store": false
           }
         },
-        "gpt-5.1-codex-medium": {
-          "name": "GPT 5.1 Codex Medium (OAuth)",
+        "gpt-5.2-medium": {
+          "name": "GPT 5.2 Medium (OAuth)",
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "medium",
@@ -62,11 +79,15 @@
             "store": false
           }
         },
-        "gpt-5.1-codex-high": {
-          "name": "GPT 5.1 Codex High (OAuth)",
+        "gpt-5.2-high": {
+          "name": "GPT 5.2 High (OAuth)",
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "high",
@@ -78,14 +99,18 @@
             "store": false
           }
         },
-        "gpt-5.1-codex-max": {
-          "name": "GPT 5.1 Codex Max (OAuth)",
+        "gpt-5.2-xhigh": {
+          "name": "GPT 5.2 Extra High (OAuth)",
           "limit": {
             "context": 272000,
             "output": 128000
           },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "options": {
-            "reasoningEffort": "high",
+            "reasoningEffort": "xhigh",
             "reasoningSummary": "detailed",
             "textVerbosity": "medium",
             "include": [
@@ -99,6 +124,10 @@
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "low",
@@ -116,6 +145,10 @@
             "context": 272000,
             "output": 128000
           },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "options": {
             "reasoningEffort": "medium",
             "reasoningSummary": "detailed",
@@ -131,6 +164,10 @@
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "high",
@@ -148,8 +185,72 @@
             "context": 272000,
             "output": 128000
           },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "options": {
             "reasoningEffort": "xhigh",
+            "reasoningSummary": "detailed",
+            "textVerbosity": "medium",
+            "include": [
+              "reasoning.encrypted_content"
+            ],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-low": {
+          "name": "GPT 5.1 Codex Low (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "low",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": [
+              "reasoning.encrypted_content"
+            ],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-medium": {
+          "name": "GPT 5.1 Codex Medium (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "medium",
+            "reasoningSummary": "auto",
+            "textVerbosity": "medium",
+            "include": [
+              "reasoning.encrypted_content"
+            ],
+            "store": false
+          }
+        },
+        "gpt-5.1-codex-high": {
+          "name": "GPT 5.1 Codex High (OAuth)",
+          "limit": {
+            "context": 272000,
+            "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
+          "options": {
+            "reasoningEffort": "high",
             "reasoningSummary": "detailed",
             "textVerbosity": "medium",
             "include": [
@@ -163,6 +264,10 @@
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "medium",
@@ -180,6 +285,10 @@
             "context": 272000,
             "output": 128000
           },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "options": {
             "reasoningEffort": "high",
             "reasoningSummary": "detailed",
@@ -195,6 +304,10 @@
           "limit": {
             "context": 272000,
             "output": 128000
+          },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
           },
           "options": {
             "reasoningEffort": "low",
@@ -212,6 +325,10 @@
             "context": 272000,
             "output": 128000
           },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "options": {
             "reasoningEffort": "medium",
             "reasoningSummary": "auto",
@@ -228,6 +345,10 @@
             "context": 272000,
             "output": 128000
           },
+          "modalities": {
+            "input": ["text", "image"],
+            "output": ["text"]
+          },
           "options": {
             "reasoningEffort": "high",
             "reasoningSummary": "detailed",
@@ -242,8 +363,9 @@
     }
   },
   "plugin": [
-    "opencode-openai-codex-auth@4.0.2",
-    "opencode-gemini-auth"
+    "opencode-openai-codex-auth@4.1.0",
+    "opencode-gemini-auth",
+    // "oh-my-opencode@2.1.7"
   ],
   "mcp": {
     "chrome-devtools": {
@@ -253,6 +375,11 @@
     "context7": {
       "type": "remote",
       "url": "https://mcp.context7.com/mcp"
+    },
+    // Web fetching - MCP official server (Python via uvx)
+    "fetch": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-fetch"]
     },
   }
 }
