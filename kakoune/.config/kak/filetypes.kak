@@ -35,3 +35,6 @@ hook global BufCreate .*[.](vue) %{
  set-option buffer filetype vue
 }
 
+hook global BufCreate .*[.](jsonc) %{
+ set-option buffer filetype json
+}
