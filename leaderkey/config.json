@@ -57,9 +57,9 @@
     },
     {
       "key" : "2",
-      "label" : "威 ZH (IME)",
+      "label" : "ZH (IME)",
       "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select org.atelierInmu.inputmethod.vChewing.IMECHT"
+      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
     },
     {
       "key" : "3",
@@ -73,18 +73,7 @@
       "type" : "command",
       "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese"
     },
-    {
-      "key" : "4",
-      "label" : "ZH (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
-    },
-    {
-      "key" : "ˋ",
-      "label" : "ZH (IME)",
-      "type" : "command",
-      "value" : "/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin"
-    },
+
     {
       "key" : "t",
       "type" : "application",
