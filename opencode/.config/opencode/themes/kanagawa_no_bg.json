@@ -34,7 +34,7 @@
     "textMuted": { "dark": "fujiGray", "light": "lightGray" },
     "background": { "dark": "none", "light": "lightBg" },
     "backgroundPanel": { "dark": "none", "light": "lightPaper" },
-    "backgroundElement": { "dark": "none", "light": "#E3DCD2" },
+    "backgroundElement": { "dark": "sumiInk2", "light": "#E3DCD2" },
     "border": { "dark": "sumiInk3", "light": "#D4CBBF" },
     "borderActive": { "dark": "carpYellow", "light": "carpYellow" },
     "borderSubtle": { "dark": "sumiInk2", "light": "#DCD4C9" },
