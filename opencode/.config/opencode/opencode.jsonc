@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "theme": "kanagawa",
   "permission": {
     "external_directory": "allow",
     "bash": {
@@ -594,7 +595,7 @@
   "plugin": [
     "opencode-openai-codex-auth@4.1.0",
     "opencode-gemini-auth",
-    // "oh-my-opencode@2.1.7"
+    "oh-my-opencode@2.9.0"
   ],
   "mcp": {
     "chrome-devtools": {
