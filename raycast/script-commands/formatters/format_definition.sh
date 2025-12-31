@@ -18,6 +18,9 @@ format_pair() {
     if [[ "$arn" =~ arn:aws:ecs:[^:]+:[^:]+:task-definition/[^:]+:([0-9]+) ]]; then
         local revision="${BASH_REMATCH[1]}"
         echo "- [ ] ${name}: ${revision}"
+    elif [[ "$arn" =~ arn:aws:iam::[0-9]+:role/(.+)$ ]]; then
+        # IAM role ARNs are metadata for ECS tasks here; skip them.
+        return 0
     else
         echo "Unrecognized format: $arn"
     fi
