@@ -28,6 +28,9 @@
     "edit": "ask"
   },
   "provider": {
+    "cursor": {
+      "name": "Cursor"
+    },
     "openai": {
       "options": {
         "reasoningEffort": "medium",
@@ -595,7 +598,8 @@
   "plugin": [
     "opencode-openai-codex-auth@4.1.0",
     "opencode-gemini-auth",
-    "oh-my-opencode@2.10.0"
+    "oh-my-opencode@2.12.2",
+    "yet-another-opencode-cursor-auth"
   ],
   "mcp": {
     "chrome-devtools": {
