@@ -30,7 +30,7 @@ kill_session() {
 popup() {
     window_id=$(tmux display-message -p '#I')
     current_session_name=$(tmux display-message -p '#S')
-    parent_session_dir=$(tmux display-message -p -F "#{pane_current_path}" -t0)
+    parent_session_dir=$(tmux display-message -p -F "#{pane_current_path}")
     session_name="floating_${current_session_name}_${window_id}"
     startup_command="$1"
 
