@@ -61,35 +61,80 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | t
     apt-get install -y tailscale && \
     rm -rf /var/lib/apt/lists/*
 
-# Create the startup script directly in the image using a portable printf.
-# This avoids needing a separate start.sh file.
-RUN printf '%s\n' \
-    '#!/bin/sh' \
-    'set -e' \
-    'TAILSCALE_STATE_DIR=/var/lib/tailscale/tailscaled.state' \
-    'echo "Starting SSH server..."' \
-    'service ssh start' \
-    'sleep 1' \
-    'echo "SSH server status:"' \
-    'service ssh status || true' \
-    'netstat -tlnp | grep :22 || echo "SSH not listening on port 22"' \
-    'echo "Starting Tailscale daemon..."' \
-    'tailscaled --state=${TAILSCALE_STATE_DIR} &' \
-    'sleep 2' \
-    'HOSTNAME=${TAILSCALE_HOSTNAME:-my-dev-container}' \
-    'echo "Connecting to Tailscale network..."' \
-    'TAILSCALE_FLAGS="--hostname=${HOSTNAME}"' \
-    'if [ -n "${TAILSCALE_AUTH_KEY}" ]; then' \
-    '  TAILSCALE_FLAGS="${TAILSCALE_FLAGS} --auth-key=${TAILSCALE_AUTH_KEY}"' \
-    '  echo "Using auth key for authentication"' \
-    'fi' \
-    'tailscale up ${TAILSCALE_FLAGS}' \
-    'echo "Tailscale is connected. Container is ready."' \
-    'echo "SSH server is running. Root password: tailscale"' \
-    'echo "Container IP: $(hostname -i)"' \
-    'echo "SSH test: ssh root@$(hostname -i)"' \
-    'exec /bin/sh -c "trap : TERM INT; sleep infinity & wait"' \
-    > /start.sh
+  # Create the startup script directly in the image using a portable printf.
+  # This avoids needing a separate start.sh file.
+  RUN printf '%s\n' \
+      '#!/bin/sh' \
+      'set -eu' \
+      '' \
+      'TAILSCALE_STATE_DIR=/var/lib/tailscale/tailscaled.state' \
+      'TAILSCALE_SOCKET=/var/run/tailscale/tailscaled.sock' \
+      '' \
+      'cleanup() {' \
+      '  if [ -n "${TAILSCALED_PID:-}" ]; then' \
+      '    kill "${TAILSCALED_PID}" 2>/dev/null || true' \
+      '  fi' \
+      '}' \
+      'trap cleanup INT TERM' \
+      '' \
+      'echo "Starting SSH server..."' \
+      'service ssh start || true' \
+      'sleep 1' \
+      'service ssh status || true' \
+      'netstat -tlnp | grep :22 >/dev/null 2>&1 || echo "SSH not listening on port 22"' \
+      '' \
+      'start_tailscaled() {' \
+      '  mkdir -p /var/run/tailscale' \
+      '  echo "Starting Tailscale daemon..."' \
+      '  tailscaled --state="${TAILSCALE_STATE_DIR}" --socket="${TAILSCALE_SOCKET}" &' \
+      '  TAILSCALED_PID=$!' \
+      '}' \
+      '' \
+      'tailscale_up() {' \
+      '  HOSTNAME=${TAILSCALE_HOSTNAME:-my-dev-container}' \
+      '  echo "Connecting to Tailscale network as ${HOSTNAME}..."' \
+      '  TAILSCALE_FLAGS="--hostname=${HOSTNAME}"' \
+      '  if [ -n "${TAILSCALE_AUTH_KEY:-}" ]; then' \
+      '    TAILSCALE_FLAGS="${TAILSCALE_FLAGS} --auth-key=${TAILSCALE_AUTH_KEY}"' \
+      '    echo "Using auth key for authentication"' \
+      '  fi' \
+      '  tailscale up ${TAILSCALE_FLAGS}' \
+      '}' \
+      '' \
+      'start_tailscaled' \
+      'sleep 2' \
+      '' \
+      '# Initial connect attempt. If this fails (e.g. needs interactive login), keep container alive.' \
+      'if ! tailscale_up 2>&1; then' \
+      '  echo "Tailscale up failed (possibly needs login URL). Check logs and run tailscale up in container."' \
+      'fi' \
+      '' \
+      'echo "Container is ready. Supervising tailscaled connectivity..."' \
+      'echo "SSH root password: tailscale"' \
+      '' \
+      'while true; do' \
+      '  if ! kill -0 "${TAILSCALED_PID}" 2>/dev/null; then' \
+      '    echo "tailscaled exited; restarting..."' \
+      '    start_tailscaled' \
+      '    sleep 2' \
+      '  fi' \
+      '' \
+      '  if ! tailscale status >/dev/null 2>&1; then' \
+      '    STATUS=$(tailscale status 2>&1 || true)' \
+      '    echo "Tailscale unhealthy: ${STATUS}"' \
+      '    if echo "${STATUS}" | grep -qi "logged out"; then' \
+      '      echo "Tailscale is logged out; waiting for manual auth (or provide TAILSCALE_AUTH_KEY)."' \
+      '      sleep 30' \
+      '      continue' \
+      '    fi' \
+      '    tailscale_up >/dev/null 2>&1 || true' \
+      '    sleep 10' \
+      '    continue' \
+      '  fi' \
+      '' \
+      'sleep 10' \
+      'done' \
+      > /start.sh
 
 # Make the startup script executable
 RUN chmod +x /start.sh
@@ -480,6 +525,59 @@ proxy_docker_command() {
     fi
 }
 
+tailscale_reconnect() {
+    UNIQUE_NAME=""
+    AUTH_KEY=""
+    RESET="false"
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --name)
+                UNIQUE_NAME="$2"
+                shift 2
+                ;;
+            --auth-key)
+                AUTH_KEY="$2"
+                shift 2
+                ;;
+            --reset)
+                RESET="true"
+                shift
+                ;;
+            *)
+                echo "Unknown option for 'reconnect': $1" >&2
+                echo "Usage: $0 reconnect --name <unique-name> [--auth-key <key>] [--reset]" >&2
+                exit 1
+                ;;
+        esac
+    done
+
+    if [ -z "$UNIQUE_NAME" ]; then
+        echo "Error: 'reconnect' command requires a --name." >&2
+        echo "Usage: $0 reconnect --name <unique-name>" >&2
+        exit 1
+    fi
+
+    CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+    HOSTNAME="${CONTAINER_NAME}"
+
+    AUTH_FLAG=""
+    if [ -n "$AUTH_KEY" ]; then
+        AUTH_FLAG="--auth-key=${AUTH_KEY}"
+    fi
+
+    RESET_FLAG=""
+    if [ "$RESET" = "true" ]; then
+        RESET_FLAG="--reset"
+    fi
+
+    echo "Reconnecting Tailscale inside ${CONTAINER_NAME}..."
+    echo "Command: tailscale up --hostname=${HOSTNAME} ${AUTH_FLAG} ${RESET_FLAG}"
+
+    # Use `sh -c` to keep arg handling simple and allow empty flags.
+    docker exec -it "${CONTAINER_NAME}" sh -c "tailscale up --hostname='${HOSTNAME}' ${AUTH_FLAG} ${RESET_FLAG}"
+}
+
 proxy_command() {
     UNIQUE_NAME=""
     LOCAL_PORT="1080"
@@ -590,6 +688,9 @@ case "$COMMAND" in
   proxy-docker)
     proxy_docker_command "$@"
     ;;
+  reconnect)
+    tailscale_reconnect "$@"
+    ;;
   *)
     echo "Tailscale Development Environment Manager" >&2
     echo "" >&2
@@ -602,9 +703,9 @@ case "$COMMAND" in
     echo "  2. Build the image: $0 build" >&2
     echo "  3. Run a container: $0 run --name mydev" >&2
     echo "" >&2
-    echo "Usage: $0 {build|run|logs|shell|list|stop|wipe|proxy} [options]" >&2
-    echo "" >&2
-    echo "Commands:" >&2
+     echo "Usage: $0 {build|run|logs|shell|list|stop|wipe|proxy|reconnect} [options]" >&2
+     echo "" >&2
+     echo "Commands:" >&2
     echo "  build [--image-name <name>]" >&2
     echo "                             Build the Docker image with UTF-8 locale support." >&2
     echo "                             Optional: specify custom image name." >&2
@@ -628,11 +729,15 @@ case "$COMMAND" in
     echo "                             Wipe the data for a specific container." >&2
     echo "                             Optional: specify custom data directory." >&2
     echo "" >&2
-    echo "  proxy --name <name> [--port <local-port>]" >&2
-    echo "                             Start SSH SOCKS5 proxy to a running container." >&2
-    echo "                             Runs in foreground, press Ctrl+C to stop. Default port: 1080" >&2
-    echo "" >&2
-    echo "EXAMPLES:" >&2
+     echo "  proxy --name <name> [--port <local-port>]" >&2
+     echo "                             Start SSH SOCKS5 proxy to a running container." >&2
+     echo "                             Runs in foreground, press Ctrl+C to stop. Default port: 1080" >&2
+     echo "" >&2
+     echo "  reconnect --name <name> [--auth-key <key>] [--reset]" >&2
+     echo "                             Re-run tailscale up inside the container." >&2
+     echo "                             Useful after account/tailnet changes." >&2
+     echo "" >&2
+     echo "EXAMPLES:" >&2
     echo "  $0 build" >&2
     echo "  $0 build --image-name my-tailscale-dev" >&2
     echo "  $0 run --name dev1" >&2
