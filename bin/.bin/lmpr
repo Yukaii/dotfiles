@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  lmpr [base_ref] [head_ref] [-- <lumen diff args...>]
+  lmpr --base <base_ref> --head <head_ref> [-- <lumen diff args...>]
+
+Runs `lumen diff` using merge-base semantics (like GitHub PR diffs).
+Equivalent to:
+  lumen diff <base_ref>...<head_ref>
+
+Defaults:
+  base_ref: origin/<default-branch> (via refs/remotes/origin/HEAD), else origin/main, origin/master, main, master
+  head_ref: HEAD
+
+Environment overrides:
+  LMPR_BASE, LMPR_HEAD
+
+Examples:
+  lmpr
+  lmpr main
+  lmpr main feature/my-branch
+  lmpr -- --watch
+  lmpr main -- --file src/main.rs
+EOF
+}
+
+die() {
+  echo "lmpr: $*" >&2
+  exit 1
+}
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"
+}
+
+default_base_ref() {
+  local default_branch=""
+
+  if default_branch=$(git symbolic-ref -q refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'); then
+    if git rev-parse --verify "origin/$default_branch^{commit}" >/dev/null 2>&1; then
+      printf '%s\n' "origin/$default_branch"
+      return
+    fi
+
+    if git rev-parse --verify "$default_branch^{commit}" >/dev/null 2>&1; then
+      printf '%s\n' "$default_branch"
+      return
+    fi
+  fi
+
+  if git rev-parse --verify "origin/main^{commit}" >/dev/null 2>&1; then
+    printf '%s\n' "origin/main"
+    return
+  fi
+
+  if git rev-parse --verify "origin/master^{commit}" >/dev/null 2>&1; then
+    printf '%s\n' "origin/master"
+    return
+  fi
+
+  if git rev-parse --verify "main^{commit}" >/dev/null 2>&1; then
+    printf '%s\n' "main"
+    return
+  fi
+
+  if git rev-parse --verify "master^{commit}" >/dev/null 2>&1; then
+    printf '%s\n' "master"
+    return
+  fi
+
+  die "could not determine a default base ref (expected origin/HEAD, origin/main, origin/master, main, or master)"
+}
+
+lmpr() {
+  if [[ ${1:-} == "-h" || ${1:-} == "--help" ]]; then
+    usage
+    return 0
+  fi
+
+  require_cmd git
+  require_cmd lumen
+
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git repository"
+
+  local base_ref="${LMPR_BASE:-}"
+  local head_ref="${LMPR_HEAD:-}"
+  local -a lumen_args=()
+
+  while (($#)); do
+    case "$1" in
+    -h | --help)
+      usage
+      return 0
+      ;;
+    --base)
+      shift
+      [[ ${1:-} ]] || die "--base requires a value"
+      base_ref="$1"
+      shift
+      ;;
+    --head)
+      shift
+      [[ ${1:-} ]] || die "--head requires a value"
+      head_ref="$1"
+      shift
+      ;;
+    --)
+      shift
+      lumen_args+=("$@")
+      break
+      ;;
+    -*)
+      lumen_args+=("$1")
+      shift
+      ;;
+    *)
+      if [[ -z "$base_ref" ]]; then
+        base_ref="$1"
+      elif [[ -z "$head_ref" ]]; then
+        head_ref="$1"
+      else
+        lumen_args+=("$1")
+      fi
+      shift
+      ;;
+    esac
+  done
+
+  if [[ -z "$base_ref" ]]; then
+    base_ref="$(default_base_ref)"
+  fi
+
+  if [[ -z "$head_ref" ]]; then
+    head_ref="HEAD"
+  fi
+
+  git rev-parse --verify "$base_ref^{commit}" >/dev/null 2>&1 || die "unknown base ref: $base_ref (try: git fetch --all --prune)"
+  git rev-parse --verify "$head_ref^{commit}" >/dev/null 2>&1 || die "unknown head ref: $head_ref"
+
+  if ((${#lumen_args[@]} > 0)); then
+    exec lumen diff "$base_ref...$head_ref" "${lumen_args[@]}"
+  else
+    exec lumen diff "$base_ref...$head_ref"
+  fi
+}
+
+lmpr "$@"
