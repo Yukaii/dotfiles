@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pop out the current tmux window into a new external Ghostty window.
+#
+# This script creates a *separate* tmux session and links the current window into it.
+# That way, you get an independent "session view" (no accidental window-sync between
+# clients), while still sharing the underlying panes/processes.
+#
+# Usage:
+#   tmux-popout-ghostty            # open popout window
+#   tmux-popout-ghostty --kill     # kill popout session for current window
+#   tmux-popout-ghostty --kill-all # kill all popout sessions
+
+usage() {
+  cat <<'EOF' >&2
+Usage:
+  tmux-popout-ghostty            Open popout Ghostty window
+  tmux-popout-ghostty --kill     Kill popout for current window
+  tmux-popout-ghostty --kill-all Kill all popout sessions
+EOF
+}
+
+mode="open"
+case "${1:-}" in
+  "") ;;
+  --kill) mode="kill";;
+  --kill-all) mode="kill-all";;
+  -h|--help) usage; exit 0;;
+  *) usage; exit 2;;
+esac
+
+# Must be run from inside tmux (we rely on tmux formats to read the current state).
+if [[ -z "${TMUX:-}" ]]; then
+  echo "Run this inside tmux." >&2
+  exit 1
+fi
+
+# Ensure external `tmux attach` targets the same server socket.
+# TMUX is like: "/path/to/socket,12345,0".
+tmux_socket="${TMUX%%,*}"
+
+action_sess="$(tmux display-message -p '#{session_name}')"
+win_id="$(tmux display-message -p '#{window_id}')"
+win_name="$(tmux display-message -p '#{window_name}')"
+cwd="$(tmux display-message -p '#{pane_current_path}')"
+
+sess_safe="${action_sess//[^a-zA-Z0-9_-]/_}"
+win_num="${win_id#@}"
+pop_sess="popout_${sess_safe}_${win_num}"
+
+kill_one() {
+  if tmux has-session -t "${pop_sess}" 2>/dev/null; then
+    tmux kill-session -t "${pop_sess}"
+  fi
+}
+
+kill_all() {
+  tmux list-sessions -F '#{session_name}' 2>/dev/null | while IFS= read -r name; do
+    [[ "${name}" == popout_* ]] || continue
+    tmux kill-session -t "${name}" >/dev/null 2>&1 || true
+  done
+}
+
+case "${mode}" in
+  kill) kill_one; exit 0;;
+  kill-all) kill_all; exit 0;;
+esac
+
+if ! tmux has-session -t "${pop_sess}" 2>/dev/null; then
+  tmux new-session -d -s "${pop_sess}" -n "__popout__" -c "${cwd}"
+  tmux link-window -k -s "${win_id}" -t "${pop_sess}:1"
+  tmux rename-window -t "${pop_sess}:1" "${win_name}" >/dev/null 2>&1 || true
+fi
+
+# Run attach in Ghostty, but make it resilient:
+# - Explicitly target the same tmux socket
+# - Recreate the popout session if it was cleaned up
+setup_and_attach="tmux -S $(printf '%q' "${tmux_socket}") has-session -t $(printf '%q' "${pop_sess}") 2>/dev/null || { tmux -S $(printf '%q' "${tmux_socket}") new-session -d -s $(printf '%q' "${pop_sess}") -n __popout__ -c $(printf '%q' "${cwd}"); tmux -S $(printf '%q' "${tmux_socket}") link-window -k -s $(printf '%q' "${win_id}") -t $(printf '%q' "${pop_sess}"):1; tmux -S $(printf '%q' "${tmux_socket}") rename-window -t $(printf '%q' "${pop_sess}"):1 $(printf '%q' "${win_name}") >/dev/null 2>&1 || true; }; exec tmux -S $(printf '%q' "${tmux_socket}") attach -t $(printf '%q' "${pop_sess}")"
+
+ghostty_cmd="bash -lc $(printf '%q' "${setup_and_attach}")"
+
+uname_s="$(uname -s)"
+if [[ "${uname_s}" == "Darwin" ]]; then
+  # macOS: launch Ghostty via LaunchServices and pass a command to run.
+  # Ref: https://github.com/ghostty-org/ghostty/discussions/3691
+  open -na "Ghostty" --args --command="${ghostty_cmd}" >/dev/null 2>&1 &
+else
+  # Linux: invoke ghostty directly (detach so this script doesn't hang).
+  # Ref: https://github.com/ghostty-org/ghostty/discussions/3691
+  nohup ghostty -e ${ghostty_cmd} >/dev/null 2>&1 &
+fi
+
+disown >/dev/null 2>&1 || true

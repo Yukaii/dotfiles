@@ -2,13 +2,18 @@
 
 # Function to get unique session names
 get_unique_sessions() {
-    tmux list-sessions -F '#{session_name}' | sed 's/^floating_//; s/_[0-9]*$//' | sort -u
+    tmux list-sessions -F '#{session_name}' \
+      | grep -v '^popout_' \
+      | sed 's/^floating_//; s/_[0-9]*$//' \
+      | sort -u
 }
 
 # Function to get all sessions for a given base name
 get_sessions_for_base() {
     base_name="$1"
-    tmux list-sessions -F '#{session_name}' | grep -E "^(floating_${base_name}_[0-9]*)|(${base_name})$"
+    tmux list-sessions -F '#{session_name}' \
+      | grep -v '^popout_' \
+      | grep -E "^(floating_${base_name}_[0-9]*)|(${base_name})$"
 }
 
 # Function to list sessions
