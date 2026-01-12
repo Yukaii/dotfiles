@@ -286,8 +286,13 @@ open_shell() {
     exit 1
   fi
   CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
-  # Use `sh -c` to handle commands with arguments correctly.
-  docker exec -it "${CONTAINER_NAME}" sh -c "${SHELL_COMMAND}"
+
+  if [ "${SHELL_COMMAND}" = "/bin/bash" ]; then
+    docker exec --detach-keys="ctrl-]" -it "${CONTAINER_NAME}" /bin/bash
+  else
+    # Use `sh -c` to handle commands with arguments correctly.
+    docker exec --detach-keys="ctrl-]" -it "${CONTAINER_NAME}" sh -c "${SHELL_COMMAND}"
+  fi
 }
 
 list_containers() {
