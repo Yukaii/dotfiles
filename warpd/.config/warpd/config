@@ -1,5 +1,7 @@
 # Cursor + ripple color (pink)
 cursor_color: #ff69b4ff
+normal_system_cursor: 1
+# cursor_pack: pointinghand
 ripple_color: #ff69b4ff
 
 # Hint appearance
@@ -7,3 +9,12 @@ hint_border_color: #3a3a3a
 hint_border_width: 1
 # hint_bgcolor supports RGBA, last two hex digits are alpha
 hint_bgcolor: #1c1c1eaa
+
+# Hold mouse buttons while key pressed
+hold_buttons: m , .
+
+# Rapid auto-click while rapid_mode is active
+rapid_mode: R
+rapid_click_interval: 40
+rapid_indicator_color: #ff69b480
+rapid_indicator_width: 3
