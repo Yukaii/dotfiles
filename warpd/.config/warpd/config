@@ -1,8 +1,11 @@
 # Cursor + ripple color (pink)
 cursor_color: #ff69b4ff
-normal_system_cursor: 1
-# cursor_pack: pointinghand
 ripple_color: #ff69b4ff
+cursor_entry_color: #ff69b4ff
+normal_system_cursor: 1
+cursor_halo_enabled: 1
+cursor_entry_effect: 1
+# cursor_pack: pointinghand
 
 # Hint appearance
 hint_border_color: #3a3a3a
