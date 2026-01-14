@@ -1,3 +1,9 @@
 # Cursor + ripple color (pink)
 cursor_color: #ff69b4ff
 ripple_color: #ff69b4ff
+
+# Hint appearance
+hint_border_color: #3a3a3a
+hint_border_width: 1
+# hint_bgcolor supports RGBA, last two hex digits are alpha
+hint_bgcolor: #1c1c1eaa
