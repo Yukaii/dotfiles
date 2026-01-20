@@ -16,6 +16,12 @@ hint_bgcolor: #1c1c1eaa
 # Hold mouse buttons while key pressed
 hold_buttons: m , .
 
+# Mouse buttons (including modifier clicks)
+buttons: M-m
+buttons: C-m
+buttons: S-m
+buttons: M-S-m
+
 # Rapid auto-click while rapid_mode is active
 rapid_mode: R
 rapid_click_interval: 40
