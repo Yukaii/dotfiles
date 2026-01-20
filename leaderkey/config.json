@@ -7,6 +7,24 @@
       "value" : "raycast://extensions/raycast/navigation/search-menu-items"
     },
     {
+      "key" : "c",
+      "label" : "Warpd Normal",
+      "type" : "url",
+      "value" : "warpd://normal"
+    },
+    {
+      "key" : "x",
+      "label" : "Warpd Hint",
+      "type" : "url",
+      "value" : "warpd://hint"
+    },
+    {
+      "key" : "f",
+      "label" : "Warpd Find",
+      "type" : "url",
+      "value" : "warpd://find"
+    },
+    {
       "actions" : [
         {
           "key" : "o",
