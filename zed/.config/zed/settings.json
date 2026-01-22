@@ -64,7 +64,7 @@
   "ui_font_family": "JetBrainsMono Nerd Font",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
-  "theme": "Alabaster Dark",
+  "theme": "Github Dark",
   "vim_mode": true,
   "helix_mode": true,
   "auto_update": true,
@@ -79,7 +79,7 @@
   },
   "confirm_quit": true,
   "cursor_blink": false,
-  "relative_line_numbers": true,
+  "relative_line_numbers": "enabled",
   "inlay_hints": {
     "enabled": false
   },
@@ -93,5 +93,9 @@
     "file_icons": true,
     "git_status": true
   },
-  "format_on_save": "off"
+  "format_on_save": "off",
+  "which_key": {
+    "enabled": true,
+    "delay_ms": 100
+  },
 }

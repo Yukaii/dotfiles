@@ -2,6 +2,7 @@
   {
     "context": "Editor && VimControl && !VimWaiting && !menu",
     "bindings": {
+      "space": null,
       "ctrl-w z": "workspace::ToggleZoom",
       "g ]": "editor::GoToDiagnostic",
       "g [": "editor::GoToPreviousDiagnostic",
@@ -11,6 +12,7 @@
       "space l r": "editor::Rename",
       "space l f": "editor::Format",
       "space l l": "diagnostics::Deploy",
+      "space f": null,
       "space f f": "file_finder::Toggle",
       "space f b": "tab_switcher::Toggle",
       "space f C": "command_palette::Toggle",
@@ -20,7 +22,7 @@
       "space p": "outline::Toggle",
       "space v": "editor::GoToDefinitionSplit",
       "space c": "pane::CloseActiveItem",
-      "space g b": "editor::ToggleGitBlame",
+      "space g b": "git::Blame",
       "space /": "editor::ToggleComments",
       "space w": "workspace::Save",
 
