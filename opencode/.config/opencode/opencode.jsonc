@@ -102,9 +102,11 @@
   "plugin": [
     // "opencode-openai-codex-auth@4.3.0",
     "opencode-gemini-auth",
-    "oh-my-opencode@3.0.0-beta.5",
-    "yet-another-opencode-cursor-auth",
+    // "oh-my-opencode@2.14.0",
+    "yet-another-opencode-cursor-auth@0.1.1-dev.13.733ad18",
+    // "opencode-antigravity-auth@beta",
     // "@tarquinen/opencode-dcp@latest",
+    "opencode-anthropic-auth@0.0.8",
   ],
   "mcp": {
     "chrome-devtools": {
@@ -114,7 +116,7 @@
     },
     "context7": {
       "type": "remote",
-      "url": "https://mcp.context7.com/mcp"
+      "url": "https://mcp.context7.com/mcp/oauth"
     },
     // Web fetching - MCP official server (Python via uvx)
     "fetch": {
@@ -126,9 +128,28 @@
       "type": "local",
       "command": ["bunx", "playwriter"],
     },
-    "linear": {
+    "linear-personal": {
       "type": "local",
-      "command": ["bunx", "-y ", "mcp-remote", "https://mcp.linear.app/sse"],
+      "command": [
+        "bunx",
+        "-y ",
+        "mcp-remote",
+        "https://mcp.linear.app/sse",
+        "--resource",
+        "ykmade"
+      ],
+      "enabled": false,
+    },
+    "linear-work": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "-y ",
+        "mcp-remote",
+        "https://mcp.linear.app/sse",
+        "--resource",
+        "hackmd"
+      ],
       "enabled": false,
     },
     "figma": {
@@ -136,5 +157,14 @@
       "command": ["bunx", "-y ", "mcp-remote", "https://mcp.figma.com/mcp"],
       "enabled": false,
     },
+    "pencil": {
+      "type": "local",
+      "enabled": false,
+      "command": [
+        "/Applications/Pencil.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+        "--ws-port",
+        "62272"
+      ]
+    }
   }
 }
