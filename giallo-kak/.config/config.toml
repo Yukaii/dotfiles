@@ -1,0 +1,24 @@
+# giallo.kak configuration
+# Place this file at ~/.config/giallo.kak/config.toml
+
+# Default theme for syntax highlighting
+theme = "kanagawa-wave"
+
+# Custom grammars directory - place .json or .plist grammar files here
+grammars_path = "~/.config/giallo.kak/grammars"
+
+# Language mapping - maps Kakoune filetypes to giallo language names
+[language_map]
+# Map Kakoune filetypes to giallo language names
+sh = "shellscript"
+js = "javascript"
+ts = "typescript"
+tsx = "typescriptreact"
+jsx = "javascriptreact"
+vue = "vue"
+
+# Other useful mappings you might want:
+# py = "python"
+# rb = "ruby"
+# go = "go"
+# rs = "rust"
