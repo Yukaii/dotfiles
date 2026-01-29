@@ -16,6 +16,10 @@ ts = "typescript"
 tsx = "typescriptreact"
 jsx = "javascriptreact"
 vue = "vue"
+terraform = "terraform"
+tf = "terraform"
+hcl = "hcl"
+
 
 # Other useful mappings you might want:
 # py = "python"
