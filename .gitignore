@@ -58,6 +58,9 @@ codex/.codex/*
 
 !claude/.claude/settings.json
 
+giallo-kak/.config/grammars/*.json
+!giallo-kak/.config/grammars/.gitkeep
+
 .storage
 
 !.gitkeep
