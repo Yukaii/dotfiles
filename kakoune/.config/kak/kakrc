@@ -1,7 +1,8 @@
 evaluate-commands %sh{
   kks init
   kak-lsp --kakoune -s $kak_session
-  kak-tree-sitter -dks --init $kak_session
+  # kak-tree-sitter -dks --init $kak_session
+  giallo-kak --print-rc
   gitlinker init kakoune
 }
 
@@ -32,6 +33,7 @@ source "%val{config}/ascii-player.kak"
 # source "%val{config}/amber.kak"
 
 colorscheme kanagawa-alabaster
+set-option global giallo_theme kanagawa-wave
 # colorscheme alabaster
 # colorscheme kanagawa
 # colorscheme ayu-mirage
@@ -566,7 +568,7 @@ bundle kak-ui 'https://github.com/kkga/ui.kak' %{
   hook global ModeChange 'normal:insert' hide-trailing-whitespaces
 }
 
-bundle harpoon 'https://github.com/raiguard/kak-harpoon' %{
+bundle harpoon 'https://codeberg.org/raiguard/kak-harpoon' %{
   declare-user-mode harpoon
   map global user o ': enter-user-mode harpoon<ret>' -docstring "Enter harpoon mode"
 
@@ -584,7 +586,7 @@ bundle harpoon 'https://github.com/raiguard/kak-harpoon' %{
   map global harpoon 9 ':harpoon-nav 9<ret>'        -docstring "go harpoon"
 }
 
-bundle live_grep 'https://github.com/raiguard/kak-live-grep' %{
+bundle live_grep 'https://codeberg.org/raiguard/kak-live-grep' %{
   # Mapped in find-actions mode (accessible via <space>f/)
 }
 
