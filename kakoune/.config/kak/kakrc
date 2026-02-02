@@ -2,7 +2,7 @@ evaluate-commands %sh{
   kks init
   kak-lsp --kakoune -s $kak_session
   # kak-tree-sitter -dks --init $kak_session
-  giallo-kak --print-rc
+  giallo-kak init
   gitlinker init kakoune
 }
 
@@ -33,7 +33,6 @@ source "%val{config}/ascii-player.kak"
 # source "%val{config}/amber.kak"
 
 colorscheme kanagawa-alabaster
-set-option global giallo_theme kanagawa-wave
 # colorscheme alabaster
 # colorscheme kanagawa
 # colorscheme ayu-mirage
@@ -63,6 +62,10 @@ add-highlighter global/ wrap -word
 add-highlighter global/todo-highlighter regex //\h*(TODO:)[^\n]* 0:cyan 1:yellow,red
 
 add-highlighter global/ regex \b(TODO|FIXME|NOTE)\b 0:default+rb
+
+# Giallo config
+set-option global giallo_theme kanagawa-wave
+set-option global giallo_debug true
 
 
 # User mode mappings

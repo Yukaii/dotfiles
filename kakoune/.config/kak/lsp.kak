@@ -247,7 +247,7 @@ hook -group lsp-filetype-vue global BufSetOption filetype=(?:vue) %{
   }
 }
 
-hook -group lsp-filetype-vue global BufSetOption filetype=(?:elixir) %{
+hook -group lsp-filetype-elixir global BufSetOption filetype=(?:elixir) %{
   set-option buffer lsp_servers %exp{
     [elixir-ls]
     root_globs = ["mix.exs", "mix.lock"]
