@@ -73,6 +73,9 @@ keybind = global:alt+shift+q=toggle_quick_terminal
 
 # tsm popup shrotcut toggle
 keybind = ctrl+apostrophe=text:\x11'
+keybind = ctrl+alt+w=text:\x11w
+keybind = ctrl+alt+shift+n=text:\x11N
+keybind = ctrl+alt+shift+p=text:\x11P
 
 # Pop out current tmux window into a new Ghostty window
 keybind = ctrl+alt+g=text:\x11G

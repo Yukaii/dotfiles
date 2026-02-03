@@ -21,6 +21,501 @@ list_sessions() {
     get_unique_sessions
 }
 
+WORKTREE_ROOT="${HOME}/Developer/tsm_worktrees"
+
+# Helpers for worktrees
+is_git_repo() {
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1
+}
+
+repo_root() {
+    git rev-parse --show-toplevel 2>/dev/null
+}
+
+# Get the main repo root (not the current worktree)
+main_repo_root() {
+    local git_common_dir
+    git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null)
+    if [ -n "$git_common_dir" ]; then
+        # Get absolute path of git dir, then strip .git suffix
+        local git_dir
+        git_dir=$(cd "$(git rev-parse --git-dir)" 2>/dev/null && pwd -P)
+        # Go up from .git/worktrees/... to get repo root
+        if [[ "$git_dir" == */.git/worktrees/* ]]; then
+            echo "$git_dir" | sed 's#/\.git/worktrees/.*$##'
+        elif [[ "$git_dir" == */.git ]]; then
+            echo "$git_dir" | sed 's#/\.git$##'
+        else
+            echo "$git_dir"
+        fi
+    else
+        repo_root
+    fi
+}
+
+sanitize_name() {
+    # Replace slashes and spaces to keep tmux/session/file names safe
+    echo "$1" | sed 's#[ /]#__#g'
+}
+
+project_id_from_path() {
+    local root="$1"
+    local normalized
+    normalized=$(echo "$root" | sed 's#^/##')
+    sanitize_name "$normalized"
+}
+
+worktree_project_root() {
+    local root="$1"
+    local project_id
+    project_id=$(project_id_from_path "$root")
+    echo "${WORKTREE_ROOT}/${project_id}"
+}
+
+worktree_path_for_branch() {
+    local root="$1"
+    local branch="$2"
+    local project_root
+    project_root=$(worktree_project_root "$root")
+    echo "${project_root}/$(sanitize_name "$branch")"
+}
+
+worktree_branch_from_path() {
+    local path="$1"
+    local branch
+    branch=$(git -C "$path" rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ "$branch" = "HEAD" ] || [ -z "$branch" ]; then
+        branch=$(git -C "$path" rev-parse --short HEAD 2>/dev/null)
+        branch="detached-${branch}"
+    fi
+    echo "$branch"
+}
+
+worktree_current_path_from_pwd() {
+    local root="$1"
+    local pwd_path
+    pwd_path=$(pwd -P)
+    local best_path=""
+    local best_len=0
+    while IFS=$'\t' read -r path branch; do
+        case "$pwd_path" in
+            "$path"/*|"$path")
+                if [ "${#path}" -gt "$best_len" ]; then
+                    best_path="$path"
+                    best_len="${#path}"
+                fi
+                ;;
+        esac
+    done < <(list_worktrees_for_repo "$root")
+    echo "$best_path"
+}
+
+worktree_cycle() {
+    local root="$1"
+    local direction="$2"
+    local paths=()
+    local count=0
+    while IFS=$'\t' read -r path branch; do
+        paths+=("$path")
+        count=$((count + 1))
+    done < <(list_worktrees_for_repo "$root")
+
+    if [ "$count" -eq 0 ]; then
+        echo "No worktrees found." >&2
+        return 1
+    fi
+
+    local current
+    current=$(worktree_current_path_from_pwd "$root")
+    local idx=0
+    if [ -n "$current" ]; then
+        local i
+        for i in "${!paths[@]}"; do
+            if [ "${paths[$i]}" = "$current" ]; then
+                idx="$i"
+                break
+            fi
+        done
+    fi
+
+    local next_idx
+    if [ "$direction" = "prev" ]; then
+        next_idx=$(( (idx - 1 + count) % count ))
+    else
+        next_idx=$(( (idx + 1) % count ))
+    fi
+
+    switch_to_worktree_session "$(main_repo_root)" "${paths[$next_idx]}"
+}
+
+worktree_session_name() {
+    local root="$1"
+    local branch="$2"
+    local project_id
+    project_id=$(project_id_from_path "$root")
+    echo "tsm_${project_id}__$(sanitize_name "$branch")"
+}
+
+fzf_select() {
+    local list_file="$1"
+    shift
+    local fzf_args=("$@")
+    local tmp
+    tmp=$(mktemp)
+    if [ -n "$TMUX" ]; then
+        # Use fzf-tmux for direct popup without script overhead
+        cat "$list_file" | fzf-tmux -p 55%,60% "${fzf_args[@]}" > "$tmp"
+    else
+        cat "$list_file" | fzf "${fzf_args[@]}" > "$tmp"
+    fi
+    cat "$tmp"
+}
+
+# Pipe stdin directly to fzf without temp file for the list
+fzf_select_pipe() {
+    shift  # discard placeholder
+    local fzf_args=("$@")
+    echo "DEBUG: fzf_select_pipe TMUX=$TMUX" >> /tmp/tsm_error.log
+    if [ -n "$TMUX" ]; then
+        echo "DEBUG: Using fzf-tmux" >> /tmp/tsm_error.log
+        fzf-tmux -p 55%,60% "${fzf_args[@]}" 2>>/tmp/tsm_error.log
+    else
+        echo "DEBUG: Using fzf" >> /tmp/tsm_error.log
+        fzf "${fzf_args[@]}"
+    fi
+}
+
+list_worktrees_porcelain() {
+    git worktree list --porcelain 2>/dev/null
+}
+
+list_worktrees_for_repo() {
+    local root="$1"
+    list_worktrees_porcelain | awk -v root="$root" '
+        $1=="worktree"{path=$2}
+        $1=="branch"{branch=$2; sub("^refs/heads/","",branch)}
+        $1=="detached"{branch="(detached)"}
+        $1==""{
+            if (path != "" && branch == "") { branch="(unknown)" }
+            if (path != "") {
+                print path "\t" branch
+            }
+            path=""; branch=""
+        }
+        END{
+            if (path != "") {
+                if (branch=="") { branch="(unknown)" }
+                print path "\t" branch
+            }
+        }'
+}
+
+print_worktree_list_current() {
+    local root="$1"
+    local wr
+    wr=$(worktree_project_root "$root")
+    git worktree list --porcelain 2>/dev/null | awk -v root="$root" -v wr="$wr" '
+        $1=="worktree"{path=$2}
+        $1=="branch"{branch=$2; sub("^refs/heads/","",branch)}
+        $1=="detached"{branch="(detached)"}
+        $1==""{
+            if (path != "" && branch == "") { branch="(unknown)" }
+            if (path != "" && (path == root || index(path, wr "/") == 1)) {
+                print branch "\t" path
+            }
+            path=""; branch=""
+        }
+        END{
+            if (path != "" && (path == root || index(path, wr "/") == 1)) {
+                if (branch=="") { branch="(unknown)" }
+                print branch "\t" path
+            }
+        }'
+}
+
+print_worktree_list_all() {
+    find "$WORKTREE_ROOT" -maxdepth 3 -mindepth 2 -type d 2>/dev/null | while IFS= read -r path; do
+        if git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            local branch
+            branch=$(worktree_branch_from_path "$path")
+            echo -e "${branch}\t${path}"
+        fi
+    done
+}
+
+# Unified worktree selector: shows existing worktrees + all branches
+worktree_select_interactive() {
+    local root="$1"
+    local wr
+    wr=$(worktree_project_root "$root")
+    # Normalize root path for reliable comparison
+    local root_normalized
+    root_normalized=$(cd "$root" && pwd -P)
+
+    # Build list of existing worktrees with normalized paths
+    local existing_worktrees_list
+    existing_worktrees_list=$(git worktree list --porcelain 2>/dev/null | awk '
+        $1=="worktree"{path=$2}
+        $1=="branch"{branch=$2; sub("^refs/heads/","",branch)}
+        $1=="detached"{branch="(detached)"}
+        $1==""{
+            if (path != "" && branch == "") { branch="(unknown)" }
+            if (path != "") { print path "\t" branch }
+            path=""; branch=""
+        }
+        END{
+            if (path != "") {
+                if (branch=="") { branch="(unknown)" }
+                print path "\t" branch
+            }
+        }')
+
+    # Get normalized root git common dir (absolute path)
+    # This is the main .git directory shared by all worktrees
+    local root_git_dir_normalized
+    root_git_dir_normalized=$(cd "$root" && git rev-parse --git-common-dir 2>/dev/null)
+    # Normalize to absolute path
+    if [ -n "$root_git_dir_normalized" ]; then
+        root_git_dir_normalized=$(cd "$root" && cd "$root_git_dir_normalized" 2>/dev/null && pwd -P) 2>/dev/null || root_git_dir_normalized=$(cd "$root" && pwd -P)/$root_git_dir_normalized
+    fi
+
+    if [ -n "$TSM_DEBUG" ]; then
+        echo "DEBUG: root=$root" >&2
+        echo "DEBUG: root_normalized=$root_normalized" >&2
+        echo "DEBUG: wr=$wr" >&2
+        echo "DEBUG: root_git_dir_normalized=$root_git_dir_normalized" >&2
+        echo "DEBUG: existing_worktrees_list:" >&2
+        echo "$existing_worktrees_list" >&2
+    fi
+
+    # Build a list of: branch\tpath\tstatus
+    # status: HAS_WORKTREE or NO_WORKTREE
+    {
+        # First: existing worktrees for current repo with HAS_WORKTREE status
+        # Show ALL worktrees that belong to this git repo, regardless of location
+        while IFS=$'\t' read -r wt_path wt_branch; do
+            [ -z "$wt_path" ] && continue
+            # Verify this is a valid worktree by checking git config
+            if [ -d "$wt_path/.git" ] || [ -f "$wt_path/.git" ]; then
+                # Verify it's the same repo by checking git-common-dir (all worktrees share the same one)
+                local wt_git_dir
+                wt_git_dir=$(git -C "$wt_path" rev-parse --git-common-dir 2>/dev/null)
+                # Normalize to absolute path
+                if [ -n "$wt_git_dir" ]; then
+                    wt_git_dir=$(cd "$wt_path" && cd "$wt_git_dir" 2>/dev/null && pwd -P) 2>/dev/null || wt_git_dir=$(cd "$wt_path" && pwd -P)/$wt_git_dir
+                fi
+                if [ -n "$TSM_DEBUG" ]; then
+                    echo "DEBUG: checking wt_path=$wt_path wt_branch=$wt_branch wt_git_dir=$wt_git_dir root_git_dir=$root_git_dir_normalized" >&2
+                fi
+                if [ "$wt_git_dir" = "$root_git_dir_normalized" ]; then
+                    if [ -n "$TSM_DEBUG" ]; then
+                        echo "DEBUG: MATCH! Adding $wt_branch" >&2
+                    fi
+                    echo -e "${wt_branch}\t${wt_path}\tHAS_WORKTREE"
+                fi
+            fi
+        done <<< "$existing_worktrees_list"
+
+        # Second: get list of branches already in worktrees for efficient lookup
+        local branches_in_worktrees
+        branches_in_worktrees=$(printf "%s" "$existing_worktrees_list" | awk -F'\t' '{print $2}')
+
+        # Third: list branches without worktrees
+        git for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null | while read -r branch; do
+            # Check if branch is already in a worktree (using grep for reliable matching)
+            if ! echo "$branches_in_worktrees" | grep -qx "$branch"; then
+                echo -e "${branch}\tCREATE_NEW\tNO_WORKTREE"
+            fi
+        done
+    } | fzf_select_pipe - --print-query --expect=enter --exit-0 \
+        --prompt="worktree> " \
+        --header="Existing worktrees (switch) | Branches without worktree (create new) | Type new branch name" \
+        --preview='echo {3}' \
+        --preview-window=hidden
+}
+
+switch_to_worktree_session() {
+    local root="$1"
+    local path="$2"
+    # Get branch name from path for session naming
+    local branch
+    branch=$(worktree_branch_from_path "$path")
+    # Get project name from root for session naming
+    local project_name
+    project_name=$(basename "$root")
+    # Create session name: just project_name for main, project_name_branch for worktrees
+    local session_name
+    if [ "$path" = "$root" ]; then
+        # This is the main repo worktree - use just project name
+        session_name="$project_name"
+    else
+        # This is a linked worktree - use project_name_branch format
+        session_name="${project_name}_${branch}"
+    fi
+    # Check if session exists, create if not using tmux directly
+    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux new-session -d -s "$session_name" -c "$path"
+    fi
+    # Switch to the session
+    if [ -n "$TMUX" ]; then
+        tmux switch-client -t "$session_name"
+    else
+        tmux attach -t "$session_name"
+    fi
+}
+
+worktree_create() {
+    local root="$1"
+    local branch_arg="$2"
+    local project_root
+    project_root=$(worktree_project_root "$root")
+    mkdir -p "$project_root"
+
+    local branches
+    branches=$(git for-each-ref --format='%(refname:short)' refs/heads 2>/dev/null)
+    local branch=""
+    if [ -n "$branch_arg" ]; then
+        branch="$branch_arg"
+    else
+        local selection
+        selection=$(printf "%s\n" "$branches" | fzf_select_pipe - --print-query --expect=enter --exit-0 --prompt="branch> " --header="Type a new branch name or pick existing")
+
+        local lines=()
+        local i
+        while IFS= read -r i; do
+            lines+=("${i//$'\r'/}")
+        done <<< "$selection"
+
+        if [ "${#lines[@]}" -eq 1 ]; then
+            # Only one line: typed query with no match
+            branch="${lines[0]}"
+        elif [ "${#lines[@]}" -eq 2 ]; then
+            # Two lines: query + key (no selection made, typed and pressed enter)
+            branch="${lines[0]}"
+        elif [ "${#lines[@]}" -ge 3 ]; then
+            # Three or more: query + key + selection
+            if [ "${lines[1]}" = "enter" ] && [ -n "${lines[2]}" ]; then
+                # Enter pressed with a selection - use the actual selection
+                branch="${lines[2]}"
+            elif [ "${lines[1]}" = "enter" ]; then
+                # Enter pressed but no selection (typed new branch name)
+                branch="${lines[0]}"
+            else
+                # Some other key - use lines[1] as selection
+                branch="${lines[1]}"
+            fi
+        fi
+    fi
+
+        if [ -n "$TSM_DEBUG" ]; then
+            echo "DEBUG: lines count=${#lines[@]}" >&2
+            local idx=0
+            for i in "${lines[@]}"; do
+                echo "DEBUG: lines[$idx]='$i'" >&2
+                idx=$((idx + 1))
+            done
+            echo "DEBUG: branch='$branch'" >&2
+        fi
+
+        if [ -z "$branch" ]; then
+            # In tmux popup, don't prompt interactively - just exit silently
+            if [ -n "$TMUX" ]; then
+                exit 0
+            fi
+            printf "Branch name: " >&2
+            read -r branch
+            if [ -z "$branch" ]; then
+                exit 0
+            fi
+        fi
+
+    local target
+    target=$(worktree_path_for_branch "$root" "$branch")
+
+    # Check if branch is already in a worktree
+    local existing_worktree
+    existing_worktree=$(git worktree list --porcelain 2>/dev/null | awk -v branch="$branch" '
+        $1=="worktree" {path=$2}
+        $1=="branch" {
+            gsub("^refs/heads/", "", $2)
+            if ($2 == branch) {print path}
+        }
+    ')
+    if [ -n "$existing_worktree" ]; then
+        echo "Branch '$branch' is already checked out at: $existing_worktree" >&2
+        # In tmux popup, auto-switch without prompting
+        if [ -n "$TMUX" ] && [ ! -t 0 ]; then
+            switch_to_worktree_session "$(main_repo_root)" "$existing_worktree"
+            return $?
+        fi
+        printf "Switch to existing worktree session? [Y/n] " >&2
+        read -r confirm
+        case "$confirm" in
+            n|N|no|NO) echo "Cancelled." >&2; return 1 ;;
+            *) switch_to_worktree_session "$(main_repo_root)" "$existing_worktree"; return $? ;;
+        esac
+    fi
+
+    # Skip confirmation in tmux popup since read doesn't work properly there
+    if [ -z "$TMUX" ] || [ -t 0 ]; then
+        printf "Create worktree for branch '%s' at '%s'? [y/N] " "$branch" "$target" >&2
+        read -r confirm
+        case "$confirm" in
+            y|Y|yes|YES) ;;
+            *) exit 0 ;;
+        esac
+    fi
+
+    if git show-ref --verify --quiet "refs/heads/${branch}"; then
+        git worktree add "$target" "$branch"
+    else
+        git worktree add -b "$branch" "$target"
+    fi
+    # After creating, switch to the new worktree session
+    switch_to_worktree_session "$(main_repo_root)" "$target"
+}
+
+worktree_delete() {
+    local root="$1"
+    local selection
+    selection=$(print_worktree_list_current "$root" | fzf_select_pipe - --prompt="delete> " --header="Select worktree to remove")
+    if [ -z "$selection" ]; then
+        echo "No worktree selected." >&2
+        return 1
+    fi
+    local path
+    path=$(printf "%s\n" "$selection" | awk -F'\t' '{print $2}')
+    if [ -z "$path" ]; then
+        echo "No worktree selected." >&2
+        return 1
+    fi
+    if [ "$path" = "$root" ]; then
+        echo "Refusing to remove the main worktree at repo root." >&2
+        return 1
+    fi
+    printf "Remove worktree at '%s'? [y/N] " "$path" >&2
+    read -r confirm
+    case "$confirm" in
+        y|Y|yes|YES) ;;
+        *) echo "Cancelled." >&2; return 1 ;;
+    esac
+    git worktree remove "$path"
+}
+
+worktree_prune() {
+    git worktree prune
+}
+
+worktree_path_cmd() {
+    local root="$1"
+    local branch="$2"
+    if [ -z "$branch" ]; then
+        echo "Error: branch name required. Usage: tsm worktree path <branch>" >&2
+        return 1
+    fi
+    worktree_path_for_branch "$root" "$branch"
+}
+
 # Function to kill sessions
 kill_session() {
     base_name="$1"
@@ -82,6 +577,7 @@ Commands:
   list                List all unique session names
   kill <session>      Kill all sessions with the given base name
   popup [command]     Create or attach to a floating popup session
+  worktree|wt         Manage git worktrees for the current repo
   help [command]      Display help information for tsm or a specific command
 
 Use "tsm help <command>" for more information about a specific command.
@@ -135,6 +631,34 @@ Examples:
   $ tsm popup "vim myfile.txt"
 EOF
             ;;
+        "worktree")
+            cat << EOF
+Usage: tsm worktree [--all]
+       tsm worktree list [--all]
+       tsm worktree next
+       tsm worktree prev
+       tsm worktree delete
+       tsm worktree prune
+       tsm worktree path <branch>
+
+Manage git worktrees for the current repository.
+
+Commands:
+  (default)           Unified picker: switch to existing worktree or create new
+                      - Shows existing worktrees (switch)
+                      - Shows branches without worktrees (create)
+                      - Type new branch name (create)
+  list                Print worktrees (no switch)
+  next                Cycle to the next worktree session
+  prev                Cycle to the previous worktree session
+  delete              Remove a worktree
+  prune               Prune stale git worktree metadata
+  path <branch>       Print the canonical worktree path for <branch>
+
+Options:
+  --all               Include all tracked worktrees under ${WORKTREE_ROOT}
+EOF
+            ;;
         *)
             echo "Error: Unknown command '$command'. Use 'tsm help' for general usage information."
             exit 1
@@ -167,8 +691,138 @@ main() {
                 display_help "popup"
             else
                 shift
-                popup "$@"
+        popup "$@"
+    fi
+    ;;
+        worktree|wt)
+            if ! is_git_repo; then
+                echo "Error: not inside a git repository." >&2
+                exit 1
             fi
+            # Debug: log startup info
+            echo "DEBUG: tsm worktree starting in $(pwd)" >> /tmp/tsm_error.log
+            echo "DEBUG: TMUX=$TMUX" >> /tmp/tsm_error.log
+            local local_root
+            local main_root
+            local local_list
+            local list_file
+            local selection
+            local path
+            local all_flag
+            local subcommand
+            local_root=$(repo_root)
+            main_root=$(main_repo_root)
+            subcommand="$2"
+            all_flag="false"
+            # Check for flags
+            for arg in "$@"; do
+                case "$arg" in
+                    --all) all_flag="true" ;;
+                esac
+            done
+            case "$subcommand" in
+                ""|"--all")
+                    selection=$(worktree_select_interactive "$main_root")
+                    if [ -n "$TSM_DEBUG" ]; then
+                        echo "DEBUG: selection='$selection'" >&2
+                    fi
+                    if [ -z "$selection" ]; then
+                        exit 0
+                    fi
+
+                    # Parse fzf output: query + key + selection lines
+                    local lines=()
+                    local i
+                    while IFS= read -r i; do
+                        lines+=("${i//$'\r'/}")
+                    done <<< "$selection"
+
+                    if [ -n "$TSM_DEBUG" ]; then
+                        echo "DEBUG: lines count=${#lines[@]}" >&2
+                        for idx in "${!lines[@]}"; do
+                            echo "DEBUG: lines[$idx]='${lines[$idx]}'" >&2
+                        done
+                    fi
+
+                    local selected_line=""
+                    if [ "${#lines[@]}" -eq 1 ]; then
+                        selected_line="${lines[0]}"
+                    elif [ "${#lines[@]}" -eq 2 ]; then
+                        selected_line="${lines[1]}"
+                    elif [ "${#lines[@]}" -ge 3 ]; then
+                        if [ "${lines[1]}" = "enter" ] && [ -n "${lines[2]}" ]; then
+                            selected_line="${lines[2]}"
+                        elif [ "${lines[1]}" = "enter" ]; then
+                            selected_line="${lines[0]}"
+                        else
+                            selected_line="${lines[1]}"
+                        fi
+                    fi
+
+                    if [ -n "$TSM_DEBUG" ]; then
+                        echo "DEBUG: selected_line='$selected_line'" >&2
+                    fi
+
+                    if [ -z "$selected_line" ]; then
+                        exit 0
+                    fi
+
+                    # Parse: branch\tpath\tstatus
+                    local branch path status
+                    branch=$(printf "%s" "$selected_line" | cut -f1)
+                    path=$(printf "%s" "$selected_line" | cut -f2)
+                    status=$(printf "%s" "$selected_line" | cut -f3)
+
+                    if [ -n "$TSM_DEBUG" ]; then
+                        echo "DEBUG: branch='$branch' path='$path' status='$status'" >&2
+                    fi
+
+                    if [ -z "$branch" ]; then
+                        exit 0
+                    fi
+
+                    if [ "$status" = "HAS_WORKTREE" ] && [ -n "$path" ] && [ "$path" != "CREATE_NEW" ]; then
+                        # Switch to existing worktree with custom session naming
+                        # Use main_root for consistent naming (tsm_test_repo_feature, not feature_main)
+                        switch_to_worktree_session "$main_root" "$path"
+                    else
+                        # Create new worktree for this branch
+                        worktree_create "$main_root" "$branch"
+                    fi
+                    ;;
+                list)
+                    if [ "$all_flag" = "true" ]; then
+                        print_worktree_list_all
+                    else
+                        print_worktree_list_current "$local_root"
+                    fi
+                    ;;
+                create)
+                    worktree_create "$local_root" "$3"
+                    ;;
+                next)
+                    worktree_cycle "$local_root" "next"
+                    ;;
+                prev)
+                    worktree_cycle "$local_root" "prev"
+                    ;;
+                delete|remove|rm)
+                    worktree_delete "$local_root"
+                    ;;
+                prune)
+                    worktree_prune
+                    ;;
+                path)
+                    worktree_path_cmd "$local_root" "$3"
+                    ;;
+                --help|-h)
+                    display_help "worktree"
+                    ;;
+                *)
+                    echo "Error: Unknown worktree command '$subcommand'. Use 'tsm help worktree' for usage information." >&2
+                    exit 1
+                    ;;
+            esac
             ;;
         help)
             display_help "$2"
