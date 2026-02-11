@@ -6,10 +6,9 @@
     <string>com.user.opencode</string>
     <key>ProgramArguments</key>
     <array>
-      <string>/usr/local/bin/opencode</string>
-      <string>serve</string>
-      <string>--port</string>
-      <string>4096</string>
+      <string>/bin/zsh</string>
+      <string>-c</string>
+      <string>export PATH="/opt/homebrew/bin:$PATH" &amp;&amp; eval "$(/opt/homebrew/bin/fnm env)" &amp;&amp; /usr/local/bin/opencode serve --port 4096</string>
     </array>
     <key>RunAtLoad</key>
     <true/>

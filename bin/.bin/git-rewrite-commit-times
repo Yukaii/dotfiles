@@ -31,6 +31,8 @@ OPTIONS:
     -d, --dry-run          Show what would be done without making changes
     -s, --start <date>     Start date for new timeline (default: first commit date)
                             Format: YYYY-MM-DD or "YYYY-MM-DD HH:MM:SS"
+    -e, --end <date>       End date for new timeline (default: now)
+                            Format: YYYY-MM-DD or "YYYY-MM-DD HH:MM:SS"
     --work-start <hour>    Work day start hour (default: 8)
     --work-end <hour>      Work day end hour (default: 18)
     --weekend-only         Only place commits on weekends
@@ -105,7 +107,14 @@ check_clean_working_tree() {
 # Generate a random time offset in seconds based on changeset size
 generate_time_offset() {
     local lines_changed=$1
-    local base_time=$((lines_changed * 3600 / BASE_LINES_PER_HOUR))
+
+    # Cap extremely large commits so we don't over-extend the schedule
+    local effective_lines=$lines_changed
+    if [ -n "$effective_lines" ] && [ "$effective_lines" -gt 2000 ]; then
+        effective_lines=2000
+    fi
+
+    local base_time=$((effective_lines * 3600 / BASE_LINES_PER_HOUR))
 
     # Add minimum time
     local min_time=$MIN_COMMIT_TIME
@@ -452,6 +461,7 @@ adjust_to_non_work_time() {
 REVISION_RANGE="--all"
 DRY_RUN=false
 START_DATE=""
+END_DATE=""
 WORK_START_HOUR=$DEFAULT_WORK_START_HOUR
 WORK_END_HOUR=$DEFAULT_WORK_END_HOUR
 WEEKEND_ONLY=false
@@ -474,6 +484,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -s|--start)
             START_DATE="$2"
+            shift 2
+            ;;
+        -e|--end)
+            END_DATE="$2"
             shift 2
             ;;
         --work-start)
@@ -565,6 +579,19 @@ main() {
         current_time=$(head -1 "$lines_file" | cut -d'|' -f2)
     fi
 
+    local end_timestamp=""
+    if [ -n "$END_DATE" ]; then
+        end_timestamp=$(date -j -f "%Y-%m-%d %H:%M:%S" "$END_DATE" "+%s" 2>/dev/null || date -j -f "%Y-%m-%d" "$END_DATE 00:00:00" "+%s" 2>/dev/null)
+        if [ -z "$end_timestamp" ]; then
+            log_error "Invalid end date format: $END_DATE"
+            exit 1
+        fi
+        if [ "$end_timestamp" -lt "$current_time" ]; then
+            log_error "End date ($END_DATE) must be after the start of the timeline."
+            exit 1
+        fi
+    fi
+
     local commit_count=$(wc -l < "$lines_file" | tr -d ' ')
     log_info "Processing $commit_count commits..."
     echo
@@ -574,6 +601,15 @@ main() {
     trap "rm -f $commits_file $lines_file $timestamps_file" EXIT
 
     local now_timestamp=$(date +%s)
+    local timeline_end=$now_timestamp
+    if [ -n "$end_timestamp" ] && [ "$end_timestamp" -lt "$timeline_end" ]; then
+        timeline_end=$end_timestamp
+    fi
+    if [ "$timeline_end" -lt "$current_time" ]; then
+        log_error "Timeline end is earlier than start. Adjust --start/--end to allow scheduling."
+        exit 1
+    fi
+
     local processed_count=0
     local last_assigned_time=""
 
@@ -596,7 +632,7 @@ main() {
             min_allowed_time=$((last_assigned_time + MIN_COMMIT_TIME))
         fi
 
-        local max_allowed_time=$((now_timestamp - remaining_after_current * MIN_COMMIT_TIME))
+        local max_allowed_time=$((timeline_end - remaining_after_current * MIN_COMMIT_TIME))
 
         if [ "$max_allowed_time" -lt "$min_allowed_time" ]; then
             log_error "Unable to schedule commit $short_hash without using future timestamps. Consider specifying an earlier --start date."
@@ -619,9 +655,28 @@ main() {
         local adjusted_time
         adjusted_time=$(adjust_to_non_work_time "$current_time" "$WEEKEND_ONLY" "$WORKDAY_ONLY" "$EVENING_ONLY" "$NIGHT_ONLY")
 
+        # Guard against empty results before clamping
+        if [ -z "$adjusted_time" ]; then
+            adjusted_time=$current_time
+        fi
+
         if ! adjusted_time=$(ensure_time_within_bounds "$adjusted_time" "$min_allowed_time" "$max_allowed_time" "$WEEKEND_ONLY" "$WORKDAY_ONLY" "$EVENING_ONLY" "$NIGHT_ONLY"); then
-            log_error "Unable to find a valid timestamp for commit $short_hash within the allowed window."
-            exit 1
+            log_warning "No valid non-work slot for commit $short_hash within the window; using bounds instead."
+            # Default to current_time if ensure_time_within_bounds produced nothing
+            if [ -z "$adjusted_time" ]; then
+                adjusted_time=$current_time
+            fi
+            local clamp_min=${min_allowed_time:-$current_time}
+            local clamp_max=${max_allowed_time:-$current_time}
+            if [ "$adjusted_time" -lt "$clamp_min" ]; then
+                adjusted_time=$clamp_min
+            elif [ "$adjusted_time" -gt "$clamp_max" ]; then
+                adjusted_time=$clamp_max
+            fi
+        fi
+
+        if [ -z "$adjusted_time" ]; then
+            adjusted_time=$current_time
         fi
 
         current_time=$adjusted_time
