@@ -11,6 +11,7 @@ source "%val{config}/wakatime.kak"
 source "%val{config}/wezterm.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/kitty.kak"
+source "%val{config}/ykmx.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
@@ -32,7 +33,7 @@ source "%val{config}/ascii-player.kak"
 # source "%val{config}/jump-stack.kak"
 # source "%val{config}/amber.kak"
 
-colorscheme kanagawa-alabaster
+colorscheme kanagawa
 # colorscheme alabaster
 # colorscheme kanagawa
 # colorscheme ayu-mirage
@@ -241,6 +242,12 @@ map global find-actions -docstring 'edit path prompt'                  'p'  ':ba
 map global find-actions -docstring 'switch theme'                      'T'  ':colorscheme<space>'
 map global find-actions -docstring 'edir (buffer dir)'                 <minus>  ':edir-buffer-dir<ret>'
 map global find-actions -docstring 'browse on github'                  'h'  ':browse_github<ret>'
+
+evaluate-commands %sh{
+  if [ -n "${kak_client_env_YKMX_CONTROL_PIPE:-$YKMX_CONTROL_PIPE}" ]; then
+    echo "try %{ require-module ykmx }"
+  fi
+}
 
 define-command basefolder-files -docstring 'file inside buffer basefolder' %{
 	evaluate-commands %sh{

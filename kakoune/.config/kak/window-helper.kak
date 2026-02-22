@@ -21,3 +21,10 @@ hook global ModuleLoaded kitty %{
   # alias global open-broot kitty-open-broot
   alias global terminal-sidebar kitty-terminal-horizontal
 }
+
+hook global ModuleLoaded ykmx %{
+  alias global terminal-vertical ykmx-terminal-vertical
+  alias global terminal-horizontal ykmx-terminal-horizontal
+  alias global terminal-popup ykmx-terminal-popup
+  alias global terminal-sidebar ykmx-terminal-sidebar
+}
