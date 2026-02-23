@@ -7,6 +7,9 @@ theme = "kanagawa-wave"
 # Custom grammars directory - place .json or .plist grammar files here
 grammars_path = "~/.config/giallo.kak/grammars"
 
+# Custom themes directory - place .json theme files here
+themes_path = "~/.config/giallo.kak/themes"
+
 # Language mapping - maps Kakoune filetypes to giallo language names
 [language_map]
 # Map Kakoune filetypes to giallo language names
@@ -15,14 +18,18 @@ js = "javascript"
 ts = "typescript"
 tsx = "typescriptreact"
 jsx = "javascriptreact"
+javascriptreact = "jsx"
+typescriptreact = "tsx"
 vue = "vue"
-terraform = "terraform"
-tf = "terraform"
+terraform = "hashicorp terraform"
+tf = "hashicorp terraform"
 hcl = "hcl"
-
 
 # Other useful mappings you might want:
 # py = "python"
 # rb = "ruby"
 # go = "go"
 # rs = "rust"
+
+[highlighter_map]
+kak = "kakrc"
