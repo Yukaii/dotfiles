@@ -22,7 +22,7 @@ define-command ykmx-terminal-popup -params .. -docstring '
 ykmx-terminal-popup: open the configured popup panel in the current ykmx session.
 When program arguments are provided, runs that command in the popup.' \
 %{
-    ykmx-ctl open-popup %arg{@}
+    ykmx-ctl open-popup --cwd %val{client_env_PWD} %arg{@}
 }
 
 define-command ykmx-terminal-command -params 1 -docstring '
@@ -47,7 +47,7 @@ Arguments are accepted for API parity and currently ignored by ykmx.' \
         [ "$ph" -lt 10 ] && ph=10
         y=$(( h - ph - 3 ))
         [ "$y" -lt 0 ] && y=0
-        echo "ykmx-ctl open-panel 0 $y $w $ph"
+        echo "ykmx-ctl open-panel 0 $y $w $ph --cwd $kak_client_env_PWD"
     }
 }
 
@@ -69,7 +69,7 @@ Arguments are accepted for API parity and currently ignored by ykmx.' \
         [ "$x" -lt 0 ] && x=0
         ph=$(( h - 3 ))
         [ "$ph" -lt 6 ] && ph=6
-        echo "ykmx-ctl open-panel $x 0 $pw $ph"
+        echo "ykmx-ctl open-panel $x 0 $pw $ph --cwd $kak_client_env_PWD"
     }
 }
 
@@ -89,7 +89,7 @@ Arguments are accepted for API parity and currently ignored by ykmx.' \
         [ "$pw" -lt 24 ] && pw=24
         ph=$(( h - 3 ))
         [ "$ph" -lt 6 ] && ph=6
-        echo "ykmx-ctl open-panel 0 0 $pw $ph"
+        echo "ykmx-ctl open-panel 0 0 $pw $ph --cwd $kak_client_env_PWD"
     }
 }
 
