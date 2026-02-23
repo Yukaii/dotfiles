@@ -143,4 +143,50 @@ define-command tmux-open-broot -docstring 'open broot' %{
   }
 }
 
+define-command tmux-open-bontree -docstring 'open bontree' %{
+  evaluate-commands nop %sh{
+    env_line="env EDITOR=\"kks edit\" KKS_SESSION=$kak_session KKS_CLIENT=$kak_client"
+
+    dir="${kak_client_env_PWD:-$PWD}"
+    target=""
+    focus=""
+    session="$kak_session"
+
+    if [ -n "$kak_buffile" ] && [ -e "$kak_buffile" ]; then
+      target="$kak_buffile"
+    elif [ -e "$kak_bufname" ]; then
+      target="$kak_bufname"
+    fi
+
+    if [ -n "$target" ] && [ ! -d "$target" ]; then
+      focus="$target"
+    fi
+
+    dir=$(realpath "$dir" 2>/dev/null || printf '%s' "$dir")
+    tmux_env="${kak_client_env_TMUX:-$TMUX}"
+    current_pane_id="${kak_client_env_TMUX_PANE}"
+    current_window_id=$(TMUX="$tmux_env" tmux display-message -p -t "$current_pane_id" '#{window_id}' 2>/dev/null)
+    bontree_pane_id=$(TMUX="$tmux_env" tmux list-panes -a -F '#{pane_id} #{window_id} #{pane_current_command} #{pane_start_command} #{pane_title}' | awk -v current="$current_pane_id" -v win="$current_window_id" '$1!=current && $2==win && ($3=="bontree" || $4 ~ /(^|\/)bontree([[:space:]]|$)/ || $5 ~ /^bontree/) { print $1; exit }')
+
+    if ! bontree ctl --session "$session" ping >/dev/null 2>&1; then
+      if [ -n "$focus" ]; then
+        focus=$(realpath "$focus" 2>/dev/null || printf '%s' "$focus")
+        TMUX="$tmux_env" tmux split-window -hb -l 23% "$env_line bontree --session \"$session\" \"$dir\" \"$focus\""
+      else
+        TMUX="$tmux_env" tmux split-window -hb -l 23% "$env_line bontree --session \"$session\" \"$dir\""
+      fi
+      exit 0
+    fi
+
+    if [ -n "$focus" ]; then
+      focus=$(realpath "$focus" 2>/dev/null || printf '%s' "$focus")
+      bontree ctl --session "$session" focus --path "$focus" >/dev/null 2>&1
+    fi
+
+    if [ -n "$bontree_pane_id" ]; then
+      TMUX="$tmux_env" tmux select-pane -t "$bontree_pane_id"
+    fi
+  }
+}
+
 }

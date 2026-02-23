@@ -89,4 +89,49 @@ define-command wezterm-open-broot -docstring 'open broot' %{
   }
 }
 
+define-command wezterm-open-bontree -docstring 'open bontree' %{
+  evaluate-commands nop %sh{
+    export EDITOR="kks edit"
+    export KKS_SESSION="$kak_session"
+    export KKS_CLIENT="$kak_client"
+
+    dir="${kak_client_env_PWD:-$PWD}"
+    target=""
+    focus=""
+    session="$kak_session"
+
+    if [ -n "$kak_buffile" ] && [ -e "$kak_buffile" ]; then
+      target="$kak_buffile"
+    elif [ -e "$kak_bufname" ]; then
+      target="$kak_bufname"
+    fi
+
+    if [ -n "$target" ] && [ ! -d "$target" ]; then
+      focus="$target"
+    fi
+
+    dir=$(realpath "$dir" 2>/dev/null || printf '%s' "$dir")
+    if ! bontree ctl --session "$session" ping >/dev/null 2>&1; then
+      if [ -n "$focus" ]; then
+        focus=$(realpath "$focus" 2>/dev/null || printf '%s' "$focus")
+        wezterm cli split-pane --left --percent 23 -- bontree --session "$session" "$dir" "$focus"
+      else
+        wezterm cli split-pane --left --percent 23 -- bontree --session "$session" "$dir"
+      fi
+      exit 0
+    fi
+
+    bontree_pane_id=$(wezterm cli list --format json | jq -r ".[] | select(((.title // \"\") | startswith(\"bontree\")) or ((.foreground_process_name // \"\") | test(\"/bontree$|^bontree$\"))) | .pane_id" | head -n 1)
+
+    if [ -n "$focus" ]; then
+      focus=$(realpath "$focus" 2>/dev/null || printf '%s' "$focus")
+      bontree ctl --session "$session" focus --path "$focus" >/dev/null 2>&1
+    fi
+
+    if [ -n "$bontree_pane_id" ]; then
+      wezterm cli activate-pane --pane-id "$bontree_pane_id"
+    fi
+  }
+}
+
 }
