@@ -45,6 +45,9 @@ set -x EDITOR 'k'
 set -x KI_EDITOR_THEME "Github Dark"
 # claude thing
 set -x ENABLE_BACKGROUND_TASKS 1
+set -x ANDROID_HOME "$HOME/Library/Android/sdk"
+set -gx JAVA_HOME (/usr/libexec/java_home -v 17)
+set -gx PATH $JAVA_HOME/bin $PATH
 
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
