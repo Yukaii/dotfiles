@@ -166,7 +166,7 @@ define-command tmux-open-bontree -docstring 'open bontree' %{
     tmux_env="${kak_client_env_TMUX:-$TMUX}"
     current_pane_id="${kak_client_env_TMUX_PANE}"
     current_window_id=$(TMUX="$tmux_env" tmux display-message -p -t "$current_pane_id" '#{window_id}' 2>/dev/null)
-    bontree_pane_id=$(TMUX="$tmux_env" tmux list-panes -a -F '#{pane_id} #{window_id} #{pane_current_command} #{pane_start_command} #{pane_title}' | awk -v current="$current_pane_id" -v win="$current_window_id" '$1!=current && $2==win && ($3=="bontree" || $4 ~ /(^|\/)bontree([[:space:]]|$)/ || $5 ~ /^bontree/) { print $1; exit }')
+    bontree_pane_id=$(TMUX="$tmux_env" tmux list-panes -a -F '#{pane_id}|#{window_id}|#{pane_current_command}|#{pane_title}|#{pane_start_command}' | awk -F'|' -v current="$current_pane_id" -v win="$current_window_id" '$1!=current && $2==win && ($3=="bontree" || $4 ~ /^bontree/ || $5 ~ /(^|[[:space:]]|\/)bontree([[:space:]]|$)/) { print $1; exit }')
 
     if ! bontree ctl --session "$session" ping >/dev/null 2>&1; then
       if [ -n "$focus" ]; then
