@@ -9,6 +9,7 @@ evaluate-commands %sh{
 # custom modules
 source "%val{config}/wakatime.kak"
 source "%val{config}/wezterm.kak"
+source "%val{config}/ghostty.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/kitty.kak"
 source "%val{config}/ykmx.kak"
@@ -247,6 +248,12 @@ map global find-actions -docstring 'browse on github'                  'h'  ':br
 evaluate-commands %sh{
   if [ -n "${kak_client_env_YKMX_CONTROL_PIPE:-$YKMX_CONTROL_PIPE}" ]; then
     echo "try %{ require-module ykmx }"
+  fi
+}
+
+evaluate-commands %sh{
+  if [ -n "${kak_client_env_GHOSTTY_BIN_DIR:-$GHOSTTY_BIN_DIR}" ]; then
+    echo "try %{ require-module ghostty }"
   fi
 }
 

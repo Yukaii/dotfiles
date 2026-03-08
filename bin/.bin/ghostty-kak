@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF' >&2
+Usage:
+  ghostty-kak new-window [command...]
+  ghostty-kak new-tab [command...]
+  ghostty-kak split:left [command...]
+  ghostty-kak split:right [command...]
+  ghostty-kak split:up [command...]
+  ghostty-kak split:down [command...]
+  ghostty-kak focus:left
+  ghostty-kak focus:right
+  ghostty-kak focus:up
+  ghostty-kak focus:down
+EOF
+}
+
+if [[ $# -lt 1 ]]; then
+  usage
+  exit 2
+fi
+
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  echo "ghostty-kak only supports macOS." >&2
+  exit 1
+fi
+
+action="$1"
+shift
+
+case "$action" in
+new-window | new-tab | split:left | split:right | split:up | split:down | focus:left | focus:right | focus:up | focus:down) ;;
+-h | --help)
+  usage
+  exit 0
+  ;;
+*)
+  usage
+  exit 2
+  ;;
+esac
+
+cwd="${PWD:-$HOME}"
+
+command_text=""
+if [[ $# -gt 0 ]]; then
+  command_text="$(printf '%q ' "$@")"
+  command_text="${command_text% }"
+fi
+
+env_args=()
+for name in PATH HOME SHELL KAK_SESSION KAK_CLIENT KKS_SESSION KKS_CLIENT TMPDIR; do
+  value="${!name-}"
+  if [[ -n "$value" ]]; then
+    env_args+=("${name}=${value}")
+  fi
+done
+
+/usr/bin/osascript - "$action" "$cwd" "$command_text" "${env_args[@]}" <<'APPLESCRIPT'
+on run argv
+  set actionName to item 1 of argv
+  set workingDir to item 2 of argv
+  set commandText to item 3 of argv
+  set envVars to {}
+
+  if (count of argv) > 3 then
+    repeat with i from 4 to count of argv
+      set end of envVars to item i of argv
+    end repeat
+  end if
+
+  tell application "Ghostty"
+    set cfg to my makeConfig(workingDir, commandText, envVars)
+
+    if actionName is "new-window" then
+      new window with configuration cfg
+      return
+    end if
+
+    if (count of windows) is 0 then
+      new window with configuration cfg
+      return
+    end if
+
+    set targetWindow to front window
+
+    if actionName is "new-tab" then
+      set newTabRef to new tab in targetWindow with configuration cfg
+      select tab newTabRef
+      activate window targetWindow
+      return
+    end if
+
+    set targetTab to selected tab of targetWindow
+    set targetTerminal to my findTargetTerminal(targetTab, workingDir)
+
+    if actionName is "split:left" then
+      set newTerminal to split targetTerminal direction left with configuration cfg
+      focus newTerminal
+      return
+    end if
+
+    if actionName is "split:right" then
+      set newTerminal to split targetTerminal direction right with configuration cfg
+      focus newTerminal
+      return
+    end if
+
+    if actionName is "split:up" then
+      set newTerminal to split targetTerminal direction up with configuration cfg
+      focus newTerminal
+      return
+    end if
+
+    if actionName is "split:down" then
+      set newTerminal to split targetTerminal direction down with configuration cfg
+      focus newTerminal
+      return
+    end if
+
+    if actionName starts with "focus:" then
+      set focusDirection to my focusDirectionForAction(actionName)
+      activate window targetWindow
+      focus targetTerminal
+      delay 0.05
+      perform action ("goto_split:" & focusDirection) on targetTerminal
+      return
+    end if
+  end tell
+end run
+
+on makeConfig(workingDir, commandText, envVars)
+  tell application "Ghostty"
+    set cfg to new surface configuration
+    set initial working directory of cfg to workingDir
+    if commandText is not "" then
+      set initial input of cfg to "exec /bin/sh -lc " & quoted form of commandText & linefeed
+    end if
+    if (count of envVars) > 0 then set environment variables of cfg to envVars
+    return cfg
+  end tell
+end makeConfig
+
+on findTargetTerminal(tabRef, workingDir)
+  tell application "Ghostty"
+    set matchingTerminals to every terminal of tabRef whose working directory is workingDir
+    if (count of matchingTerminals) > 0 then
+      return item 1 of matchingTerminals
+    end if
+    return terminal 1 of tabRef
+  end tell
+end findTargetTerminal
+
+on focusDirectionForAction(actionName)
+  if actionName is "focus:left" then
+    return "left"
+  end if
+
+  if actionName is "focus:right" then
+    return "right"
+  end if
+
+  if actionName is "focus:up" then
+    return "up"
+  end if
+
+  if actionName is "focus:down" then
+    return "down"
+  end if
+
+  error "Unknown focus action: " & actionName
+end focusDirectionForAction
+APPLESCRIPT

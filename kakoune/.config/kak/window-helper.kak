@@ -7,6 +7,14 @@ hook global ModuleLoaded wezterm %{
   alias global terminal-sidebar wezterm-terminal-horizontal
 }
 
+hook global ModuleLoaded ghostty %{
+  alias global terminal-vertical ghostty-terminal-vertical
+  alias global terminal-horizontal ghostty-terminal-horizontal
+  alias global terminal-popup ghostty-terminal-popup
+  alias global open-bontree ghostty-open-bontree
+  alias global terminal-sidebar ghostty-terminal-sidebar
+}
+
 hook global ModuleLoaded tmux %{
   alias global terminal-vertical tmux-terminal-vertical
   alias global terminal-horizontal tmux-terminal-horizontal
