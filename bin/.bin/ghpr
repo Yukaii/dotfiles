@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
 
 ghpr() {
-    GH_FORCE_TTY=100% gh pr list --limit 300 | fzf --ansi --preview 'GH_FORCE_TTY=100% gh pr view {1}' --header-lines 4 --preview-window 'up:70%' | awk '{print substr($1, 2)}'
+    local key selection pr_number
+
+    selection="$(GH_FORCE_TTY=100% gh pr list --limit 300 --json number,title,headRefName,author --jq '.[] | [.number, ("#" + (.number | tostring)), .title, .headRefName, ("@" + .author.login)] | @tsv' | fzf --ansi --delimiter=$'\t' --with-nth=2,3,4,5 --layout=reverse --expect=ctrl-o --header 'enter: select | ctrl-o: open' --preview 'GH_FORCE_TTY=100% gh pr view {1}' --preview-window 'right:60%,wrap,border-left')" || return
+
+    key="$(awk 'NR==1 { print; exit }' <<<"$selection")"
+    pr_number="$(awk -F $'\t' 'NR==2 { print $1; exit }' <<<"$selection")"
+
+    [[ -n "$pr_number" ]] || return
+
+    if [[ "$key" == "ctrl-o" ]]; then
+        open "$(gh pr view "$pr_number" --json url --jq '.url')"
+    fi
+
+    printf '%s\n' "$pr_number"
 }
 
 ghpr
-
