@@ -252,7 +252,7 @@ evaluate-commands %sh{
 }
 
 evaluate-commands %sh{
-  if [ -n "${kak_client_env_GHOSTTY_BIN_DIR:-$GHOSTTY_BIN_DIR}" ]; then
+  if [ -z "${kak_client_env_TMUX:-$TMUX}" ] && [ -n "${kak_client_env_GHOSTTY_BIN_DIR:-$GHOSTTY_BIN_DIR}" ]; then
     echo "try %{ require-module ghostty }"
   fi
 }

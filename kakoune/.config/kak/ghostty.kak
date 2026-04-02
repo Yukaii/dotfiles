@@ -1,7 +1,10 @@
 provide-module ghostty %{
 
 evaluate-commands %sh{
-  [ -z "${kak_opt_windowing_modules}" ] || [ -n "${kak_client_env_GHOSTTY_BIN_DIR:-$GHOSTTY_BIN_DIR}" ] || echo 'fail ghostty not detected'
+  [ -z "${kak_opt_windowing_modules}" ] || {
+    [ -z "${kak_client_env_TMUX:-$TMUX}" ] || exit 0
+    [ -n "${kak_client_env_GHOSTTY_BIN_DIR:-$GHOSTTY_BIN_DIR}" ] || echo 'fail ghostty not detected'
+  }
 }
 
 define-command -hidden -params 1.. ghostty-terminal-impl %{
