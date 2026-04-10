@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+# switch_chromium — switch profile or workspace in any Chromium-based browser via macOS menu
+# Supports: Chrome, Chrome Dev/Canary, Edge, Edge Dev/Canary, Brave, Arc, Vivaldi, Opera, Thorium, Helium
+#
+# Usage:
+#   switch-chromium --browser <app> (--profile <name> | --workspace <name>) [--en|--jp|--zh-tw|--zh-cn]
+#
+# Alternatively, invoke via convenience symlink:
+#   switch-edge.sh  (defaults to --browser edge)
+#   switch-chrome.sh (defaults to --browser chrome)
+#   switch-brave.sh  (defaults to --browser brave)
+
+set -e
+
+usage() {
+  local self
+  self=$(basename "$0")
+  cat <<USAGE
+Usage: $0 --browser <app> (--profile <name> | --workspace <name>) [--en|--jp|--zh-tw|--zh-cn]
+
+  --browser APP     Browser shortcut or full app name:
+                      chrome, chrome-dev, chrome-canary,
+                      edge, edge-dev, edge-canary,
+                      brave, arc, vivaldi, opera, thorium, helium
+  --profile NAME    switch to profile matching NAME (fuzzy)
+  --workspace NAME  switch to workspace matching NAME (fuzzy)
+  --en              use English menus (default)
+  --jp              use Japanese menus
+  --zh-tw           use Traditional Chinese menus
+  --zh-cn           use Simplified Chinese menus
+
+If invoked as switch-<browser>.sh, --browser defaults to that browser.
+USAGE
+  exit 1
+}
+
+# ── Resolve default browser from symlink name ──────────────────────────
+resolve_default_browser() {
+  local name
+  name=$(basename "$0")
+  name=${name%.sh}
+  # strip "switch-" prefix
+  local shortcut=${name#switch-}
+  case $shortcut in
+    edge)         echo "edge" ;;
+    edge-dev)     echo "edge-dev" ;;
+    edge-canary)  echo "edge-canary" ;;
+    chrome)       echo "chrome" ;;
+    chrome-dev)   echo "chrome-dev" ;;
+    chrome-canary) echo "chrome-canary" ;;
+    brave)        echo "brave" ;;
+    arc)          echo "arc" ;;
+    vivaldi)      echo "vivaldi" ;;
+    opera)        echo "opera" ;;
+    thorium)      echo "thorium" ;;
+    helium)       echo "helium" ;;
+    *)            echo "" ;;
+  esac
+}
+
+# ── Map shortcut → macOS app name ─────────────────────────────────────
+resolve_app_name() {
+  local shortcut=$1
+  case $shortcut in
+    chrome)         echo "Google Chrome" ;;
+    chrome-dev)     echo "Google Chrome Dev" ;;
+    chrome-canary)  echo "Google Chrome Canary" ;;
+    edge)           echo "Microsoft Edge" ;;
+    edge-dev)       echo "Microsoft Edge Dev" ;;
+    edge-canary)    echo "Microsoft Edge Canary" ;;
+    brave)          echo "Brave Browser" ;;
+    arc)            echo "Arc" ;;
+    vivaldi)        echo "Vivaldi" ;;
+    opera)          echo "Opera" ;;
+    thorium)        echo "Thorium" ;;
+    helium)         echo "Helium" ;;
+    *)              echo "$shortcut" ;;
+  esac
+}
+
+# ── Defaults ───────────────────────────────────────────────────────────
+browser=$(resolve_default_browser)
+lang="en"; profile=""; workspace=""
+
+# ── Parse arguments ───────────────────────────────────────────────────
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --browser)    browser="$2"; shift 2;;
+    --profile)    [[ -n $workspace ]] && usage; profile="$2"; shift 2;;
+    --workspace)  [[ -n $profile ]] && usage; workspace="$2"; shift 2;;
+    --en|--jp|--zh-tw|--zh-cn) lang="${1#--}"; shift;;
+    -h|--help)    usage;;
+    *)            usage;;
+  esac
+done
+
+[[ -z $browser ]] && { echo "Error: --browser is required (or invoke via switch-<browser>.sh symlink)" >&2; exit 1; }
+[[ -z $profile && -z $workspace ]] && usage
+
+app=$(resolve_app_name "$browser")
+
+# ── Localize menu titles ──────────────────────────────────────────────
+case $lang in
+  jp)    M_PROFILE="プロファイル"; M_WINDOW="ウィンドウ" ;;
+  zh-tw) M_PROFILE="個人檔案";     M_WINDOW="視窗" ;;
+  zh-cn) M_PROFILE="个人资料";     M_WINDOW="窗口" ;;
+  *)     M_PROFILE="Profile";      M_WINDOW="Window" ;;
+esac
+
+# ── Pick which menu item to target ─────────────────────────────────────
+if [[ -n $profile ]]; then
+  MENU_BAR_ITEM="$M_PROFILE"
+  TARGET="$profile"
+else
+  MENU_BAR_ITEM="$M_WINDOW"
+  TARGET="$workspace"
+fi
+
+# ── AppleScript: click first menu item whose name fuzzy-matches TARGET ─
+osascript <<EOF
+tell application "System Events"
+  tell process "$app"
+    set theMenu to menu 1 of menu bar item "$MENU_BAR_ITEM" of menu bar 1
+    click (first menu item of theMenu whose name contains "$TARGET")
+  end tell
+end tell
+EOF
