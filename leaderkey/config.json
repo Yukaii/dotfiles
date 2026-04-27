@@ -252,10 +252,16 @@
           "value" : "raycast://extensions/raycast/raycast-ai/ai-chat"
         },
         {
+          "key" : "3",
+          "label" : "Gemini",
+          "type" : "application",
+          "value" : "/Applications/Gemini.app"
+        },
+        {
           "key" : "g",
           "label" : "Fix grammar",
           "type" : "url",
-          "value" : "raycast://ai-commands/fix-spelling-and-grammar-gpt-nano"
+          "value" : "raycast://ai-commands/fix-spelling-and-grammar-custom"
         },
         {
           "key" : "j",
