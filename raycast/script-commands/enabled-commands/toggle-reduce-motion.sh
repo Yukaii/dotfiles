@@ -1,0 +1,1 @@
+../toggle-reduce-motion.sh
