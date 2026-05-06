@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ghhkpr [pr_number|pr_url|branch] [-- <hunk patch args...>]
+
+Interactively pick a PR using fzf (via `gh pr list`) and open it in `hunk patch`.
+
+Examples:
+  ghhkpr
+  ghhkpr 123
+  ghhkpr https://github.com/owner/repo/pull/123
+  ghhkpr -- --mode stack
+  ghhkpr 123 -- --wrap
+EOF
+}
+
+die() {
+  echo "ghhkpr: $*" >&2
+  exit 1
+}
+
+require_cmd() {
+  command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"
+}
+
+pick_pr() {
+  GH_FORCE_TTY=100% gh pr list --limit 300 |
+    fzf --ansi \
+      --preview 'GH_FORCE_TTY=100% gh pr view {1}' \
+      --header-lines 4 \
+      --preview-window 'up:70%' |
+    awk '{print substr($1, 2)}'
+}
+
+ghhkpr() {
+  require_cmd gh
+  require_cmd fzf
+  require_cmd hunk
+
+  local pr_ref=""
+  local -a hunk_args=()
+
+  while (($#)); do
+    case "$1" in
+    -h | --help)
+      usage
+      return 0
+      ;;
+    --)
+      shift
+      hunk_args+=("$@")
+      break
+      ;;
+    -*)
+      hunk_args+=("$1")
+      shift
+      ;;
+    *)
+      if [[ -z "$pr_ref" ]]; then
+        pr_ref="$1"
+      else
+        hunk_args+=("$1")
+      fi
+      shift
+      ;;
+    esac
+  done
+
+  if [[ -z "$pr_ref" ]]; then
+    pr_ref="$(pick_pr)"
+  fi
+
+  [[ -n "$pr_ref" ]] || die "no PR selected"
+
+  if ((${#hunk_args[@]} > 0)); then
+    gh pr diff "$pr_ref" --patch --color=never | hunk patch "${hunk_args[@]}" -
+  else
+    gh pr diff "$pr_ref" --patch --color=never | hunk patch -
+  fi
+}
+
+ghhkpr "$@"

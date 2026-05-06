@@ -3,6 +3,7 @@
 
 [core]
 	pager = git-split-diffs --color | less -RFX
+	; pager = hunk pager
 	excludesfile = ~/.gitignore_global
 	difftool = true
 [delta]
@@ -103,3 +104,9 @@
 	min-line-width = 40
 [gpg]
 	program = /opt/homebrew/bin/gpg
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
