@@ -111,17 +111,32 @@ esac
 if [[ -n $profile ]]; then
   MENU_BAR_ITEM="$M_PROFILE"
   TARGET="$profile"
+  MENU_BAR_ITEM_CANDIDATES=("Profile" "プロファイル" "個人檔案" "个人资料")
 else
   MENU_BAR_ITEM="$M_WINDOW"
   TARGET="$workspace"
+  MENU_BAR_ITEM_CANDIDATES=("Window" "ウィンドウ" "視窗" "窗口")
 fi
 
 # ── AppleScript: click first menu item whose name fuzzy-matches TARGET ─
+MENU_BAR_ITEM_CANDIDATES_APPLE=""
+for item in "${MENU_BAR_ITEM_CANDIDATES[@]}"; do
+  MENU_BAR_ITEM_CANDIDATES_APPLE+="\"${item}\", "
+done
+MENU_BAR_ITEM_CANDIDATES_APPLE=${MENU_BAR_ITEM_CANDIDATES_APPLE%, }
+
 osascript <<EOF
 tell application "System Events"
   tell process "$app"
-    set theMenu to menu 1 of menu bar item "$MENU_BAR_ITEM" of menu bar 1
-    click (first menu item of theMenu whose name contains "$TARGET")
+    set menuBarItemNames to {$MENU_BAR_ITEM_CANDIDATES_APPLE}
+    repeat with menuBarItemName in menuBarItemNames
+      try
+        set theMenu to menu 1 of menu bar item menuBarItemName of menu bar 1
+        click (first menu item of theMenu whose name contains "$TARGET")
+        return
+      end try
+    end repeat
+    error "Could not find matching menu bar item"
   end tell
 end tell
 EOF
