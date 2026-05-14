@@ -1,0 +1,8 @@
+[
+  {
+    "icon": "󰒓",
+    "title": "TPM Maintenance",
+    "category": "Tools",
+    "action": { "palette": "tpm-maintenance" }
+  }
+]

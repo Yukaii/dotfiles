@@ -1,0 +1,46 @@
+{
+  "title": "TPM Maintenance",
+  "grouped": true,
+  "items": [
+    {
+      "icon": "󰒓",
+      "title": "Install Plugins",
+      "category": "Actions",
+      "action": {
+        "shell": "tmux display-popup -E -w 70% -h 60% \"sh -lc '$HOME/.tmux/plugins/tpm/bin/install_plugins; status=\\$?; printf \\\"\\nExit: %s\\n\\\" \\\"\\$status\\\"; printf \\\"Press Enter to close...\\\"; read _'\""
+      }
+    },
+    {
+      "icon": "󰚰",
+      "title": "Update Plugins",
+      "category": "Actions",
+      "action": {
+        "shell": "tmux display-popup -E -w 70% -h 60% \"sh -lc '$HOME/.tmux/plugins/tpm/bin/update_plugins all; status=\\$?; printf \\\"\\nExit: %s\\n\\\" \\\"\\$status\\\"; printf \\\"Press Enter to close...\\\"; read _'\""
+      }
+    },
+    {
+      "icon": "󰆴",
+      "title": "Clean Plugins",
+      "category": "Actions",
+      "action": {
+        "shell": "tmux display-popup -E -w 70% -h 60% \"sh -lc '$HOME/.tmux/plugins/tpm/bin/clean_plugins; status=\\$?; printf \\\"\\nExit: %s\\n\\\" \\\"\\$status\\\"; printf \\\"Press Enter to close...\\\"; read _'\""
+      }
+    },
+    {
+      "icon": "󰑐",
+      "title": "Reload Tmux Config",
+      "category": "Actions",
+      "action": {
+        "tmux": "source-file ~/.tmux.conf"
+      }
+    },
+    {
+      "icon": "󰅟",
+      "title": "Check TPM Status",
+      "category": "Inspect",
+      "action": {
+        "shell": "tmux display-popup -E -w 70% -h 60% \"sh -lc 'printf \\\"TPM dir: %s\\n\\n\\\" \\\"$HOME/.tmux/plugins/tpm\\\"; if [ -d \\\"$HOME/.tmux/plugins/tpm\\\" ]; then printf \\\"installed\\n\\\"; printf \\\"remote: \\\"; git -C \\\"$HOME/.tmux/plugins/tpm\\\" remote get-url origin 2>/dev/null || true; printf \\\"\\nplugins dir:\\n\\\"; ls -1 \\\"$HOME/.tmux/plugins\\\"; else printf \\\"missing\\n\\\"; fi; printf \\\"\\nPress Enter to close...\\\"; read _'\""
+      }
+    }
+  ]
+}
