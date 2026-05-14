@@ -58,7 +58,7 @@
     "title": "TSM Sessions",
     "category": "Sessions",
     "action": {
-      "shell": "echo $(tsm list | fzf-tmux -p 55%,60% --no-sort --border-label ' Tmux session manager ' --prompt '🔗  ' --header '  Enter to attach to session, ^x to kill, Esc to cancel' --bind 'enter:execute(tmux switch-client -t {})+abort' --bind 'ctrl-x:execute(tsm kill {})+reload(tsm list)') > /dev/null"
+      "shell": "echo $(tsm list | fzf-tmux -p 55%,60% --no-sort --layout=reverse --border=none --prompt 'session > ' --pointer '>' --bind 'enter:execute(tmux switch-client -t {})+abort' --bind 'ctrl-x:execute(tsm kill {})+reload(tsm list)') > /dev/null"
     }
   },
   {
@@ -84,6 +84,32 @@
     "title": "TSM Prev Worktree",
     "category": "Sessions",
     "action": { "tmux": "run-shell 'cd \"#{pane_current_path}\" && tsm worktree prev'" }
+  },
+  {
+    "icon": "󰇘",
+    "title": "Toggle File Explorer",
+    "category": "Tools",
+    "action": {
+      "shell": "$HOME/.config/tmux-palette/bin/toggle-bontree.sh"
+    }
+  },
+  {
+    "icon": "󱂬",
+    "title": "Toggle Bottom Panel",
+    "category": "Tools",
+    "action": { "shell": "tsm panel toggle --direction bottom" }
+  },
+  {
+    "icon": "󰇙",
+    "title": "Toggle Left Panel",
+    "category": "Tools",
+    "action": { "shell": "tsm panel toggle --direction left" }
+  },
+  {
+    "icon": "󰑐",
+    "title": "Reload Tmux Config",
+    "category": "Tools",
+    "action": { "tmux": "source-file ~/.tmux.conf" }
   },
   {
     "icon": "󰒓",

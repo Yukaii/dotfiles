@@ -27,14 +27,6 @@
       }
     },
     {
-      "icon": "󰑐",
-      "title": "Reload Tmux Config",
-      "category": "Actions",
-      "action": {
-        "tmux": "source-file ~/.tmux.conf"
-      }
-    },
-    {
       "icon": "󰅟",
       "title": "Check TPM Status",
       "category": "Inspect",
