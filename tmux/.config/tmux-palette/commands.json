@@ -1,5 +1,91 @@
 [
   {
+    "icon": "󰖲",
+    "title": "Rotate Panes Forward",
+    "category": "Panes",
+    "action": { "tmux": "rotate-window -D" }
+  },
+  {
+    "icon": "󰖯",
+    "title": "Rotate Panes Backward",
+    "category": "Panes",
+    "action": { "tmux": "rotate-window -U" }
+  },
+  {
+    "icon": "󰓦",
+    "title": "Toggle Synchronize Panes",
+    "category": "Panes",
+    "action": { "tmux": "set-window-option synchronize-panes" }
+  },
+  {
+    "icon": "󰕮",
+    "title": "Even Horizontal Layout",
+    "category": "Layout",
+    "action": { "tmux": "select-layout even-horizontal" }
+  },
+  {
+    "icon": "󰕭",
+    "title": "Even Vertical Layout",
+    "category": "Layout",
+    "action": { "tmux": "select-layout even-vertical" }
+  },
+  {
+    "icon": "󰕬",
+    "title": "Main Horizontal Layout",
+    "category": "Layout",
+    "action": { "tmux": "set-window-option main-pane-height 60; select-layout main-horizontal" }
+  },
+  {
+    "icon": "󰕫",
+    "title": "Main Vertical Layout",
+    "category": "Layout",
+    "action": { "tmux": "select-layout main-vertical" }
+  },
+  {
+    "icon": "󰝘",
+    "title": "Tiled Layout",
+    "category": "Layout",
+    "action": { "tmux": "select-layout tiled" }
+  },
+  {
+    "icon": "󱂬",
+    "title": "Session Picker",
+    "category": "Sessions",
+    "action": { "popup": "sesh picker -i" }
+  },
+  {
+    "icon": "󰆍",
+    "title": "TSM Sessions",
+    "category": "Sessions",
+    "action": {
+      "shell": "echo $(tsm list | fzf-tmux -p 55%,60% --no-sort --border-label ' Tmux session manager ' --prompt '🔗  ' --header '  Enter to attach to session, ^x to kill, Esc to cancel' --bind 'enter:execute(tmux switch-client -t {})+abort' --bind 'ctrl-x:execute(tsm kill {})+reload(tsm list)') > /dev/null"
+    }
+  },
+  {
+    "icon": "󰒓",
+    "title": "TSM Move Window",
+    "category": "Sessions",
+    "action": { "shell": "tsm move-window" }
+  },
+  {
+    "icon": "󰙅",
+    "title": "TSM Worktree",
+    "category": "Sessions",
+    "action": { "tmux": "run-shell 'cd \"#{pane_current_path}\" && tsm worktree 2>/tmp/tsm_error.log'" }
+  },
+  {
+    "icon": "󰒭",
+    "title": "TSM Next Worktree",
+    "category": "Sessions",
+    "action": { "tmux": "run-shell 'cd \"#{pane_current_path}\" && tsm worktree next'" }
+  },
+  {
+    "icon": "󰒮",
+    "title": "TSM Prev Worktree",
+    "category": "Sessions",
+    "action": { "tmux": "run-shell 'cd \"#{pane_current_path}\" && tsm worktree prev'" }
+  },
+  {
     "icon": "󰒓",
     "title": "TPM Maintenance",
     "category": "Tools",
