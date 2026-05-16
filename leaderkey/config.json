@@ -4,7 +4,7 @@
       "key" : "m",
       "label" : "Menu Items",
       "type" : "url",
-      "value" : "raycast://extensions/raycast/navigation/search-menu-items"
+      "value" : "raycast-x://extensions/raycast/navigation/search-menu-bar-items"
     },
     {
       "key" : "c",
@@ -103,73 +103,73 @@
           "key" : "m",
           "label" : "Maximize",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/maximize"
+          "value" : "raycast-x://extensions/raycast/window-management/maximize"
         },
         {
           "key" : "h",
           "label" : "Left Half",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/left-half"
+          "value" : "raycast-x://extensions/raycast/window-management/left-half"
         },
         {
           "key" : "l",
           "label" : "Right Half",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/right-half"
+          "value" : "raycast-x://extensions/raycast/window-management/right-half"
         },
         {
           "key" : "M",
           "label" : "Maximize (no padding)",
           "type" : "url",
-          "value" : "raycast://customWindowManagementCommand?&name=Maximize%20(no%20padding)&position=center&relativeWidth=1.0&relativeHeight=1.0"
+          "value" : "raycast-x://customWindowManagementCommand?&name=Maximize%20(no%20padding)&position=center&relativeWidth=1.0&relativeHeight=1.0"
         },
         {
           "key" : "t",
           "label" : "Terminal size",
           "type" : "url",
-          "value" : "raycast://customWindowManagementCommand?&name=term&position=center&absoluteWidth=1155.0&absoluteHeight=755.0"
+          "value" : "raycast-x://customWindowManagementCommand?&name=term&position=center&absoluteWidth=1155.0&absoluteHeight=755.0"
         },
         {
           "key" : "L",
           "label" : "Large window",
           "type" : "url",
-          "value" : "raycast://customWindowManagementCommand?&name=large&position=center&absoluteWidth=1600.0&absoluteHeight=900.0"
+          "value" : "raycast-x://customWindowManagementCommand?&name=large&position=center&absoluteWidth=1600.0&absoluteHeight=900.0"
         },
         {
           "key" : "w",
           "label" : "Switch Windows",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/navigation/switch-windows"
+          "value" : "raycast-x://extensions/raycast/navigation/switch-windows"
         },
         {
           "key" : "]",
           "label" : "Next Desktop",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/next-desktop"
+          "value" : "raycast-x://extensions/raycast/window-management/next-desktop"
         },
         {
           "key" : "[",
           "label" : "Previous Desktop",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/previous-desktop"
+          "value" : "raycast-x://extensions/raycast/window-management/previous-desktop"
         },
         {
           "key" : "c",
           "label" : "Center",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/center"
+          "value" : "raycast-x://extensions/raycast/window-management/center"
         },
         {
           "key" : "}",
           "label" : "Next Display",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/next-display"
+          "value" : "raycast-x://extensions/raycast/window-management/next-display"
         },
         {
           "key" : "{",
           "label" : "Previous Display",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/window-management/previous-display"
+          "value" : "raycast-x://extensions/raycast/window-management/previous-display"
         },
         {
           "key" : "N",
@@ -243,13 +243,13 @@
           "key" : "1",
           "label" : "Toggle ChatGPT",
           "type" : "url",
-          "value" : "raycast://extensions/HelloImSteven/keyboard-shortcut-sequences/run-shortcut-sequence?arguments=%7B%22sequenceName%22%3A%22Toggle%20ChatGPT%22%7D"
+          "value" : "raycast-x://extensions/HelloImSteven/keyboard-shortcut-sequences/run-shortcut-sequence?arguments=%7B%22sequenceName%22%3A%22Toggle%20ChatGPT%22%7D"
         },
         {
           "key" : "2",
           "label" : "Raycast AI Chat",
           "type" : "url",
-          "value" : "raycast://extensions/raycast/raycast-ai/ai-chat"
+          "value" : "raycast-x://extensions/raycast/ai/ai-chat"
         },
         {
           "key" : "3",
@@ -261,37 +261,37 @@
           "key" : "g",
           "label" : "Fix grammar",
           "type" : "url",
-          "value" : "raycast://ai-commands/fix-spelling-and-grammar-custom"
+          "value" : "raycast-x://extensions/raycast/ai/fix-spelling-and-grammar-custom"
         },
         {
           "key" : "j",
           "label" : "Japanese Helper",
           "type" : "url",
-          "value" : "raycast://ai-commands/japanese-helper"
+          "value" : "raycast-x://extensions/raycast/ai/japanese-helper"
         },
         {
           "key" : "J",
           "label" : "Translate to Japanese",
           "type" : "url",
-          "value" : "raycast://ai-commands/translate-to-japanese"
+          "value" : "raycast-x://extensions/raycast/ai/translate-to-japanese"
         },
         {
           "key" : "r",
           "label" : "Translate to Traditional Chinses",
           "type" : "url",
-          "value" : "raycast://ai-commands/translate-to-traditional-chinese"
+          "value" : "raycast-x://extensions/raycast/ai/translate-to-traditional-chinese"
         },
         {
           "key" : "y",
           "label" : "Summarize YouTube",
           "type" : "url",
-          "value" : "raycast://ai-commands/summarize-youtube-video"
+          "value" : "raycast-x://extensions/raycast/ai/summarize-youtube-video"
         },
         {
           "key" : "e",
           "label" : "Translate to English",
           "type" : "url",
-          "value" : "raycast://ai-commands/translate-to-english"
+          "value" : "raycast-x://extensions/raycast/ai/translate-to-english"
         }
       ],
       "key" : "a",
@@ -346,25 +346,25 @@
           "key" : "s",
           "label" : "Switch Account",
           "type" : "url",
-          "value" : "raycast://extensions/tailscale/tailscale/account-switcher"
+          "value" : "raycast-x://extensions/tailscale/tailscale/account-switcher"
         },
         {
           "key" : "d",
           "label" : "Devices",
           "type" : "url",
-          "value" : "raycast://extensions/tailscale/tailscale/my-devices"
+          "value" : "raycast-x://extensions/tailscale/tailscale/my-devices"
         },
         {
           "key" : "e",
           "label" : "Exit Nodes",
           "type" : "url",
-          "value" : "raycast://extensions/tailscale/tailscale/exit"
+          "value" : "raycast-x://extensions/tailscale/tailscale/exit"
         },
         {
           "key" : "c",
           "label" : "Connect",
           "type" : "url",
-          "value" : "raycast://extensions/tailscale/tailscale/connect"
+          "value" : "raycast-x://extensions/tailscale/tailscale/connect"
         }
       ],
       "key" : "S",
