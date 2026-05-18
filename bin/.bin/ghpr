@@ -3,7 +3,7 @@
 ghpr() {
     local key selection pr_number
 
-    selection="$(GH_FORCE_TTY=100% gh pr list --limit 300 --json number,title,headRefName,author --jq '.[] | [.number, ("#" + (.number | tostring)), .title, .headRefName, ("@" + .author.login)] | @tsv' | fzf --ansi --delimiter=$'\t' --with-nth=2,3,4,5 --layout=reverse --expect=ctrl-o --header 'enter: select | ctrl-o: open' --preview 'GH_FORCE_TTY=100% gh pr view {1}' --preview-window 'right:60%,wrap,border-left')" || return
+    selection="$(GH_FORCE_TTY=100% gh pr list --limit 300 --json number,title,headRefName,author --jq '.[] | [.number, ("#" + (.number | tostring)), .title, .headRefName, ("@" + .author.login)] | @tsv' | fzf --ansi --delimiter=$'\t' --with-nth=2,3,4,5 --layout=reverse --expect=ctrl-o --header 'enter: select | ctrl-o: open | ctrl-/: wrap preview' --bind 'ctrl-/:toggle-preview-wrap-word' --preview 'GH_FORCE_TTY=100% gh pr view {1}' --preview-window 'right:60%,wrap-word,border-left')" || return
 
     key="$(awk 'NR==1 { print; exit }' <<<"$selection")"
     pr_number="$(awk -F $'\t' 'NR==2 { print $1; exit }' <<<"$selection")"
