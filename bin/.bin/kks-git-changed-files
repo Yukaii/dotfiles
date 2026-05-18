@@ -21,7 +21,9 @@ repo_root=$(git rev-parse --show-toplevel)
 } | \
     fzf --multi --height 100% --prompt 'git changes> ' \
         --style=full \
+        --header='[ctrl-/] toggle preview wrap' \
         --preview "bat --color=always --line-range=:500 --style plain $repo_root/{}" --history="$history_file" \
+        --bind 'ctrl-/:toggle-preview-wrap-word' \
         --bind "ctrl-d:preview-page-down,ctrl-u:preview-page-up" |
     while read -r file; do
         kks edit "$repo_root/$file"

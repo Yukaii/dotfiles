@@ -9,7 +9,7 @@
 # - fd (https://github.com/sharkdp/fd)
 # - eza (https://github.com/eza-community/eza)
 
-preview_cmd="bat --color=always --line-range=:500"
+preview_cmd="bat --color=always --line-range=:500 --style plain"
 folder_preview_cmd="eza --icons --oneline --group-directories-first --all"
 history_file="$HOME/.cache/kks-files-navigation-history"
 start_dir="$(pwd)"  # Remember the starting directory
@@ -69,7 +69,8 @@ while true; do
       --style=full \
       --history="$history_file" \
       --expect=alt-h \
-      --header="[ctrl-l] send files to grep buffer | [enter] open file/enter directory" \
+      --header="[ctrl-l] send files to grep buffer | [ctrl-/] toggle preview wrap | [enter] open file/enter directory" \
+      --bind 'ctrl-/:toggle-preview-wrap-word' \
       --bind "ctrl-l:execute(rg --hidden --no-ignore -l '' . --max-depth 1 | sed 's|^\./||' | sed \"s|^|$rel_prefix|\" | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort")
 
   # Process fzf output to check for alt-h keybinding

@@ -7,7 +7,7 @@
 # - fzf (https://github.com/junegunn/fzf)
 # - bat (https://github.com/sharkdp/bat)
 
-preview_cmd="bat --color=always --line-range=:500"
+preview_cmd="bat --color=always --line-range=:500 --style plain"
 history_file="$HOME/.cache/kks-files-history"
 
 [ -f "$history_file" ] || touch "$history_file"
@@ -16,7 +16,8 @@ FZF_DEFAULT_COMMAND="rg --hidden --no-ignore -l '' $@" \
   fzf --multi --height 100% --highlight-line --prompt 'files> ' \
     --preview "$preview_cmd {}" --history="$history_file" \
     --style=full \
-    --header="[ctrl-l] send to files buffer" \
+    --header="[ctrl-l] send to files buffer | [ctrl-/] toggle preview wrap" \
+    --bind 'ctrl-/:toggle-preview-wrap-word' \
     --bind "ctrl-l:execute(rg --hidden --no-ignore -l '' $@ | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort" |
   while read -r file; do
     kks edit "${file}"

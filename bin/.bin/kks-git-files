@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# pick files from git ls-files
+# pick files from git ls-files, including untracked non-ignored files
 #
 # requires:
 # - fzf (https://github.com/junegunn/fzf)
@@ -11,17 +11,20 @@ history_file="$HOME/.cache/kks-files-history"
 [ -f "$history_file" ] || touch "$history_file"
 
 repo_root=$(git rev-parse --show-toplevel)
+export repo_root
+git_files_command='git -C "$repo_root" ls-files --cached --others --exclude-standard --full-name'
 
-FZF_DEFAULT_COMMAND="git ls-files --full-name $repo_root" \
+FZF_DEFAULT_COMMAND="$git_files_command" \
   fzf --highlight-line \
     --multi \
     --height 100% \
     --style=full \
     --prompt 'git-files> ' \
-    --preview "bat --color=always --line-range=:500 $repo_root/{}" \
+    --preview "bat --color=always --line-range=:500 --style plain '$repo_root'/{}" \
     --history="$history_file" \
-    --header="[ctrl-l] send to files buffer" \
-    --bind "ctrl-l:execute(git ls-files --full-name $repo_root | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort" |
+    --header="[ctrl-l] send to files buffer | [ctrl-/] toggle preview wrap" \
+    --bind 'ctrl-/:toggle-preview-wrap-word' \
+    --bind "ctrl-l:execute($git_files_command | fzf --filter={q} | sed 's|$|:1:1:|' | kks-pipe-to-grep-buffer)+abort" |
   while read -r file; do
     kks edit "$repo_root/$file"
   done

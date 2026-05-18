@@ -41,12 +41,15 @@ FZF_DEFAULT_COMMAND="$RG_PREFIX '$query'" \
     --prompt="grep> " \
     --history="$history_file" \
     --highlight-line \
+    --freeze-left=2 \
     --bind "change:reload:$RG_PREFIX {q} $* || true" \
     --bind "ctrl-l:execute($RG_PREFIX {q} $* | kks-pipe-to-grep-buffer {q})+abort" \
+    --bind 'ctrl-/:toggle-preview-wrap-word' \
     --style=full \
     --exit-0 \
     --phony \
-    --header="[ctrl-l] send to grep buffer" \
+    --header="[ctrl-l] send to grep buffer | [ctrl-/] toggle preview wrap" \
+    --preview-window='right:60%:wrap-word' \
     --preview='range="$(echo {2}-5 | bc | sed "s/^-.*/0/"):$(echo {2}+20 | bc)"; bat -r "$range" -n --color always -H {2} {1}' |
   awk -F':' '{print $1 " " "+" $2 ":" $3 }' |
   xargs -r kks edit

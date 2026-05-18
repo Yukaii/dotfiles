@@ -11,6 +11,7 @@ command kak -clear
 kks list |
   fzf -d '\t*: *' \
     --style=full \
+    --track --id-nth=1,2 \
     --header="[c-x] kill, [c-t] new, [c-r] reload" \
     --bind="ctrl-x:execute-silent(kks kill -s {1})+reload(sleep 0.1; kks list)" \
     --bind="ctrl-t:execute-silent(kks new {q})+reload(sleep 0.1; kks list)" \

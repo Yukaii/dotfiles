@@ -30,8 +30,11 @@ cymbal --delimiter $'\t' --separator $'\n' "$current_file" |
     --highlight-line \
     --ansi \
     --with-nth=4,5 \
+    --freeze-left=3 \
     --preview='bat {1} --color always --style=numbers,snip,header --highlight-line {2} --line-range {2}:+50' \
+    --bind 'ctrl-/:toggle-preview-wrap-word' \
+    --bind 'alt-v:change-with-nth(4,5|1,2,3,4,5|..)' \
     --style=full \
-    --header="symbols in $(basename "$current_file")" |
+    --header="[alt-v] toggle columns | [ctrl-/] toggle preview wrap | symbols in $(basename "$current_file")" |
   awk -F$'\t' '{print $2 "g" ($3-1) "l"}' |
   xargs -r -I {} kks send "execute-keys '<esc>{}'"
