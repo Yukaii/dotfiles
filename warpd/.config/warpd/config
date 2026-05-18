@@ -27,3 +27,5 @@ rapid_mode: R
 rapid_click_interval: 40
 rapid_indicator_color: #ff69b480
 rapid_indicator_width: 3
+
+middle: M
