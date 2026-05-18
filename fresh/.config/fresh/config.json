@@ -1,0 +1,15 @@
+{
+  "theme": "builtin://dark",
+  "plugins": {
+    "vi_mode": {
+      "settings": {
+        "autoStart": true
+      }
+    },
+    "dashboard": {
+      "settings": {
+        "autoOpen": false
+      }
+    }
+  }
+}
