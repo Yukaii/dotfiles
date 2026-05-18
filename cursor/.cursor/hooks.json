@@ -2,7 +2,7 @@
   "version": 1,
   "hooks": {
     "stop": [
-      { "command": "open -g raycast://extensions/raycast/raycast/confetti?emojis=🤖🤖🔥🔥" }
+      { "command": "open -g raycast-x://extensions/raycast/raycast/confetti?emojis=🤖🤖🔥🔥" }
     ]
   }
 }
