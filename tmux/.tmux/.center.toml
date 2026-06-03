@@ -1,6 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Dotbar-style window status entry (used by window-status-format/current-format).
+# Window status style source for `tmuxship apply`.
+# tmux renders window index/name with #I/#W; tmuxship reads these styles.
 format = "$custom"
 right_format = ""
 add_newline = false
