@@ -261,7 +261,7 @@
           "key" : "g",
           "label" : "Fix grammar",
           "type" : "url",
-          "value" : "raycast-x://extensions/raycast/ai/fix-spelling-and-grammar-custom"
+          "value" : "raycast-x://extensions/raycast/ai/fix-spelling-and-grammarcustom"
         },
         {
           "key" : "j",
