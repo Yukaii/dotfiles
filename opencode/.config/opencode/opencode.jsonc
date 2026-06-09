@@ -176,6 +176,10 @@
       "enabled": false,
       "command": ["bunx", "-y", "xcodebuildmcp@beta", "mcp"]
     },
+    "serena": {
+      "type": "local",
+      "command": ["serena", "start-mcp-server", "--context", "ide"]
+    },
   },
   "lsp": {
     "swift": {
