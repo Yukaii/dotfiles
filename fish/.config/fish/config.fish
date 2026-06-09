@@ -14,6 +14,7 @@ set -x LC_ALL en_US.UTF-8
 fish_add_path "$HOME/.bin"
 fish_add_path "$HOME/.deno/bin"
 fish_add_path "$HOME/.spicetify"
+fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.local/bin/hx-utils-bin"
 fish_add_path "$HOME/.cargo/bin"
 fish_add_path "$HOME/go/bin"
