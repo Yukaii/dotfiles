@@ -47,7 +47,7 @@ set global tabstop 2
 # set global autocomplete prompt
 
 set-option global scrolloff 5,5
-set-option global startup_info_version 20240518
+set-option global startup_info_version 20260521
 
 set-option -add global ui_options terminal_assistant=none
 set-option -add global ui_options terminal_cursor_native=true
