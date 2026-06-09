@@ -61,10 +61,12 @@ pick_pr() {
   gh pr list --limit 100 --json number,title,headRefName \
     --template '{{range .}}{{.number}} {{.title}} ({{.headRefName}})\n{{end}}' |
     fzf --ansi \
-        --header="Select a PR (or pass it as \`$0 <number>\`)" \
+        --header="Select a PR (or pass it as \`$0 <number>\`) | ctrl-/: wrap preview" \
         --prompt="PR> " \
         --preview="gh pr view {1} --json body --template '{{.body}}' | bat --style=plain --paging=never" \
-        --preview-window="right:50%,border-left" \
+        --preview-window="right:50%,wrap-word,border-left" \
+        --track --id-nth=1 \
+        --bind 'ctrl-/:toggle-preview-wrap-word' \
         --bind 'ctrl-o:execute(gh pr view {1} --web)' \
         --bind 'ctrl-d:reload(gh pr list --limit 100 --json number,title,headRefName --template '\''{{range .}}{{.number}} {{.title}} ({{.headRefName}})\n{{end}}'\'')' \
         --nth=1 \
@@ -76,10 +78,11 @@ pick_pr() {
 # Function: pick a commit interactively
 pick_commit() {
   git log --oneline --color=always | fzf --ansi \
-        --header="Select a commit (or pass it as \`$0 <hash>\`)" \
+        --header="Select a commit (or pass it as \`$0 <hash>\`) | ctrl-/: wrap preview" \
         --prompt="Commit> " \
         --preview="git show {1} --patch --quiet | bat --style=plain --paging=never" \
-        --preview-window="right:50%,border-left" \
+        --preview-window="right:50%,wrap-word,border-left" \
+        --bind 'ctrl-/:toggle-preview-wrap-word' \
         --bind 'ctrl-d:reload(git log --oneline --color=always)'
 }
 
@@ -152,7 +155,7 @@ browse_files() {
   local file_list_cmd="$1"
   local preview_cmd="$2"
 
-  eval "$file_list_cmd" | fzf -m --ansi --preview="$preview_cmd"
+  eval "$file_list_cmd" | fzf -m --ansi --header='ctrl-/: wrap preview' --bind 'ctrl-/:toggle-preview-wrap-word' --preview-window='right:60%,wrap-word,border-left' --preview="$preview_cmd"
 }
 
 # Function: determine mode and ID from arguments or interactive selection
