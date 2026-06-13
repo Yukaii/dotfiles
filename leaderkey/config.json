@@ -7,24 +7,6 @@
       "value" : "raycast-x://extensions/raycast/navigation/search-menu-bar-items"
     },
     {
-      "key" : "c",
-      "label" : "Warpd Normal",
-      "type" : "url",
-      "value" : "warpd://normal"
-    },
-    {
-      "key" : "x",
-      "label" : "Warpd Hint",
-      "type" : "url",
-      "value" : "warpd://hint"
-    },
-    {
-      "key" : "f",
-      "label" : "Warpd Find",
-      "type" : "url",
-      "value" : "warpd://find"
-    },
-    {
       "actions" : [
         {
           "key" : "o",
@@ -100,90 +82,6 @@
     {
       "actions" : [
         {
-          "key" : "m",
-          "label" : "Maximize",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/maximize"
-        },
-        {
-          "key" : "h",
-          "label" : "Left Half",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/left-half"
-        },
-        {
-          "key" : "l",
-          "label" : "Right Half",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/right-half"
-        },
-        {
-          "key" : "M",
-          "label" : "Maximize (no padding)",
-          "type" : "url",
-          "value" : "raycast-x://customWindowManagementCommand?&name=Maximize%20(no%20padding)&position=center&relativeWidth=1.0&relativeHeight=1.0"
-        },
-        {
-          "key" : "t",
-          "label" : "Terminal size",
-          "type" : "url",
-          "value" : "raycast-x://customWindowManagementCommand?&name=term&position=center&absoluteWidth=1155.0&absoluteHeight=755.0"
-        },
-        {
-          "key" : "L",
-          "label" : "Large window",
-          "type" : "url",
-          "value" : "raycast-x://customWindowManagementCommand?&name=large&position=center&absoluteWidth=1600.0&absoluteHeight=900.0"
-        },
-        {
-          "key" : "w",
-          "label" : "Switch Windows",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/navigation/switch-windows"
-        },
-        {
-          "key" : "]",
-          "label" : "Next Desktop",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/next-desktop"
-        },
-        {
-          "key" : "[",
-          "label" : "Previous Desktop",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/previous-desktop"
-        },
-        {
-          "key" : "c",
-          "label" : "Center",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/center"
-        },
-        {
-          "key" : "}",
-          "label" : "Next Display",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/next-display"
-        },
-        {
-          "key" : "{",
-          "label" : "Previous Display",
-          "type" : "url",
-          "value" : "raycast-x://extensions/raycast/window-management/previous-display"
-        },
-        {
-          "key" : "N",
-          "type" : "application",
-          "value" : "/Applications/DeskPad.app"
-        }
-      ],
-      "key" : "w",
-      "label" : "Window Management",
-      "type" : "group"
-    },
-    {
-      "actions" : [
-        {
           "key" : "s",
           "type" : "application",
           "value" : "/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app"
@@ -197,44 +95,20 @@
           "key" : "e",
           "type" : "application",
           "value" : "/Applications/Microsoft Edge Dev.app"
+        },
+        {
+          "key" : "h",
+          "type" : "application",
+          "value" : "/Applications/Helium.app"
+        },
+        {
+          "key" : "z",
+          "type" : "application",
+          "value" : "/Applications/Zen Browser.app"
         }
       ],
       "key" : "b",
       "label" : "Browsers",
-      "type" : "group"
-    },
-    {
-      "actions" : [
-        {
-          "key" : "c",
-          "type" : "application",
-          "value" : "/Applications/Cursor.app"
-        },
-        {
-          "key" : "v",
-          "type" : "application",
-          "value" : "/Applications/Visual Studio Code - Insiders.app"
-        }
-      ],
-      "key" : "e",
-      "label" : "Editors",
-      "type" : "group"
-    },
-    {
-      "actions" : [
-        {
-          "key" : "a",
-          "type" : "application",
-          "value" : "/Applications/Alacritty.app"
-        },
-        {
-          "key" : "w",
-          "type" : "application",
-          "value" : "/Applications/WezTerm.app"
-        }
-      ],
-      "key" : "T",
-      "label" : "Terminals",
       "type" : "group"
     },
     {
@@ -338,37 +212,6 @@
       ],
       "key" : "o",
       "label" : "Apps",
-      "type" : "group"
-    },
-    {
-      "actions" : [
-        {
-          "key" : "s",
-          "label" : "Switch Account",
-          "type" : "url",
-          "value" : "raycast-x://extensions/tailscale/tailscale/account-switcher"
-        },
-        {
-          "key" : "d",
-          "label" : "Devices",
-          "type" : "url",
-          "value" : "raycast-x://extensions/tailscale/tailscale/my-devices"
-        },
-        {
-          "key" : "e",
-          "label" : "Exit Nodes",
-          "type" : "url",
-          "value" : "raycast-x://extensions/tailscale/tailscale/exit"
-        },
-        {
-          "key" : "c",
-          "label" : "Connect",
-          "type" : "url",
-          "value" : "raycast-x://extensions/tailscale/tailscale/connect"
-        }
-      ],
-      "key" : "S",
-      "label" : "TailScale",
       "type" : "group"
     }
   ],
