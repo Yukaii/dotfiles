@@ -94,6 +94,24 @@ keybind = cmd+shift+right_bracket=text:\x11n
 keybind = ctrl+alt+t=text:\x11T
 keybind = ctrl+alt+r=text:\x11r
 
+# Keyroute tmux session slots. Ctrl+Cmd+K sends tmux prefix C-q and enters
+# the tmux Keyroute table y; the next digit is passed through separately.
+keybind = ctrl+cmd+k=text:\x11y
+keybind = chain=activate_key_table_once:keyroute
+keybind = keyroute/escape=deactivate_key_table
+keybind = keyroute/1=text:1
+keybind = keyroute/2=text:2
+keybind = keyroute/3=text:3
+keybind = keyroute/4=text:4
+keybind = keyroute/5=text:5
+keybind = keyroute/6=text:6
+keybind = keyroute/7=text:7
+keybind = keyroute/8=text:8
+keybind = keyroute/9=text:9
+keybind = keyroute/w=text:w
+keybind = keyroute/p=text:p
+keybind = keyroute/s=text:s
+
 # Tabs manipulcation
 keybind = cmd+t=text:\x11c
 keybind = cmd+w=text:\x11&
