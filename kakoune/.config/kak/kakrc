@@ -1,7 +1,7 @@
 evaluate-commands %sh{
   kks init
   kak-lsp --kakoune -s $kak_session
-  # kak-tree-sitter -dks --init $kak_session
+  kak-tree-sitter -dks --init $kak_session
   giallo-kak init
   gitlinker init kakoune
 }
