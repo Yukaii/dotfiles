@@ -469,8 +469,8 @@ hook global BufOpenFile .* %{
       \**|"") exit 0 ;;
     esac
 
-    cd $(dirname "$kak_buffile") 2>/dev/null || exit 0
-    if [ $(git rev-parse --git-dir 2>/dev/null) ]; then
+    cd "$(dirname "$kak_buffile")" 2>/dev/null || exit 0
+    if [ -n "$(git rev-parse --git-dir 2>/dev/null)" ]; then
       for hook in WinCreate BufReload BufWritePost NormalIdle; do
         # Wrap git update-diff to skip scratch buffers at runtime
         printf "hook buffer -group git-update-diff %s .* 'evaluate-commands %%sh{ case \"\\$kak_bufname\" in \\*\\*) ;; *) printf \"git update-diff\" ;; esac }'\n" "$hook"
