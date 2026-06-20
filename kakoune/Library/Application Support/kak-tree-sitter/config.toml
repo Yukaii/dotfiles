@@ -1,3 +1,5 @@
+[features]
+highlighting = false
 
 # gleam
 [language.gleam.grammar.source.git]
