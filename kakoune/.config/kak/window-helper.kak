@@ -38,3 +38,10 @@ hook global ModuleLoaded ykmx %{
   alias global terminal-popup ykmx-terminal-popup
   alias global terminal-sidebar ykmx-terminal-sidebar
 }
+
+hook global ModuleLoaded herdr %{
+  alias global terminal-vertical herdr-terminal-vertical
+  alias global terminal-horizontal herdr-terminal-horizontal
+  alias global terminal-popup herdr-terminal-popup
+  alias global terminal-sidebar herdr-terminal-sidebar
+}

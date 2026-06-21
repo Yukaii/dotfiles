@@ -13,6 +13,7 @@ source "%val{config}/ghostty.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/kitty.kak"
 source "%val{config}/ykmx.kak"
+source "%val{config}/herdr.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
@@ -248,6 +249,12 @@ map global find-actions -docstring 'browse on github'                  'h'  ':br
 evaluate-commands %sh{
   if [ -n "${kak_client_env_YKMX_CONTROL_PIPE:-$YKMX_CONTROL_PIPE}" ]; then
     echo "try %{ require-module ykmx }"
+  fi
+}
+
+evaluate-commands %sh{
+  if [ -n "${kak_client_env_HERDR_ENV:-$HERDR_ENV}" ]; then
+    echo "try %{ set-option global windowing_modules herdr; require-module herdr; set-option global windowing_module herdr }"
   fi
 }
 
