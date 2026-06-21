@@ -1,0 +1,27 @@
+onboarding = false
+
+[keys]
+prefix = "ctrl+q"
+previous_workspace = "prefix+shift+left"
+next_workspace = "prefix+shift+right"
+switch_workspace = "prefix+shift+1..9"
+
+[theme]
+name = "kanagawa"
+
+[ui.sound]
+enabled = false
+
+[ui.toast]
+delivery = "herdr"
+
+[ui]
+show_agent_labels_on_pane_borders = true
+prompt_new_tab_name = false
+
+agent_panel_scope = "all"
+[experimental]
+switch_ascii_input_source_in_prefix = false
+
+[terminal]
+default_shell = "/opt/homebrew/bin/fish"
