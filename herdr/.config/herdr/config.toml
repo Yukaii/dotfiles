@@ -5,6 +5,13 @@ prefix = "ctrl+q"
 previous_workspace = "prefix+shift+left"
 next_workspace = "prefix+shift+right"
 switch_workspace = "prefix+shift+1..9"
+# last_pane = "prefix+9"
+
+[[keys.command]]
+key = "prefix+alt+l"
+type = "shell"
+command = "herdr-popup lazygit"
+description = "popup lazygit"
 
 [theme]
 name = "kanagawa"

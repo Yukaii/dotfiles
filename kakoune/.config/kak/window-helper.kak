@@ -1,3 +1,55 @@
+define-command terminal-popup-wrapper -params .. -docstring '
+terminal-popup-wrapper [<program> [<arguments>...]]: open a popup using the active terminal multiplexer.
+Uses herdr-popup under Herdr, tsm popup under tmux when available, and tmux-popup as a fallback.' \
+%{
+  evaluate-commands %sh{
+    quote_arg() {
+      printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\''/g")"
+    }
+
+    emit_kak_args() {
+      for arg do
+        printf ' %s' "$(quote_arg "$arg")"
+      done
+    }
+
+    if [ -n "${kak_client_env_HERDR_ENV:-${HERDR_ENV:-}}" ] && command -v herdr-popup >/dev/null 2>&1; then
+      printf 'nop %%sh{ herdr-popup'
+      emit_kak_args "$@"
+      printf ' >/dev/null 2>&1 & }'
+      exit 0
+    fi
+
+    if [ -n "${kak_client_env_TMUX:-${TMUX:-}}" ] && command -v tsm >/dev/null 2>&1; then
+      program=""
+      for arg do
+        quoted=$(quote_arg "$arg")
+        if [ -z "$program" ]; then
+          program="$quoted"
+        else
+          program="$program $quoted"
+        fi
+      done
+
+      if [ -n "$program" ]; then
+        printf 'nop %%sh{ tsm popup %s >/dev/null 2>&1 & }' "$(quote_arg "$program")"
+      else
+        printf 'nop %%sh{ tsm popup >/dev/null 2>&1 & }'
+      fi
+      exit 0
+    fi
+
+    if [ -n "${kak_client_env_TMUX:-${TMUX:-}}" ]; then
+      printf 'tmux-popup'
+      emit_kak_args "$@"
+      exit 0
+    fi
+
+    echo "fail 'terminal-popup-wrapper: no supported popup backend detected'"
+  }
+}
+complete-command terminal-popup-wrapper shell
+
 hook global ModuleLoaded wezterm %{
   alias global terminal-vertical wezterm-terminal-vertical
   alias global terminal-horizontal wezterm-terminal-horizontal
@@ -42,6 +94,6 @@ hook global ModuleLoaded ykmx %{
 hook global ModuleLoaded herdr %{
   alias global terminal-vertical herdr-terminal-vertical
   alias global terminal-horizontal herdr-terminal-horizontal
-  alias global terminal-popup herdr-terminal-popup
+  alias global terminal-popup terminal-popup-wrapper
   alias global terminal-sidebar herdr-terminal-sidebar
 }

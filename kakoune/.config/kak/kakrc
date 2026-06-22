@@ -149,29 +149,29 @@ map global insert <c-d> <del>      # Delete current character
 # Terminal actions
 declare-user-mode terminal-actions
 
-define-command lazygit -hidden -docstring 'Launch lazygit' %{ nop %sh{
-  (tsm popup lazygit &) >/dev/null 2>/dev/null
-}}
+define-command lazygit -hidden -docstring 'Launch lazygit' %{
+  terminal-popup-wrapper lazygit
+}
 
-define-command serpl -hidden -docstring 'Launch serpl' %{ nop %sh{
-  (tsm popup serpl &) >/dev/null 2>/dev/null
-}}
+define-command serpl -hidden -docstring 'Launch serpl' %{
+  terminal-popup-wrapper serpl
+}
 
-define-command lazyjj -hidden -docstring 'Launch lazyjj' %{ nop %sh{
-  (tsm popup lazyjj &) >/dev/null 2>/dev/null
-}}
+define-command lazyjj -hidden -docstring 'Launch lazyjj' %{
+  terminal-popup-wrapper lazyjj
+}
 
-define-command sqlit -hidden -docstring 'Launch sqlit' %{ nop %sh{
-  (tsm popup sqlit &) >/dev/null 2>/dev/null
-}}
+define-command sqlit -hidden -docstring 'Launch sqlit' %{
+  terminal-popup-wrapper sqlit
+}
 
 
 define-command bottom-terminal -hidden -docstring 'Launch bottom terminal' %{
   terminal-vertical fish
 }
-define-command floating-terminal -hidden -docstring 'Launch floating terminal' %{ nop %sh{
-  (tsm popup &) >/dev/null 2>/dev/null
-}}
+define-command floating-terminal -hidden -docstring 'Launch floating terminal' %{
+  terminal-popup-wrapper
+}
 
 map global terminal-actions 'l' ':lazygit<ret>'           -docstring 'lazygit'
 map global terminal-actions 'j' ':lazyjj<ret>'            -docstring 'lazyjj'

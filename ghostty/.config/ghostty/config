@@ -116,7 +116,11 @@ keybind = keyroute/s=text:s
 keybind = cmd+t=text:\x11c
 keybind = cmd+w=text:\x11&
 
-# # Panel navigation
+# Workspace navigation
+keybind = cmd+shift+up=text:\x11\x1b[1;2D
+keybind = cmd+shift+down=text:\x11\x1b[1;2C
+
+# Panel navigation
 keybind = ctrl+shift+left=text:\x11h
 keybind = ctrl+shift+right=text:\x11l
 keybind = ctrl+shift+up=text:\x11k
@@ -160,7 +164,7 @@ keybind = ctrl+alt+Digit5=text:\x025
 keybind = ctrl+alt+Digit6=text:\x026
 keybind = ctrl+alt+Digit7=text:\x027
 keybind = ctrl+alt+Digit8=text:\x028
-keybind = ctrl+alt+Digit9=text:\x029
+keybind = ctrl+alt+Digit9=text:\x1b[F
 
 keybind = ctrl+alt+left=text:\x02p
 keybind = ctrl+alt+right=text:\x02n
