@@ -5,6 +5,7 @@ prefix = "ctrl+q"
 previous_workspace = "prefix+shift+left"
 next_workspace = "prefix+shift+right"
 switch_workspace = "prefix+shift+1..9"
+close_pane = "prefix+&"
 # last_pane = "prefix+9"
 
 [[keys.command]]
@@ -23,12 +24,16 @@ enabled = false
 delivery = "herdr"
 
 [ui]
-show_agent_labels_on_pane_borders = true
+show_agent_labels_on_pane_borders = false
 prompt_new_tab_name = false
 
 agent_panel_scope = "all"
+
 [experimental]
+kitty_graphics = true
 switch_ascii_input_source_in_prefix = false
+reveal_hidden_cursor_for_cjk_ime = true
 
 [terminal]
 default_shell = "/opt/homebrew/bin/fish"
+
