@@ -5,31 +5,18 @@ evaluate-commands %sh{
     [ -z "${kak_opt_windowing_modules}" ] || [ -n "${kak_client_env_HERDR_ENV:-$HERDR_ENV}" ] || echo 'fail herdr not detected'
 }
 
-# Wait for a pane's shell to be ready, then run a program in it via `pane run`.
+# Run a program in a Herdr pane via `pane run`.
 # Herdr pane split does not accept a command (unlike tmux split-window).
 # `pane run` types into the pane's terminal, so callers must pass a shell-ready
 # command line with argv boundaries already quoted.
-# The polling loop is backgrounded so kakoune does not block.
-define-command -hidden -params 2 herdr-wait-and-run %{
+define-command -hidden -params 2 herdr-run-in-pane %{
     nop %sh{
         pane_id="$1"
         program="$2"
         [ -z "$pane_id" ] || [ -z "$program" ] && exit 0
         pane_id_shell=$(printf '%s' "$pane_id" | sed "s/'/'\\\\''/g")
         command_line="$program; herdr pane close '$pane_id_shell'"
-        (
-            attempts=20
-            while [ "$attempts" -gt 0 ]; do
-                sleep 0.1
-                if herdr pane read "$pane_id" --source visible --lines 1 2>&1 | grep -q '[^[:space:]]'; then
-                    sleep 0.1
-                    herdr pane run "$pane_id" "$command_line" >/dev/null 2>&1
-                    exit 0
-                fi
-                attempts=$((attempts - 1))
-            done
-            herdr pane run "$pane_id" "$command_line" >/dev/null 2>&1
-        ) >/dev/null 2>&1 &
+        herdr pane run "$pane_id" "$command_line" >/dev/null 2>&1
     }
 }
 
@@ -59,7 +46,7 @@ define-command -hidden -params 2.. herdr-terminal-impl %{
         pane_id_esc=$(printf '%s' "$pane_id" | sed "s/'/''/g")
         program=$(for arg do printf " '%s'" "$(printf '%s' "$arg" | sed "s/'/'\\\\''/g")"; done)
         program_esc=$(printf '%s' "${program# }" | sed "s/'/''/g")
-        printf "herdr-wait-and-run '%s' '%s'" "$pane_id_esc" "$program_esc"
+        printf "herdr-run-in-pane '%s' '%s'" "$pane_id_esc" "$program_esc"
     }
 }
 
@@ -83,7 +70,7 @@ If a program is provided, it is executed in the new tab.' \
         pane_id_esc=$(printf '%s' "$pane_id" | sed "s/'/''/g")
         program=$(for arg do printf " '%s'" "$(printf '%s' "$arg" | sed "s/'/'\\\\''/g")"; done)
         program_esc=$(printf '%s' "${program# }" | sed "s/'/''/g")
-        printf "herdr-wait-and-run '%s' '%s'" "$pane_id_esc" "$program_esc"
+        printf "herdr-run-in-pane '%s' '%s'" "$pane_id_esc" "$program_esc"
     }
 }
 complete-command herdr-terminal-window shell
@@ -113,7 +100,7 @@ Splits downward at 50% then zooms the new pane. If a program is provided, it is 
         pane_id_esc=$(printf '%s' "$pane_id" | sed "s/'/''/g")
         program=$(for arg do printf " '%s'" "$(printf '%s' "$arg" | sed "s/'/'\\\\''/g")"; done)
         program_esc=$(printf '%s' "${program# }" | sed "s/'/''/g")
-        printf "herdr-wait-and-run '%s' '%s'" "$pane_id_esc" "$program_esc"
+        printf "herdr-run-in-pane '%s' '%s'" "$pane_id_esc" "$program_esc"
     }
 }
 complete-command herdr-terminal-popup shell
@@ -160,7 +147,7 @@ If a program is provided, it is executed in the new pane.' \
         pane_id_esc=$(printf '%s' "$pane_id" | sed "s/'/''/g")
         program=$(for arg do printf " '%s'" "$(printf '%s' "$arg" | sed "s/'/'\\\\''/g")"; done)
         program_esc=$(printf '%s' "${program# }" | sed "s/'/''/g")
-        printf "herdr-wait-and-run '%s' '%s'" "$pane_id_esc" "$program_esc"
+        printf "herdr-run-in-pane '%s' '%s'" "$pane_id_esc" "$program_esc"
     }
 }
 complete-command herdr-terminal-sidebar shell
