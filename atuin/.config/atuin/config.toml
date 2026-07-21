@@ -207,3 +207,6 @@ records = true
 [dotfiles]
 enabled = true
 
+[ai]
+enabled = false
+
