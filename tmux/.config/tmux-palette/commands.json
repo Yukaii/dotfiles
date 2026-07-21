@@ -86,6 +86,22 @@
     "action": { "tmux": "run-shell 'cd \"#{pane_current_path}\" && tsm worktree prev'" }
   },
   {
+    "icon": "󰈞",
+    "title": "Pick Visible File",
+    "category": "Termscope",
+    "action": {
+      "shell": "$HOME/.config/tmux-palette/bin/termscope-pick.sh"
+    }
+  },
+  {
+    "icon": "󰖟",
+    "title": "Pick Visible Link",
+    "category": "Termscope",
+    "action": {
+      "shell": "$HOME/.config/tmux-palette/bin/termscope-links.sh"
+    }
+  },
+  {
     "icon": "󰇘",
     "title": "Toggle File Explorer",
     "category": "Tools",
