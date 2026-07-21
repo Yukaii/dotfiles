@@ -173,3 +173,4 @@ keybind = ctrl+alt+right=text:\x02n
 # Herdr keybindings
 keybind = cmd+shift+n=text:\x11N
 keybind = cmd+shift+d=text:\x11D
+keybind = ctrl+alt+f=text:\x11f
