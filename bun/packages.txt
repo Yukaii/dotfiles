@@ -1,5 +1,5 @@
 @andresaya/edge-tts@1.2.4
-@anthropic-ai/claude-code@2.1.79
+@anthropic-ai/claude-code@2.1.177
 @biomejs/biome@1.9.4
 @builder.io/micro-agent@0.0.25
 @charmland/crush@0.7.10
@@ -15,7 +15,7 @@
 @mermaid-js/mermaid-cli@11.4.0
 @modelcontextprotocol/inspector@0.18.0
 @musistudio/claude-code-router@1.0.31
-@openai/codex@0.130.0
+@openai/codex@0.139.0
 @playwright/cli@0.1.0
 @qwen-code/qwen-code@0.0.1-alpha.11
 @scil/reliable-debundle@0.6.3
@@ -37,7 +37,7 @@ dockerfile-language-server-nodejs@0.13.0
 eslint-formatter-kakoune@1.0.0
 git-split-diffs@2.2.0
 http-server@14.1.1
-hunkdiff@0.11.1
+hunkdiff@0.13.1
 inngest-cli@1.5.10
 jsondiffpatch@0.6.0
 license@1.0.3
@@ -46,7 +46,6 @@ netlify-cli@17.33.4
 npkill@0.12.2
 oc-wrapped@1.0.1
 openapi-mcp-generator@3.1.2
-opencode-ai@1.14.48
 openskills@1.5.0
 portless@0.5.2
 prettier@3.4.2
@@ -61,7 +60,7 @@ source-map-explorer@2.5.3
 typescript-language-server@4.3.3
 vite-plus@0.1.12
 vscode-langservers-extracted@4.8.0
-wrangler@4.51.0
+wrangler@4.93.1
 xcodebuildmcp@2.0.0-beta.1
 yalc@1.0.0-pre.53
 yet-another-opencode-cursor-auth@0.1.1-dev.14.f2de9ef
