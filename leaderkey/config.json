@@ -7,41 +7,9 @@
       "value" : "raycast-x://extensions/raycast/navigation/search-menu-bar-items"
     },
     {
-      "actions" : [
-        {
-          "key" : "o",
-          "label" : "Zen Open",
-          "type" : "application",
-          "value" : "/Applications/Zen Browser.app"
-        },
-        {
-          "key" : "1",
-          "label" : "Zen Workspace 1",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 1"
-        },
-        {
-          "key" : "2",
-          "label" : "Zen Workspace 2",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 2"
-        },
-        {
-          "key" : "3",
-          "label" : "Zen Workspace 3",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 3"
-        },
-        {
-          "key" : "4",
-          "label" : "Zen Workspace 4",
-          "type" : "command",
-          "value" : "~/dotfiles/raycast/script-commands/enabled-commands/zen-open-workspace.sh 4"
-        }
-      ],
       "key" : "z",
-      "label" : "Zen Browser",
-      "type" : "group"
+      "type" : "application",
+      "value" : "/Applications/Zen Browser.app"
     },
     {
       "key" : "1",
@@ -75,9 +43,19 @@
     },
 
     {
+      "key" : "h",
+      "type" : "application",
+      "value" : "/Applications/Helium.app"
+    },
+    {
       "key" : "t",
       "type" : "application",
       "value" : "/Applications/Ghostty.app"
+    },
+    {
+      "key" : "l",
+      "type" : "application",
+      "value" : "/Applications/Linear.app"
     },
     {
       "actions" : [
@@ -95,11 +73,6 @@
           "key" : "e",
           "type" : "application",
           "value" : "/Applications/Microsoft Edge Dev.app"
-        },
-        {
-          "key" : "h",
-          "type" : "application",
-          "value" : "/Applications/Helium.app"
         },
         {
           "key" : "z",
