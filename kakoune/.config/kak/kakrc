@@ -761,3 +761,5 @@ bundle kakship 'https://github.com/Yukaii/kakship' %{
 
 bundle texture 'https://github.com/ftonneau/texture.kak' %{
 }
+
+bundle dir-kak 'https://git.sr.ht/~hadronized/dir.kak' %{}
