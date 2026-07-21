@@ -10,13 +10,22 @@ close_pane = "prefix+&"
 
 [[keys.command]]
 key = "prefix+alt+l"
-type = "shell"
-command = "herdr-popup lazygit"
-description = "popup lazygit"
+type = "popup"
+command = "lazygit"
+description = "run lazygit"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+f"
+type = "plugin_action"
+command = "sessionizer.open"
+description = "project sessionizer"
 
 [theme]
 name = "kanagawa"
 
+auto_switch = false
 [ui.sound]
 enabled = false
 
@@ -36,4 +45,3 @@ reveal_hidden_cursor_for_cjk_ime = true
 
 [terminal]
 default_shell = "/opt/homebrew/bin/fish"
-
