@@ -19,8 +19,8 @@ height = "80%"
 [[keys.command]]
 key = "prefix+f"
 type = "plugin_action"
-command = "sessionizer.open"
-description = "project sessionizer"
+command = "sessionizer.pick"
+description = "fuzzy-switch workspace"
 
 [theme]
 name = "kanagawa"
@@ -35,8 +35,8 @@ delivery = "herdr"
 [ui]
 show_agent_labels_on_pane_borders = false
 prompt_new_tab_name = false
-
-agent_panel_scope = "all"
+pane_gaps = false
+pane_outer_borders = false
 
 [experimental]
 kitty_graphics = true
