@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Define the width of the bar graph
+GRAPH_WIDTH=30
+# Define the maximum expected power draw in milliwatts (e.g., 40W = 40000mW for M1/M2 macs)
+MAX_POWER=40000
+
+# Loop indefinitely to update the display
+while true; do
+    # Run powermetrics and capture the output
+    POWER_OUTPUT=$(sudo powermetrics -i 1000 -s cpu_power,gpu_power -n 2 2>/dev/null)
+
+    # Extract combined power in mW (milliwatts)
+    COMBINED_POWER_MW=$(echo "$POWER_OUTPUT" | grep "Combined Power" | tail -1 | grep -oE '[0-9]+' | tail -1)
+
+    if [ -n "$COMBINED_POWER_MW" ] && [ "$COMBINED_POWER_MW" -gt 0 ]; then
+        # Convert to Watts
+        COMBINED_POWER_W=$(LC_NUMERIC=C awk "BEGIN {printf \"%.1f\", $COMBINED_POWER_MW / 1000}")
+
+        # Calculate the length of the bar graph
+        BAR_LENGTH=$(LC_NUMERIC=C awk "BEGIN {printf \"%d\", ($COMBINED_POWER_MW / $MAX_POWER) * $GRAPH_WIDTH}")
+
+        # Build the bar string
+        BAR=""
+        for ((i=0; i<$BAR_LENGTH; i++)); do
+            BAR=$BAR"#"
+        done
+
+        # Display power with bar graph
+        printf "\r%5.1f W |%-*s|" "$COMBINED_POWER_W" "$GRAPH_WIDTH" "$BAR"
+    fi
+done
