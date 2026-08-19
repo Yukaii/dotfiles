@@ -37,8 +37,6 @@ end
 fish_add_path /opt/homebrew/opt/gnu-getopt/bin
 fish_add_path /opt/homebrew/opt/make/libexec/gnubin
 
-fish_add_path "$HOME/Programs/kakoune/src"
-
 # Environment Variables
 set -x PIPENV_SHELL_FANCY 1
 set -x PIPENV_IGNORE_VIRTUALENVS 1
@@ -49,6 +47,7 @@ set -x ENABLE_BACKGROUND_TASKS 1
 set -x ANDROID_HOME "$HOME/Library/Android/sdk"
 set -gx JAVA_HOME (/usr/libexec/java_home -v 17)
 set -gx PATH $JAVA_HOME/bin $PATH
+set -gx TERMSCOPE_OPENER "k"
 
 alias ibrew='arch -x86_64 /usr/local/homebrew/bin/brew'
 alias mbrew='arch -arm64e /opt/homebrew/bin/brew'
@@ -139,3 +138,15 @@ set -gx PATH $PATH /Users/yukai/.cache/lm-studio/bin
 
 # windsurf
 set -gx PATH $PATH /Users/yukai/.codeium/windsurf/bin
+
+# >>> otty shell integration >>>
+# Added by Otty — toggle in Settings > Shell > Shell Integration.
+# Inert unless launched by Otty (it sets $OTTY_SHELL_INTEGRATION).
+if test -n "$OTTY_SHELL_INTEGRATION" -a -r "$OTTY_SHELL_INTEGRATION/otty-integration.fish"
+    source "$OTTY_SHELL_INTEGRATION/otty-integration.fish"
+end
+# <<< otty shell integration <<<
+
+
+# Added by Antigravity CLI installer
+set -gx PATH "/Users/yukai/.local/bin" $PATH

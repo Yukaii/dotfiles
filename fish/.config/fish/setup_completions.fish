@@ -67,3 +67,11 @@ end
 if command -q ov
   ov --completion fish > $completions_dir/ov.fish
 end
+
+if command -q omp
+  omp completions fish > $completions_dir/omp.fish
+end
+
+if command -q workmux
+  workmux completions fish > $completions_dir/workmux.fish 
+end
