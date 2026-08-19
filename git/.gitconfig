@@ -34,19 +34,27 @@
     delete-squashed = "!f() { \
       local defaultBranch=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'); \
       local targetBranch=${1:-$defaultBranch}; \
-      git checkout -q $targetBranch; \
-      git branch --merged | \
-        grep -v \"\\*\" | \
-        grep -vE '^(develop|main|master|production|deploy)$' | \
-        xargs -n 1 git branch -d; \
+      local worktreeBranches=$(git worktree list --porcelain | sed -n 's/^branch refs\\/heads\\///p'); \
+      git checkout -q \"$targetBranch\"; \
+      git branch --merged --format='%(refname:short)' | \
+        while read branch; do \
+          if [[ -n $branch && $branch != \"$targetBranch\" && ! $branch =~ ^(develop|main|master|production|deploy)$ ]]; then \
+            if ! printf '%s\\n' \"$worktreeBranches\" | grep -Fxq \"$branch\"; then \
+              git branch -d \"$branch\"; \
+            fi; \
+          fi; \
+        done; \
       git for-each-ref refs/heads/ \"--format=%(refname:short)\" | \
         while read branch; do \
-          if [[ ! $branch =~ ^(develop|main|master|production|deploy)$ ]]; then \
-            local mergeBase=$(git merge-base $targetBranch $branch); \
-            if [[ $mergeBase != $(git rev-parse $branch) ]]; then \
-              local isSquashed=$(git cherry $targetBranch $(git commit-tree $(git rev-parse $branch^{tree}) -p $mergeBase -m _)); \
+          if [[ -n $branch && $branch != \"$targetBranch\" && ! $branch =~ ^(develop|main|master|production|deploy)$ ]]; then \
+            if printf '%s\\n' \"$worktreeBranches\" | grep -Fxq \"$branch\"; then \
+              continue; \
+            fi; \
+            local mergeBase=$(git merge-base \"$targetBranch\" \"$branch\"); \
+            if [[ $mergeBase != $(git rev-parse \"$branch\") ]]; then \
+              local isSquashed=$(git cherry \"$targetBranch\" $(git commit-tree $(git rev-parse \"$branch^{tree}\") -p $mergeBase -m _)); \
               if [[ $isSquashed == \"-\"* ]]; then \
-                git branch -D $branch; \
+                git branch -D \"$branch\"; \
               fi; \
             fi; \
           fi; \
