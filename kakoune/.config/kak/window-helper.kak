@@ -1,6 +1,6 @@
 define-command terminal-popup-wrapper -params .. -docstring '
 terminal-popup-wrapper [<program> [<arguments>...]]: open a popup using the active terminal multiplexer.
-Uses herdr-popup under Herdr, tsm popup under tmux when available, and tmux-popup as a fallback.' \
+Uses a native Herdr plugin popup, tsm popup under tmux when available, and tmux-popup as a fallback.' \
 %{
   evaluate-commands %sh{
     quote_arg() {
@@ -14,7 +14,13 @@ Uses herdr-popup under Herdr, tsm popup under tmux when available, and tmux-popu
     }
 
     if [ -n "${kak_client_env_HERDR_ENV:-${HERDR_ENV:-}}" ] && command -v herdr-popup >/dev/null 2>&1; then
-      printf 'nop %%sh{ herdr-popup'
+      cwd="${kak_client_env_PWD:-$PWD}"
+      printf 'nop %%sh{ herdr-popup --cwd %s' "$(quote_arg "$cwd")"
+      printf ' --env %s' "$(quote_arg "KAK_SESSION=$kak_session")"
+      printf ' --env %s' "$(quote_arg "KAK_CLIENT=$kak_client")"
+      printf ' --env %s' "$(quote_arg "KKS_SESSION=$kak_session")"
+      printf ' --env %s' "$(quote_arg "KKS_CLIENT=$kak_client")"
+      printf ' --'
       emit_kak_args "$@"
       printf ' >/dev/null 2>&1 & }'
       exit 0

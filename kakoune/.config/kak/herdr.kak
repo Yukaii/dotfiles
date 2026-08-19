@@ -75,36 +75,6 @@ If a program is provided, it is executed in the new tab.' \
 }
 complete-command herdr-terminal-window shell
 
-define-command herdr-terminal-popup -params .. -docstring '
-herdr-terminal-popup [<program> [<arguments>...]]: open a zoomed herdr pane as a popup overlay.
-Splits downward at 50% then zooms the new pane. If a program is provided, it is executed in the new pane.' \
-%{
-    evaluate-commands %sh{
-        cwd="${kak_client_env_PWD:-$PWD}"
-        resp=$(herdr pane split --current --direction down --ratio 0.5 \
-            --cwd "$cwd" --focus \
-            --env "KAK_SESSION=$kak_session" \
-            --env "KAK_CLIENT=$kak_client" \
-            --env "KKS_SESSION=$kak_session" \
-            --env "KKS_CLIENT=$kak_client" 2>&1)
-
-        pane_id=$(printf '%s' "$resp" | jq -r '.result.pane.pane_id // empty' 2>/dev/null)
-        [ -z "$pane_id" ] && pane_id=$(printf '%s' "$resp" | head -n1 | tr -d '[:space:]')
-
-        [ -n "$pane_id" ] && herdr pane zoom "$pane_id" --on >/dev/null 2>&1
-
-        if [ -z "$pane_id" ] || [ $# -eq 0 ]; then
-            exit 0
-        fi
-
-        pane_id_esc=$(printf '%s' "$pane_id" | sed "s/'/''/g")
-        program=$(for arg do printf " '%s'" "$(printf '%s' "$arg" | sed "s/'/'\\\\''/g")"; done)
-        program_esc=$(printf '%s' "${program# }" | sed "s/'/''/g")
-        printf "herdr-run-in-pane '%s' '%s'" "$pane_id_esc" "$program_esc"
-    }
-}
-complete-command herdr-terminal-popup shell
-
 define-command herdr-terminal-horizontal -params .. -docstring '
 herdr-terminal-horizontal [<program> [<arguments>...]]: split the current herdr pane downward (bottom panel, 33%).
 If a program is provided, it is executed in the new pane.' \

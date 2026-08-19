@@ -6,22 +6,20 @@ usage() {
 Usage:
   herdr-popup [options] [--] [command [args...]]
 
-Create a Herdr popup-like pane by splitting the current pane, focusing it, and
-zooming it. If a command is provided, run it in the new pane.
+Open a command in a native Herdr popup. With no command, open a login shell.
 
 Options:
-  -d, --direction down|right  Split direction. Default: down
-  -r, --ratio RATIO           Split ratio. Default: 0.5
-  -c, --cwd DIR               Working directory. Default: current directory
-      --keep-open             Do not close the pane after the command exits
-      --no-zoom               Create the pane without zooming it
-  -h, --help                  Show this help
+  -c, --cwd DIR       Working directory. Default: current directory
+  -w, --width SIZE    Popup width in cells or percent. Default: 80%
+  -H, --height SIZE   Popup height in cells or percent. Default: 80%
+  -e, --env KEY=VALUE Add an environment variable to the popup process
+  -h, --help          Show this help
 
 Examples:
   herdr-popup
   herdr-popup lazygit
   herdr-popup -- rg TODO
-  herdr-popup --keep-open -- bash -lc 'npm test; exec "$SHELL"'
+  herdr-popup --cwd /tmp --env FOO=bar -- bash -lc 'printf "%s\n" "$FOO"'
 EOF
 }
 
@@ -30,122 +28,80 @@ die() {
   exit 1
 }
 
-quote_arg() {
-  printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\''/g")"
-}
-
-extract_pane_id() {
-  if command -v jq >/dev/null 2>&1; then
-    printf '%s' "$1" | jq -r '.result.pane.pane_id // .result.root_pane.pane_id // empty' 2>/dev/null
-    return
-  fi
-
-  printf '%s' "$1" | sed -n 's/.*"pane_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1
-}
-
-wait_and_run() {
-  local pane_id="$1"
-  local command_line="$2"
-  local attempts=20
-
-  while [ "$attempts" -gt 0 ]; do
-    sleep 0.1
-    if herdr pane read "$pane_id" --source visible --lines 1 2>&1 | grep -q '[^[:space:]]'; then
-      sleep 0.1
-      herdr pane run "$pane_id" "$command_line" >/dev/null
-      return
-    fi
-    attempts=$((attempts - 1))
-  done
-
-  herdr pane run "$pane_id" "$command_line" >/dev/null
-}
-
-direction="down"
-ratio="0.5"
 cwd="$PWD"
-zoom="true"
-keep_open="false"
+width="80%"
+height="80%"
+extra_env=()
+extra_env_count=0
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    -d|--direction)
-      [ "$#" -ge 2 ] || die "$1 requires an argument"
-      direction="$2"
-      shift 2
+  -c | --cwd)
+    [ "$#" -ge 2 ] || die "$1 requires an argument"
+    cwd="$2"
+    shift 2
+    ;;
+  -w | --width)
+    [ "$#" -ge 2 ] || die "$1 requires an argument"
+    width="$2"
+    shift 2
+    ;;
+  -H | --height)
+    [ "$#" -ge 2 ] || die "$1 requires an argument"
+    height="$2"
+    shift 2
+    ;;
+  -e | --env)
+    [ "$#" -ge 2 ] || die "$1 requires an argument"
+    case "$2" in
+    *=*)
+      extra_env[$extra_env_count]="$2"
+      extra_env_count=$((extra_env_count + 1))
       ;;
-    -r|--ratio)
-      [ "$#" -ge 2 ] || die "$1 requires an argument"
-      ratio="$2"
-      shift 2
-      ;;
-    -c|--cwd)
-      [ "$#" -ge 2 ] || die "$1 requires an argument"
-      cwd="$2"
-      shift 2
-      ;;
-    --keep-open)
-      keep_open="true"
-      shift
-      ;;
-    --no-zoom)
-      zoom="false"
-      shift
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    --)
-      shift
-      break
-      ;;
-    -*)
-      die "unknown option: $1"
-      ;;
-    *)
-      break
-      ;;
+    *) die "$1 requires KEY=VALUE" ;;
+    esac
+    shift 2
+    ;;
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  --)
+    shift
+    break
+    ;;
+  -*)
+    die "unknown option: $1"
+    ;;
+  *)
+    break
+    ;;
   esac
 done
 
-case "$direction" in
-  down|right) ;;
-  *) die "direction must be 'down' or 'right'" ;;
-esac
-
 command -v herdr >/dev/null 2>&1 || die "herdr not found in PATH"
 
-resp=$(herdr pane split --current --direction "$direction" --ratio "$ratio" --cwd "$cwd" --focus 2>&1) || {
-  printf '%s\n' "$resp" >&2
-  exit 1
-}
+herdr_args=(
+  plugin pane open
+  --plugin kakoune-popup
+  --entrypoint command
+  --placement popup
+  --width "$width"
+  --height "$height"
+  --cwd "$cwd"
+)
 
-pane_id=$(extract_pane_id "$resp")
-[ -n "$pane_id" ] || pane_id=$(printf '%s' "$resp" | head -n 1 | tr -d '[:space:]')
-[ -n "$pane_id" ] || die "could not determine new pane id"
-
-if [ "$zoom" = "true" ]; then
-  herdr pane zoom "$pane_id" --on >/dev/null
-fi
-
-[ "$#" -gt 0 ] || exit 0
-
-program=""
-for arg do
-  quoted=$(quote_arg "$arg")
-  if [ -z "$program" ]; then
-    program="$quoted"
-  else
-    program="$program $quoted"
-  fi
+index=0
+while [ "$index" -lt "$extra_env_count" ]; do
+  herdr_args+=(--env "${extra_env[$index]}")
+  index=$((index + 1))
 done
 
-if [ "$keep_open" = "true" ]; then
-  command_line="$program"
-else
-  pane_id_quoted=$(quote_arg "$pane_id")
-  command_line="$program; herdr pane close $pane_id_quoted"
-fi
+herdr_args+=(--env "KAKOUNE_POPUP_ARGC=$#")
+index=0
+for arg; do
+  herdr_args+=(--env "KAKOUNE_POPUP_ARG_$index=$arg")
+  index=$((index + 1))
+done
 
-wait_and_run "$pane_id" "$command_line" &
+exec herdr "${herdr_args[@]}"
