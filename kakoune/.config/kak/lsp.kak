@@ -145,14 +145,14 @@ declare-option -hidden str lsp_server_harper_lsp %{
 
 hook -group lsp-filetype-javascript global BufSetOption filetype=(?:javascript|typescript) %{
   set-option buffer lsp_servers %exp{
-    [tsgo]
-    command = "%val{home}/.bun/install/global/node_modules/@typescript/native-preview-darwin-arm64/lib/tsgo"
-    args = ["lsp"]
-    root_globs = ["package.json", "tsconfig.json", "jsconfig.json", ".git", ".hg"]
-    settings_section = "_"
-    [tsgo.settings._]
-    # quotePreference = "double"
-    # typescript.format.semicolons = "insert"
+    [vtsls]
+    command = "vtsls"
+    args = ["--stdio"]
+    root_globs = ["tsconfig.json", "jsconfig.json", "package.json", ".git"]
+    settings_section = "typescript"
+    [vtsls.settings.typescript.inlayHints]
+    parameterNames.enabled = "all"
+    variableTypes.enabled = true
 
     [vscode-eslint-language-server]
     root_globs = [".eslintrc", ".eslintrc.json"]
@@ -177,6 +177,15 @@ hook -group lsp-filetype-javascript global BufSetOption filetype=(?:javascript|t
     settings_section = "_"
     [tailwindcss-language-server.settings._]
     editor = {}
+
+    [oxlint]
+    root_globs = ["oxlint.json", ".oxlintrc.json", "package.json", ".git"]
+    command = "oxlint"
+    args = ["--lsp"]
+    [oxlint.settings]
+    run = "onType"
+    fixKind = "all"
+    unusedDisableDirectives = "deny"
 
     %opt{lsp_server_typos}
     %opt{lsp_server_simple_completion}
