@@ -13,7 +13,6 @@ source "%val{config}/ghostty.kak"
 source "%val{config}/tmux.kak"
 source "%val{config}/kitty.kak"
 source "%val{config}/ykmx.kak"
-source "%val{config}/herdr.kak"
 source "%val{config}/window-helper.kak"
 source "%val{config}/color-highlighter.kak"
 source "%val{config}/highlight.kak"
@@ -249,12 +248,6 @@ map global find-actions -docstring 'browse on github'                  'h'  ':br
 evaluate-commands %sh{
   if [ -n "${kak_client_env_YKMX_CONTROL_PIPE:-$YKMX_CONTROL_PIPE}" ]; then
     echo "try %{ require-module ykmx }"
-  fi
-}
-
-evaluate-commands %sh{
-  if [ -n "${kak_client_env_HERDR_ENV:-$HERDR_ENV}" ]; then
-    echo "try %{ set-option global windowing_modules herdr; require-module herdr; set-option global windowing_module herdr }"
   fi
 }
 
@@ -529,6 +522,14 @@ hook global ModeChange .*:insert:.* %{
 
 source "%val{config}/bundle/kak-bundle/rc/kak-bundle.kak"
 bundle-noload kak-bundle https://github.com/jdugan6240/kak-bundle
+
+bundle herdr-kak 'https://github.com/Yukaii/herdr.kak' %{
+  evaluate-commands %sh{
+    if [ -n "${kak_client_env_HERDR_ENV:-$HERDR_ENV}" ]; then
+      echo "try %{ set-option global windowing_modules herdr; require-module herdr; herdr-enable-default-aliases; set-option global windowing_module herdr }"
+    fi
+  }
+}
 
 
 bundle smarttab "https://github.com/andreyorst/smarttab.kak"

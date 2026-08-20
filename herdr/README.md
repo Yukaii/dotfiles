@@ -1,11 +1,10 @@
 # Herdr
 
-Stow the command and Herdr packages, then install the sessionizer and link the
-local Kakoune popup plugin once per machine:
+Stow the Herdr package, then install the plugins once per machine:
 
 ```sh
-stow bin herdr
+stow herdr
 herdr plugin install salkhalil/herdr-sessionizer --yes
-herdr plugin link "$HOME/.config/herdr/plugins-src/kakoune-popup" --enabled
+herdr plugin install Yukaii/herdr-kakoune-popup --ref v0.1.1 --yes
 herdr server reload-config
 ```
