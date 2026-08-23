@@ -1,0 +1,8 @@
+[settings]
+auto_update = true
+
+[tools]
+"github:BurntSushi/ripgrep" = "latest"
+node = "lts"
+"npm:@opencode-ai/cli" = "next"
+"npm:opencode-ai" = "latest"
