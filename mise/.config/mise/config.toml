@@ -1,0 +1,13 @@
+[tools]
+bun = "latest"
+"cargo:cargo-binstall" = "latest"
+"cargo:giallo-kak" = "0.3.1"
+"github:BurntSushi/ripgrep" = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:@openai/codex" = "latest"
+"npm:druk" = "latest"
+"npm:opencode-ai" = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["node"]
+auto_update = true
