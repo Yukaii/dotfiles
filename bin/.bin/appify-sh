@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+# appify-sh - Turn TUI commands into native macOS .app bundles powered by Kitty, WezTerm, or Ghostty
+#
+# Backend Findings & Differences:
+# - kitty:   Works best if you want full Kitty image protocol (inline images, avatars, album art).
+#            Configured with -o confirm_os_window_close=0 for prompt-free launch and exit.
+# - wezterm: Works well, prompt-free, and reliable.
+# - ghostty: Shows an alert ("terminal still has a running process") on launch on macOS;
+#            you can hit Cancel after launch and it appears only once.
+set -euo pipefail
+
+NAME=""
+ICON=""
+TERMINAL="kitty"
+OUTPUT_DIR="$HOME/Applications"
+BUNDLE_ID=""
+CWD=""
+USE_SHELL=false
+ENV_VARS=()
+EXTRA_ARGS=()
+
+usage() {
+  cat <<EOF
+Usage: appify-sh [options] [--] <command> [args...]
+
+Options:
+  -n, --name <name>          Application display name (default: derived from command)
+  -i, --icon <path>          Path to icon (.png or .icns)
+  -t, --terminal <engine>    Terminal backend: 'kitty' (default), 'wezterm', or 'ghostty'
+  -o, --output <dir>         Output directory (default: ~/Applications)
+  -b, --bundle-id <id>       Bundle Identifier (default: com.local.<name>)
+  -e, --env <KEY=VAL>        Set environment variable (can be used multiple times)
+  --cwd <path>               Initial working directory
+  --shell                    Run command inside a shell session
+  -h, --help                 Show this help message
+
+Backends:
+  kitty    (default) Works best if you want full Kitty image protocol (avatars, emotes, album art).
+  wezterm  Works well, prompt-free, and reliable.
+  ghostty  Shows a confirmation alert upon launch; hit Cancel once to dismiss (appears only once).
+
+Examples:
+  appify-sh -n "Concord" -i /Applications/Discord.app/Contents/Resources/electron.icns -- concord
+  appify-sh -n "SpotaTUI" -i /Applications/Spotify.app/Contents/Resources/AppIcon.icns -- spotatui
+  appify-sh -n "Slk" -i /Applications/Slack.app/Contents/Resources/electron.icns -- slk
+  appify-sh -n "Btop" -t wezterm -- btop
+EOF
+  exit 0
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -n|--name)
+      NAME="$2"
+      shift 2
+      ;;
+    -i|--icon)
+      ICON="$2"
+      shift 2
+      ;;
+    -t|--terminal)
+      TERMINAL="$2"
+      shift 2
+      ;;
+    -o|--output)
+      OUTPUT_DIR="$2"
+      shift 2
+      ;;
+    -b|--bundle-id)
+      BUNDLE_ID="$2"
+      shift 2
+      ;;
+    -e|--env)
+      ENV_VARS+=("$2")
+      shift 2
+      ;;
+    --cwd)
+      CWD="$2"
+      shift 2
+      ;;
+    --shell)
+      USE_SHELL=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      ;;
+    --)
+      shift
+      EXTRA_ARGS=("$@")
+      break
+      ;;
+    *)
+      EXTRA_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+if [[ ${#EXTRA_ARGS[@]} -eq 0 ]]; then
+  echo "Error: No command specified." >&2
+  usage
+fi
+
+COMMAND="${EXTRA_ARGS[0]}"
+CMD_ARGS=("${EXTRA_ARGS[@]:1}")
+
+if [[ -z "$NAME" ]]; then
+  NAME="$(basename "$COMMAND")"
+fi
+
+if [[ -z "$BUNDLE_ID" ]]; then
+  SLUG="$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '.' | sed 's/^\.//;s/\.$//')"
+  BUNDLE_ID="com.local.${SLUG}"
+fi
+
+APP_BUNDLE="${OUTPUT_DIR}/${NAME}.app"
+CONTENTS="${APP_BUNDLE}/Contents"
+MACOS="${CONTENTS}/MacOS"
+RESOURCES="${CONTENTS}/Resources"
+
+mkdir -p "$OUTPUT_DIR"
+rm -rf "$APP_BUNDLE"
+mkdir -p "$MACOS" "$RESOURCES"
+
+# --- Icon Processing ---
+if [[ -n "$ICON" && -f "$ICON" ]]; then
+  if [[ "$ICON" == *.icns ]]; then
+    cp "$ICON" "$RESOURCES/AppIcon.icns"
+  else
+    TEMP_DIR="$(mktemp -d)"
+    ICONSET_DIR="${TEMP_DIR}/AppIcon.iconset"
+    mkdir -p "$ICONSET_DIR"
+
+    sips -z 16 16     "$ICON" --out "$ICONSET_DIR/icon_16x16.png" >/dev/null 2>&1 || true
+    sips -z 32 32     "$ICON" --out "$ICONSET_DIR/icon_16x16@2x.png" >/dev/null 2>&1 || true
+    sips -z 32 32     "$ICON" --out "$ICONSET_DIR/icon_32x32.png" >/dev/null 2>&1 || true
+    sips -z 64 64     "$ICON" --out "$ICONSET_DIR/icon_32x32@2x.png" >/dev/null 2>&1 || true
+    sips -z 128 128   "$ICON" --out "$ICONSET_DIR/icon_128x128.png" >/dev/null 2>&1 || true
+    sips -z 256 256   "$ICON" --out "$ICONSET_DIR/icon_128x128@2x.png" >/dev/null 2>&1 || true
+    sips -z 256 256   "$ICON" --out "$ICONSET_DIR/icon_256x256.png" >/dev/null 2>&1 || true
+    sips -z 512 512   "$ICON" --out "$ICONSET_DIR/icon_256x256@2x.png" >/dev/null 2>&1 || true
+    sips -z 512 512   "$ICON" --out "$ICONSET_DIR/icon_512x512.png" >/dev/null 2>&1 || true
+    sips -z 1024 1024 "$ICON" --out "$ICONSET_DIR/icon_512x512@2x.png" >/dev/null 2>&1 || true
+
+    iconutil -c icns "$ICONSET_DIR" -o "$RESOURCES/AppIcon.icns" >/dev/null 2>&1 || true
+    rm -rf "$TEMP_DIR"
+  fi
+fi
+
+# --- Info.plist ---
+cat <<EOF > "$CONTENTS/Info.plist"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>launcher</string>
+    <key>CFBundleIdentifier</key>
+    <string>${BUNDLE_ID}</string>
+    <key>CFBundleName</key>
+    <string>${NAME}</string>
+    <key>CFBundleDisplayName</key>
+    <string>${NAME}</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
+EOF
+
+# --- Command string preparation ---
+RUN_CMD="$COMMAND"
+if [[ ${#CMD_ARGS[@]} -gt 0 ]]; then
+  RUN_CMD="$RUN_CMD ${CMD_ARGS[*]}"
+fi
+
+if [[ "$USE_SHELL" == "true" ]]; then
+  RUN_CMD="\$SHELL -c '$RUN_CMD'"
+fi
+
+# --- Inherit Environment Variables ---
+# Convert $HOME in current PATH to \$HOME for user/machine portability
+INHERITED_PATH="${PATH//${HOME}/\$HOME}"
+
+ENV_EXPORTS=""
+for env_entry in "${ENV_VARS[@]+"${ENV_VARS[@]}"}"; do
+  ENV_EXPORTS="${ENV_EXPORTS}export ${env_entry}"$'\n'
+done
+
+# --- Backend Launcher ---
+if [[ "$TERMINAL" == "kitty" ]]; then
+  CWD_OPT=""
+  if [[ -n "$CWD" ]]; then
+    CWD_OPT="-d \"$CWD\""
+  fi
+
+  cat <<EOF > "$MACOS/launcher"
+#!/usr/bin/env bash
+export PATH="${INHERITED_PATH}:\$PATH"
+${ENV_EXPORTS}
+KITTY_BIN="\$(command -v kitty 2>/dev/null || echo "/Applications/kitty.app/Contents/MacOS/kitty")"
+exec "\$KITTY_BIN" \
+  --title "$NAME" \
+  -o confirm_os_window_close=0 \
+  ${CWD_OPT} \
+  -- $RUN_CMD
+EOF
+
+elif [[ "$TERMINAL" == "wezterm" ]]; then
+  CWD_OPT=""
+  if [[ -n "$CWD" ]]; then
+    CWD_OPT="--cwd \"$CWD\""
+  fi
+
+  cat <<EOF > "$MACOS/launcher"
+#!/usr/bin/env bash
+export PATH="${INHERITED_PATH}:\$PATH"
+${ENV_EXPORTS}
+WEZTERM_BIN="\$(command -v wezterm 2>/dev/null || echo "/opt/homebrew/bin/wezterm")"
+exec "\$WEZTERM_BIN" start --class "$NAME" ${CWD_OPT} -- $RUN_CMD
+EOF
+
+elif [[ "$TERMINAL" == "ghostty" ]]; then
+  CWD_OPT=""
+  if [[ -n "$CWD" ]]; then
+    CWD_OPT="--working-directory=\"$CWD\""
+  fi
+
+  cat <<EOF > "$MACOS/launcher"
+#!/usr/bin/env bash
+export PATH="${INHERITED_PATH}:\$PATH"
+${ENV_EXPORTS}
+exec open -na /Applications/Ghostty.app --args \
+  --title="$NAME" \
+  ${CWD_OPT} \
+  -e "$RUN_CMD"
+EOF
+
+else
+  echo "Error: Unknown terminal backend '$TERMINAL'. Use 'kitty', 'wezterm', or 'ghostty'." >&2
+  exit 1
+fi
+
+chmod +x "$MACOS/launcher"
+touch "$APP_BUNDLE"
+
+echo "✅ Successfully created application: ${APP_BUNDLE}"
