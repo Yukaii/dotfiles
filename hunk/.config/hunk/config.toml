@@ -1,0 +1,4 @@
+theme = "kanagawa-wave"
+sidebar = true
+layout = "split"
+transparent_background = true

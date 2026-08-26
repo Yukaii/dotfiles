@@ -2,8 +2,8 @@
     path = ~/.gitconfig.local
 
 [core]
-	pager = git-split-diffs --color | less -RFX
-	; pager = hunk pager
+	; pager = git-split-diffs --color | less -RFX
+	pager = hunk pager --fast --sidebar --mode split
 	excludesfile = ~/.gitignore_global
 	difftool = true
 [delta]
