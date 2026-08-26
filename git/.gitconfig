@@ -36,7 +36,7 @@
       local targetBranch=${1:-$defaultBranch}; \
       local worktreeBranches=$(git worktree list --porcelain | sed -n 's/^branch refs\\/heads\\///p'); \
       git checkout -q \"$targetBranch\"; \
-      git branch --merged --format='%(refname:short)' | \
+      git branch --merged \"$targetBranch\" --format='%(refname:short)' | \
         while read branch; do \
           if [[ -n $branch && $branch != \"$targetBranch\" && ! $branch =~ ^(develop|main|master|production|deploy)$ ]]; then \
             if ! printf '%s\\n' \"$worktreeBranches\" | grep -Fxq \"$branch\"; then \
@@ -51,7 +51,7 @@
               continue; \
             fi; \
             local mergeBase=$(git merge-base \"$targetBranch\" \"$branch\"); \
-            if [[ $mergeBase != $(git rev-parse \"$branch\") ]]; then \
+            if [[ -n $mergeBase && $mergeBase != $(git rev-parse \"$branch\") ]]; then \
               local isSquashed=$(git cherry \"$targetBranch\" $(git commit-tree $(git rev-parse \"$branch^{tree}\") -p $mergeBase -m _)); \
               if [[ $isSquashed == \"-\"* ]]; then \
                 git branch -D \"$branch\"; \
