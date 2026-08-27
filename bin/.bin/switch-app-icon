@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  switch-app-icon APP IMAGE
+  switch-app-icon --reset APP
+
+Set or reset a macOS application's Finder custom icon. APP may be an app path or
+a name found in ~/Applications or /Applications. IMAGE may be any format macOS
+can read, including PNG, JPEG, HEIC, TIFF, WebP, and ICNS.
+
+Examples:
+  switch-app-icon "Ghostty" ~/Pictures/ghostty.png
+  switch-app-icon /Applications/Ghostty.app custom.icns
+  switch-app-icon --reset "Ghostty"
+EOF
+}
+
+fail() {
+  echo "switch-app-icon: $*" >&2
+  exit 1
+}
+
+find_app() {
+  local requested=$1
+  local app_name=$requested
+  local candidate
+
+  if [[ -d "$requested" ]]; then
+    printf '%s\n' "$requested"
+    return
+  fi
+
+  if [[ "$app_name" != *.app ]]; then
+    app_name="${app_name}.app"
+  fi
+
+  for candidate in \
+    "$HOME/Applications/$app_name" \
+    "/Applications/$app_name"; do
+    if [[ -d "$candidate" ]]; then
+      printf '%s\n' "$candidate"
+      return
+    fi
+  done
+
+  return 1
+}
+
+reset=false
+
+case ${1:-} in
+-h | --help)
+  usage
+  exit 0
+  ;;
+--reset)
+  reset=true
+  shift
+  ;;
+esac
+
+if [[ "$reset" == true ]]; then
+  [[ $# -eq 1 ]] || {
+    usage >&2
+    exit 2
+  }
+else
+  [[ $# -eq 2 ]] || {
+    usage >&2
+    exit 2
+  }
+fi
+
+app_path=$(find_app "$1") || fail "application not found: $1"
+
+if [[ "$reset" == true ]]; then
+  osascript -l JavaScript - "$app_path" <<'JXA'
+function run(argv) {
+  ObjC.import("AppKit");
+
+  const appPath = $(argv[0]).stringByStandardizingPath;
+  if (!$.NSWorkspace.sharedWorkspace.setIconForFileOptions(undefined, appPath, 0)) {
+    throw new Error("Could not reset icon: " + argv[0]);
+  }
+}
+JXA
+  echo "Reset icon: $app_path"
+  exit 0
+fi
+
+icon_path=$2
+[[ -f "$icon_path" ]] || fail "image not found: $icon_path"
+
+osascript -l JavaScript - "$app_path" "$icon_path" <<'JXA'
+function run(argv) {
+  ObjC.import("AppKit");
+
+  const appPath = $(argv[0]).stringByStandardizingPath;
+  const iconPath = $(argv[1]).stringByStandardizingPath;
+  const icon = $.NSImage.alloc.initWithContentsOfFile(iconPath);
+
+  if (!icon) {
+    throw new Error("Unsupported or unreadable image: " + argv[1]);
+  }
+  if (!$.NSWorkspace.sharedWorkspace.setIconForFileOptions(icon, appPath, 0)) {
+    throw new Error("Could not set icon: " + argv[0]);
+  }
+}
+JXA
+
+echo "Updated icon: $app_path"

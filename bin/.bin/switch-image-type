@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: switch-image-type [-f|--force] INPUT OUTPUT
+
+Convert an image to the file type named by OUTPUT's extension using macOS sips.
+The destination is not overwritten unless --force is given.
+
+Examples:
+  switch-image-type photo.webp photo.png
+  switch-image-type logo.png AppIcon.icns
+  switch-image-type --force scan.heic scan.jpg
+EOF
+}
+
+fail() {
+  echo "switch-image-type: $*" >&2
+  exit 1
+}
+
+force=false
+
+case ${1:-} in
+-h | --help)
+  usage
+  exit 0
+  ;;
+-f | --force)
+  force=true
+  shift
+  ;;
+esac
+
+[[ $# -eq 2 ]] || {
+  usage >&2
+  exit 2
+}
+
+input=$1
+output=$2
+
+[[ -f "$input" ]] || fail "input file not found: $input"
+[[ ! -d "$output" ]] || fail "OUTPUT must be a file path, not a directory"
+[[ "$input" != "$output" ]] || fail "INPUT and OUTPUT must be different files"
+
+if [[ -e "$output" && "$force" != true ]]; then
+  fail "output already exists (use --force): $output"
+fi
+
+output_name=$(basename "$output")
+if [[ "$output_name" != *.* || "$output_name" == .* ]]; then
+  fail "OUTPUT needs a file extension"
+fi
+
+extension=${output_name##*.}
+extension=$(printf '%s' "$extension" | tr '[:upper:]' '[:lower:]')
+
+case $extension in
+jpg | jpeg) format=jpeg ;;
+tif | tiff) format=tiff ;;
+*) format=$extension ;;
+esac
+
+mkdir -p "$(dirname "$output")"
+sips -s format "$format" "$input" --out "$output" >/dev/null
+echo "Converted image: $output"
