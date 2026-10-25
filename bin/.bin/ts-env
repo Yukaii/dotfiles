@@ -3,6 +3,7 @@ set -e
 
 # The name for the Docker image
 IMAGE_NAME="tailscale-dev-env"
+PROG=$(basename "$0")
 
 # --- SUBCOMMANDS ---
 
@@ -17,7 +18,7 @@ build_image() {
         ;;
       *)
         echo "Unknown option for 'build': $1" >&2
-        echo "Usage: $0 build [--image-name <custom-name>]" >&2
+        echo "Usage: ${PROG} build [--image-name <custom-name>]" >&2
         exit 1
         ;;
     esac
@@ -33,20 +34,11 @@ build_image() {
 # Start from a base image
 FROM debian:12-slim
 
-# Install dependencies, including ping, vim, mosh, openssh-server, net-tools, and locale support
-RUN apt-get update && apt-get install -y curl gnupg ssh openssh-server net-tools iputils-ping vim mosh locales && rm -rf /var/lib/apt/lists/*
+# Install dependencies. No sshd on purpose: anything listening here is reachable
+# from the whole tailnet. Use `ts-env shell` for a shell inside the container.
+RUN apt-get update && apt-get install -y curl gnupg openssh-client net-tools iproute2 iputils-ping vim locales && rm -rf /var/lib/apt/lists/*
 
-# Configure SSH
-RUN mkdir -p /var/run/sshd /root/.ssh_writable && \
-    echo 'root:tailscale' | chpasswd && \
-    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
-    sed -i 's/#ListenAddress 0.0.0.0/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config && \
-    sed -i 's|#AuthorizedKeysFile.*|AuthorizedKeysFile /root/.ssh_writable/authorized_keys|' /etc/ssh/sshd_config && \
-    ssh-keygen -A
-
-# Configure UTF-8 locale for mosh
+# Configure UTF-8 locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen
 ENV LANG=en_US.UTF-8
@@ -77,16 +69,19 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | t
       '}' \
       'trap cleanup INT TERM' \
       '' \
-      'echo "Starting SSH server..."' \
-      'service ssh start || true' \
-      'sleep 1' \
-      'service ssh status || true' \
-      'netstat -tlnp | grep :22 >/dev/null 2>&1 || echo "SSH not listening on port 22"' \
-      '' \
       'start_tailscaled() {' \
       '  mkdir -p /var/run/tailscale' \
       '  echo "Starting Tailscale daemon..."' \
-      '  tailscaled --state="${TAILSCALE_STATE_DIR}" --socket="${TAILSCALE_SOCKET}" &' \
+      '  # Built-in proxies let the host reach this tailnet without an SSH tunnel.' \
+      '  # Bind to eth0 only (where docker -p forwards to): on 0.0.0.0 they would' \
+      '  # also be an open proxy for every peer on the tailnet. Fail closed.' \
+      '  BIND_ADDR=$(ip -4 -o addr show dev eth0 2>/dev/null | sed -n "s/.*inet \([0-9.]*\).*/\1/p" | head -n1)' \
+      '  if [ -z "${BIND_ADDR}" ]; then' \
+      '    echo "No eth0 IPv4 address; proxies bound to 127.0.0.1 (unreachable from host)."' \
+      '    BIND_ADDR=127.0.0.1' \
+      '  fi' \
+      '  tailscaled --state="${TAILSCALE_STATE_DIR}" --socket="${TAILSCALE_SOCKET}" \' \
+      '    --socks5-server="${BIND_ADDR}:1080" --outbound-http-proxy-listen="${BIND_ADDR}:1081" &' \
       '  TAILSCALED_PID=$!' \
       '}' \
       '' \
@@ -98,7 +93,7 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | t
       '    TAILSCALE_FLAGS="${TAILSCALE_FLAGS} --auth-key=${TAILSCALE_AUTH_KEY}"' \
       '    echo "Using auth key for authentication"' \
       '  fi' \
-      '  tailscale up ${TAILSCALE_FLAGS}' \
+      '  tailscale up ${TAILSCALE_FLAGS} ${TAILSCALE_EXTRA_ARGS:-}' \
       '}' \
       '' \
       'start_tailscaled' \
@@ -110,7 +105,6 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg | t
       'fi' \
       '' \
       'echo "Container is ready. Supervising tailscaled connectivity..."' \
-      'echo "SSH root password: tailscale"' \
       '' \
       'while true; do' \
       '  if ! kill -0 "${TAILSCALED_PID}" 2>/dev/null; then' \
@@ -150,13 +144,20 @@ run_container() {
   DATA_DIR_BASE=""
   CUSTOM_IMAGE_NAME=""
   SOCKS5_PORT=""
+  HTTP_PORT=""
   AUTH_KEY=""
+  TS_ARGS=""
+  MOUNT_SSH="false"
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
       --name)
         UNIQUE_NAME="$2"
         shift 2
+        ;;
+      --mount-ssh)
+        MOUNT_SSH="true"
+        shift
         ;;
       --data-dir)
         DATA_DIR_BASE="$2"
@@ -170,13 +171,21 @@ run_container() {
         SOCKS5_PORT="$2"
         shift 2
         ;;
+      --http-port)
+        HTTP_PORT="$2"
+        shift 2
+        ;;
       --auth-key)
         AUTH_KEY="$2"
         shift 2
         ;;
+      --ts-args)
+        TS_ARGS="$2"
+        shift 2
+        ;;
       *)
         echo "Unknown option for 'run': $1" >&2
-        echo "Usage: $0 run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>] [--socks5-port <port>] [--auth-key <key>]" >&2
+        echo "Usage: ${PROG} run --name <unique-name> [--data-dir <path>] [--image-name <custom-name>] [--socks5-port <port>] [--http-port <port>] [--auth-key <key>] [--ts-args '<tailscale up flags>'] [--mount-ssh]" >&2
         exit 1
         ;;
     esac
@@ -184,7 +193,7 @@ run_container() {
 
   if [ -z "$UNIQUE_NAME" ]; then
     echo "Error: 'run' command requires a --name." >&2
-    echo "Usage: $0 run --name <unique-name>" >&2
+    echo "Usage: ${PROG} run --name <unique-name>" >&2
     exit 1
   fi
 
@@ -203,16 +212,25 @@ run_container() {
   # Use custom image name if provided, otherwise use default
   RUN_IMAGE_NAME="${CUSTOM_IMAGE_NAME:-$IMAGE_NAME}"
 
-  # Build Docker run command with optional SOCKS5 port mapping
-  DOCKER_PORTS=""
+  # Publish tailscaled's built-in proxies on localhost only (never the LAN)
+  DOCKER_ARGS=()
   if [ -n "$SOCKS5_PORT" ]; then
-    DOCKER_PORTS="-p ${SOCKS5_PORT}:1080"
+    DOCKER_ARGS+=(-p "127.0.0.1:${SOCKS5_PORT}:1080")
+  fi
+  if [ -n "$HTTP_PORT" ]; then
+    DOCKER_ARGS+=(-p "127.0.0.1:${HTTP_PORT}:1081")
   fi
 
-  # Build environment variables
-  DOCKER_ENV="-e TAILSCALE_HOSTNAME=${HOSTNAME}"
+  DOCKER_ARGS+=(-e "TAILSCALE_HOSTNAME=${HOSTNAME}")
   if [ -n "$AUTH_KEY" ]; then
-    DOCKER_ENV="${DOCKER_ENV} -e TAILSCALE_AUTH_KEY=${AUTH_KEY}"
+    DOCKER_ARGS+=(-e "TAILSCALE_AUTH_KEY=${AUTH_KEY}")
+  fi
+  if [ -n "$TS_ARGS" ]; then
+    DOCKER_ARGS+=(-e "TAILSCALE_EXTRA_ARGS=${TS_ARGS}")
+  fi
+  # Opt-in: only needed to ssh from *inside* the container (ts-env shell).
+  if [ "$MOUNT_SSH" = "true" ]; then
+    DOCKER_ARGS+=(-v "${HOME}/.ssh:/root/.ssh:ro")
   fi
 
   echo "Starting container ${CONTAINER_NAME}..."
@@ -221,16 +239,17 @@ run_container() {
         --device=/dev/net/tun \
         --cap-add=NET_ADMIN \
         -v "${DATA_DIR}":/var/lib/tailscale \
-        -v ~/.ssh:/root/.ssh:ro \
-        ${DOCKER_ENV} \
-        ${DOCKER_PORTS} \
+        "${DOCKER_ARGS[@]}" \
         "${RUN_IMAGE_NAME}"
 
   echo "Container ${CONTAINER_NAME} started with auto-restart policy."
   if [ -n "$SOCKS5_PORT" ]; then
-    echo "SOCKS5 proxy will be available on localhost:${SOCKS5_PORT} once connected"
+    echo "SOCKS5 proxy will be available on 127.0.0.1:${SOCKS5_PORT} once connected"
   fi
-  echo "To get the auth URL, run: $0 logs --name ${UNIQUE_NAME}"
+  if [ -n "$HTTP_PORT" ]; then
+    echo "HTTP proxy will be available on 127.0.0.1:${HTTP_PORT} once connected"
+  fi
+  echo "To get the auth URL, run: ${PROG} login --name ${UNIQUE_NAME}"
 }
 
 show_logs() {
@@ -243,7 +262,7 @@ show_logs() {
         ;;
       *)
         echo "Unknown option for 'logs': $1" >&2
-        echo "Usage: $0 logs --name <unique-name>" >&2
+        echo "Usage: ${PROG} logs --name <unique-name>" >&2
         exit 1
         ;;
     esac
@@ -251,7 +270,7 @@ show_logs() {
 
   if [ -z "$UNIQUE_NAME" ]; then
     echo "Error: 'logs' command requires a --name." >&2
-    echo "Usage: $0 logs --name <unique-name>" >&2
+    echo "Usage: ${PROG} logs --name <unique-name>" >&2
     exit 1
   fi
   CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
@@ -274,7 +293,7 @@ open_shell() {
         ;;
       *)
         echo "Unknown option for 'shell': $1" >&2
-        echo "Usage: $0 shell --name <name> [--command 'custom command']" >&2
+        echo "Usage: ${PROG} shell --name <name> [--command 'custom command']" >&2
         exit 1
         ;;
     esac
@@ -282,7 +301,7 @@ open_shell() {
 
   if [ -z "$UNIQUE_NAME" ]; then
     echo "Error: 'shell' command requires a --name." >&2
-    echo "Usage: $0 shell --name <unique-name>" >&2
+    echo "Usage: ${PROG} shell --name <unique-name>" >&2
     exit 1
   fi
   CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
@@ -297,7 +316,7 @@ open_shell() {
 
 list_containers() {
   echo "Listing running Tailscale containers..."
-  docker ps --filter "name=multi-ts-*" --format '{{json .}}' | jq -r '.Names | sub("multi-ts-"; "")'
+  docker ps --filter "name=multi-ts-" --format '{{.Names}}\t{{.Status}}\t{{.Ports}}' | sed 's/^multi-ts-//'
 }
 
 stop_container() {
@@ -310,7 +329,7 @@ stop_container() {
         ;;
       *)
         echo "Unknown option for 'stop': $1" >&2
-        echo "Usage: $0 stop --name <unique-name>" >&2
+        echo "Usage: ${PROG} stop --name <unique-name>" >&2
         exit 1
         ;;
     esac
@@ -318,7 +337,7 @@ stop_container() {
 
   if [ -z "$UNIQUE_NAME" ]; then
     echo "Error: 'stop' command requires a --name." >&2
-    echo "Usage: $0 stop --name <unique-name>" >&2
+    echo "Usage: ${PROG} stop --name <unique-name>" >&2
     exit 1
   fi
   CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
@@ -343,7 +362,7 @@ wipe_data() {
                 ;;
             *)
                 echo "Unknown option for 'wipe': $1" >&2
-                echo "Usage: $0 wipe --name <unique-name> [--data-dir <path>]" >&2
+                echo "Usage: ${PROG} wipe --name <unique-name> [--data-dir <path>]" >&2
                 exit 1
                 ;;
         esac
@@ -351,7 +370,7 @@ wipe_data() {
 
     if [ -z "$UNIQUE_NAME" ]; then
         echo "Error: 'wipe' command requires a --name." >&2
-        echo "Usage: $0 wipe --name <unique-name>" >&2
+        echo "Usage: ${PROG} wipe --name <unique-name>" >&2
         exit 1
     fi
 
@@ -378,156 +397,32 @@ wipe_data() {
 }
 
 debug_container() {
-    UNIQUE_NAME=""
-
-    while [ "$#" -gt 0 ]; do
-        case "$1" in
-            --name)
-                UNIQUE_NAME="$2"
-                shift 2
-                ;;
-            *)
-                echo "Unknown option for 'debug': $1" >&2
-                echo "Usage: $0 debug --name <unique-name>" >&2
-                exit 1
-                ;;
-        esac
-    done
-
-    if [ -z "$UNIQUE_NAME" ]; then
-        echo "Error: 'debug' command requires a --name." >&2
-        echo "Usage: $0 debug --name <unique-name>" >&2
-        exit 1
-    fi
-
-    CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+    parse_name_and_rest "$@"
 
     echo "=== Container Debug Information ==="
     echo "Container name: ${CONTAINER_NAME}"
     echo ""
 
-    # Check if container exists and is running
     if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
         echo "❌ Container is not running"
         echo "Available containers:"
-        docker ps --filter "name=multi-ts-*" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+        docker ps --filter "name=multi-ts-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
         return 1
     fi
-
     echo "✅ Container is running"
 
-    # Get container info
-    CONTAINER_IP=$(docker inspect "${CONTAINER_NAME}" --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 2>/dev/null || echo "")
-    echo "Container IP: ${CONTAINER_IP}"
-
-    # Check SSH server status
     echo ""
-    echo "=== SSH Server Status ==="
-    docker exec "${CONTAINER_NAME}" sh -c "ps aux | grep sshd | grep -v grep" || echo "SSH server not running"
+    echo "=== Published proxies ==="
+    echo "SOCKS5: $(published_addr 1080 || true)"
+    echo "HTTP:   $(published_addr 1081 || true)"
 
-    # Check if SSH port is listening
     echo ""
-    echo "=== Network Status ==="
-    docker exec "${CONTAINER_NAME}" sh -c "netstat -tlnp | grep :22" || echo "SSH port 22 not listening"
+    echo "=== Listening sockets ==="
+    docker exec "${CONTAINER_NAME}" netstat -tlnp || true
 
-    # Test SSH connectivity
-    echo ""
-    echo "=== SSH Connectivity Test ==="
-    if ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=3 \
-       -o BatchMode=yes "root@${CONTAINER_IP}" "echo 'SSH working'" 2>/dev/null; then
-        echo "✅ SSH connection successful"
-    else
-        echo "❌ SSH connection failed"
-        echo "Try manual SSH: ssh root@${CONTAINER_IP} (password: tailscale)"
-    fi
-
-    # Check Tailscale status
     echo ""
     echo "=== Tailscale Status ==="
     docker exec "${CONTAINER_NAME}" tailscale status || echo "Tailscale not connected"
-}
-
-proxy_docker_command() {
-    UNIQUE_NAME=""
-    LOCAL_PORT="1080"
-
-    while [ "$#" -gt 0 ]; do
-        case "$1" in
-            --name)
-                UNIQUE_NAME="$2"
-                shift 2
-                ;;
-            --port)
-                LOCAL_PORT="$2"
-                shift 2
-                ;;
-            *)
-                echo "Unknown option for 'proxy-docker': $1" >&2
-                echo "Usage: $0 proxy-docker --name <unique-name> [--port <local-port>]" >&2
-                exit 1
-                ;;
-        esac
-    done
-
-    if [ -z "$UNIQUE_NAME" ]; then
-        echo "Error: 'proxy-docker' command requires a --name." >&2
-        echo "Usage: $0 proxy-docker --name <unique-name> [--port <local-port>]" >&2
-        exit 1
-    fi
-
-    CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
-
-    # Check if container was started with port mapping
-    CONTAINER_PORTS=$(docker inspect "${CONTAINER_NAME}" --format '{{.NetworkSettings.Ports}}' 2>/dev/null || echo "")
-    if echo "$CONTAINER_PORTS" | grep -q "${LOCAL_PORT}/tcp"; then
-        echo "✓ Container has port mapping for ${LOCAL_PORT}"
-        echo "Starting Docker-based SOCKS5 proxy on localhost:${LOCAL_PORT}..."
-        echo "This approach uses Docker exec with port mapping"
-        echo "Press Ctrl+C to stop the proxy"
-        echo ""
-
-        # Start SOCKS proxy using Docker exec with port mapping
-        docker exec -it "${CONTAINER_NAME}" sh -c "
-            echo 'Starting SOCKS5 proxy inside container on port ${LOCAL_PORT}...'
-
-            # Create SSH keys in a writable location
-            SSH_DIR='/tmp/.ssh'
-            mkdir -p \$SSH_DIR
-            chmod 700 \$SSH_DIR
-
-            if [ ! -f \$SSH_DIR/id_ed25519 ]; then
-                echo 'Creating SSH keys in writable location...'
-                ssh-keygen -t ed25519 -f \$SSH_DIR/id_ed25519 -N \"\"
-                cp \$SSH_DIR/id_ed25519.pub \$SSH_DIR/authorized_keys
-                chmod 600 \$SSH_DIR/authorized_keys
-            fi
-
-            # Update SSH config to use our keys
-            mkdir -p /root/.ssh_writable
-            cp \$SSH_DIR/authorized_keys /root/.ssh_writable/
-            chmod 600 /root/.ssh_writable/authorized_keys
-
-            echo 'Starting SSH tunnel with key authentication...'
-            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-                -o BatchMode=yes -i \$SSH_DIR/id_ed25519 \
-                -N -D 0.0.0.0:${LOCAL_PORT} root@localhost &
-            SSH_PID=\$!
-            echo 'SOCKS5 proxy started with PID '\$SSH_PID
-            echo 'Configure your applications to use SOCKS5 proxy: 127.0.0.1:${LOCAL_PORT}'
-            trap 'kill \$SSH_PID 2>/dev/null || true; exit' INT TERM
-            wait \$SSH_PID
-        "
-    else
-        echo "❌ Container not started with port mapping for ${LOCAL_PORT}"
-        echo "To use proxy-docker, restart container with port mapping:"
-        echo "  $0 stop --name ${UNIQUE_NAME}"
-        echo "  $0 run --name ${UNIQUE_NAME} --socks5-port ${LOCAL_PORT}"
-        echo "  $0 proxy-docker --name ${UNIQUE_NAME}"
-        echo ""
-        echo "Or use the regular proxy command (external SSH):"
-        echo "  $0 proxy --name ${UNIQUE_NAME}"
-        exit 1
-    fi
 }
 
 tailscale_reconnect() {
@@ -551,7 +446,7 @@ tailscale_reconnect() {
                 ;;
             *)
                 echo "Unknown option for 'reconnect': $1" >&2
-                echo "Usage: $0 reconnect --name <unique-name> [--auth-key <key>] [--reset]" >&2
+                echo "Usage: ${PROG} reconnect --name <unique-name> [--auth-key <key>] [--reset]" >&2
                 exit 1
                 ;;
         esac
@@ -559,17 +454,11 @@ tailscale_reconnect() {
 
     if [ -z "$UNIQUE_NAME" ]; then
         echo "Error: 'reconnect' command requires a --name." >&2
-        echo "Usage: $0 reconnect --name <unique-name>" >&2
+        echo "Usage: ${PROG} reconnect --name <unique-name>" >&2
         exit 1
     fi
 
     CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
-    HOSTNAME="${CONTAINER_NAME}"
-
-    AUTH_FLAG=""
-    if [ -n "$AUTH_KEY" ]; then
-        AUTH_FLAG="--auth-key=${AUTH_KEY}"
-    fi
 
     RESET_FLAG=""
     if [ "$RESET" = "true" ]; then
@@ -577,84 +466,114 @@ tailscale_reconnect() {
     fi
 
     echo "Reconnecting Tailscale inside ${CONTAINER_NAME}..."
-    echo "Command: tailscale up --hostname=${HOSTNAME} ${AUTH_FLAG} ${RESET_FLAG}"
-
-    # Use `sh -c` to keep arg handling simple and allow empty flags.
-    docker exec -it "${CONTAINER_NAME}" sh -c "tailscale up --hostname='${HOSTNAME}' ${AUTH_FLAG} ${RESET_FLAG}"
+    # Reuse the hostname/flags the container was started with: `tailscale up`
+    # rejects (or with --reset, silently drops) previously-set flags otherwise.
+    # The auth key goes in via env so it never appears in output or `ps`.
+    docker exec -it -e "TS_RECONNECT_KEY=${AUTH_KEY}" "${CONTAINER_NAME}" sh -c \
+        'tailscale up --hostname="${TAILSCALE_HOSTNAME}" ${TAILSCALE_EXTRA_ARGS:-} ${TS_RECONNECT_KEY:+--auth-key="${TS_RECONNECT_KEY}"} '"${RESET_FLAG}"
 }
 
-proxy_command() {
+# Resolve "--name <name>" for the proxy helpers; remaining args land in REST_ARGS.
+parse_name_and_rest() {
     UNIQUE_NAME=""
-    LOCAL_PORT="1080"
-
+    REST_ARGS=()
     while [ "$#" -gt 0 ]; do
         case "$1" in
             --name)
                 UNIQUE_NAME="$2"
                 shift 2
                 ;;
-            --port)
-                LOCAL_PORT="$2"
-                shift 2
+            --)
+                shift
+                REST_ARGS+=("$@")
+                break
                 ;;
             *)
-                echo "Unknown option for 'proxy': $1" >&2
-                echo "Usage: $0 proxy --name <unique-name> [--port <local-port>]" >&2
-                exit 1
+                REST_ARGS+=("$1")
+                shift
                 ;;
         esac
     done
 
     if [ -z "$UNIQUE_NAME" ]; then
-        echo "Error: 'proxy' command requires a --name." >&2
-        echo "Usage: $0 proxy --name <unique-name> [--port <local-port>]" >&2
+        echo "Error: '${COMMAND}' command requires a --name." >&2
+        echo "Usage: ${PROG} ${COMMAND} --name <unique-name> [args...]" >&2
         exit 1
     fi
-
     CONTAINER_NAME="multi-ts-${UNIQUE_NAME}"
+}
 
-    # Get container IP address
-    CONTAINER_IP=$(docker inspect "${CONTAINER_NAME}" --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 2>/dev/null || echo "")
+# Host address of a published container port, e.g. "127.0.0.1:1080".
+published_addr() {
+    docker port "${CONTAINER_NAME}" "$1/tcp" 2>/dev/null | head -n1
+}
 
-    if [ -z "$CONTAINER_IP" ]; then
-        echo "Error: Container ${CONTAINER_NAME} not found or not running" >&2
+require_socks() {
+    SOCKS_ADDR=$(published_addr 1080)
+    if [ -z "$SOCKS_ADDR" ]; then
+        echo "Error: ${CONTAINER_NAME} has no SOCKS5 port published." >&2
+        echo "Recreate it with: ${PROG} stop --name ${UNIQUE_NAME} && ${PROG} run --name ${UNIQUE_NAME} --socks5-port <port>" >&2
         exit 1
     fi
+}
 
-    # Check if SSH tunnel is already running
-    if pgrep -f "ssh.*${CONTAINER_IP}.*-D ${LOCAL_PORT}" > /dev/null; then
-        echo "SOCKS5 proxy is already running on localhost:${LOCAL_PORT}"
-        echo "To stop it, run: pkill -f \"ssh.*${CONTAINER_IP}.*-D ${LOCAL_PORT}\""
+show_status() {
+    parse_name_and_rest "$@"
+    docker exec "${CONTAINER_NAME}" tailscale status "${REST_ARGS[@]}"
+}
+
+show_login() {
+    parse_name_and_rest "$@"
+    # `tailscale status` prints "Log in at: <url>" while logged out.
+    STATUS=$(docker exec "${CONTAINER_NAME}" tailscale status 2>&1 || true)
+    URL=$(echo "${STATUS}" | grep -oE 'https://login\.tailscale\.com/[A-Za-z0-9/]+' | head -n1)
+    if [ -n "$URL" ]; then
+        echo "Open this URL and sign in to the target tailnet:"
+        echo "  ${URL}"
+    elif echo "${STATUS}" | grep -qi "logged out"; then
+        echo "Logged out but no URL yet; run: ${PROG} reconnect --name ${UNIQUE_NAME}"
+    else
+        echo "Already logged in:"
+        echo "${STATUS}" | head -n1
+    fi
+}
+
+print_env() {
+    parse_name_and_rest "$@"
+    require_socks
+    HTTP_ADDR=$(published_addr 1081)
+    echo "# eval \"\$(${PROG} env --name ${UNIQUE_NAME})\""
+    echo "export ALL_PROXY=socks5h://${SOCKS_ADDR}"
+    if [ -n "$HTTP_ADDR" ]; then
+        echo "export HTTP_PROXY=http://${HTTP_ADDR} HTTPS_PROXY=http://${HTTP_ADDR}"
+    fi
+}
+
+ssh_via() {
+    parse_name_and_rest "$@"
+    require_socks
+    exec ssh -o ProxyCommand="nc -X 5 -x ${SOCKS_ADDR} %h %p" "${REST_ARGS[@]}"
+}
+
+print_ssh_config() {
+    parse_name_and_rest "$@"
+    require_socks
+    SUFFIX=$(docker exec "${CONTAINER_NAME}" tailscale status --json 2>/dev/null \
+        | sed -n 's/.*"MagicDNSSuffix": *"\([^"]*\)".*/\1/p' | head -n1)
+    if [ -z "$SUFFIX" ]; then
+        echo "Error: no MagicDNS suffix yet; is ${CONTAINER_NAME} logged in? (${PROG} login --name ${UNIQUE_NAME})" >&2
         exit 1
     fi
+    echo "# ${UNIQUE_NAME} tailnet via ts-env (append to ~/.ssh/config)"
+    echo "Host *.${SUFFIX}"
+    echo "  ProxyCommand nc -X 5 -x ${SOCKS_ADDR} %h %p"
+}
 
-    echo "Starting SOCKS5 proxy on localhost:${LOCAL_PORT} via SSH to container..."
-    echo "Container IP: ${CONTAINER_IP}"
-    echo ""
-    echo "Testing SSH connectivity first..."
-
-    # Test SSH connectivity first
-    if ! ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 \
-         -o BatchMode=yes "root@${CONTAINER_IP}" "echo 'SSH connection successful'" 2>/dev/null; then
-        echo "✗ SSH connection failed!"
-        echo ""
-        echo "Troubleshooting steps:"
-        echo "1. Check if container is running: docker ps | grep ${CONTAINER_NAME}"
-        echo "2. Check container logs: $0 logs --name ${UNIQUE_NAME}"
-        echo "3. Test SSH manually: ssh root@${CONTAINER_IP} (password: tailscale)"
-        echo "4. Check if SSH is running in container: $0 shell --name ${UNIQUE_NAME} --command 'ps aux | grep ssh'"
-        echo "5. Rebuild image with SSH fixes: $0 build"
-        exit 1
-    fi
-
-    echo "✓ SSH connection successful!"
-    echo "Configure your applications to use SOCKS5 proxy: 127.0.0.1:${LOCAL_PORT}"
-    echo "Press Ctrl+C to stop the proxy"
-    echo ""
-
-    # Start SSH SOCKS proxy (foreground, will run until interrupted)
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR \
-        -N -D "${LOCAL_PORT}" "root@${CONTAINER_IP}"
+curl_via() {
+    parse_name_and_rest "$@"
+    require_socks
+    # socks5h: tailscaled resolves MagicDNS names for this tailnet.
+    exec curl --proxy "socks5h://${SOCKS_ADDR}" "${REST_ARGS[@]}"
 }
 
 # --- MAIN LOGIC ---
@@ -687,83 +606,90 @@ case "$COMMAND" in
   debug)
     debug_container "$@"
     ;;
-  proxy)
-    proxy_command "$@"
+  status)
+    show_status "$@"
     ;;
-  proxy-docker)
-    proxy_docker_command "$@"
+  login)
+    show_login "$@"
+    ;;
+  env|proxy)
+    print_env "$@"
+    ;;
+  ssh)
+    ssh_via "$@"
+    ;;
+  ssh-config)
+    print_ssh_config "$@"
+    ;;
+  curl)
+    curl_via "$@"
     ;;
   reconnect)
     tailscale_reconnect "$@"
     ;;
   *)
-    echo "Tailscale Development Environment Manager" >&2
-    echo "" >&2
-    echo "REQUIREMENTS:" >&2
-    echo "  - Docker daemon must be running" >&2
-    echo "  - jq (required for 'list' command)" >&2
-    echo "" >&2
-    echo "FIRST TIME SETUP:" >&2
-    echo "  1. Ensure Docker is running: docker info" >&2
-    echo "  2. Build the image: $0 build" >&2
-    echo "  3. Run a container: $0 run --name mydev" >&2
-    echo "" >&2
-     echo "Usage: $0 {build|run|logs|shell|list|stop|wipe|proxy|reconnect} [options]" >&2
-     echo "" >&2
-     echo "Commands:" >&2
-    echo "  build [--image-name <name>]" >&2
-    echo "                             Build the Docker image with UTF-8 locale support." >&2
-    echo "                             Optional: specify custom image name." >&2
-    echo "" >&2
-    echo "  run --name <name> [--data-dir <path>] [--image-name <name>] [--socks5-port <port>] [--auth-key <key>]" >&2
-    echo "                             Run a new container with a unique name." >&2
-    echo "                             Optional: specify custom data directory, image name, SOCKS5 port mapping, and auth key." >&2
-    echo "" >&2
-    echo "  logs --name <name>         Follow the logs of a container to get auth URL." >&2
-    echo "" >&2
-    echo "  shell --name <name> [--command 'cmd']" >&2
-    echo "                             Get an interactive shell or run a command in a container." >&2
-    echo "                             Default shell: /bin/bash" >&2
-    echo "" >&2
-    echo "  list                       List all running multi-ts containers." >&2
-    echo "                             (requires jq)" >&2
-    echo "" >&2
-    echo "  stop --name <name>         Stop a specific container." >&2
-    echo "" >&2
-    echo "  wipe --name <name> [--data-dir <path>]" >&2
-    echo "                             Wipe the data for a specific container." >&2
-    echo "                             Optional: specify custom data directory." >&2
-    echo "" >&2
-     echo "  proxy --name <name> [--port <local-port>]" >&2
-     echo "                             Start SSH SOCKS5 proxy to a running container." >&2
-     echo "                             Runs in foreground, press Ctrl+C to stop. Default port: 1080" >&2
-     echo "" >&2
-     echo "  reconnect --name <name> [--auth-key <key>] [--reset]" >&2
-     echo "                             Re-run tailscale up inside the container." >&2
-     echo "                             Useful after account/tailnet changes." >&2
-     echo "" >&2
-     echo "EXAMPLES:" >&2
-    echo "  $0 build" >&2
-    echo "  $0 build --image-name my-tailscale-dev" >&2
-    echo "  $0 run --name dev1" >&2
-    echo "  $0 run --name dev1 --socks5-port 1080" >&2
-    echo "  $0 run --name dev1 --auth-key tskey-auth-xxxxx" >&2
-    echo "  $0 run --name dev2 --image-name my-tailscale-dev" >&2
-    echo "  $0 logs --name dev1" >&2
-    echo "  $0 shell --name dev1" >&2
-    echo "  $0 shell --name dev1 --command 'ping google.com'" >&2
-    echo "  $0 proxy --name dev1" >&2
-    echo "  $0 proxy --name dev1 --port 9090" >&2
-    echo "  $0 list" >&2
-    echo "  $0 stop --name dev1" >&2
-    echo "  $0 wipe --name dev1" >&2
-    echo "" >&2
-    echo "SOCKS5 PROXY USAGE:" >&2
-    echo "  1. Run container with port mapping: $0 run --name proxy1 --socks5-port 1080" >&2
-    echo "  2. Wait for Tailscale to connect (check logs)" >&2
-    echo "  3. Start SOCKS5 proxy: $0 proxy --name proxy1 --action start" >&2
-    echo "  4. Configure your applications to use SOCKS5 proxy at localhost:1080" >&2
-    echo "  5. All traffic will be routed through the Tailscale network" >&2
+    cat >&2 <<HELP_EOF
+Tailscale Development Environment Manager
+
+Runs extra tailnets in containers, each with its own tailscaled, so the host's
+Tailscale connection stays untouched. tailscaled's built-in SOCKS5/HTTP proxies
+are published on 127.0.0.1 for host apps.
+
+REQUIREMENTS:
+  - Docker daemon must be running (OrbStack / Docker Desktop / Docker Engine)
+  - For 'ssh' / 'ssh-config': an nc with SOCKS5 support (-X 5). Built in on
+    macOS; on Linux install netcat-openbsd.
+
+FIRST TIME SETUP:
+  1. Build the image: ${PROG} build
+  2. Run a container: ${PROG} run --name work --socks5-port 1080
+  3. Log in:          ${PROG} login --name work
+
+Usage: ${PROG} {build|run|login|status|env|ssh|ssh-config|curl|logs|shell|list|stop|wipe|debug|reconnect} [options]
+
+Commands:
+  build [--image-name <name>]
+                             Build the Docker image (rebuild to update Tailscale).
+
+  run --name <name> [--socks5-port <port>] [--http-port <port>] [--auth-key <key>]
+      [--ts-args '<flags>'] [--mount-ssh] [--data-dir <path>] [--image-name <name>]
+                             Run a new container. Ports bind to 127.0.0.1 only.
+                             --ts-args is passed to 'tailscale up' (e.g. '--accept-routes').
+                             --mount-ssh mounts ~/.ssh read-only (for ssh from 'shell').
+                             Note: --auth-key is visible in 'docker inspect'.
+
+  login --name <name>        Print the login URL (or current login state).
+  status --name <name> [args...]
+                             Run 'tailscale status' inside the container.
+
+  env --name <name>          Print ALL_PROXY / HTTP(S)_PROXY exports for the container.
+                             Usage: eval "\$(${PROG} env --name work)"
+  ssh --name <name> [ssh args...]
+                             SSH to a host on that tailnet (MagicDNS names work).
+  ssh-config --name <name>   Print a ~/.ssh/config block routing *.<tailnet>.ts.net
+                             through this container.
+  curl --name <name> [curl args...]
+                             curl through that tailnet.
+
+  logs --name <name>         Follow the container logs.
+  shell --name <name> [--command 'cmd']
+                             Interactive shell (or command) inside the container.
+  list                       List running containers with ports.
+  stop --name <name>         Stop and remove a container (state is kept).
+  wipe --name <name> [--data-dir <path>]
+                             Delete a container's saved Tailscale state.
+  debug --name <name>        Print diagnostics.
+  reconnect --name <name> [--auth-key <key>] [--reset]
+                             Re-run 'tailscale up' inside the container.
+
+EXAMPLES:
+  ${PROG} run --name work --socks5-port 1080 --http-port 1081 --ts-args '--accept-routes'
+  ${PROG} login --name work
+  ${PROG} ssh --name work me@devbox
+  ${PROG} ssh-config --name work >> ~/.ssh/config
+  ${PROG} curl --name work http://grafana:3000
+  eval "\$(${PROG} env --name work)"; gh api ...
+HELP_EOF
     exit 1
     ;;
 esac
