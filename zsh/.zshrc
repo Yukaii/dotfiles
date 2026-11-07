@@ -1,7 +1,6 @@
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
-export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
 
 ompconfig=$(brew --prefix oh-my-posh)
@@ -43,3 +42,24 @@ export PATH="$PATH:/Users/yukai/.cache/lm-studio/bin"
 
 # Added by Windsurf
 export PATH="/Users/yukai/.codeium/windsurf/bin:$PATH"
+
+# Added by Antigravity
+export PATH="/Users/yukai/.antigravity/antigravity/bin:$PATH"
+source /Users/yukai/.secrets.sh
+
+# Bun global bins (cf, etc.) — appended so they don't shadow existing tools
+export PATH="$PATH:/Users/yukai/.bun/bin"
+
+# >>> otty shell integration >>>
+# Added by Otty — toggle in Settings > Shell > Shell Integration.
+# Inert unless launched by Otty (it sets $OTTY_SHELL_INTEGRATION).
+if [ -n "$OTTY_SHELL_INTEGRATION" ] && [ -r "$OTTY_SHELL_INTEGRATION/otty-integration.zsh" ]; then
+  . "$OTTY_SHELL_INTEGRATION/otty-integration.zsh"
+fi
+# <<< otty shell integration <<<
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/yukai/.local/bin:$PATH"
+
+eval "$(~/.local/bin/mise activate zsh)"
