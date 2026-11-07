@@ -17,5 +17,10 @@ function _fzf_wrapper --description "Prepares some environment variables before 
         set --export FZF_DEFAULT_OPTS '--cycle --layout=reverse --border --height=90% --preview-window=wrap --marker="*"'
     end
 
+    # Follow macOS appearance; an explicit --color (env or argv) wins.
+    if not string match -q '*--color*' "$FZF_DEFAULT_OPTS $argv"
+        set --export FZF_DEFAULT_OPTS "$FZF_DEFAULT_OPTS --color="(appearance-mode)
+    end
+
     fzf $argv
 end

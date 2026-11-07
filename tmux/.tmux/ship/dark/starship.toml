@@ -1,0 +1,21 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Left status style source for `tmuxship apply`.
+# tmux renders the session name with #S; tmuxship reads these styles.
+format = "$custom"
+right_format = ""
+add_newline = false
+
+[custom.prefix_active]
+shell = "bash"
+when = 'test "${TMUX_CLIENT_PREFIX:-0}" = "1"'
+command = 'printf "%s " "${TMUX_SESSION_NAME:-?}"'
+format = "[$output]($style) "
+style = "bg:#95E6CB bold"
+
+[custom.session_normal]
+shell = "bash"
+when = 'test "${TMUX_CLIENT_PREFIX:-0}" != "1"'
+command = 'printf "%s" "${TMUX_SESSION_NAME:-?}"'
+format = "[$output]($style) "
+style = "fg:#565B66"

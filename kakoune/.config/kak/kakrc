@@ -34,11 +34,7 @@ source "%val{config}/ascii-player.kak"
 # source "%val{config}/jump-stack.kak"
 # source "%val{config}/amber.kak"
 
-colorscheme kanagawa
-# colorscheme alabaster
-# colorscheme kanagawa
-# colorscheme ayu-mirage
-# colorscheme catppuccin_macchiato
+source "%val{config}/appearance.kak"
 
 set global indentwidth 2
 set global tabstop 2
@@ -65,10 +61,8 @@ add-highlighter global/todo-highlighter regex //\h*(TODO:)[^\n]* 0:cyan 1:yellow
 
 add-highlighter global/ regex \b(TODO|FIXME|NOTE)\b 0:default+rb
 
-# Giallo config
-set-option global giallo_theme kanagawa-wave
 set-option global giallo_debug true
-
+# Giallo theme is managed by appearance.kak (follows system appearance).
 
 # User mode mappings
 # Core actions (frequently used)
@@ -672,8 +666,8 @@ bundle save-state 'https://gitlab.com/Screwtapello/kakoune-state-save.git' %{
 
 bundle crosshair 'https://github.com/insipx/kak-crosshairs' %{
   set-option global highlight_current_line true
-  set-face   global crosshairs_line   default,rgb:383838
-  set-face   global crosshairs_column default,rgb:383838
+  # crosshairs_line/column faces are managed by appearance.kak
+  # (follows system appearance; hardcoded dark values would clobber light theme).
 
   crosshairs-change-hooks
   crosshairs-update

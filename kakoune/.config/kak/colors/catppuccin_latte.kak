@@ -42,8 +42,8 @@ set-face	global	list				"%opt{white}"
 
 # Builtins
 set-face	global	Default				"%opt{white},%opt{background}"
-set-face	global	PrimarySelection	"%opt{gray0},%opt{lavender}"
-set-face	global	SecondarySelection	"%opt{lavender},%opt{gray0}"
+set-face	global	PrimarySelection	"default,rgba:7287fd80"
+set-face	global	SecondarySelection	"default,rgba:9ca0b080"
 set-face	global	PrimaryCursor		"%opt{background},%opt{rosewater}"
 set-face	global	SecondaryCursor		"%opt{black1},%opt{teal}"
 set-face	global	PrimaryCursorEol	"%opt{gray0},%opt{mauve}"

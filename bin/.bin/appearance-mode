@@ -1,0 +1,8 @@
+#!/bin/sh
+# Print current macOS appearance: "dark" or "light".
+# Used by shell prompts, fzf/bat/tmux theming to follow system appearance.
+if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
+  printf 'dark\n'
+else
+  printf 'light\n'
+fi

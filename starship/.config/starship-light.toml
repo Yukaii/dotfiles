@@ -1,0 +1,64 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Light variant — same layout as starship-dark.toml, colors adjusted for
+# light backgrounds. STARSHIP_CONFIG=$HOME/.config/starship-light.toml
+# when macOS is in Light mode.
+
+format = """[~](#6B4E71) $username $git_branch$git_state$shell $fill $cmd_duration ${custom.day} [at](bold black) ${custom.time} $nodejs
+[~](#6B4E71) ${custom.spaced_dir} $character
+"""
+
+[username]
+format = "[$user]($style)"
+style_user = 'black'
+show_always = true
+
+[git_branch]
+format = "[ ](bold black) [ $branch]($style)"
+style = '#6B4E71'
+
+[fill]
+symbol = ' '
+
+[shell]
+fish_indicator = 'fish'
+disabled = false
+format = '[  ](bold black) [$indicator]($style)'
+style = 'blue'
+
+[nodejs]
+format = " [](green) [$version](black) "
+version_format ="${raw}"
+
+[cmd_duration]
+min_time = 1
+show_milliseconds = true
+format = '[$duration]($style) 󰇝'
+style = 'black'
+show_notifications = true
+
+[git_status]
+style = 'red'
+
+[character]
+error_symbol = "[~](bold red)"
+success_symbol = "[~](bold green)"
+
+[custom.spaced_dir]
+command = """p=${PWD/#$HOME/home}; p=${p#/}; echo "$p" | sed 's|/| / |g'"""
+format = "[ $output]($style)"
+shell = "bash"
+style = "blue"
+when = true
+
+[custom.day]
+command = """date '+%A'"""
+shell = "bash"
+format = "[${output}](#4d4d4d)"
+when = true
+
+[custom.time]
+command = """date '+%-l:%M %p'"""
+shell = "bash"
+format = "[${output}](#4d4d4d)"
+when = true

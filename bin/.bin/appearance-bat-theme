@@ -1,0 +1,9 @@
+#!/bin/sh
+# Print bat theme for the current (or given) appearance.
+# Usage: appearance-bat-theme [dark|light]
+mode="${1:-$(appearance-mode)}"
+if [ "$mode" = "dark" ]; then
+  printf 'Catppuccin Mocha\n'
+else
+  printf 'Catppuccin Latte\n'
+fi

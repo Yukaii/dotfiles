@@ -1,0 +1,78 @@
+#!/bin/sh
+# Apply tmux chrome + statusline for the current macOS appearance.
+# Called once from .tmux.conf at server start and on client-focus-in for
+# live switching (mirrors the Kakoune FocusIn approach).
+# Usage: appearance-tmux [dark|light|force]
+# Exits quietly when the requested mode is already applied (unless "force").
+
+if ! command -v tmux >/dev/null 2>&1; then
+  exit 0
+fi
+
+case "$1" in
+  dark | light) mode="$1" ;;
+  force)
+    mode="$(appearance-mode)"
+    force=1
+    ;;
+  *) mode="$(appearance-mode)" ;;
+esac
+
+if [ -z "$force" ]; then
+  current="$(tmux show-environment -g APPEARANCE_MODE 2>/dev/null | cut -d= -f2-)"
+  if [ "$current" = "$mode" ]; then
+    exit 0
+  fi
+fi
+
+tmux set-environment -g APPEARANCE_MODE "$mode" >/dev/null
+
+if [ "$mode" = "light" ]; then
+  SHIP="$HOME/.tmux/ship/light"
+  PANE_BORDER="fg=#ccd0da"
+  PANE_ACTIVE="fg=#1e66f5"
+  POPUP_BORDER="fg=#9ca0b0"
+  DOTBAR_FG="#6c6f85"
+  DOTBAR_CURRENT="#4c4f69"
+  DOTBAR_SESSION="#c8c093"
+  DOTBAR_PREFIX="#209fb5"
+  TMUX_FZF_COLOR="light"
+else
+  SHIP="$HOME/.tmux/ship/dark"
+  PANE_BORDER="fg=#2A2A37"
+  PANE_ACTIVE="fg=#7FB4CA"
+  POPUP_BORDER="fg=#565B66"
+  DOTBAR_FG="#727169"
+  DOTBAR_CURRENT="#dcd7ba"
+  DOTBAR_SESSION="#c8c093"
+  DOTBAR_PREFIX="#7fb4ca"
+  TMUX_FZF_COLOR="dark"
+fi
+
+tmux set -g pane-border-style "$PANE_BORDER" >/dev/null
+tmux set -g pane-active-border-style "$PANE_ACTIVE" >/dev/null
+tmux set -g popup-border-style "$POPUP_BORDER" >/dev/null
+tmux set -g @tmux-dotbar-fg "$DOTBAR_FG" >/dev/null
+tmux set -g @tmux-dotbar-fg-current "$DOTBAR_CURRENT" >/dev/null
+tmux set -g @tmux-dotbar-fg-session "$DOTBAR_SESSION" >/dev/null
+tmux set -g @tmux-dotbar-fg-prefix "$DOTBAR_PREFIX" >/dev/null
+
+tmux setenv -g TMUX_SHIP_LEFT_CONFIG "$SHIP/starship.toml" >/dev/null
+tmux setenv -g TMUX_SHIP_RIGHT_CONFIG "$SHIP/.right.toml" >/dev/null
+tmux setenv -g TMUX_SHIP_CENTER_CONFIG "$SHIP/.center.toml" >/dev/null
+# tmuxship reads its input paths from the process environment, which was
+# snapshotted when this run-shell spawned — export them explicitly.
+export TMUX_SHIP_LEFT_CONFIG="$SHIP/starship.toml"
+export TMUX_SHIP_RIGHT_CONFIG="$SHIP/.right.toml"
+export TMUX_SHIP_CENTER_CONFIG="$SHIP/.center.toml"
+
+# Server-wide env for tools spawned from tmux (popups, run-shell).
+# FZF_DEFAULT_OPTS carries color only: bare fzf merges it with call-site
+# flags, and shells layer their own full defaults on top.
+tmux setenv -g FZF_DEFAULT_OPTS "--color=$TMUX_FZF_COLOR" >/dev/null
+tmux setenv -g BAT_THEME "$(appearance-bat-theme "$mode")" >/dev/null
+
+if command -v tmuxship >/dev/null 2>&1; then
+  tmuxship apply >/dev/null 2>&1
+fi
+tmux refresh-client -S >/dev/null 2>&1

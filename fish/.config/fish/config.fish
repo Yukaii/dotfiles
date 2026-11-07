@@ -122,6 +122,26 @@ end
 if command -q starship
   starship init fish | source
   enable_transience
+  # Auto-switch themes with macOS system appearance (starship, fzf, bat).
+  # Canonical fzf defaults (mirrors _fzf_wrapper.fish fallback).
+  set -g __FZF_BASE_OPTS '--cycle --layout=reverse --border --height=90% --preview-window=wrap --marker="*"'
+  function _starship_auto_appearance --description "switch STARSHIP/FZF/BAT themes with system appearance"
+    set -l mode (appearance-mode)
+    if test "$mode" = dark
+      set -gx STARSHIP_CONFIG "$HOME/.config/starship-dark.toml"
+    else
+      set -gx STARSHIP_CONFIG "$HOME/.config/starship-light.toml"
+    end
+    set -gx BAT_THEME (appearance-bat-theme "$mode")
+    set -gx FZF_DEFAULT_OPTS "$__FZF_BASE_OPTS --color=$mode"
+  end
+  _starship_auto_appearance
+  # Re-check on every prompt so toggle applies without restarting shell.
+  # starship defines fish_prompt; wrap it.
+  functions -c fish_prompt _starship_orig_fish_prompt 2>/dev/null; and function fish_prompt
+    _starship_auto_appearance
+    _starship_orig_fish_prompt
+  end
 end
 
 if command -q atuin
