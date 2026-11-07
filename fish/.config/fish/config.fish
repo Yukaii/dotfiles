@@ -111,8 +111,12 @@ function start_dnstt
   dnstt-client -doh https://cloudflare-dns.com/dns-query -pubkey-file $DNSTT_PUB_KEY_PATH $DNS_TUNNEL 127.0.0.1:8000
 end
 
-if command -q fnm
-  fnm env --use-on-cd | source
+# if command -q fnm
+#   fnm env --use-on-cd | source
+# end
+
+if command -q mise
+  mise activate fish | source
 end
 
 # if command -q oh-my-posh
