@@ -61,8 +61,9 @@ add-highlighter global/todo-highlighter regex //\h*(TODO:)[^\n]* 0:cyan 1:yellow
 
 add-highlighter global/ regex \b(TODO|FIXME|NOTE)\b 0:default+rb
 
-set-option global giallo_debug true
 # Giallo theme is managed by appearance.kak (follows system appearance).
+set-option global giallo_debug false
+set-option global giallo_rate_limit_ms 50
 
 # User mode mappings
 # Core actions (frequently used)
