@@ -1,0 +1,47 @@
+command = "/opt/homebrew/bin/fish"
+
+# font-blending = "linear" (reset to default)
+theme = "Ayu Dark"
+theme-dark = "Ayu Dark"
+# window-layout = "tabs-top" (reset to default)
+foreground = "#b3b1ad"
+background = "#0a0e14"
+palette-0 = "#01060e"
+palette-1 = "#ea6c73"
+palette-2 = "#91b362"
+palette-3 = "#f9af4f"
+palette-4 = "#53bdfa"
+palette-5 = "#fae994"
+palette-6 = "#90e1c6"
+palette-7 = "#c7c7c7"
+palette-8 = "#686868"
+palette-9 = "#f07178"
+palette-10 = "#c2d94c"
+palette-11 = "#ffb454"
+palette-12 = "#59c2ff"
+palette-13 = "#ffee99"
+palette-14 = "#95e6cb"
+# palette-15 = "#e0def4" (reset to default)
+# selection-foreground = "#2e3440" (reset to default)
+# selection-background = "#e5e9f0" (reset to default)
+# cursor-color = "#e5e9f0" (reset to default)
+# cursor-text = "#2e3440" (reset to default)
+
+auto-theme-dark-mode = false
+
+font-size = 14
+
+cursor-animation = "smooth"
+
+cursor-style-blink = false
+
+# window-working-directory = "inherit" (reset to default)
+
+term = "xterm-ghostty"
+
+sidebar-width = 248
+
+keybind = "cmd+b=toggle_tabs_panel"
+keybind = "cmd+opt+b=toggle_details_panel"
+
+details-panel-width = 267
