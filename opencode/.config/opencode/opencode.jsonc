@@ -176,11 +176,43 @@
       "enabled": false,
       "command": ["bunx", "-y", "xcodebuildmcp@beta", "mcp"]
     },
+    "qemu-vnc": {
+      "type": "local",
+      "enabled": true,
+      "command": [
+        "uvx",
+        "--from", "git+https://github.com/faizbawa/mcp-qemu-vnc.git",
+        "mcp-qemu-vnc"
+      ]
+    },
     "serena": {
       "type": "local",
       "command": ["serena", "start-mcp-server", "--context", "ide"],
       "enabled": false,
     },
+    "mdverse": {
+      "type": "remote",
+      "url": "https://md.yukai.dev/mcp",
+      "enabled": true,
+      "oauth": {
+        "clientId": "opencode",
+        "scope": "notes:read notes:write offline_access"
+      }
+    },
+    "rea": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "rea-agents@6.4.0",
+        "mcp"
+      ],
+      "enabled": true,
+      "environment": {
+        "GHIDRA_INSTALL_DIR": "/opt/homebrew/opt/ghidra/libexec",
+        "JAVA_HOME": "/opt/homebrew/Cellar/openjdk@21/21.0.12.1/libexec/openjdk.jdk/Contents/Home"
+      }
+    }
   },
   "lsp": {
     "swift": {
