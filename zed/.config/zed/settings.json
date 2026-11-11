@@ -7,26 +7,46 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
-  "language_models": {
-    "copilot_chat": {
-      "api_url": "https://api.githubcopilot.com/chat/completions",
-      "auth_url": "https://api.github.com/copilot_internal/v2/token",
-      "models_url": "https://api.githubcopilot.com/models"
+  "ui_font_size": 15.0,
+  "agent_servers": {
+    "pi-acp": {
+      "type": "registry"
+    },
+    "github-copilot-cli": {
+      "type": "registry"
+    },
+    "cursor": {
+      "type": "registry"
+    },
+    "codex-acp": {
+      "type": "registry"
     }
   },
-  "edit_predictions": {
-    "mode": "eager",
-    "copilot": {
-      "proxy": null,
-      "proxy_no_verify": null
-    },
-    "enabled_in_text_threads": false
+  "show_edit_predictions": false,
+  "languages": {
+    "Plain Text": {
+      "show_edit_predictions": false
+    }
   },
-  "icon_theme": "JetBrains New UI Icons (Dark)",
-  "features": {
-    "edit_prediction_provider": "zed"
+  "project_panel": {
+    "dock": "right"
+  },
+  "outline_panel": {
+    "dock": "right"
+  },
+  "collaboration_panel": {
+    "dock": "right"
+  },
+  "git_panel": {
+    "dock": "right"
+  },
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Catppuccin Macchiato",
+    "dark": "Catppuccin Macchiato"
   },
   "agent": {
+    "dock": "left",
     "default_profile": "write",
     "profiles": {
       "write": {
@@ -61,10 +81,14 @@
       "model": "claude-sonnet-4-5-latest"
     }
   },
-  "ui_font_family": "JetBrainsMono Nerd Font",
+  "ui_font_family": "Ioskeley Mono",
   "buffer_font_size": 15,
   "buffer_font_family": "JetBrainsMono Nerd Font",
-  "theme": "Github Dark",
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Lumin Blur"
+  },
   "vim_mode": true,
   "helix_mode": true,
   "auto_update": true,
