@@ -1,8 +1,58 @@
 {
-  "version": 1,
   "hooks": {
+    "sessionStart": [
+      {
+        "command": "bash '/Users/yukai/.cursor/herdr-agent-state.sh' session"
+      }
+    ],
     "stop": [
-      { "command": "open -g raycast-x://extensions/raycast/raycast/confetti?emojis=🤖🤖🔥🔥" }
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "postToolUse": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
+    ],
+    "afterAgentResponse": [
+      {
+        "command": "if [ -f '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -r '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ] && [ -x '/Users/yukai/.orca/agent-hooks/cursor-hook.sh' ]; then /bin/sh '/Users/yukai/.orca/agent-hooks/cursor-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+        "timeout": 10
+      }
     ]
-  }
+  },
+  "version": 1
 }
