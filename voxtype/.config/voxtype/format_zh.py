@@ -33,12 +33,11 @@ def rule_based_format(text: str) -> str:
     return text.strip()
 
 def llm_format(text: str) -> str:
-    """Smart LLM formatting via local Ollama (qwen2.5:1.5b)."""
+    """Smart LLM formatting via local Ollama (qwen2.5:1.5b) for pure Chinese."""
     url = "http://localhost:11434/api/generate"
     model = os.environ.get("VOXTYPE_LLM_MODEL", "qwen2.5:1.5b")
     prompt = (
-        "請將以下語音識別文字轉為標準繁體中文全形標點（，。？！：；）。\n"
-        "注意：請嚴格保留所有中英文詞彙、專有名詞與數字原樣，不要翻譯或改寫任何字詞。\n"
+        "請將以下純中文語音識別文字轉為標準繁體中文，並加上標準全形標點符號（，。？！：；）。\n"
         "請直接輸出修正標點後的結果，不要添加任何引號、前綴或說明文字。\n\n"
         f"輸入：{text}\n輸出："
     )
@@ -78,18 +77,22 @@ def main():
 
     text = raw_input.strip()
 
-    # Detect if any Chinese characters appear
+    # Detect language composition
     has_chinese = bool(re.search(r'[\u4e00-\u9fff\u3400-\u4dbf]', text))
+    has_english = bool(re.search(r'[a-zA-Z]', text))
 
-    # 只要有中文出現（純中文或中英混排），就盡量替換為全形標點
-    # 只有在完全沒有中文（如純英文輸入）時，才保持原樣不替換
-    if has_chinese:
+    if has_chinese and has_english:
+        # 中英混合模式：使用精確規則替換全形標點（，。？！），嚴禁呼叫 LLM 避免英文句子被意譯成中文
+        output = rule_based_format(text)
+    elif has_chinese and not has_english:
+        # 純中文模式：可透過 LLM 修整標點與繁體字
         use_llm = os.environ.get("VOXTYPE_USE_LLM", "1").lower() not in ("0", "false", "no")
         if use_llm:
             output = llm_format(text)
         else:
             output = rule_based_format(text)
     else:
+        # 純英文模式：完全不更動
         output = text
 
     sys.stdout.write(output)

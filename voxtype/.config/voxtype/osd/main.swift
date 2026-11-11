@@ -1,6 +1,8 @@
 import Cocoa
 import Foundation
 import Darwin
+import ApplicationServices
+import Security
 
 // MARK: - Audio Frame Wire Structure (16 bytes, native endian)
 struct AudioFrame {
@@ -237,9 +239,14 @@ final class OSDOverlayPanel: NSPanel {
     private let statusLabel = NSTextField(labelWithString: "Listening...")
     private let waveformView = WaveformView(frame: NSRect(x: 148, y: 6, width: 38, height: 30))
     private let spinner = NSProgressIndicator(frame: NSRect(x: 154, y: 13, width: 16, height: 16))
+    private let cancelButton = NSButton(frame: NSRect(x: 192, y: 7, width: 28, height: 28))
+    var onCancel: (() -> Void)?
+
+    override var canBecomeKey: Bool { false }
+    override var canBecomeMain: Bool { false }
 
     init() {
-        let contentRect = NSRect(x: 0, y: 0, width: 196, height: 42)
+        let contentRect = NSRect(x: 0, y: 0, width: 230, height: 42)
         super.init(
             contentRect: contentRect,
             styleMask: [.borderless, .nonactivatingPanel],
@@ -253,7 +260,8 @@ final class OSDOverlayPanel: NSPanel {
         isOpaque = false
         backgroundColor = .clear
         hasShadow = true
-        ignoresMouseEvents = true
+        ignoresMouseEvents = false
+        becomesKeyOnlyIfNeeded = true
 
         setupView(contentRect: contentRect)
     }
@@ -281,16 +289,35 @@ final class OSDOverlayPanel: NSPanel {
         spinner.isDisplayedWhenStopped = false
         spinner.appearance = NSAppearance(named: .darkAqua)
 
+        cancelButton.image = NSImage(systemSymbolName: "xmark.circle.fill", accessibilityDescription: "Cancel dictation")
+        cancelButton.imagePosition = .imageOnly
+        cancelButton.isBordered = false
+        cancelButton.contentTintColor = NSColor.white.withAlphaComponent(0.8)
+        cancelButton.focusRingType = .none
+        cancelButton.toolTip = "Cancel recording or transcription (Esc)"
+        cancelButton.setAccessibilityLabel("Cancel dictation")
+        cancelButton.target = self
+        cancelButton.action = #selector(cancelClicked)
+
         visualEffectView.addSubview(dotView)
         visualEffectView.addSubview(statusLabel)
         visualEffectView.addSubview(waveformView)
         visualEffectView.addSubview(spinner)
+        visualEffectView.addSubview(cancelButton)
 
         contentView = visualEffectView
     }
 
     func setAudioLevel(_ level: Float) {
         waveformView.setAudioLevel(level)
+    }
+
+    @objc private func cancelClicked() {
+        onCancel?()
+    }
+
+    func setCancelPending(_ pending: Bool) {
+        cancelButton.isEnabled = !pending
     }
 
     func setMode(recording: Bool, transcribing: Bool) {
@@ -357,15 +384,112 @@ final class AppCoordinator {
     private let statePath = "/tmp/voxtype/state"
     private var timer: Timer?
     private var currentState: String = "idle"
+    private var cancelProcess: Process?
+    private var globalKeyMonitor: Any?
+    private var localKeyMonitor: Any?
 
     init() {
         socketClient.onLevelUpdate = { [weak self] level in
             self?.panel.setAudioLevel(level)
         }
+        panel.onCancel = { [weak self] in
+            self?.cancelRequest()
+        }
+    }
+
+    private var didPromptForTrust = false
+
+    private func startEscapeMonitoring() {
+        guard globalKeyMonitor == nil, localKeyMonitor == nil else { return }
+        var trusted = AXIsProcessTrusted()
+        if !trusted && !didPromptForTrust {
+            // Ask macOS once per process to show the Accessibility grant dialog.
+            // Further prompts would nag every recording; the user can grant
+            // manually in System Settings afterwards.
+            didPromptForTrust = true
+            let options = [kAXTrustedCheckOptionPrompt.takeRetainedValue() as String: true] as CFDictionary
+            trusted = AXIsProcessTrustedWithOptions(options)
+        }
+        if !trusted {
+            NSLog("voxtype-osd: Accessibility not granted; Escape will not cancel. Enable this binary in System Settings → Privacy & Security → Accessibility.")
+        }
+        globalKeyMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            self?.handleEscape(event)
+        }
+        // Global monitors exclude events sent to this application.
+        localKeyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            self?.handleEscape(event)
+            return event
+        }
+    }
+
+    private func stopEscapeMonitoring() {
+        if let monitor = globalKeyMonitor { NSEvent.removeMonitor(monitor) }
+        if let monitor = localKeyMonitor { NSEvent.removeMonitor(monitor) }
+        globalKeyMonitor = nil
+        localKeyMonitor = nil
+    }
+
+    func handleEscape(_ event: NSEvent) {
+        let modifiers: NSEvent.ModifierFlags = [.command, .control, .option, .shift, .function]
+        guard event.type == .keyDown, event.keyCode == 53, !event.isARepeat,
+              event.modifierFlags.intersection(modifiers).isEmpty else { return }
+        cancelRequest()
+    }
+
+    deinit {
+        stopEscapeMonitoring()
+        timer?.invalidate()
+    }
+
+    private func cancelRequest() {
+        // Re-read the daemon state in case it finished since the last poll.
+        checkState()
+        guard currentState == "recording" || currentState == "transcribing",
+              cancelProcess == nil else { return }
+
+        let process = Process()
+        let sibling = URL(fileURLWithPath: CommandLine.arguments[0]).resolvingSymlinksInPath()
+            .deletingLastPathComponent().appendingPathComponent("voxtype-bin")
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let candidates = [sibling, home.appendingPathComponent(".local/bin/voxtype"),
+                          home.appendingPathComponent(".local/share/mise/shims/voxtype")]
+        if let executable = candidates.first(where: { FileManager.default.isExecutableFile(atPath: $0.path) }) {
+            process.executableURL = executable
+            process.arguments = ["record", "cancel"]
+        } else {
+            process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
+            process.arguments = ["voxtype", "record", "cancel"]
+        }
+        process.standardOutput = FileHandle.nullDevice
+        process.terminationHandler = { [weak self] process in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                self.cancelProcess = nil
+                self.panel.setCancelPending(false)
+                if process.terminationStatus != 0 {
+                    NSLog("Voxtype cancellation failed (status %d)", process.terminationStatus)
+                    NSSound.beep()
+                }
+                // Only the daemon can confirm cancellation; never hide optimistically.
+                self.checkState()
+            }
+        }
+        cancelProcess = process
+        panel.setCancelPending(true)
+        do {
+            try process.run()
+        } catch {
+            cancelProcess = nil
+            panel.setCancelPending(false)
+            NSLog("Unable to cancel voxtype: %@", error.localizedDescription)
+            NSSound.beep()
+        }
     }
 
     func start() {
         panel.alphaValue = 0.0
+        logCodeIdentity()
 
         // Poll state file every 50ms for low latency
         timer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] _ in
@@ -373,6 +497,18 @@ final class AppCoordinator {
         }
 
         checkState()
+    }
+
+    private func logCodeIdentity() {
+        let exe = (CommandLine.arguments[0] as NSString).resolvingSymlinksInPath
+        var staticCode: SecStaticCode?
+        guard SecStaticCodeCreateWithPath(URL(fileURLWithPath: exe) as CFURL, SecCSFlags(), &staticCode) == errSecSuccess,
+              let staticCode = staticCode else { return }
+        var cfInfo: CFDictionary?
+        guard SecCodeCopySigningInformation(staticCode, SecCSFlags(), &cfInfo) == errSecSuccess,
+              let info = cfInfo as? [String: Any] else { return }
+        let identifier = info[kSecCodeInfoIdentifier as String] as? String ?? "?"
+        NSLog("voxtype-osd: exe=%@ id=%@ Accessibility=%@", exe, identifier, AXIsProcessTrusted() ? "granted" : "missing")
     }
 
     private func checkState() {
@@ -395,16 +531,19 @@ final class AppCoordinator {
 
         switch state {
         case "recording":
+            startEscapeMonitoring()
             panel.setMode(recording: true, transcribing: false)
             socketClient.start()
             panel.showAnimated()
         case "transcribing":
+            startEscapeMonitoring()
             panel.setMode(recording: false, transcribing: true)
             socketClient.stop()
             panel.showAnimated()
         case "idle":
             fallthrough
         default:
+            stopEscapeMonitoring()
             panel.setMode(recording: false, transcribing: false)
             socketClient.stop()
             panel.hideAnimated()

@@ -26,9 +26,9 @@ modifiers = []
 mode = "toggle"
 
 # Enable built-in hotkey detection (default: true)
-# Set to false when using compositor keybindings (Hyprland, Sway) instead
+# Disabled so BetterTouchTool can handle the double-tap Fn trigger.
 # When disabled, use `voxtype record start/stop/toggle` to control recording
-# enabled = true
+enabled = false
 
 # Modifier key to select secondary model (evdev input mode only)
 # When held while pressing the hotkey, uses whisper.secondary_model instead
@@ -95,7 +95,7 @@ volume = 0.5
 # .en models are English-only but faster and more accurate for English
 # large-v3-turbo is faster than large-v3 with minimal accuracy loss (recommended for GPU)
 # Or provide absolute path to a custom .bin model file
-model = "large-v3-turbo"
+model = "medium"
 
 # Language for transcription
 # Options:
@@ -111,8 +111,10 @@ translate = false
 # Number of CPU threads for inference (omit for auto-detection)
 # threads = 4
 
-# Initial prompt to bias Whisper toward Traditional Chinese (繁體中文) characters & mixed English
-initial_prompt = "繁體中文與 English 語音輸入。包含常用標點符號與台灣常用語彙。"
+# Initial prompt: balanced EN/Traditional Chinese. Must stay language-neutral or
+# pure-English audio gets mis-decoded as Chinese. Rules: verbatim, no translation,
+# output language follows input language.
+initial_prompt = "Verbatim transcription, do not translate. Spoken English stays in English, spoken Chinese stays in Traditional Chinese. 這是繁體中文和 English 混合語音，請逐字轉錄，不要翻譯。Example: see you tomorrow, 明天見。"
 
 # --- Multi-model settings ---
 #
@@ -284,7 +286,10 @@ on_transcription = false
 
 [osd]
 # Enable native macOS floating OSD
-enabled = true
+# Spawned as a separate LaunchAgent (io.voxtype.osd) so Accessibility
+# grants attach to the OSD itself, not Voxtype.app. The daemon child
+# inherits the parent's TCC identity and AXIsProcessTrusted() stays NO.
+enabled = false
 
 # On-screen display frontend.
 # - gtk4: Default toolkit frontend
