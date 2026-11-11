@@ -1,22 +1,32 @@
 [tools]
+"aqua:leoafarias/fvm" = "latest"
+"aqua:openai/codex" = "latest"
+aube = "latest"
 bun = "latest"
 "cargo:cargo-binstall" = "latest"
 "cargo:giallo-kak" = "latest"
 "github:BurntSushi/ripgrep" = "latest"
-"github:LargeModGames/spotatui" = "latest"
+"github:CircleCI-Public/circleci-cli" = "latest"
+"github:CosmoCreeper/Sine" = "latest"
+"github:altinukshini/gha-tui" = "latest"
 "github:bjarneo/cliamp" = "latest"
 "github:chenyukang/ghr" = "latest"
-"github:chojs23/concord" = "2.5.13"
+"github:chojs23/concord" = "latest"
+"github:eugenioenko/ttt" = "latest"
 "github:gammons/slk" = "latest"
 "github:jesseduffield/lazygit" = "latest"
 "github:modem-dev/hunk" = "latest"
+"github:patricksmill/romm-cli" = "latest"
+"github:peteonrails/voxtype" = "latest"
+"github:router-for-me/CLIProxyAPI" = "latest"
+"github:sinelaw/fresh" = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
-"npm:@openai/codex" = "latest"
-"npm:@opencode-ai/cli" = "next"
 "npm:druk" = "latest"
-"npm:opencode-ai" = "latest"
-"npm:t3" = { version = "nightly", trust_policy_excludes = ["@pierre/theme@1.1.0"] }
+"npm:vercel" = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
 auto_update = true
+
+[settings.github]
+use_git_credentials = true
