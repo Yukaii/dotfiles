@@ -1,0 +1,50 @@
+layout_backend="plugin"
+plugins_enabled=true
+layout_plugin="desktop-wm"
+plugins_dirs=[
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/desktop-wm",
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/popup-controls",
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/sidebar-panel",
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/bottom-panel",
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/command-palette",
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/theme-switch-command-palette",
+  "/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/windows31-decoration-theme",
+]
+# plugin_dir="/Users/yukai/Projects/Personal/ykwm/docs/examples/plugins.d/paperwm"
+
+# Prefix + Ctrl+S => sidebar toggle command
+# Prefix + Ctrl+B => bottom panel toggle command
+plugin_keybindings=[
+  "ctrl+s:panel.sidebar.toggle",
+  "ctrl+b:panel.bottom.toggle",
+  "ctrl+p:palette.open",
+  "ctrl+t:theme.palette.open",
+]
+
+[plugin.popup-controls]
+persistent_process=true
+
+[plugin.sidebar-panel]
+side="left"
+width=50
+persistent_process=true
+
+[plugin.bottom-panel]
+height=16
+persistent_process=true
+
+[plugin.command-palette]
+open_command="palette.open"
+popup_width=110
+popup_height=26
+fzf_prompt="ykmx> "
+
+[plugin.theme-switch-command-palette]
+open_command="theme.palette.open"
+entries="Windows 3.1 Theme=theme.windows31.enable,Reset To Default=theme.windows31.disable"
+popup_width=110
+popup_height=24
+fzf_prompt="theme> "
+
+[plugin.windows31-decoration-theme]
+enabled_on_start=true

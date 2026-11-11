@@ -1,0 +1,621 @@
+[[aliases.entries]]
+abbreviation = 'bt'
+
+    [[aliases.entries.targets]]
+    catalogID = 'tuna.applications'
+    id = '/Applications/BetterTouchTool.app'
+
+[[aliases.entries]]
+abbreviation = 'emo'
+
+    [[aliases.entries.targets]]
+    catalogID = 'tuna.emoji.search'
+    id = 'emoji.search'
+
+[catalogs]
+searchPriorities = []
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'brew.packages'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.color-history'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.contacts'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.custom-items'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.emoji'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.last-dictation-recording'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.network-locations'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.printers'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.processes'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.quick-actions'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.scripts'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.shelf'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.shortcuts'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.smart-links'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.globalScopes]]
+    catalogIdentifier = 'tuna.volumes'
+
+        [catalogs.globalScopes.scope]
+        kind = 'none'
+
+    [[catalogs.sortOrders]]
+    catalogIdentifier = 'tuna.clipboard'
+    sortOrder = 'capturedAt.desc'
+
+[[comboMode.bindings]]
+key = 'm'
+label = 'Menu Items'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/browse'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'tuna.menu-items/menuItems.search' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'e'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/browse'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'tuna.emoji.search/emoji.search' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'z'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/open'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'path:/Applications/Zen Browser.app' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = '1'
+label = 'EN (IME)'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/run-text-as-shell-command'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'text:/opt/homebrew/bin/im-select com.apple.keylayout.ABC' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = "\u3105"
+label = 'EN (IME)'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/run-text-as-shell-command'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'text:/opt/homebrew/bin/im-select com.apple.keylayout.ABC' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = '2'
+label = 'ZH (IME)'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/run-text-as-shell-command'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'text:/opt/homebrew/bin/im-select com.apple.inputmethod.TCIM.Zhuyin' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = '3'
+label = 'JA (IME)'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/run-text-as-shell-command'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'text:/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = "\u02C7"
+label = 'JA (IME)'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/run-text-as-shell-command'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'text:/opt/homebrew/bin/im-select com.apple.inputmethod.Kotoeri.RomajiTyping.Japanese' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'h'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/open'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'path:/Applications/Helium.app' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 't'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/open'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'path:/Applications/Ghostty.app' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'l'
+
+    [comboMode.bindings.destination]
+    type = 'command'
+
+        [comboMode.bindings.destination.command]
+        actionIdentifier = 'tuna.common-actions/open'
+        behavior = 'run'
+        presentation = 'automatic'
+        subjectIdentifiers = [ 'path:/Applications/Linear.app' ]
+        type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'b'
+label = 'Browsers'
+
+    [comboMode.bindings.destination]
+    type = 'group'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 's'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/System/Volumes/Preboot/Cryptexes/App/System/Applications/Safari.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'c'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Google Chrome.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'e'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Microsoft Edge Dev.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'z'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Zen Browser.app' ]
+                type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'a'
+label = 'AI & Translation'
+
+    [comboMode.bindings.destination]
+    type = 'group'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'g'
+        label = 'Fix grammar'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/run-text-as-shell-command'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'text:open -g btt://trigger_named/?trigger_name=Tuna-stage' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'j'
+        label = 'Japanese Helper'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open-url'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'url:raycast-x://extensions/raycast/ai/japanese-helper' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'J'
+        label = 'Translate to Japanese'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open-url'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'url:raycast-x://extensions/raycast/ai/translate-to-japanese' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'r'
+        label = 'Translate to Traditional Chinses'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open-url'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'url:raycast-x://extensions/raycast/ai/translate-to-traditional-chinese' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'y'
+        label = 'Summarize YouTube'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open-url'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'url:raycast-x://extensions/raycast/ai/summarize-youtube-video' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'e'
+        label = 'Translate to English'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open-url'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'url:raycast-x://extensions/raycast/ai/translate-to-english' ]
+                type = 'savedCommand'
+
+[[comboMode.bindings]]
+key = 'o'
+label = 'Apps'
+
+    [comboMode.bindings.destination]
+    type = 'group'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'm'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Messenger.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 's'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Slack.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'c'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Users/yukai/Applications/Edge Apps.localized/Notion Calendar.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'S'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Spark Desktop.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'o'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Obsidian.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'l'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Linear.app' ]
+                type = 'savedCommand'
+
+        [[comboMode.bindings.destination.bindings]]
+        key = 'f'
+
+            [comboMode.bindings.destination.bindings.destination]
+            type = 'command'
+
+                [comboMode.bindings.destination.bindings.destination.command]
+                actionIdentifier = 'tuna.common-actions/open'
+                behavior = 'run'
+                presentation = 'automatic'
+                subjectIdentifiers = [ 'path:/Applications/Figma.app' ]
+                type = 'savedCommand'
+
+[hotkeys.app.activate]
+carbonKeyCode = 49
+carbonModifiers = 2048
+
+[[hotkeys.custom]]
+id = '04E3D283-39C2-4C19-9F6D-F1B6E6BB1ED5'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/run'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.window-management/right-half' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 37
+    carbonModifiers = 2560
+
+[[hotkeys.custom]]
+id = '0AB70F87-0C7A-44DD-8B7B-C54E8A26286B'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/run'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.window-management/almost-maximize' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 46
+    carbonModifiers = 2560
+
+[[hotkeys.custom]]
+id = '0D7F666B-60D8-42E5-8A85-0FE1617333DC'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/toggle-application'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.applications//Applications/ChatGPT.app' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 0
+    carbonModifiers = 2560
+
+[[hotkeys.custom]]
+id = '2D6A53E2-3CF7-4D00-B9DC-C17EB149D8A8'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/browse'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.clipboard/clipboard.history.root' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 9
+    carbonModifiers = 768
+
+[[hotkeys.custom]]
+id = '92C117FC-2E0A-4C77-A5D9-AD51A75BD8A5'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/run'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.window-management/center' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 8
+    carbonModifiers = 2560
+
+[[hotkeys.custom]]
+id = '9A8F97A1-C204-4BDF-9342-18D7C14E169D'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/run'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.window-management/left-half' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 4
+    carbonModifiers = 2560
+
+[[hotkeys.custom]]
+id = 'F34654CC-B10D-41E5-8142-85B5527E2353'
+
+    [hotkeys.custom.command]
+    actionIdentifier = 'tuna.common-actions/run'
+    behavior = 'run'
+    presentation = 'automatic'
+    subjectIdentifiers = [ 'tuna.window-management/maximize' ]
+    type = 'savedCommand'
+
+    [hotkeys.custom.shortcut]
+    carbonKeyCode = 46
+    carbonModifiers = 2816
+
+[settings]
+comboModeDoublePressTrigger = 'leftCommand'
+comboModeKeyboardLayoutBehavior = 'forceUS'
+comboModeThemeStyle = 'breadcrumb'
+comboModeTriggerType = 'doublePress'
+
+[[catalogSettings]]
+catalogIdentifier = 'tuna.prompts'
+
+    [catalogSettings.values]
+    Provider = 'apple'
