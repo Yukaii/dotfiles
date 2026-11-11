@@ -99,6 +99,8 @@ brew "awscli"
 brew "libgit2"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
+# Bourne-Again SHell with modern language features
+brew "bash"
 # Control and limit battery charging on Apple Silicon MacBooks
 brew "batt"
 # Open-source, cross-platform JavaScript runtime environment
