@@ -7,10 +7,11 @@
     <key>ProgramArguments</key>
     <array>
       <string>/bin/bash</string>
-      <string>/Users/yukai/.startup.sh</string>
+      <string>__HOME__/.startup.sh</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
+    <key>StandardErrorPath</key>
+    <string>__HOME__/Library/Logs/com.user.startup.err</string>
   </dict>
 </plist>
-

@@ -1,2 +1,3 @@
-com.user.startup.plist
 README.*
+^/install\.sh$
+^/.*\.plist$
