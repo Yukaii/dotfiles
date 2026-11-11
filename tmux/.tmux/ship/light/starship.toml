@@ -11,11 +11,11 @@ shell = "bash"
 when = 'test "${TMUX_CLIENT_PREFIX:-0}" = "1"'
 command = 'printf "%s " "${TMUX_SESSION_NAME:-?}"'
 format = "[$output]($style) "
-style = "bg:#95E6CB bold"
+style = "bg:#b8cece bold"
 
 [custom.session_normal]
 shell = "bash"
 when = 'test "${TMUX_CLIENT_PREFIX:-0}" != "1"'
 command = 'printf "%s" "${TMUX_SESSION_NAME:-?}"'
 format = "[$output]($style) "
-style = "fg:#6c6f85"
+style = "fg:#9893a5"

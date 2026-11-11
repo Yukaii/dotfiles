@@ -5,5 +5,5 @@ mode="${1:-$(appearance-mode)}"
 if [ "$mode" = "dark" ]; then
   printf 'Catppuccin Mocha\n'
 else
-  printf 'Catppuccin Latte\n'
+  printf 'Dawnfox\n'
 fi

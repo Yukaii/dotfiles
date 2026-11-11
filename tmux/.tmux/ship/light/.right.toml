@@ -8,7 +8,7 @@ add_newline = false
 shell = "bash"
 command = 'date "+%a %-l:%M %p"'
 format = "[$output]($style)"
-style = "fg:#475266"
+style = "fg:#9893a5"
 when = true
 
 [custom.battery]

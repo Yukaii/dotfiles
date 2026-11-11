@@ -1,18 +1,19 @@
 # appearance.kak — follow macOS system appearance (Light/Dark).
 # Dark:  kanagawa colorscheme + kanagawa-wave giallo theme (your current setup).
-# Light: catppuccin_latte colorscheme + catppuccin-latte giallo theme.
+# Light: dawnfox colorscheme + dawnfox giallo theme (custom, converted from
+#        nightfox's dawnfox.tmTheme into ~/.config/giallo.kak/themes).
 # Change the four options below to pick different pairs.
 
 declare-option str appearance_dark_colorscheme kanagawa
-declare-option str appearance_light_colorscheme catppuccin_latte
+declare-option str appearance_light_colorscheme dawnfox
 declare-option str appearance_dark_giallo kanagawa-wave
-declare-option str appearance_light_giallo catppuccin-latte
+declare-option str appearance_light_giallo dawnfox
 # Current-line/column (kak-crosshairs) backgrounds per theme.
 declare-option str appearance_dark_line 'default,rgb:383838'
-declare-option str appearance_light_line 'default,rgb:e6e9ef'
+declare-option str appearance_light_line 'default,rgb:ebe5df'
 # Word-under-cursor (highlight.kak CurWord) background per theme.
 declare-option str appearance_dark_word 'default,rgb:4a4a4a'
-declare-option str appearance_light_word 'default,rgb:ccd0da'
+declare-option str appearance_light_word 'default,rgb:d0d8d8'
 declare-option -hidden str appearance_current ""
 
 define-command appearance-apply-giallo -hidden -params 1 %{

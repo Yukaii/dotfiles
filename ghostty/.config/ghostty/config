@@ -1,7 +1,7 @@
 auto-update-channel = tip
 
 font-size                  = 15
-theme                      = light:GitHub-Light-Default,dark:kanagawabones
+theme                      = light:Dawnfox,dark:kanagawabones
 
 command                    = /opt/homebrew/bin/fish
 

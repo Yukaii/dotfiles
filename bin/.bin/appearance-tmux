@@ -18,6 +18,15 @@ case "$1" in
   *) mode="$(appearance-mode)" ;;
 esac
 
+# tmux-palette reads theme.json on every launch. Point it at the per-mode file;
+# the palette's theme switcher writes through the link, so each mode keeps
+# its own pick. Runs before the early exit so a missing link gets repaired.
+palette_dir="${XDG_CONFIG_HOME:-$HOME/.config}/tmux-palette"
+if [ -e "$palette_dir/theme-$mode.json" ] &&
+  [ "$(readlink "$palette_dir/theme.json" 2>/dev/null)" != "theme-$mode.json" ]; then
+  ln -sfn "theme-$mode.json" "$palette_dir/theme.json"
+fi
+
 if [ -z "$force" ]; then
   current="$(tmux show-environment -g APPEARANCE_MODE 2>/dev/null | cut -d= -f2-)"
   if [ "$current" = "$mode" ]; then
@@ -29,13 +38,13 @@ tmux set-environment -g APPEARANCE_MODE "$mode" >/dev/null
 
 if [ "$mode" = "light" ]; then
   SHIP="$HOME/.tmux/ship/light"
-  PANE_BORDER="fg=#ccd0da"
-  PANE_ACTIVE="fg=#1e66f5"
-  POPUP_BORDER="fg=#9ca0b0"
-  DOTBAR_FG="#6c6f85"
-  DOTBAR_CURRENT="#4c4f69"
-  DOTBAR_SESSION="#c8c093"
-  DOTBAR_PREFIX="#209fb5"
+  PANE_BORDER="fg=#bdbfc9"
+  PANE_ACTIVE="fg=#286983"
+  POPUP_BORDER="fg=#a8a3b3"
+  DOTBAR_FG="#9893a5"
+  DOTBAR_CURRENT="#575279"
+  DOTBAR_SESSION="#d7827e"
+  DOTBAR_PREFIX="#56949f"
   TMUX_FZF_COLOR="light"
 else
   SHIP="$HOME/.tmux/ship/dark"

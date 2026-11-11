@@ -4,8 +4,8 @@
 # light backgrounds. STARSHIP_CONFIG=$HOME/.config/starship-light.toml
 # when macOS is in Light mode.
 
-format = """[~](#6B4E71) $username $git_branch$git_state$shell $fill $cmd_duration ${custom.day} [at](bold black) ${custom.time} $nodejs
-[~](#6B4E71) ${custom.spaced_dir} $character
+format = """[~](#907aa9) $username $git_branch$git_state$shell $fill $cmd_duration ${custom.day} [at](bold black) ${custom.time} $nodejs
+[~](#907aa9) ${custom.spaced_dir} $character
 """
 
 [username]
@@ -15,7 +15,7 @@ show_always = true
 
 [git_branch]
 format = "[ ](bold black) [ $branch]($style)"
-style = '#6B4E71'
+style = '#907aa9'
 
 [fill]
 symbol = ' '
@@ -54,11 +54,11 @@ when = true
 [custom.day]
 command = """date '+%A'"""
 shell = "bash"
-format = "[${output}](#4d4d4d)"
+format = "[${output}](#625c87)"
 when = true
 
 [custom.time]
 command = """date '+%-l:%M %p'"""
 shell = "bash"
-format = "[${output}](#4d4d4d)"
+format = "[${output}](#625c87)"
 when = true
