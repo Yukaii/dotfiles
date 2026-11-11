@@ -1,4 +1,7 @@
 prSections:
+- title: Open Pull Requests
+  filters: is:open
+  type: null
 - title: My Pull Requests
   filters: is:open author:@me
   type: null
