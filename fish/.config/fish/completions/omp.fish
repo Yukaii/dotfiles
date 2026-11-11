@@ -2,7 +2,7 @@
 
 function __fish_omp_no_subcommand
 	for i in (commandline -opc)
-		if contains -- $i acp agents auth-broker auth-gateway bench commit completions config dry-balance gallery gc grep grievances install join models plugin read say search q setup shell ssh stats tiny-models token ttsr update usage worktree wt
+		if contains -- $i acp agents auth-broker auth-gateway bench browser-relay cleanse commit completions compress config dry-balance gallery gc grep grievances install join models plugin read say search q setup share shell ssh stats tiny-models token ttsr update usage worktree wt
 			return 1
 		end
 	end
@@ -14,8 +14,11 @@ complete -c omp -f -n '__fish_omp_no_subcommand' -a 'agents' -d 'Manage bundled 
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'auth-broker' -d 'Manage the omp auth-broker (credential vault)'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'auth-gateway' -d 'Run an auth-gateway forward proxy backed by the configured broker'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'bench' -d 'Benchmark models with the same prompt: time-to-first-token and generation throughput (tokens/s)'
+complete -c omp -f -n '__fish_omp_no_subcommand' -a 'browser-relay' -d 'Run the local CDP relay that lets the browser tool drive your own Chrome tabs'
+complete -c omp -f -n '__fish_omp_no_subcommand' -a 'cleanse' -d 'Detect and fix project diagnostics with weighted parallel subagents'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'commit' -d 'Generate a commit message and update changelogs'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'completions' -d 'Print a shell completion script (bash, zsh, or fish)'
+complete -c omp -f -n '__fish_omp_no_subcommand' -a 'compress' -d 'Rewrite a text file into the dense prompt register, reporting what it drops'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'config' -d 'Manage configuration settings'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'dry-balance' -d 'Dry-run OAuth account balancing across random session ids'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'gallery' -d 'Preview tool renderers across streaming, in-progress, success, and failure states'
@@ -31,6 +34,7 @@ complete -c omp -f -n '__fish_omp_no_subcommand' -a 'say' -d 'Synthesize text wi
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'search' -d 'Test web search providers'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'q' -d 'Test web search providers'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'setup' -d 'Run onboarding setup or install dependencies for optional features'
+complete -c omp -f -n '__fish_omp_no_subcommand' -a 'share' -d 'Share a saved session via an encrypted link (same as /share)'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'shell' -d 'Interactive shell console'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'ssh' -d 'Manage SSH host configurations'
 complete -c omp -f -n '__fish_omp_no_subcommand' -a 'stats' -d 'View usage statistics'
@@ -46,6 +50,11 @@ complete -c omp -n '__fish_omp_no_subcommand' -l model -d 'Model to use (fuzzy m
 complete -c omp -n '__fish_omp_no_subcommand' -l smol -d 'Smol/fast model for lightweight tasks (or PI_SMOL_MODEL env)' -x -a '(command omp __complete models -- (commandline -ct))'
 complete -c omp -n '__fish_omp_no_subcommand' -l slow -d 'Slow/reasoning model for thorough analysis (or PI_SLOW_MODEL env)' -x -a '(command omp __complete models -- (commandline -ct))'
 complete -c omp -n '__fish_omp_no_subcommand' -l plan -d 'Plan model for architectural planning (or PI_PLAN_MODEL env)' -x -a '(command omp __complete models -- (commandline -ct))'
+complete -c omp -n '__fish_omp_no_subcommand' -l prewalk -d 'Switch from the active model to a fast/cheap model at the first edit/write after the plan’s todo list exists (default off; see prewalk.enabled)'
+complete -c omp -n '__fish_omp_no_subcommand' -l no-prewalk -d 'Disable prewalk even if prewalk.enabled is set'
+complete -c omp -n '__fish_omp_no_subcommand' -l prewalk-into -d 'Target model for prewalk (default the "smol" role)' -r -F
+complete -c omp -n '__fish_omp_no_subcommand' -l plan-yolo -d 'Force read-only plan mode at start, auto-approve the plan on the model’s first resolve call, then switch to --plan-yolo-into to implement it'
+complete -c omp -n '__fish_omp_no_subcommand' -l plan-yolo-into -d 'Target model for plan-yolo execution (default the "smol" role)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l provider -d 'Provider to use (legacy; prefer --model)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l api-key -d 'API key (defaults to env vars)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l system-prompt -d 'System prompt (default: coding assistant prompt)' -r -F
@@ -56,19 +65,24 @@ complete -c omp -n '__fish_omp_no_subcommand' -l alias -d 'Create a shell shortc
 complete -c omp -n '__fish_omp_no_subcommand' -l cwd -d 'Directory to start in (overrides the launch cwd)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l mode -d 'Output mode: text (default), json, rpc, or rpc-ui' -x -a 'text json rpc acp rpc-ui'
 complete -c omp -n '__fish_omp_no_subcommand' -l config -d 'Load an extra config.yml-style overlay for this run (repeatable)' -r -F
+complete -c omp -n '__fish_omp_no_subcommand' -l add-dir -d 'Add a workspace directory beyond the working directory (repeatable)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -s p -l print -d 'Non-interactive mode: process prompt and exit'
 complete -c omp -n '__fish_omp_no_subcommand' -s c -l continue -d 'Continue previous session'
 complete -c omp -n '__fish_omp_no_subcommand' -s r -l resume -d 'Resume a session (by ID prefix, path, or picker if omitted)' -x -a '(command omp __complete sessions -- (commandline -ct))'
+complete -c omp -n '__fish_omp_no_subcommand' -l from-claude -d 'Import a Claude Code session into OMP'
+complete -c omp -n '__fish_omp_no_subcommand' -l from-codex -d 'Import a Codex session into OMP'
 complete -c omp -n '__fish_omp_no_subcommand' -l session-dir -d 'Directory for session storage and lookup' -x -a '(__fish_complete_directories (commandline -ct))'
 complete -c omp -n '__fish_omp_no_subcommand' -l no-session -d 'Don’t save session (ephemeral)'
 complete -c omp -n '__fish_omp_no_subcommand' -l models -d 'Comma-separated model patterns for Ctrl+P cycling' -x -a '(command omp __complete models -- (commandline -ct))'
 complete -c omp -n '__fish_omp_no_subcommand' -l no-tools -d 'Disable all built-in tools'
 complete -c omp -n '__fish_omp_no_subcommand' -l no-lsp -d 'Disable LSP tools, formatting, and diagnostics'
 complete -c omp -n '__fish_omp_no_subcommand' -l no-pty -d 'Disable PTY-based interactive bash execution'
-complete -c omp -n '__fish_omp_no_subcommand' -l tools -d 'Comma-separated list of tools to enable (default: all)' -x -a 'read bash edit ast_grep ast_edit ask debug eval ssh github glob grep lsp inspect_image browser checkpoint rewind task job irc todo web_search search_tool_bm25 write memory_edit retain recall reflect learn manage_skill'
+complete -c omp -n '__fish_omp_no_subcommand' -l tools -d 'Comma-separated list of tools to enable (default: all)' -x -a 'read bash edit ast_grep ast_edit ask debug eval github glob grep lsp inspect_image browser computer checkpoint rewind security_scan task hub todo web_search write memory_edit retain recall reflect learn manage_skill'
 complete -c omp -n '__fish_omp_no_subcommand' -l thinking -d 'Set thinking level: off, minimal, low, medium, high, xhigh, max, auto' -x -a 'off minimal low medium high xhigh max auto'
+complete -c omp -n '__fish_omp_no_subcommand' -l service-tier -d 'OpenAI service tier for this session (none omits service_tier)' -x -a 'none auto default flex scale priority'
 complete -c omp -n '__fish_omp_no_subcommand' -l hide-thinking -d 'Hide thinking blocks in TUI output (display only, does not disable model thinking)'
 complete -c omp -n '__fish_omp_no_subcommand' -l advisor -d 'Enable the advisor runtime (passively reviews each turn and injects notes)'
+complete -c omp -n '__fish_omp_no_subcommand' -l external-thinking -d 'Use a private scratchpad while disabling supported GPT, Claude, and Gemini reasoning'
 complete -c omp -n '__fish_omp_no_subcommand' -l hook -d 'Load a hook/extension file (can be used multiple times)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -s e -l extension -d 'Load an extension file (can be used multiple times)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l no-extensions -d 'Disable extension discovery (explicit -e paths still work)'
@@ -78,7 +92,7 @@ complete -c omp -n '__fish_omp_no_subcommand' -l no-rules -d 'Disable rules disc
 complete -c omp -n '__fish_omp_no_subcommand' -l export -d 'Export session file to HTML and exit' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l no-title -d 'Disable title auto-generation'
 complete -c omp -n '__fish_omp_no_subcommand' -l print-thoughts -d 'Include thinking blocks in print mode text output'
-complete -c omp -n '__fish_omp_no_subcommand' -l max-time -d 'Stop the session after this many seconds' -r -F
+complete -c omp -n '__fish_omp_no_subcommand' -l max-time -d 'Stop the session after this duration (e.g., 600, 10m, 1h)' -r -F
 complete -c omp -n '__fish_omp_no_subcommand' -l auto-approve -d 'Auto-approve all tool calls (skip approval prompts)'
 complete -c omp -n '__fish_omp_no_subcommand' -l approval-mode -d 'Override tools.approvalMode for this session (always-ask|write|yolo)' -x -a 'always-ask write yolo'
 
@@ -105,13 +119,29 @@ complete -c omp -n '__fish_seen_subcommand_from auth-gateway' -l regenerate -d '
 complete -c omp -n '__fish_seen_subcommand_from auth-gateway' -l no-auth -d 'Disable inbound bearer-token auth (serve). Useful when bound to loopback — any caller is allowed.'
 complete -c omp -n '__fish_seen_subcommand_from auth-gateway' -l strict -d 'For `check`: additionally probe each credential against its provider’s chat-completion endpoint. Slower; consumes a tiny amount of quota per credential.'
 complete -c omp -f -n '__fish_seen_subcommand_from auth-gateway' -a 'serve token status check' -d 'Sub-command'
-complete -c omp -n '__fish_seen_subcommand_from bench' -l runs -d 'Requests per model (results are averaged)' -x
-complete -c omp -n '__fish_seen_subcommand_from bench' -l max-tokens -d 'Max output tokens per request' -x
+complete -c omp -n '__fish_seen_subcommand_from bench' -l runs -d 'Requests per model (results are averaged; default: 10)' -x
+complete -c omp -n '__fish_seen_subcommand_from bench' -l max-tokens -d 'Max output tokens per request (default: 512; cache mode: 64)' -x
 complete -c omp -n '__fish_seen_subcommand_from bench' -l prompt -d 'Custom prompt text (default: bundled bench prompt)' -r -F
 complete -c omp -n '__fish_seen_subcommand_from bench' -l service-tier -d 'Service tier applied per model family (default: configured `tier.*` settings; `none` omits it)' -x -a 'none auto default flex scale priority'
 complete -c omp -n '__fish_seen_subcommand_from bench' -l json -d 'Output JSON'
-complete -c omp -n '__fish_seen_subcommand_from bench' -l par -d 'Execute runs with N parallel queries/requests' -x
+complete -c omp -n '__fish_seen_subcommand_from bench' -l par -d 'Execute runs with N parallel queries/requests (default: 4)' -x
+complete -c omp -n '__fish_seen_subcommand_from bench' -l cache -d 'Run independent cold/warm prompt-cache pairs (not supported for openai-codex-responses)'
+complete -c omp -n '__fish_seen_subcommand_from bench' -l cache-prefix-file -d 'Stable prompt prefix file for --cache' -r -F
+complete -c omp -n '__fish_seen_subcommand_from bench' -l cache-prefix-bytes -d 'Stable prefix byte budget for --cache (default: 8192)' -x
+complete -c omp -n '__fish_seen_subcommand_from bench' -l cache-pairs -d 'Cold/warm pairs per model for --cache (default: 1)' -x
+complete -c omp -n '__fish_seen_subcommand_from bench' -l cache-concurrency -d 'Concurrent cache pairs for --cache; each pair remains sequential (default: 1)' -x
 complete -c omp -F -n '__fish_seen_subcommand_from bench'
+complete -c omp -n '__fish_seen_subcommand_from browser-relay' -s p -l port -d 'Port to listen on' -x
+complete -c omp -n '__fish_seen_subcommand_from browser-relay' -l token -d 'Require the extension to present this token' -r -F
+complete -c omp -n '__fish_seen_subcommand_from browser-relay' -l dir -d 'Extension install directory (install; default ~/.omp/browser-relay/extension)' -r -F
+complete -c omp -n '__fish_seen_subcommand_from browser-relay' -l no-group -d 'Don’t gather controllable tabs into an ’omp’ tab group'
+complete -c omp -n '__fish_seen_subcommand_from browser-relay' -s v -l verbose -d 'Log relay traffic summaries to stderr'
+complete -c omp -f -n '__fish_seen_subcommand_from browser-relay' -a 'serve install' -d 'Action: serve | install (default serve)'
+complete -c omp -n '__fish_seen_subcommand_from cleanse' -s n -l agents -d 'Maximum number of file-disjoint subagents' -x
+complete -c omp -n '__fish_seen_subcommand_from cleanse' -s m -l model -d 'Subagent model selector' -x -a '(command omp __complete models -- (commandline -ct))'
+complete -c omp -n '__fish_seen_subcommand_from cleanse' -s t -l tests -d 'Also run configured project test suites'
+complete -c omp -n '__fish_seen_subcommand_from cleanse' -s a -l all -d 'Run every discovered checker without the interactive picker'
+complete -c omp -F -n '__fish_seen_subcommand_from cleanse'
 complete -c omp -n '__fish_seen_subcommand_from commit' -l push -d 'Push after committing'
 complete -c omp -n '__fish_seen_subcommand_from commit' -l dry-run -d 'Preview without committing'
 complete -c omp -n '__fish_seen_subcommand_from commit' -l no-changelog -d 'Skip changelog updates'
@@ -119,6 +149,12 @@ complete -c omp -n '__fish_seen_subcommand_from commit' -l legacy -d 'Use legacy
 complete -c omp -n '__fish_seen_subcommand_from commit' -s c -l context -d 'Additional context for the model' -r -F
 complete -c omp -n '__fish_seen_subcommand_from commit' -s m -l model -d 'Override model selection' -x -a '(command omp __complete models -- (commandline -ct))'
 complete -c omp -f -n '__fish_seen_subcommand_from completions' -a 'bash zsh fish' -d 'Target shell'
+complete -c omp -n '__fish_seen_subcommand_from compress' -s o -l out -d 'Write the approved text here instead of stdout (single file)' -r -F
+complete -c omp -n '__fish_seen_subcommand_from compress' -s i -l inPlace -d 'Overwrite each source file with its approved text'
+complete -c omp -n '__fish_seen_subcommand_from compress' -s r -l rounds -d 'Maximum drafts per file before giving up' -x
+complete -c omp -n '__fish_seen_subcommand_from compress' -s n -l agents -d 'Files compressed concurrently' -x
+complete -c omp -n '__fish_seen_subcommand_from compress' -s m -l model -d 'Model selector' -x -a '(command omp __complete models -- (commandline -ct))'
+complete -c omp -F -n '__fish_seen_subcommand_from compress'
 complete -c omp -n '__fish_seen_subcommand_from config' -l json -d 'Output JSON'
 complete -c omp -f -n '__fish_seen_subcommand_from config' -a 'list get set reset path init-xdg' -d 'Config action'
 complete -c omp -n '__fish_seen_subcommand_from dry-balance' -l model -d 'Model selector (same syntax as --model on omp)' -x -a '(command omp __complete models -- (commandline -ct))'
@@ -185,7 +221,7 @@ complete -c omp -n '__fish_seen_subcommand_from say' -l model -d 'Local TTS mode
 complete -c omp -n '__fish_seen_subcommand_from say' -s f -l file -d 'Read the text to speak from this file' -r -F
 complete -c omp -n '__fish_seen_subcommand_from say' -s o -l out -d 'Write WAV to this path instead of playing' -r -F
 complete -c omp -F -n '__fish_seen_subcommand_from say'
-complete -c omp -n '__fish_seen_subcommand_from search q' -l provider -d 'Search provider' -x -a 'auto perplexity gemini anthropic codex xai zai exa tinyfish jina kagi tavily firecrawl brave kimi parallel synthetic searxng startpage duckduckgo bing yahoo ecosia google mojeek public'
+complete -c omp -n '__fish_seen_subcommand_from search q' -l provider -d 'Search provider' -x -a 'auto perplexity gemini anthropic codex xai zai exa tinyfish jina kagi tavily firecrawl brave kimi parallel synthetic searxng startpage duckduckgo ecosia google mojeek public'
 complete -c omp -n '__fish_seen_subcommand_from search q' -l recency -d 'Recency filter' -x -a 'day week month year'
 complete -c omp -n '__fish_seen_subcommand_from search q' -s l -l limit -d 'Max results to return' -x
 complete -c omp -n '__fish_seen_subcommand_from search q' -l compact -d 'Render condensed output'
@@ -193,6 +229,8 @@ complete -c omp -F -n '__fish_seen_subcommand_from search q'
 complete -c omp -n '__fish_seen_subcommand_from setup' -s c -l check -d 'Check if dependencies are installed'
 complete -c omp -n '__fish_seen_subcommand_from setup' -l json -d 'Output status as JSON'
 complete -c omp -f -n '__fish_seen_subcommand_from setup' -a 'python speech' -d 'Optional component to install'
+complete -c omp -n '__fish_seen_subcommand_from share' -l gist -d 'Upload to a secret GitHub gist instead of the share server'
+complete -c omp -F -n '__fish_seen_subcommand_from share'
 complete -c omp -n '__fish_seen_subcommand_from shell' -s C -l cwd -d 'Set working directory for commands' -r -F
 complete -c omp -n '__fish_seen_subcommand_from shell' -s t -l timeout -d 'Timeout per command in milliseconds' -x
 complete -c omp -n '__fish_seen_subcommand_from shell' -l no-snapshot -d 'Skip sourcing snapshot from user shell'
@@ -206,6 +244,7 @@ complete -c omp -n '__fish_seen_subcommand_from ssh' -l compat -d 'Enable compat
 complete -c omp -n '__fish_seen_subcommand_from ssh' -l scope -d 'Config scope (project|user)' -x -a 'project user'
 complete -c omp -f -n '__fish_seen_subcommand_from ssh' -a 'add remove list' -d 'SSH action'
 complete -c omp -n '__fish_seen_subcommand_from stats' -s p -l port -d 'Port for the dashboard server' -x
+complete -c omp -n '__fish_seen_subcommand_from stats' -l host -d 'Host to bind' -r -F
 complete -c omp -n '__fish_seen_subcommand_from stats' -s j -l json -d 'Output stats as JSON'
 complete -c omp -n '__fish_seen_subcommand_from stats' -s s -l summary -d 'Print summary to console'
 complete -c omp -n '__fish_seen_subcommand_from tiny-models' -l json -d 'Output JSON'

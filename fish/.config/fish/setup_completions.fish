@@ -12,8 +12,8 @@ if command -q oh-my-posh
 end
 
 
-if command -q sg
-  sg completions fish > $completions_dir/sg.fish
+if command -q asg-grep
+  asg-grep completions fish > $completions_dir/asg-grep.fish
 end
 
 if command -q fzf
@@ -72,6 +72,6 @@ if command -q omp
   omp completions fish > $completions_dir/omp.fish
 end
 
-if command -q workmux
-  workmux completions fish > $completions_dir/workmux.fish 
+if command -q /Applications/Tailscale.app/Contents/MacOS/Tailscale
+  /Applications/Tailscale.app/Contents/MacOS/Tailscale completion fish > $completions_dir/tailscale.fish
 end
