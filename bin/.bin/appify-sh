@@ -8,7 +8,12 @@
 # - ghostty: Launches a new Ghostty instance with the command as its initial
 #            surface. The command and its arguments are passed as separate argv
 #            entries so tools such as `fresh --help` are not collapsed into one
-#            invalid command name.
+#            invalid command name. With --helper, a private Ghostty copy named
+#            after the app is embedded under Resources/ and ad-hoc signed; its
+#            Dock/Cmd-Tab label comes from that bundle's folder name. Ghostty's
+#            upstream DockTilePlugin (hard-wired to com.mitchellh.ghostty) is
+#            removed and the icon is baked into the bundle, so the generated app
+#            gets its own name and icon instead of Ghostty's.
 set -euo pipefail
 
 NAME=""
@@ -34,8 +39,10 @@ Options:
   -b, --bundle-id <id>       Bundle Identifier (default: com.local.<name>)
   -e, --env <KEY=VAL>        Set environment variable (can be used multiple times)
   --cwd <path>               Initial working directory
-  --shell                    Run command inside a shell session
-  --helper                   Ghostty only: bundle a private Ghostty helper app
+  --shell                    Run command inside an interactive login shell
+                             (loads .zprofile/.zshrc: mise, aliases, colours)
+  --helper                   Ghostty only: bundle a private, ad-hoc signed
+                             Ghostty app named after the app (own Dock name/icon)
   -h, --help                 Show this help message
 
 Backends:
@@ -143,42 +150,15 @@ mkdir -p "$OUTPUT_DIR"
 rm -rf "$APP_BUNDLE"
 mkdir -p "$MACOS" "$RESOURCES"
 
-HELPER_APP=""
-if [[ "$USE_HELPER" == "true" ]]; then
-  GHOSTTY_SOURCE="${GHOSTTY_APP:-/Applications/Ghostty.app}"
-  if [[ ! -d "$GHOSTTY_SOURCE" ]]; then
-    echo "Error: Ghostty app not found at '$GHOSTTY_SOURCE'." >&2
-    exit 1
-  fi
-
-  # LaunchServices identifies the app that owns the executable. A private,
-  # renamed Ghostty bundle therefore gives the generated app its own Dock and
-  # Cmd-Tab identity. Keep it under Resources so the outer launcher can be
-  # moved as one self-contained app.
-  HELPER_APP="$RESOURCES/Terminal.app"
-  ditto --norsrc --noqtn "$GHOSTTY_SOURCE" "$HELPER_APP"
-  /usr/libexec/PlistBuddy \
-    -c "Set :CFBundleIdentifier ${BUNDLE_ID}.terminal" \
-    -c "Set :CFBundleName ${NAME}" \
-    -c "Set :CFBundleDisplayName ${NAME}" \
-    "$HELPER_APP/Contents/Info.plist"
-  # Homebrew/Ghostty bundles may carry Finder resource forks. Strip those
-  # before re-signing the renamed copy; codesign rejects resource forks.
-  xattr -cr "$HELPER_APP" 2>/dev/null || true
-  codesign --remove-signature "$HELPER_APP" >/dev/null 2>&1 || true
-  if ! codesign --force --deep --sign - "$HELPER_APP" >/dev/null 2>&1; then
-    echo "Error: failed to ad-hoc sign the bundled Ghostty helper." >&2
-    exit 1
-  fi
-fi
-
 ICON_FILE=""
+BUNDLED_ICON=""
 
 # --- Icon Processing ---
 if [[ -n "$ICON" && -f "$ICON" ]]; then
   if [[ "$ICON" == *.icns ]]; then
     cp "$ICON" "$RESOURCES/AppIcon.icns"
     ICON_FILE="AppIcon"
+    BUNDLED_ICON="AppIcon.icns"
   else
     TEMP_DIR="$(mktemp -d)"
     ICONSET_DIR="${TEMP_DIR}/AppIcon.iconset"
@@ -197,12 +177,14 @@ if [[ -n "$ICON" && -f "$ICON" ]]; then
 
     if iconutil -c icns "$ICONSET_DIR" -o "$RESOURCES/AppIcon.icns" >/dev/null 2>&1; then
       ICON_FILE="AppIcon"
+      BUNDLED_ICON="AppIcon.icns"
     else
       # Keep a usable icon when iconutil rejects an input image. macOS accepts
       # a PNG named by CFBundleIconFile, while other platforms can still run
       # this script for bundle generation/tests.
       cp "$ICON" "$RESOURCES/AppIcon.png"
       ICON_FILE="AppIcon.png"
+      BUNDLED_ICON="AppIcon.png"
     fi
     rm -rf "$TEMP_DIR"
   fi
@@ -210,6 +192,55 @@ fi
 
 if [[ -z "$ICON_FILE" ]]; then
   ICON_FILE="AppIcon"
+fi
+
+HELPER_APP=""
+if [[ "$USE_HELPER" == "true" ]]; then
+  GHOSTTY_SOURCE="${GHOSTTY_APP:-/Applications/Ghostty.app}"
+  if [[ ! -d "$GHOSTTY_SOURCE" ]]; then
+    echo "Error: Ghostty app not found at '$GHOSTTY_SOURCE'." >&2
+    exit 1
+  fi
+
+  # LaunchServices derives the Dock/Cmd-Tab label and the tile icon from this
+  # nested bundle, so name the folder after the app (e.g. "Fresh.app") rather
+  # than a generic "Terminal.app", which macOS would display verbatim. Keep it
+  # under Resources so the outer launcher can be moved as one self-contained app.
+  HELPER_APP="$RESOURCES/${NAME}.app"
+  ditto --norsrc --noqtn "$GHOSTTY_SOURCE" "$HELPER_APP"
+  /usr/libexec/PlistBuddy \
+    -c "Set :CFBundleIdentifier ${BUNDLE_ID}.terminal" \
+    -c "Set :CFBundleName ${NAME}" \
+    -c "Set :CFBundleDisplayName ${NAME}" \
+    "$HELPER_APP/Contents/Info.plist"
+
+  # Ghostty ships a DockTilePlugin hard-wired to the upstream
+  # com.mitchellh.ghostty defaults suite (and plugin id), so a rebranded copy
+  # can never feed it an icon; it resets the tile to the built-in Ghostty icon.
+  # Drop the plugin and drive the tile icon from the bundle instead.
+  /usr/libexec/PlistBuddy \
+    -c "Delete :NSDockTilePlugIn" \
+    "$HELPER_APP/Contents/Info.plist" >/dev/null 2>&1 || true
+  # CFBundleIconName points at Ghostty's asset catalog; point the bundle at our
+  # own icon so Dock and Finder show the app's icon, not Ghostty's.
+  /usr/libexec/PlistBuddy \
+    -c "Delete :CFBundleIconName" \
+    "$HELPER_APP/Contents/Info.plist" >/dev/null 2>&1 || true
+  if [[ -n "$BUNDLED_ICON" ]]; then
+    cp "$RESOURCES/$BUNDLED_ICON" "$HELPER_APP/Contents/Resources/$BUNDLED_ICON"
+    /usr/libexec/PlistBuddy \
+      -c "Set :CFBundleIconFile AppIcon" \
+      "$HELPER_APP/Contents/Info.plist"
+  fi
+
+  # Homebrew/Ghostty bundles may carry Finder resource forks. Strip those
+  # before re-signing the renamed copy; codesign rejects resource forks.
+  xattr -cr "$HELPER_APP" 2>/dev/null || true
+  codesign --remove-signature "$HELPER_APP" >/dev/null 2>&1 || true
+  if ! codesign --force --deep --sign - "$HELPER_APP" >/dev/null 2>&1; then
+    echo "Error: failed to ad-hoc sign the bundled Ghostty helper." >&2
+    exit 1
+  fi
 fi
 
 # --- Info.plist ---
@@ -258,9 +289,11 @@ shell_join() {
 
 RUN_SCRIPT="$(shell_join "$COMMAND" "${CMD_ARGS[@]}")"
 if [[ "$USE_SHELL" == "true" ]]; then
-  # Keep `$SHELL` for the generated launcher to expand at runtime. The script
-  # itself is already shell-quoted, so `-c` receives one exact string.
-  RUN_ARGS='"$SHELL" -c '"$(printf '%q' "$RUN_SCRIPT")"
+  # Keep the shell lookup for the generated launcher to resolve at runtime.
+  # Finder-launched apps do not always inherit SHELL, so use zsh as the macOS
+  # default. Login + interactive flags load the same startup files as a
+  # terminal window (mise, aliases, colour settings, and shell integration).
+  RUN_ARGS='"${SHELL:-/bin/zsh}" -ilc '"$(printf '%q' "$RUN_SCRIPT")"
 else
   RUN_ARGS="$RUN_SCRIPT"
 fi
@@ -312,9 +345,9 @@ elif [[ "$TERMINAL" == "ghostty" ]]; then
 #!/usr/bin/env bash
 export PATH="${INHERITED_PATH}:\$PATH"
 ${ENV_EXPORTS}
+APP_ROOT="\$(cd "\$(dirname "\$0")/.." && pwd)"
 if [[ "$USE_HELPER" == "true" ]]; then
-  APP_ROOT="\$(cd "\$(dirname "\$0")/.." && pwd)"
-  GHOSTTY_APP="\$APP_ROOT/Resources/Terminal.app"
+  GHOSTTY_APP="\$APP_ROOT/Resources/${NAME}.app"
 else
   GHOSTTY_APP="\${GHOSTTY_APP:-/Applications/Ghostty.app}"
 fi
@@ -323,12 +356,10 @@ GHOSTTY_ARGS=(
   --title=$(printf '%q' "$NAME")
   --window-save-state=never
   --quit-after-last-window-closed=true
+  --confirm-close-surface=false
 )
 if [[ -n "${CWD}" ]]; then
   GHOSTTY_ARGS+=(--working-directory=$(printf '%q' "${CWD}"))
-fi
-if [[ -n "${ICON}" && -f "${ICON}" ]]; then
-  GHOSTTY_ARGS+=(--macos-icon=custom --macos-custom-icon=$(printf '%q' "${ICON}"))
 fi
 exec open -na "\$GHOSTTY_APP" --args "\${GHOSTTY_ARGS[@]}" -e "\${RUN_ARGS[@]}"
 EOF

@@ -1,0 +1,397 @@
+#!/usr/bin/env bash
+
+# DNS Tunnel PT (Pluggable Transport) Client Wrapper
+# Migrates old dnstt-client command-line interface to new PT SOCKS interface
+#
+# Author: Claude Code
+# Created: $(date)
+#
+# Usage:
+#   start_dnstt_pt [--test] [--proxy] [--help]
+#
+# Environment variables required:
+#   DNSTT_PUB_KEY_PATH: Path to the public key file
+#   DNS_TUNNEL: DNS tunnel domain
+
+set -euo pipefail
+
+# Configuration
+readonly DOH_URL="https://cloudflare-dns.com/dns-query"
+readonly LOCAL_ADDR="127.0.0.1:8000"
+readonly UTLS="3*Firefox_65,1*Firefox_63,1*iOS_12_1"
+
+# Colors for output
+readonly RED='\033[0;31m'
+readonly GREEN='\033[0;32m'
+readonly YELLOW='\033[1;33m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
+# Global variables
+TEST_MODE=false
+PROXY_MODE=false
+CLIENT_PID=""
+PROXY_PID=""
+PT_SOCKS_ADDR=""
+
+# Function to print colored output
+print_color() {
+    local color=$1
+    shift
+    echo -e "${color}$*${NC}"
+}
+
+print_error() {
+    print_color "$RED" "Error: $*" >&2
+}
+
+print_success() {
+    print_color "$GREEN" "$*"
+}
+
+print_info() {
+    print_color "$BLUE" "$*"
+}
+
+print_warning() {
+    print_color "$YELLOW" "$*"
+}
+
+# Function to show help
+show_help() {
+    cat << EOF
+DNS Tunnel PT (Pluggable Transport) Client Wrapper
+
+This script migrates your old dnstt-client command line interface to the new
+PT-compatible SOCKS interface. It translates:
+
+OLD: dnstt-client -doh URL -pubkey-file FILE DOMAIN LOCAL_ADDR
+NEW: PT SOCKS proxy with configuration passed through SOCKS arguments
+
+USAGE:
+    start_dnstt_pt [OPTIONS]
+
+OPTIONS:
+    --test      Install PT tools and run connection tests
+    --proxy     Create TCP proxy from $LOCAL_ADDR to SOCKS
+    --help      Show this help message
+
+ENVIRONMENT VARIABLES:
+    DNSTT_PUB_KEY_PATH    Path to the public key file (required)
+    DNS_TUNNEL            DNS tunnel domain (required)
+
+EXAMPLES:
+    # Basic usage - shows available connection methods
+    start_dnstt_pt
+
+    # Test mode - installs tools and runs tests
+    start_dnstt_pt --test
+
+    # Proxy mode - creates TCP proxy for compatibility
+    start_dnstt_pt --proxy
+
+DEPENDENCIES:
+    - dnstt-client binary (searches in ./dnstt-client, ~/Programs/dnstt/dnstt-client/dnstt-client, or PATH)
+    - Optional: torsocks, proxychains-ng (auto-installed in test mode)
+    - Optional: socat (for proxy mode, usually pre-installed)
+
+EOF
+}
+
+# Function to cleanup processes on exit
+cleanup() {
+    local exit_code=$?
+    print_info "\nCleaning up..."
+
+    if [[ -n "$PROXY_PID" ]] && kill -0 "$PROXY_PID" 2>/dev/null; then
+        print_info "Stopping TCP proxy (PID: $PROXY_PID)..."
+        kill "$PROXY_PID" 2>/dev/null || true
+    fi
+
+    if [[ -n "$CLIENT_PID" ]] && kill -0 "$CLIENT_PID" 2>/dev/null; then
+        print_info "Stopping dnstt-client (PID: $CLIENT_PID)..."
+        kill "$CLIENT_PID" 2>/dev/null || true
+    fi
+
+    exit $exit_code
+}
+
+# Function to validate environment
+validate_environment() {
+    if [[ -z "${DNSTT_PUB_KEY_PATH:-}" ]]; then
+        print_error "DNSTT_PUB_KEY_PATH environment variable not set"
+        return 1
+    fi
+
+    if [[ -z "${DNS_TUNNEL:-}" ]]; then
+        print_error "DNS_TUNNEL environment variable not set"
+        return 1
+    fi
+
+    if [[ ! -f "$DNSTT_PUB_KEY_PATH" ]]; then
+        print_error "Pubkey file not found: $DNSTT_PUB_KEY_PATH"
+        return 1
+    fi
+
+    return 0
+}
+
+# Function to find dnstt-client binary
+find_dnstt_client() {
+    local dnstt_client=""
+
+    if [[ -x "./dnstt-client" ]]; then
+        dnstt_client="./dnstt-client"
+    elif [[ -x "$HOME/Programs/dnstt/dnstt-client/dnstt-client" ]]; then
+        dnstt_client="$HOME/Programs/dnstt/dnstt-client/dnstt-client"
+    elif command -v dnstt-client >/dev/null 2>&1; then
+        dnstt_client="dnstt-client"
+    else
+        print_error "dnstt-client binary not found"
+        print_error "Searched in: ./dnstt-client, ~/Programs/dnstt/dnstt-client/dnstt-client, PATH"
+        return 1
+    fi
+
+    echo "$dnstt_client"
+}
+
+# Function to install PT tools
+install_pt_tools() {
+    if [[ "$TEST_MODE" == "true" ]]; then
+        if ! command -v torsocks >/dev/null 2>&1; then
+            print_info "📦 Installing torsocks for PT testing..."
+            brew install torsocks
+        fi
+
+        if ! command -v proxychains-ng >/dev/null 2>&1; then
+            print_info "📦 Installing proxychains-ng for PT testing..."
+            brew install proxychains-ng
+        fi
+    fi
+}
+
+# Function to start PT client
+start_pt_client() {
+    local dnstt_client
+    dnstt_client=$(find_dnstt_client) || return 1
+
+    print_info "Using dnstt-client: $dnstt_client"
+    print_info "Starting dnstt-client..."
+
+    # Set PT environment variables
+    export TOR_PT_MANAGED_TRANSPORT_VER="1"
+    export TOR_PT_CLIENT_TRANSPORTS="dnstt"
+
+    # Start client and capture output
+    local pt_output_file
+    pt_output_file=$(mktemp)
+
+    "$dnstt_client" -utls "$UTLS" > "$pt_output_file" 2>/dev/null &
+    CLIENT_PID=$!
+
+    # Give client time to start
+    sleep 2
+
+    # Parse SOCKS address from PT output
+    local socks_addr
+    socks_addr=$(grep "CMETHOD dnstt socks5" "$pt_output_file" | awk '{print $4}')
+    rm -f "$pt_output_file"
+
+    if [[ -z "$socks_addr" ]]; then
+        print_error "Failed to get SOCKS address from dnstt-client"
+        if [[ -n "$CLIENT_PID" ]]; then
+            kill "$CLIENT_PID" 2>/dev/null || true
+        fi
+        return 1
+    fi
+
+    PT_SOCKS_ADDR="$socks_addr"
+}
+
+# Function to create TCP proxy
+create_tcp_proxy() {
+    local socks_addr=$1
+
+    if ! command -v socat >/dev/null 2>&1; then
+        print_error "socat not found. Please install it: brew install socat"
+        return 1
+    fi
+
+    print_info "🔗 Creating TCP proxy from $LOCAL_ADDR to SOCKS proxy..."
+
+    local local_host local_port socks_host socks_port
+    local_host=$(echo "$LOCAL_ADDR" | cut -d: -f1)
+    local_port=$(echo "$LOCAL_ADDR" | cut -d: -f2)
+    socks_host=$(echo "$socks_addr" | cut -d: -f1)
+    socks_port=$(echo "$socks_addr" | cut -d: -f2)
+
+    # Create TCP proxy using socat
+    socat "TCP-LISTEN:$local_port,bind=$local_host,reuseaddr,fork" \
+          "SOCKS5:$socks_host:0.0.0.0:80,socksport=$socks_port" &
+    PROXY_PID=$!
+
+    print_success "✅ TCP proxy running on $LOCAL_ADDR (PID: $PROXY_PID)"
+}
+
+# Function to run connection tests
+run_tests() {
+    local socks_addr=$1
+
+    print_info "\n🧪 Running connection tests..."
+
+    if command -v torsocks >/dev/null 2>&1; then
+        print_info "\nTesting with torsocks:"
+        local cmd="torsocks -P $socks_addr curl -s http://httpbin.org/ip --max-time 10"
+        print_info "Command: $cmd"
+
+        if eval "$cmd" 2>/dev/null; then
+            print_success "✅ torsocks test successful!"
+        else
+            print_warning "❌ torsocks test failed"
+        fi
+    fi
+
+    if command -v proxychains-ng >/dev/null 2>&1; then
+        print_info "\nTesting with proxychains-ng:"
+
+        # Create temporary proxychains config
+        local pc_config
+        pc_config=$(mktemp)
+        cat > "$pc_config" << EOF
+strict_chain
+proxy_dns
+[ProxyList]
+socks5 $(echo "$socks_addr" | tr ':' ' ')
+EOF
+
+        local cmd="proxychains4 -f $pc_config curl -s http://httpbin.org/ip --max-time 10"
+        print_info "Command: $cmd"
+
+        if eval "$cmd" 2>/dev/null; then
+            print_success "✅ proxychains-ng test successful!"
+        else
+            print_warning "❌ proxychains-ng test failed"
+        fi
+
+        rm -f "$pc_config"
+    fi
+}
+
+# Function to show usage instructions
+show_usage_instructions() {
+    local socks_addr=$1
+
+    print_success "\n🚀 dnstt-client is now running!"
+    print_info "📍 SOCKS proxy: $socks_addr"
+    print_info "🔧 Configuration: domain=$DNS_TUNNEL, doh=$DOH_URL"
+
+    if [[ "$PROXY_MODE" == "true" ]]; then
+        print_success "\n🌐 Test your connection:"
+        print_info "   curl http://httpbin.org/ip"
+        print_info "   (should use the tunnel automatically)"
+    else
+        print_info "\nTo use the tunnel, you need PT-compatible tools:"
+        print_info "\n📋 Available tools:"
+
+        if command -v torsocks >/dev/null 2>&1; then
+            print_success "✅ torsocks: torsocks curl http://httpbin.org/ip"
+        else
+            print_warning "❌ torsocks: brew install torsocks"
+        fi
+
+        if command -v proxychains-ng >/dev/null 2>&1; then
+            print_success "✅ proxychains-ng: proxychains4 curl http://httpbin.org/ip"
+        else
+            print_warning "❌ proxychains-ng: brew install proxychains-ng"
+        fi
+
+        print_info "\n🔧 Manual configuration:"
+        print_info "   - Configure app to use SOCKS5 proxy: $socks_addr"
+        print_info "   - Pass PT args: domain=$DNS_TUNNEL&pubkey=[truncated]&doh=$DOH_URL"
+        print_info "\n🚀 Quick setup: start_dnstt_pt --proxy (creates TCP proxy on $LOCAL_ADDR)"
+    fi
+}
+
+# Function to parse arguments
+parse_arguments() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --test)
+                TEST_MODE=true
+                shift
+                ;;
+            --proxy)
+                PROXY_MODE=true
+                shift
+                ;;
+            --help|-h)
+                show_help
+                exit 0
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                print_info "Use --help for usage information"
+                exit 1
+                ;;
+        esac
+    done
+}
+
+# Main function
+main() {
+    # Parse command line arguments
+    parse_arguments "$@"
+
+    # Setup signal handlers
+    trap cleanup EXIT INT TERM
+
+    # Validate environment
+    validate_environment || exit 1
+
+    # Read pubkey from file
+    local pubkey
+    pubkey=$(cat "$DNSTT_PUB_KEY_PATH" | tr -d '\n\r\t ')
+
+    # Show startup info
+    print_info "Starting dnstt-client with PT interface..."
+    print_info "Domain: $DNS_TUNNEL"
+    print_info "Local address: $LOCAL_ADDR"
+    print_info "DoH URL: $DOH_URL"
+
+    # Install PT tools if needed
+    install_pt_tools
+
+    # Start PT client
+    start_pt_client || exit 1
+    local socks_addr="$PT_SOCKS_ADDR"
+
+    print_success "dnstt-client listening on SOCKS: $socks_addr"
+
+    # Create TCP proxy if requested
+    if [[ "$PROXY_MODE" == "true" ]]; then
+        create_tcp_proxy "$socks_addr" || exit 1
+    fi
+
+    # Show usage instructions
+    show_usage_instructions "$socks_addr"
+
+    # Run tests if requested
+    if [[ "$TEST_MODE" == "true" ]]; then
+        run_tests "$socks_addr"
+    fi
+
+    # Show process info and wait
+    if [[ "$PROXY_MODE" == "true" ]]; then
+        print_info "\nPress Ctrl+C to stop (Client PID: $CLIENT_PID, Proxy PID: $PROXY_PID)"
+    else
+        print_info "\nPress Ctrl+C to stop (Client PID: $CLIENT_PID)"
+    fi
+
+    # Keep script running until interrupted
+    while kill -0 "$CLIENT_PID" 2>/dev/null; do
+        sleep 1
+    done
+}
+
+# Run main function with all arguments
+main "$@"

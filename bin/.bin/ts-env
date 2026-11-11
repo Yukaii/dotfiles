@@ -576,6 +576,45 @@ curl_via() {
     exec curl --proxy "socks5h://${SOCKS_ADDR}" "${REST_ARGS[@]}"
 }
 
+# Launch an isolated Chrome profile whose traffic all goes through this tailnet.
+chrome_via() {
+    parse_name_and_rest "$@"
+    require_socks
+
+    CHROME_APP="${TS_ENV_CHROME_APP:-Google Chrome}"
+    # Kept outside the container's data dir (that one is mounted into the container).
+    XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+    PROFILE_DIR="${XDG_DATA_HOME}/ts-env/chrome/${UNIQUE_NAME}"
+    mkdir -p "${PROFILE_DIR}"
+
+    # Fail early instead of opening a browser where every page errors out.
+    if ! nc -z -G 3 "${SOCKS_ADDR%:*}" "${SOCKS_ADDR##*:}" 2>/dev/null \
+        && ! nc -z -w 3 "${SOCKS_ADDR%:*}" "${SOCKS_ADDR##*:}" 2>/dev/null; then
+        echo "Error: SOCKS5 proxy ${SOCKS_ADDR} is not answering. Try: ${PROG} debug --name ${UNIQUE_NAME}" >&2
+        exit 1
+    fi
+
+    # socks5:// in Chrome resolves hostnames on the proxy side (MagicDNS works).
+    # The resolver rule stops local DNS lookups (prefetch etc.) from leaking.
+    CHROME_ARGS=(
+        --user-data-dir="${PROFILE_DIR}"
+        --proxy-server="socks5://${SOCKS_ADDR}"
+        --host-resolver-rules="MAP * ~NOTFOUND, EXCLUDE 127.0.0.1"
+        --proxy-bypass-list="<-loopback>"
+        --no-first-run
+        --no-default-browser-check
+    )
+
+    echo "Opening ${CHROME_APP} (profile: ${PROFILE_DIR}) via socks5://${SOCKS_ADDR}"
+    if [ "$(uname)" = "Darwin" ]; then
+        # -n: new instance, so it runs alongside your normal Chrome.
+        open -na "${CHROME_APP}" --args "${CHROME_ARGS[@]}" "${REST_ARGS[@]}"
+    else
+        BIN="${TS_ENV_CHROME_BIN:-$(command -v google-chrome || command -v chromium || command -v chromium-browser)}"
+        nohup "${BIN}" "${CHROME_ARGS[@]}" "${REST_ARGS[@]}" >/dev/null 2>&1 &
+    fi
+}
+
 # --- MAIN LOGIC ---
 
 COMMAND=$1
@@ -624,6 +663,9 @@ case "$COMMAND" in
   curl)
     curl_via "$@"
     ;;
+  chrome)
+    chrome_via "$@"
+    ;;
   reconnect)
     tailscale_reconnect "$@"
     ;;
@@ -645,7 +687,7 @@ FIRST TIME SETUP:
   2. Run a container: ${PROG} run --name work --socks5-port 1080
   3. Log in:          ${PROG} login --name work
 
-Usage: ${PROG} {build|run|login|status|env|ssh|ssh-config|curl|logs|shell|list|stop|wipe|debug|reconnect} [options]
+Usage: ${PROG} {build|run|login|status|env|ssh|ssh-config|curl|chrome|logs|shell|list|stop|wipe|debug|reconnect} [options]
 
 Commands:
   build [--image-name <name>]
@@ -670,6 +712,10 @@ Commands:
                              through this container.
   curl --name <name> [curl args...]
                              curl through that tailnet.
+  chrome --name <name> [url...]
+                             Open a separate Chrome profile that browses via that
+                             tailnet. Profile: ~/.local/share/ts-env/chrome/<name>.
+                             TS_ENV_CHROME_APP picks the app (e.g. "Brave Browser").
 
   logs --name <name>         Follow the container logs.
   shell --name <name> [--command 'cmd']

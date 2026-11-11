@@ -1,5 +1,71 @@
 # Some useful shell script I made
 
+## [`switch-app-icon`](./.bin/switch-app-icon)
+
+Set a Finder custom icon on a macOS application from any supported image format.
+Reset it with `--reset` before redistributing or strictly verifying a signed app.
+
+```bash
+switch-app-icon "Ghostty" ~/Pictures/ghostty.png
+switch-app-icon --reset "Ghostty"
+```
+
+## [`switch-image-type`](./.bin/switch-image-type)
+
+Convert an image based on the output filename's extension. It uses macOS `sips`
+and supports formats such as PNG, JPEG, HEIC, TIFF, WebP input, and ICNS output.
+
+```bash
+switch-image-type photo.webp photo.png
+switch-image-type logo.png AppIcon.icns
+```
+
+## [`appify-sh`](./.bin/appify-sh)
+
+Turn TUI commands into native, lightweight macOS `.app` bundles powered by Kitty, WezTerm, or Ghostty. Replaces heavy embedded wrappers with native terminal backends to preserve battery life while retaining custom Dock icons, application switcher entries, and dedicated windows.
+
+### Usage
+
+```bash
+appify-sh [options] [--] <command> [args...]
+```
+
+### Options
+
+- `-n, --name <name>`: Application display name (default: derived from command)
+- `-i, --icon <path>`: Path to icon (`.png` or `.icns`)
+- `-t, --terminal <engine>`: Terminal backend: `kitty` (default), `wezterm`, or `ghostty`
+- `-o, --output <dir>`: Output directory (default: `~/Applications`)
+- `-b, --bundle-id <id>`: Bundle Identifier (default: `com.local.<name>`)
+- `-e, --env <KEY=VAL>`: Set environment variable (can be used multiple times)
+- `--cwd <path>`: Initial working directory
+- `--shell`: Run command inside an interactive login shell (`${SHELL:-/bin/zsh} -ilc`), so `.zprofile`/`.zshrc` run and TUI tools get mise activation, aliases, colors, and shell integration
+- `--helper`: Ghostty only, bundle a private, ad-hoc signed Ghostty helper app for a self-contained Dock/Cmd-Tab identity
+- `-h, --help`: Show help message
+
+### Backends & Findings
+
+- **`kitty` (default)**: Works best if you want full Kitty image protocol support (inline images, avatars, album art). Automatically configured with `-o confirm_os_window_close=0` for prompt-free launch and clean exit.
+- **`wezterm`**: Works well, reliable, and prompt-free.
+- **`ghostty`**: Opens a dedicated Ghostty window with the command as its initial surface, preserving command arguments without triggering wrapper lifecycle or saved-window restoration alerts. With `--helper`, a private copy of Ghostty is embedded under the app's `Resources/` and re-signed ad-hoc, giving the generated app its own standalone Dock and Cmd-Tab identity. The bundle icon is applied at runtime from the bundled `AppIcon.icns`, so the app stays self-contained and can be moved anywhere.
+
+### Examples
+
+```bash
+# Create Concord app with Kitty graphics protocol support (default)
+appify-sh -n "Concord" -i /Applications/Discord.app/Contents/Resources/electron.icns -- concord
+
+# Create SpotaTUI app using Kitty backend
+appify-sh -n "SpotaTUI" -i /Applications/Spotify.app/Contents/Resources/AppIcon.icns -- spotatui
+
+# Create Btop app using WezTerm backend
+appify-sh -n "Btop" -t wezterm -- btop
+
+# Create a standalone Fresh editor app with its own bundled Ghostty helper
+appify-sh --helper -n "Fresh" -t ghostty \
+  -i /path/to/fresh.png -- fresh
+```
+
 ## [`ncduu`](./.bin/ncduu)
 
 A simple wrapper around `ncdu`. It deals with result caching in `/tmp` automatically.
@@ -253,4 +319,3 @@ If you encounter issues:
 3. Verify that you have the necessary permissions to execute the script and read the profile files.
 
 For further assistance, please open an issue on the project's repository.
-

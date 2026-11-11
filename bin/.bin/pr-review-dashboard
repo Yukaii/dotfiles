@@ -1,0 +1,297 @@
+#!/usr/bin/env bash
+# Lightweight PR-review dashboard using only GitHub CLI and jq.
+#
+# Usage:
+#   pr-review-dashboard --repo OWNER/REPO
+#   pr-review-dashboard --repo OWNER/REPO --no-tui
+#   pr-review-dashboard --repo OWNER/REPO --hours 24 --days 30
+#
+# Authenticate once before use: gh auth login
+
+set -euo pipefail
+
+GH_BIN="${GH_BIN:-gh}"
+REPO=""
+SLA_HOURS=24
+LOOKBACK_DAYS=30
+NO_TUI=false
+
+usage() {
+  cat <<'EOF'
+PR review dashboard
+
+Options:
+  -R, --repo OWNER/REPO  Repository to inspect (defaults to current gh repo)
+  -H, --hours HOURS      First-review SLA in clock hours (default: 24)
+  -D, --days DAYS        Lookback for merged-PR summary (default: 30)
+      --no-tui           Print the current queue once and exit
+  -h, --help             Show this help
+
+Examples:
+  pr-review-dashboard -R acme/api
+  pr-review-dashboard -R acme/api -H 8 -D 14
+EOF
+}
+
+die() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "Required command not found: $1"
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -R | --repo)
+      [[ $# -ge 2 ]] || die "$1 requires OWNER/REPO"
+      REPO="$2"
+      shift 2
+      ;;
+    -H | --hours)
+      [[ $# -ge 2 ]] || die "$1 requires a whole number of hours"
+      SLA_HOURS="$2"
+      shift 2
+      ;;
+    -D | --days)
+      [[ $# -ge 2 ]] || die "$1 requires a whole number of days"
+      LOOKBACK_DAYS="$2"
+      shift 2
+      ;;
+    --no-tui)
+      NO_TUI=true
+      shift
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown option: $1"
+      ;;
+  esac
+done
+
+require_command "$GH_BIN"
+require_command jq
+
+[[ "$SLA_HOURS" =~ ^[0-9]+$ ]] || die "--hours must be a whole number"
+[[ "$LOOKBACK_DAYS" =~ ^[0-9]+$ ]] || die "--days must be a whole number"
+
+# jq's --argjson rejects numbers with leading zeroes, while Bash arithmetic
+# accepts them as octal. Normalize explicitly as decimal integers.
+SLA_HOURS=$((10#$SLA_HOURS))
+LOOKBACK_DAYS=$((10#$LOOKBACK_DAYS))
+
+if [[ -z "$REPO" ]]; then
+  if ! REPO="$("$GH_BIN" repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null)"; then
+    die "Pass --repo OWNER/REPO, or run this inside a GitHub repository."
+  fi
+fi
+
+[[ "$REPO" =~ ^[^/[:space:]]+/[^/[:space:]]+$ ]] || die "Expected OWNER/REPO, got: $REPO"
+
+OWNER="${REPO%%/*}"
+NAME="${REPO#*/}"
+
+OPEN_QUERY='query($owner: String!, $name: String!, $first: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequests(first: $first, states: OPEN, orderBy: {field: UPDATED_AT, direction: DESC}) {
+      nodes {
+        number title url isDraft createdAt updatedAt reviewDecision additions deletions changedFiles
+        author { login }
+        reviewRequests(first: 20) {
+          nodes { requestedReviewer { ... on User { login } ... on Team { slug name } } }
+        }
+        reviews(first: 100) {
+          nodes { submittedAt author { login } }
+        }
+        timelineItems(first: 100, itemTypes: [READY_FOR_REVIEW_EVENT, REVIEW_REQUESTED_EVENT]) {
+          nodes {
+            __typename
+            ... on ReadyForReviewEvent { createdAt }
+            ... on ReviewRequestedEvent { createdAt }
+          }
+        }
+      }
+    }
+  }
+}'
+
+MERGED_QUERY='query($owner: String!, $name: String!, $first: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequests(first: $first, states: MERGED, orderBy: {field: UPDATED_AT, direction: DESC}) {
+      nodes {
+        number title createdAt mergedAt author { login }
+        timelineItems(first: 100, itemTypes: [READY_FOR_REVIEW_EVENT, REVIEW_REQUESTED_EVENT]) {
+          nodes {
+            __typename
+            ... on ReadyForReviewEvent { createdAt }
+            ... on ReviewRequestedEvent { createdAt }
+          }
+        }
+        reviews(first: 100) { nodes { state submittedAt author { login } } }
+      }
+    }
+  }
+}'
+
+graphql() {
+  local query="$1"
+  local payload error_message
+
+  if ! payload="$("$GH_BIN" api graphql -f query="$query" -f owner="$OWNER" -f name="$NAME" -F first=100)"; then
+    die "GitHub API request failed. Check that gh is authenticated with: gh auth status"
+  fi
+
+  if jq -e '(.errors // []) | length > 0' >/dev/null <<<"$payload"; then
+    error_message="$(jq -r '(.errors // []) | map(.message // "Unknown GraphQL error") | join("; ")' <<<"$payload")"
+    die "GitHub API error: $error_message"
+  fi
+
+  jq -e '.data.repository != null' >/dev/null <<<"$payload" ||
+    die "GitHub API returned no repository data for $REPO"
+
+  printf '%s\n' "$payload"
+}
+
+fetch_open() {
+  graphql "$OPEN_QUERY"
+}
+
+fetch_merged() {
+  graphql "$MERGED_QUERY"
+}
+
+format_table() {
+  if command -v column >/dev/null 2>&1; then
+    column -t -s $'\t'
+  else
+    cat
+  fi
+}
+
+show_queue() {
+  local payload counts
+  payload="$(fetch_open)"
+
+  printf '\n%s — PRs waiting for review (SLA: %sh)\n\n' "$REPO" "$SLA_HOURS"
+  jq -r --argjson sla "$SLA_HOURS" '
+    def ready_at:
+      ([.timelineItems.nodes[]?
+        | select(.__typename == "ReadyForReviewEvent" or .__typename == "ReviewRequestedEvent")
+        | .createdAt] | max) // .createdAt;
+    (now) as $now
+    | [.data.repository.pullRequests.nodes[]?
+      | select(.isDraft | not)
+      | .readyAt = ready_at
+      | . as $pr
+      | .reviewCount = ([$pr.reviews.nodes[]?
+          | select(.submittedAt != null and .submittedAt >= $pr.readyAt)] | length)
+      | select(.reviewCount == 0)
+      | .waitHours = (($now - (.readyAt | fromdateiso8601)) / 3600 | floor)
+      | .reviewers = ([.reviewRequests.nodes[]?.requestedReviewer
+          | (.login // .slug // .name // "unknown")] | join(", "))]
+    | sort_by(.waitHours) | reverse
+    | (["AGE", "PR", "AUTHOR", "REVIEWERS", "SIZE", "TITLE"] | @tsv),
+      (.[] | [
+        (if .waitHours >= $sla then "! " else "  " end) + (.waitHours | tostring) + "h",
+        ("#" + (.number | tostring)),
+        (.author.login // "ghost"),
+        (if .reviewers == "" then "unassigned" else .reviewers end),
+        ((.additions + .deletions | tostring) + " lines"),
+        (.title | gsub("[\\t\\r\\n]"; " ") | .[0:58])
+      ] | @tsv)
+  ' <<<"$payload" | format_table
+
+  counts="$(jq -r --argjson sla "$SLA_HOURS" '
+    def ready_at:
+      ([.timelineItems.nodes[]?
+        | select(.__typename == "ReadyForReviewEvent" or .__typename == "ReviewRequestedEvent")
+        | .createdAt] | max) // .createdAt;
+    (now) as $now
+    | [.data.repository.pullRequests.nodes[]?
+      | select(.isDraft | not)
+      | .readyAt = ready_at
+      | . as $pr
+      | select(([$pr.reviews.nodes[]?
+          | select(.submittedAt != null and .submittedAt >= $pr.readyAt)] | length) == 0)
+      | (($now - (.readyAt | fromdateiso8601)) / 3600 | floor)]
+    | {waiting: length, overdue: map(select(. >= $sla)) | length}
+    | "\(.waiting) waiting; \(.overdue) beyond SLA"
+  ' <<<"$payload")"
+  printf '\n%s\n' "$counts"
+}
+
+show_summary() {
+  local payload cutoff
+  payload="$(fetch_merged)"
+  cutoff="$(($(date +%s) - LOOKBACK_DAYS * 86400))"
+
+  printf '\n%s — merged PR first-review summary (last %s days)\n\n' "$REPO" "$LOOKBACK_DAYS"
+  jq -r --argjson cutoff "$cutoff" --argjson sla "$SLA_HOURS" '
+    def ready_at:
+      ([.timelineItems.nodes[]?
+        | select(.__typename == "ReadyForReviewEvent" or .__typename == "ReviewRequestedEvent")
+        | .createdAt] | max) // .createdAt;
+    [.data.repository.pullRequests.nodes[]?
+      | select(.mergedAt != null and (.mergedAt | fromdateiso8601) >= $cutoff)
+      | .readyAt = ready_at
+      | . as $pr
+      | .firstReviewAt = ([$pr.reviews.nodes[]?
+          | select(.submittedAt != null and .submittedAt >= $pr.readyAt)
+          | .submittedAt] | min)
+      | select(.firstReviewAt != null)
+      | ((.firstReviewAt | fromdateiso8601) - (.readyAt | fromdateiso8601)) / 3600]
+    | sort
+    | if length == 0 then
+        "No merged PRs with a review event in this period."
+      else
+        . as $hours
+        | ($hours | length) as $n
+        | ($hours[(($n - 1) * 0.50 | floor)]) as $p50
+        | ($hours[(($n - 1) * 0.85 | floor)]) as $p85
+        | (($hours | map(select(. <= $sla)) | length) / $n * 100) as $within
+        | "PRs measured: \($n)\n" +
+          "p50 time to first review: \($p50 | floor)h\n" +
+          "p85 time to first review: \($p85 | floor)h\n" +
+          "within \($sla)h SLA: \($within | floor)%"
+      end
+  ' <<<"$payload"
+  printf '\n'
+}
+
+if "$NO_TUI"; then
+  show_queue
+  exit 0
+fi
+
+[[ -t 0 && -t 1 ]] || die "Interactive mode requires a terminal; use --no-tui for one-shot output."
+
+while true; do
+  if [[ -t 1 ]] && command -v clear >/dev/null 2>&1; then
+    clear
+  fi
+  printf 'PR Review Dashboard — %s\n\n' "$REPO"
+  printf '1) Current review queue\n2) Last %s-day summary\n3) Refresh\nq) Quit\n\n' "$LOOKBACK_DAYS"
+  if ! read -r -p 'Choose: ' choice; then
+    exit 0
+  fi
+  case "$choice" in
+    1)
+      show_queue
+      read -r -p 'Press Enter to return…' _ || true
+      ;;
+    2)
+      show_summary
+      read -r -p 'Press Enter to return…' _ || true
+      ;;
+    3) continue ;;
+    q | Q) exit 0 ;;
+    *)
+      printf 'Unknown choice.\n'
+      sleep 1
+      ;;
+  esac
+done
