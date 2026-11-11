@@ -1,0 +1,19 @@
+# herdr-core (`hc`) settings. This is the core that herdr-app and `hc` share;
+# the herdr TUI config stays at ~/.config/herdr/config.toml.
+# Changes apply to the next new shell or `keep` recovery, no restart needed.
+
+# Shell for new terminals and keep recovery. Migrated from herdr's
+# `[terminal] default_shell = "/opt/homebrew/bin/fish"`. `-l` keeps the login
+# shell herdr's `shell_mode = "auto"` used on macOS. Default: $SHELL -l.
+shell = ["/opt/homebrew/bin/fish", "-l"]
+
+# Other keys, defaults shown:
+# detach_key = 'ctrl+\'   # chord that detaches `hc attach`
+# wait_timeout = 180      # seconds before a waiting `hc run` checks in
+# notes = true            # parent notes and <hc> tags between agents
+# notes_quiet = 3         # seconds of quiet before a parent note
+# draft_wait = 60         # seconds a draft holds sends/notes; 0 disables it
+# headless = "200x120"    # size of a terminal nobody is attached to
+# history_mb = 5          # scrollback kept per live terminal
+# machine_timeout = 30    # seconds another machine gets to answer
+# socket = ...            # where the core listens; default under $XDG_RUNTIME_DIR

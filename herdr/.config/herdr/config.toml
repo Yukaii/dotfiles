@@ -37,6 +37,10 @@ show_agent_labels_on_pane_borders = false
 prompt_new_tab_name = false
 pane_gaps = false
 pane_outer_borders = false
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "datetime", format = "%H:%M" },
+]
 
 [experimental]
 kitty_graphics = true
