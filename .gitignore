@@ -68,3 +68,9 @@ giallo-kak/.config/giallo.kak/themes/*.json
 !.gitkeep
 
 tmp
+
+lazygit/Library/Application\ Support/lazygit/github_pull_requests.json
+
+voxtype/.config/voxtype/osd/voxtype-osd
+__pycache__/
+*.pyc
