@@ -1,0 +1,146 @@
+#!/usr/bin/env node
+'use strict';
+
+/*
+ * Why this exists
+ *
+ * On one network path to api.anthropic.com, IPv4 packets through 1,492 bytes
+ * reached the server and packets just above that size triggered a TCP reset.
+ * A padded X25519 ClientHello reproduced the failure, and the same bytes
+ * succeeded when sent in smaller writes. The larger hybrid TLS handshake
+ * can hit that cutoff, as can a bulk upload after a successful handshake.
+ * This points to a packet-size problem along the path. The 1,492-byte
+ * cutoff is consistent with PPPoE. The device responsible remains unknown.
+ * This CONNECT proxy spaces outbound writes and lets the client negotiate
+ * and verify TLS directly with Anthropic.
+ *
+ * Credential-free check (OpenSSL 3.5 or later)
+ *
+ * On the affected network, run this directly:
+ *   openssl s_client -connect api.anthropic.com:443 -servername api.anthropic.com \
+ *     -verify_hostname api.anthropic.com -verify_return_error -tls1_3 \
+ *     -groups X25519MLKEM768 -brief </dev/null
+ *
+ * Start claude-network-proxy and repeat the same handshake through it:
+ *   openssl s_client -proxy 127.0.0.1:17843 -connect api.anthropic.com:443 \
+ *     -servername api.anthropic.com -verify_hostname api.anthropic.com \
+ *     -verify_return_error -tls1_3 -groups X25519MLKEM768 -brief </dev/null
+ *
+ * The direct test reset on the affected network. The proxied test reported
+ * TLSv1.3, Verification: OK, and negotiated X25519MLKEM768. Use the configured
+ * port in the second command if you start the proxy with --port.
+ */
+
+const { once } = require('node:events');
+const http = require('node:http');
+const net = require('node:net');
+const { setTimeout: delay } = require('node:timers/promises');
+
+const defaultPort = 17843;
+const hosts = new Set([
+  'api.anthropic.com',
+  'claude.ai',
+  'platform.claude.com',
+  'console.anthropic.com',
+]);
+const [option, value, ...extra] = process.argv.slice(2);
+const port = option === '--port' ? Number(value) : defaultPort;
+
+function instructions(port) {
+  const address = `http://127.0.0.1:${port}`;
+  return [
+    `Proxy URL: ${address}`,
+    '',
+    'Magpie: Edit the Claude subscription provider. Under Proxy, choose',
+    `Custom for your Claude account and enter ${address}.`,
+    'Keep T3 Code pointed at Magpie and leave Magpie’s global proxy setting alone.',
+    '',
+    'Other Claude clients or gateways: Set their outbound HTTP CONNECT',
+    `proxy to ${address} and keep their existing API endpoint.`,
+    `For clients that read proxy environment variables, set HTTPS_PROXY=${address}`,
+    `and https_proxy=${address} for that client process.`,
+    'The proxy accepts CONNECT to Anthropic hosts on port 443 and preserves TLS end to end.',
+    '',
+    'Keep this terminal open while using the proxy. Press Ctrl-C to stop it.',
+    'Clear the client’s proxy setting when you return to a network that works.',
+  ].join('\n');
+}
+
+if ((option === '--help' || option === '-h') && !value) {
+  console.log(`Usage: claude-network-proxy [--port PORT]\n\n${instructions(defaultPort)}`);
+  process.exit(0);
+}
+if (option !== undefined && (option !== '--port' || extra.length ||
+  !/^\d+$/.test(value ?? '') || port < 1 || port > 65535)) {
+  console.error('Usage: claude-network-proxy [--port PORT]');
+  process.exit(2);
+}
+
+const clients = new Set();
+const proxy = http.createServer((request, response) => response.writeHead(405).end());
+proxy.on('connection', (client) => {
+  clients.add(client);
+  client.once('close', () => clients.delete(client));
+});
+
+proxy.on('connect', async (request, client, head) => {
+  const target = /^([a-z0-9][a-z0-9.-]*):443$/i.exec(request.url);
+  const hostname = target?.[1].toLowerCase();
+  if (!hosts.has(hostname)) {
+    client.end('HTTP/1.1 403 Forbidden\r\nConnection: close\r\n\r\n');
+    return;
+  }
+
+  const upstream = net.connect({ host: hostname, port: 443, noDelay: true });
+  const controller = new AbortController();
+  const wait = { signal: controller.signal };
+  client.pause();
+  client.once('close', () => {
+    controller.abort();
+    upstream.destroy();
+  });
+  client.on('error', () => upstream.destroy());
+  upstream.on('error', () => client.destroy());
+  upstream.setTimeout(10000, () => upstream.destroy(new Error('Connection timed out')));
+
+  // Space out small TCP writes so the affected network can carry the original TLS stream.
+  async function sendPaced(chunk) {
+    for (let offset = 0; offset < chunk.length; offset += 700) {
+      if (!upstream.write(chunk.subarray(offset, offset + 700))) {
+        await once(upstream, 'drain', wait);
+      }
+      await delay(20, undefined, wait);
+    }
+  }
+
+  try {
+    await once(upstream, 'connect', wait);
+    upstream.setTimeout(0);
+    client.write('HTTP/1.1 200 Connection Established\r\n\r\n');
+    upstream.pipe(client);
+    await sendPaced(head);
+    for await (const chunk of client) await sendPaced(chunk);
+    upstream.end();
+  } catch {
+    client.destroy();
+    upstream.destroy();
+  }
+});
+
+proxy.once('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${port} is already in use. Stop the earlier proxy or choose another port with --port.`);
+  } else {
+    console.error(`Could not start the proxy: ${error.message}`);
+  }
+  process.exitCode = 1;
+});
+
+function stop() {
+  proxy.close();
+  for (const client of clients) client.destroy();
+}
+
+process.once('SIGINT', stop);
+process.once('SIGTERM', stop);
+proxy.listen(port, '127.0.0.1', () => console.log(instructions(port)));
